@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-140                              */
+/*                              boOX 0_iskra-144                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 0_iskra-140                                                   */
+/* smtcbs.cpp / 0_iskra-144                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories

@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-140                              */
+/*                              boOX 0_iskra-144                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 0_iskra-140                                                      */
+/* cbs.cpp / 0_iskra-144                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -2802,7 +2802,6 @@ namespace boOX
 									   sInt_32                    cost_limit,
 									   sInt_32                    extra_cost)
     {
-	printf("Alpha 1\n");
 	sInt_32 cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 
@@ -2883,8 +2882,6 @@ namespace boOX
 	    }
             #endif
 
-	    printf("Search queue size:%ld\n", search_Queue.size());
-	    
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -3579,7 +3576,7 @@ namespace boOX
 
     sInt_32 sCBS::find_NonconflictingPaths_principalCollision(const sInstance           &instance,
 							      AgentConflicts_vector     &agent_Conflicts,
-							      AgentEdgeConflicts_vector &agent_edge_Conflicts,							      
+							      AgentEdgeConflicts_vector &agent_edge_Conflicts,
 							      AgentPaths_vector         &agent_Paths,
 							      sInt_32                    cost_limit) const
     {    
@@ -3656,6 +3653,14 @@ namespace boOX
 		    sequencing_begin = clock();
 		}
 		#endif
+
+		/*
+		printf("Queue:%d,%d\n", search_Queue.size());
+		printf("update_agent:%d\n", best_node.m_upd_agent_id);
+		printf("  conflicts:%d\n", best_node.m_agent_Conflicts[best_node.m_upd_agent_id].size());
+		printf("  edge conflicts:%d\n", best_node.m_agent_edge_Conflicts[best_node.m_upd_agent_id].size());
+		*/
+		
 		if (find_NonconflictingSequence(instance.m_environment,
 						instance.m_start_configuration.get_AgentLocation(best_node.m_upd_agent_id),
 						instance.m_goal_configuration.get_AgentLocation(best_node.m_upd_agent_id),
@@ -3962,7 +3967,7 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
-
+/*
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -3975,6 +3980,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+*/
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -3987,28 +3993,47 @@ namespace boOX
 		}
 		#endif
 
+		/*
 		#ifdef sDEBUG
 		{
 		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
 		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
 		}
 		#endif		
-
+		*/
+		
 		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
 					   best_node.m_node_id,
 					   search_Store);	
-
+		/*
 		#ifdef sDEBUG
 		{
 		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
 		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
 		}
 		#endif
+		*/
 
 		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
 				       best_node.m_node_id,
 				       search_Store);		
 		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+
+		/*
+		printf("Node STACK:\n");
+		sInt_32 nd_id = best_node.m_node_id;
+		std::vector<sInt_32> print_buff;
+		while (nd_id > 0)
+		{
+		    print_buff.push_back(nd_id);
+		    nd_id = search_Store[nd_id].m_upper_node_id;
+		}
+		for (std::vector<sInt_32>::const_reverse_iterator nd = print_buff.rbegin(); nd != print_buff.rend(); ++nd)
+		{
+		    printf("%d ", *nd);
+		}
+		printf("\n--------\n");
+		*/
 	
 		if (findStar_NonconflictingSequence(instance.m_environment,
 						    instance.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
@@ -11097,6 +11122,7 @@ namespace boOX
 		    #endif
 		    */
 		    
+
 		    if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(neighbor_id) == Conflicts[front_visit.m_level + 1].end())
 		    {
 			/*
@@ -11247,7 +11273,7 @@ namespace boOX
 	    printf("seq:%d -> %d\n", source_id, sink_id);
 	}
 	#endif
-		
+
 	Visits_list visit_Queue;
 	Visits_vector visited_Vertices;
        
@@ -11389,7 +11415,7 @@ namespace boOX
 				{
 				    sInt_32 prev_vertex_id = sink_id;
 				    Path.resize(front_visit.m_level + 2, -1);
-				    
+/* Lamda				    
 				    #ifdef sDEBUG
 				    {
 					printf("Path:\n");
@@ -11409,25 +11435,30 @@ namespace boOX
 					printf("P:");
 				    }
 				    #endif
+*/
 				    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
 				    {
 					Path[i] = prev_vertex_id;
+					/*
                                         #ifdef sDEBUG
 					{
 					    printf("%d ", Path[i]);
 					}
 				        #endif
+					*/
 					Visits_umap::const_iterator prev_visit = visited_Vertices[i].find(prev_vertex_id);
 					
 					sASSERT(prev_visit != visited_Vertices[i].end());
 					
 					prev_vertex_id = prev_visit->second.m_previous_id;
 				    }
+				    /*
 				    #ifdef sDEBUG
 				    {
 					printf("\n");
 				    }
 				    #endif
+				    */
 
 				    return front_visit.m_level + 2;
 				}			
@@ -11489,7 +11520,8 @@ namespace boOX
 				{
 				    sInt_32 prev_vertex_id = sink_id;
 				    Path.resize(front_visit.m_level + 1, -1);
-				
+				    
+				    /*
 				    #ifdef sDEBUG
 				    {
 					printf("Path:\n");
@@ -11503,7 +11535,7 @@ namespace boOX
 					}
 				    }
 				    #endif
-
+				    */
 				    for (sInt_32 i = front_visit.m_level; i >= 0; --i)
 				    {
 					Path[i] = prev_vertex_id;
@@ -11689,7 +11721,8 @@ namespace boOX
 				    {
 					sInt_32 prev_vertex_id = sink_id;
 					Path.resize(front_visit.m_level + 2, -1);
-					
+
+					/* Lambda
                                         #ifdef sDEBUG
 					{
 					    printf("Path:\n");
@@ -11709,26 +11742,30 @@ namespace boOX
 					    printf("P:");
 					}
 				        #endif
+					*/
 					for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
 					{
 					    Path[i] = prev_vertex_id;
+					    /*
                                             #ifdef sDEBUG
 					    {
 						printf("%d ", Path[i]);
 					    }
 				            #endif
+					    */
 					    Visits_umap::const_iterator prev_visit = visited_Vertices[i].find(prev_vertex_id);
 					    
 					    sASSERT(prev_visit != visited_Vertices[i].end());
 					    
 					    prev_vertex_id = prev_visit->second.m_previous_id;
 					}
+					/*
 				        #ifdef sDEBUG
 					{
 					    printf("\n");
 					}
 				        #endif
-
+					*/
 					return front_visit.m_level + 2;
 				    }	 		
 				}			    

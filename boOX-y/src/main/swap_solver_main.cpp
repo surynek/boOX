@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-140                              */
+/*                              boOX 0_iskra-144                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.cpp / 0_iskra-140                                         */
+/* swap_solver_main.cpp / 0_iskra-144                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
@@ -77,11 +77,11 @@ namespace boOX
     void print_Help(void)
     {
 	printf("Usage:\n");
-	printf("tswap_solver_boOX  --input-file=<string>\n");
-	printf("                   --output-file=<sting>\n");
-	printf("                  [--cost-limit=<int>]\n");
-	printf("                  [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+}]\n");		
-        printf("		  [--timeout=<double>]\n");
+	printf("swap_solver_boOX  --input-file=<string>\n");
+	printf("                  --output-file=<sting>\n");
+	printf("                 [--cost-limit=<int>]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+}]\n");		
+        printf("	         [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
 	printf("tswap_solver_boOX --input-file=grid_02x02_t04.tkn\n");

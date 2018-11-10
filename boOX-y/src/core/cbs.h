@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-140                              */
+/*                              boOX 0_iskra-144                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 0_iskra-140                                                        */
+/* cbs.h / 0_iskra-144                                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -329,7 +329,9 @@ namespace boOX
 	    
 	    AgentPaths_vector m_agent_Paths;
 	    AgentConflicts_vector m_agent_Conflicts;
-	    AgentEdgeConflicts_vector m_agent_edge_Conflicts;	    
+	    AgentEdgeConflicts_vector m_agent_edge_Conflicts;
+
+	    sInt_32 mm_depth;
 	};
 
 	typedef std::vector<Node> Nodes_vector;

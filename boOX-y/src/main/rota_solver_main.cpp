@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-140                              */
+/*                              boOX 0_iskra-144                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.cpp / 0_iskra-140                                         */
+/* rota_solver_main.cpp / 0_iskra-144                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.
@@ -77,11 +77,11 @@ namespace boOX
     void print_Help(void)
     {
 	printf("Usage:\n");
-	printf("tswap_solver_boOX  --input-file=<string>\n");
-	printf("                   --output-file=<sting>\n");
-	printf("                  [--cost-limit=<int>]\n");
-	printf("                  [--algorithm={cbs|cbs+|cbs++|smtcbs}]\n");
-        printf("		  [--timeout=<double>]\n");
+	printf("swap_solver_boOX  --input-file=<string>\n");
+	printf("                  --output-file=<sting>\n");
+	printf("                 [--cost-limit=<int>]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+}]\n");
+        printf("		 [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
 	printf("tswap_solver_boOX --input-file=grid_02x02_t04.tkn\n");
@@ -164,6 +164,19 @@ namespace boOX
 	    cost = smtcbs_Solver.find_ShortestNonconflictingRotation(solution, parameters.m_cost_limit);
 	    break;
 	}
+	case sCommandParameters::ALGORITHM_SMTCBS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-PLUS");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    cost = smtcbs_Solver.find_ShortestNonconflictingRotationInverse(solution, parameters.m_cost_limit);
+	    break;
+	}			
 	default:
 	{
 	    sASSERT(false);
@@ -251,6 +264,10 @@ namespace boOX
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS;
 	    }
+	    else if (algorithm_str == "smtcbs+")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS;
+	    }	    
 	    else
 	    {
 		return sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

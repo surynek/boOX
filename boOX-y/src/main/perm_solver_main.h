@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-140                              */
+/*                              boOX 0_iskra-144                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.h / 0_iskra-140                                           */
+/* perm_solver_main.h / 0_iskra-144                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.
@@ -44,7 +44,8 @@ namespace boOX
 	    ALGORITHM_CBS,
 	    ALGORITHM_CBS_PLUS,
 	    ALGORITHM_CBS_PLUS_PLUS,
-	    ALGORITHM_SMTCBS
+	    ALGORITHM_SMTCBS,
+	    ALGORITHM_SMTCBS_PLUS
 	};
 
 	sCommandParameters();
