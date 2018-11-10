@@ -1,0 +1,6 @@
+./mkversion
+python makegen.py devel.mds
+./version.sh > src/version.h
+./compile-opt.sh > src/compile.h
+python augment.py
+make clean
