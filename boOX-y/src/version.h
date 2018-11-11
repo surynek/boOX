@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-144                              */
+/*                              boOX 0_iskra-146                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 0_iskra-144                                                    */
+/* version.h / 0_iskra-146                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -26,8 +26,8 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "0_iskra-144"
-#define sPRODUCT "boOX 0_iskra-144"
+#define sVERSION "0_iskra-146"
+#define sPRODUCT "boOX 0_iskra-146"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.com>"
 #define sCOPYRIGHT "(C) Copyright 2018 Pavel Surynek"

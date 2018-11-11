@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do        
     echo 'Solving grid instance '$SIZE'x'$SIZE' with '$ROBOTS' agents ...'
-  ./swap_solver_boOX --algorithm=cbs++ --timeout=64 '--input-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'swap-cbs_grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+   ./swap_solver_boOX --algorithm=cbs++ --timeout=1024 '--input-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=swap-cbs_grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'swap-cbs_grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

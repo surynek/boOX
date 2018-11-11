@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do            
     echo 'Solving path instance '$SIZE' with '$ROBOTS' agents ...'
-   ./swap_solver_boOX --algorithm=smtcbs --timeout=64 '--input-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'swap-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    ./swap_solver_boOX --algorithm=smtcbs+ --timeout=1024 '--input-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=swap-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'swap-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

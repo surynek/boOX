@@ -1,13 +1,4 @@
-#./expr_pathsol_swap_16_cbs.sh &
-#./expr_pathsol_swap_16_smt.sh &
-
-#./expr_cliquesol_rota_16_cbs.sh &
-#./expr_cliquesol_rota_16_smt.sh &
-./expr_cliquesol_swap_16_cbs.sh &
-./expr_cliquesol_swap_16_smt.sh &
-
-#./expr_randsol_rota_16_cbs.sh &
-#./expr_randsol_rota_16_smt.sh &
-
-#./expr_starsol_rota_16_cbs.sh &
-#./expr_starsol_rota_16_smt.sh &
+./run_cliquesolvers_16.sh &
+./run_pathsolvers_16.sh &
+./run_randsolvers_16.sh &
+./run_starsolvers_16.sh &
