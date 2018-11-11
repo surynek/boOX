@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-151                              */
+/*                              boOX 0_iskra-156                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 0_iskra-151                                                      */
+/* cbs.cpp / 0_iskra-156                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -626,7 +626,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving TSWAP cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));
+		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));
 	    }
 	    #endif
 	    if ((solution_cost = find_NonconflictingPaths_Delta(instance, agent_Paths, cost)) >= 0)
@@ -723,7 +723,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving TSWAP cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));
+		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));
 	    }
 	    #endif
 	    if ((solution_cost = find_NonconflictingPaths_DeltaStar(instance, agent_Paths, cost, extra)) >= 0)
@@ -813,7 +813,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
 	    }
 	    #endif	    
 	    if ((solution_cost = find_NonconflictingPermutation(instance, agent_Paths, cost)) >= 0)
@@ -909,7 +909,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
 	    }
 	    #endif	    
 	    if ((solution_cost = find_NonconflictingPermutation_Delta(instance, agent_Paths, cost)) >= 0)
@@ -1006,7 +1006,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
 	    }
 	    #endif	    
 	    if ((solution_cost = find_NonconflictingPermutation_DeltaStar(instance, agent_Paths, cost, extra)) >= 0)
@@ -1096,7 +1096,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
 	    }
 	    #endif	    
 	    if ((solution_cost = find_NonconflictingRotation(instance, agent_Paths, cost)) >= 0)
@@ -1192,7 +1192,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
 	    }
 	    #endif	    
 	    if ((solution_cost = find_NonconflictingRotation_Delta(instance, agent_Paths, cost)) >= 0)
@@ -1289,7 +1289,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
 	    }
 	    #endif	    
 	    if ((solution_cost = find_NonconflictingRotation_DeltaStar(instance, agent_Paths, cost, extra)) >= 0)

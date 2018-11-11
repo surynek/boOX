@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-151                              */
+/*                              boOX 0_iskra-156                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* compile.h / 0_iskra-151                                                    */
+/* compile.h / 0_iskra-156                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Compilation configuration file for boOX package - debugging variant.

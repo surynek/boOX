@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do                
     echo 'Generating map ost003d with '$ROBOTS' agents ...'
-   ../main/gridgen_boOX --map-file=.../main/.../main/map../main/ost003d.map '--N-agents='$ROBOTS '--mpf-file=ost003d_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=ost003d_a'$ROBOTS'_'$SEED'.cpf'
+   ../main/gridgen_boOX --map-file=../../maps/ost003d.map '--N-agents='$ROBOTS '--mpf-file=ost003d_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=ost003d_a'$ROBOTS'_'$SEED'.cpf'
   done
 done

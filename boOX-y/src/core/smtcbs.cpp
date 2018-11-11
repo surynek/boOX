@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-151                              */
+/*                              boOX 0_iskra-156                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 0_iskra-151                                                   */
+/* smtcbs.cpp / 0_iskra-156                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -1010,7 +1010,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)) > 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1052,7 +1052,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)) > 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1118,7 +1118,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) > 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1161,7 +1161,7 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1229,7 +1229,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) > 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1273,7 +1273,7 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1341,7 +1341,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)) > 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1383,7 +1383,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)) > 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1450,7 +1450,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1495,7 +1495,7 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1564,7 +1564,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1610,7 +1610,7 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1678,7 +1678,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)) > 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1720,7 +1720,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)) > 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1786,7 +1786,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) > 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1829,7 +1829,7 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -1897,7 +1897,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) > 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -1941,7 +1941,7 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -2009,7 +2009,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)) > 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -2051,7 +2051,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)) > 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -2118,7 +2118,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -2163,7 +2163,7 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }
@@ -2232,7 +2232,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	{
 	    return cummulative;
 	}
@@ -2278,7 +2278,7 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) > 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
 	    {
 		return cummulative;
 	    }

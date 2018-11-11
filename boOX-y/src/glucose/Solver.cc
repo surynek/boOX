@@ -1032,10 +1032,12 @@ bool Solver::simplify()
 |    if the clause set is unsatisfiable. 'l_Undef' if the bound on number of conflicts is reached.
 |________________________________________________________________________________________________@*/
 
-sDouble s_Glucose_end_time, s_Glucose_start_time;
+sDouble s__Glucose_end_time, s__Glucose_start_time;
 
 lbool Solver::search(int /*nof_conflicts*/)
-{    	
+{
+    sDouble s__Glucose_start_time = sStatistics::get_CPU_Seconds();
+		  
     assert(ok);
     int         backtrack_level;
     int         conflictC = 0;
@@ -1056,6 +1058,18 @@ lbool Solver::search(int /*nof_conflicts*/)
 		   (int)starts,(int)nbstopsrestarts, (int)(conflicts/starts), 
 		   (int)dec_vars - (trail_lim.size() == 0 ? trail.size() : trail_lim[0]), nClauses(), (int)clauses_literals, 
 		   (int)nbReduceDB, nLearnts(), (int)nbDL2,(int)nbRemovedClauses, progressEstimate()*100);
+	  }
+
+	  if (conflicts % 1024 == 0)
+	  {
+	      if (s_Glucose_timeout >= 0)
+	      {
+		  s__Glucose_end_time = sStatistics::get_CPU_Seconds();
+		  if (s__Glucose_end_time - s__Glucose_start_time > s_Glucose_timeout)
+		  {
+		      return l_Undef;
+		  }
+	      }
 	  }
 
 	  if (decisionLevel() == 0) {
