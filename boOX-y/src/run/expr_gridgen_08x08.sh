@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do    
     echo 'Generating grid '$SIZE'x'$SIZE' with '$ROBOTS' agents ...'
-    ./gridgen_boOX --walk '--x-size=8' '--y-size=8' '--N-agents='$ROBOTS '--seed='$SEED '--mpf-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--N-agents='$ROBOTS '--cpf-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.cpf'
+    ../main/gridgen_boOX --walk '--x-size=8' '--y-size=8' '--N-agents='$ROBOTS '--seed='$SEED '--mpf-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--N-agents='$ROBOTS '--cpf-file=grid_'$SIZE'x'$SIZE'_a'$ROBOTS'_'$SEED'.cpf'
   done
 done

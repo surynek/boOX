@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do            
     echo 'Solving path instance '$SIZE' with '$ROBOTS' agents ...'
-    ./rota_solver_boOX --algorithm=smtcbs+ --timeout=512 '--input-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=rota-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'rota-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    ../main/rota_solver_boOX --algorithm=smtcbs+ --timeout=128 '--input-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=rota-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'rota-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

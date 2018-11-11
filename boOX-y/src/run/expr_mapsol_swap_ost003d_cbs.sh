@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do            
     echo 'Solving clique instance '$SIZE' with '$ROBOTS' agents ...'
-    ./swap_solver_boOX --algorithm=cbs++ --timeout=512 '--input-file=ost003d_a'$ROBOTS'_'$SEED'.mpf' '--output-file=swap-cbs_ost003d_a'$ROBOTS'_'$SEED'.out' > 'swap-cbs_ost003d_a'$ROBOTS'_'$SEED'.txt'
+    ../main/swap_solver_boOX --algorithm=cbs++ --timeout=128 '--input-file=ost003d_a'$ROBOTS'_'$SEED'.mpf' '--output-file=swap-cbs_ost003d_a'$ROBOTS'_'$SEED'.out' > 'swap-cbs_ost003d_a'$ROBOTS'_'$SEED'.txt'
   done
 done

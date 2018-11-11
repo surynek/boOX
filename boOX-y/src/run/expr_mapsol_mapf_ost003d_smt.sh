@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do            
     echo 'Solving ost003d instance with '$ROBOTS' agents ...'
-    ./mapf_solver_boOX --algorithm=smtcbs+ --timeout=512 '--input-file=ost003d_a'$ROBOTS'_'$SEED'.mpf' '--output-file=mapf-smt_ost003d_a'$ROBOTS'_'$SEED'.out' > 'mapf-smt_ost003d_a'$ROBOTS'_'$SEED'.txt'
+    ../main/mapf_solver_boOX --algorithm=smtcbs+ --timeout=128 '--input-file=ost003d_a'$ROBOTS'_'$SEED'.mpf' '--output-file=mapf-smt_ost003d_a'$ROBOTS'_'$SEED'.out' > 'mapf-smt_ost003d_a'$ROBOTS'_'$SEED'.txt'
   done
 done

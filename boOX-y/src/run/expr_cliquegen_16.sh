@@ -7,7 +7,7 @@ for ROBOTS in $ROBOT_LIST;
   for SEED in $SEED_LIST;	
   do
     echo 'Generating clique '$SIZE' with '$ROBOTS' agents ...'
-    ./cliquegen_boOX '--N-vertices='$SIZE '--N-agents='$ROBOTS '--seed='$SEED '--mpf-file=clique_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=clique_'$SIZE'_a'$ROBOTS'_'$SEED'.cpf'
+    ../main/cliquegen_boOX '--N-vertices='$SIZE '--N-agents='$ROBOTS '--seed='$SEED '--mpf-file=clique_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=clique_'$SIZE'_a'$ROBOTS'_'$SEED'.cpf'
   done
 done
 	      

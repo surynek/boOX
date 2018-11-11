@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do            
     echo 'Solving brc202d instance with '$ROBOTS' agents ...'
-    ./perm_solver_boOX --algorithm=smtcbs+ --timeout=512 '--input-file=brc202d_a'$ROBOTS'_'$SEED'.mpf' '--output-file=perm-smt_brc202d_a'$ROBOTS'_'$SEED'.out' > 'perm-smt_brc202d_a'$ROBOTS'_'$SEED'.txt'
+    ../main/perm_solver_boOX --algorithm=smtcbs+ --timeout=128 '--input-file=brc202d_a'$ROBOTS'_'$SEED'.mpf' '--output-file=perm-smt_brc202d_a'$ROBOTS'_'$SEED'.out' > 'perm-smt_brc202d_a'$ROBOTS'_'$SEED'.txt'
   done
 done

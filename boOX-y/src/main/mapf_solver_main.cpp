@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-149                              */
+/*                              boOX 0_iskra-151                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.cpp / 0_iskra-149                                         */
+/* mapf_solver_main.cpp / 0_iskra-151                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.

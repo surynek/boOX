@@ -7,6 +7,6 @@ do
   for SEED in $SEED_LIST;	
   do            
     echo 'Solving star instance '$SIZE' with '$ROBOTS' agents ...'
-    ./swap_solver_boOX --algorithm=cbs++ --timeout=512 '--input-file=star_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=swap-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'swap-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    ../main/swap_solver_boOX --algorithm=cbs++ --timeout=128 '--input-file=star_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--output-file=swap-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.out' > 'swap-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

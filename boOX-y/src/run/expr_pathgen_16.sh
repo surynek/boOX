@@ -7,6 +7,6 @@ for ROBOTS in $ROBOT_LIST;
   for SEED in $SEED_LIST;
   do
     echo 'Generating path '$SIZE' with '$ROBOTS' agents ...'
-    ./pathgen_boOX '--N-vertices='$SIZE '--N-agents='$ROBOTS '--seed='$SEED '--mpf-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.cpf'
+    ../main/pathgen_boOX '--N-vertices='$SIZE '--N-agents='$ROBOTS '--seed='$SEED '--mpf-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=path_'$SIZE'_a'$ROBOTS'_'$SEED'.cpf'
   done
 done

@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-149                              */
+/*                              boOX 0_iskra-151                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.cpp / 0_iskra-149                                         */
+/* perm_solver_main.cpp / 0_iskra-151                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.
