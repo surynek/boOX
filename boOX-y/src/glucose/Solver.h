@@ -274,7 +274,8 @@ protected:
 public:
     sDouble s_Glucose_timeout;
 
-protected:
+//protected:    
+public:
     double totalTime4Sat,totalTime4Unsat;
     int nbSatCalls,nbUnsatCalls;
     vec<int> assumptionPositions,initialPositions;

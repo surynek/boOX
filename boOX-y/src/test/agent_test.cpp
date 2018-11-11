@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-146                              */
+/*                              boOX 0_iskra-149                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* agent_test.cpp / 0_iskra-146                                               */
+/* agent_test.cpp / 0_iskra-149                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures - testing program.

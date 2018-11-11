@@ -1035,9 +1035,7 @@ bool Solver::simplify()
 sDouble s_Glucose_end_time, s_Glucose_start_time;
 
 lbool Solver::search(int /*nof_conflicts*/)
-{    
-    sDouble s_Glucose_start_time = sStatistics::get_CPU_Seconds();
-	
+{    	
     assert(ok);
     int         backtrack_level;
     int         conflictC = 0;
@@ -1058,16 +1056,8 @@ lbool Solver::search(int /*nof_conflicts*/)
 		   (int)starts,(int)nbstopsrestarts, (int)(conflicts/starts), 
 		   (int)dec_vars - (trail_lim.size() == 0 ? trail.size() : trail_lim[0]), nClauses(), (int)clauses_literals, 
 		   (int)nbReduceDB, nLearnts(), (int)nbDL2,(int)nbRemovedClauses, progressEstimate()*100);
-
-	    if (s_Glucose_timeout >= 0)
-	    {
-		sDouble s_Glucose_end_time = sStatistics::get_CPU_Seconds();
-		if (s_Glucose_end_time - s_Glucose_start_time > s_Glucose_timeout)
-		{
-		    return l_Undef;
-		}
-	    }	    
 	  }
+
 	  if (decisionLevel() == 0) {
 	    return l_False;
 	    
@@ -1255,6 +1245,8 @@ printf("c ==================================[ Search Statistics (every %6d confl
       printf("c =========================================================================================================\n");
     }
 
+    sDouble s_Glucose_start_time = sStatistics::get_CPU_Seconds();    
+
     // Search:
     int curr_restarts = 0;
     while (status == l_Undef){
@@ -1262,6 +1254,15 @@ printf("c ==================================[ Search Statistics (every %6d confl
 
         if (!withinBudget()) break;
         curr_restarts++;
+
+	if (s_Glucose_timeout >= 0)
+	{
+	    sDouble s_Glucose_end_time = sStatistics::get_CPU_Seconds();
+	    if (s_Glucose_end_time - s_Glucose_start_time > s_Glucose_timeout)
+	    {
+		return l_Undef;
+	    }
+	}	    	
     }
 
     if (!incremental && verbosity >= 1)

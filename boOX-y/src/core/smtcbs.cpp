@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-146                              */
+/*                              boOX 0_iskra-149                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 0_iskra-146                                                   */
+/* smtcbs.cpp / 0_iskra-149                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -2313,63 +2313,49 @@ namespace boOX
 	}
 */
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("variables");
-	}
-	#endif	   	
-	
 	variable_ID = build_PathModelVariables(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("constraints");
-	}
-	#endif	   		
-
 	build_PathModelConstraints(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif	   	
-	
 	if (!solver->simplify())
 	{
   	    #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
 	    }
-	    #endif	   
+	    #endif
 	    return false;
 	}
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
+	Glucose::lbool result = solver->solve_();
 
-  	#ifdef sSTATISTICS
+	if (result == l_True)
 	{
-	    s_GlobalStatistics.enter_Phase("solving");
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
 	}
-	#endif
-	
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -2384,13 +2370,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-	
+*/
 	decode_PathModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -2422,41 +2402,11 @@ namespace boOX
 	}
 */
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("variables");
-	}
-	#endif	   	
-	
 	variable_ID = build_PathModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("constraints");
-	}
-	#endif	   		
-
 	build_PathModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif	   	
-	
 	if (!solver->simplify())
 	{
   	    #ifdef sSTATISTICS
@@ -2467,18 +2417,34 @@ namespace boOX
 	    return false;
 	}
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
+	Glucose::lbool result = solver->solve_();
 
-  	#ifdef sSTATISTICS
+	if (result == l_True)
 	{
-	    s_GlobalStatistics.enter_Phase("solving");
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
 	}
-	#endif
-	
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -2493,13 +2459,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-	
+*/	
 	decode_PathModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -2536,6 +2496,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -2550,6 +2539,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
+*/
 	decode_PathModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -2589,6 +2579,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -2603,6 +2622,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_PathModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -2644,6 +2664,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -2658,6 +2707,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_PathModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -2927,40 +2977,10 @@ namespace boOX
 	}
 */
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("variables");
-	}
-	#endif	   	
-	
 	variable_ID = build_SwappingModelVariables(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("constraints");
-	}
-	#endif	   			
-
 	build_SwappingModelConstraints(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif	   		
 
 	if (!solver->simplify())
 	{
@@ -2971,19 +2991,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("solving");
-	}
-	#endif
 	
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -2998,19 +3034,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif		
-	
+*/
 	decode_SwappingModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3041,41 +3065,11 @@ namespace boOX
 	    }
 	}
 */
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("variables");
-	}
-	#endif	   	
 	
 	variable_ID = build_SwappingModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("constraints");
-	}
-	#endif	   			
-
 	build_SwappingModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif	   		
 
 	if (!solver->simplify())
 	{
@@ -3087,18 +3081,34 @@ namespace boOX
 	    return false;
 	}
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif	
+	Glucose::lbool result = solver->solve_();
 
-  	#ifdef sSTATISTICS
+	if (result == l_True)
 	{
-	    s_GlobalStatistics.enter_Phase("solving");
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
 	}
-	#endif
-	
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3113,19 +3123,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif		
-	
+*/
 	decode_SwappingModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3145,12 +3143,6 @@ namespace boOX
     {
 	context.m_trans_Collisions.push_back(principal_collision);
 
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("refinement");
-	}
-	#endif
-
 	refine_SwappingModelCollision(solver,
 				      principal_collision,
 				      instance,
@@ -3159,18 +3151,6 @@ namespace boOX
 				      extra_cost,
 				      sat_Model);
 
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif	
-	
 	if (!solver->simplify())
 	{
   	    #ifdef sSTATISTICS
@@ -3181,18 +3161,34 @@ namespace boOX
 	    return false;
 	}
 
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
+	Glucose::lbool result = solver->solve_();
 
-  	#ifdef sSTATISTICS
+	if (result == l_True)
 	{
-	    s_GlobalStatistics.enter_Phase("solving");
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
 	}
-	#endif	
-	
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3201,19 +3197,13 @@ namespace boOX
 	    }
 	    #endif	    
 	    return false;
-	}
-
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-	
+	}	
   	#ifdef sSTATISTICS
 	{
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
+*/
 	decode_SwappingModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3232,12 +3222,6 @@ namespace boOX
 						  sInt_32                      sUNUSED(cost_limit),
 						  AgentPaths_vector           &agent_Paths) const
     {
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("refinement");
-	}
-	#endif
 	
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
@@ -3257,18 +3241,6 @@ namespace boOX
 				       extra_cost,
 				       sat_Model);
 
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif	
-	
 	if (!solver->simplify())
 	{
   	    #ifdef sSTATISTICS
@@ -3279,18 +3251,34 @@ namespace boOX
 	    return false;
 	}
 
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
+	Glucose::lbool result = solver->solve_();
 
-  	#ifdef sSTATISTICS
+	if (result == l_True)
 	{
-	    s_GlobalStatistics.enter_Phase("solving");
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
 	}
-	#endif	
-	
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3300,18 +3288,12 @@ namespace boOX
 	    #endif	    
 	    return false;
 	}
-
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-	
   	#ifdef sSTATISTICS
 	{
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_SwappingModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3331,12 +3313,6 @@ namespace boOX
 							 sInt_32                      sUNUSED(cost_limit),
 							 AgentPaths_vector            &agent_Paths) const
     {
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("refinement");
-	}
-	#endif
-	
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
 	    context.m_trans_Collisions.push_back(*collision);
@@ -3356,18 +3332,6 @@ namespace boOX
 					      extra_cost,
 					      sat_Model);
 
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-
-  	#ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.enter_Phase("simplification");
-	}
-	#endif		
-	
 	if (!solver->simplify())
 	{
   	    #ifdef sSTATISTICS
@@ -3378,18 +3342,34 @@ namespace boOX
 	    return false;
 	}
 
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
+	Glucose::lbool result = solver->solve_();
 
-  	#ifdef sSTATISTICS
+	if (result == l_True)
 	{
-	    s_GlobalStatistics.enter_Phase("solving");
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
 	}
-	#endif
-	
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3399,18 +3379,12 @@ namespace boOX
 	    #endif	    
 	    return false;
 	}
-
-        #ifdef sSTATISTICS
-	{
-	    s_GlobalStatistics.leave_Phase();
-	}
-	#endif
-	
   	#ifdef sSTATISTICS
 	{
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_SwappingModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3711,6 +3685,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3725,7 +3728,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-	
+*/	
 	decode_PermutationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3771,6 +3774,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+	
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3785,7 +3817,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-	
+*/
 	decode_PermutationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3822,6 +3854,36 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+
+/*
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3836,6 +3898,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
+*/
 	decode_PermutationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3875,6 +3938,36 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+	
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3889,6 +3982,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_PermutationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -3930,6 +4024,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -3944,6 +4067,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_PermutationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -4242,6 +4366,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -4256,7 +4409,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-	
+*/	
 	decode_RotationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -4302,6 +4455,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -4316,7 +4498,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
-	
+*/	
 	decode_RotationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -4353,6 +4535,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -4367,6 +4578,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif
+*/
 	decode_RotationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -4412,6 +4624,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -4426,6 +4667,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_RotationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
@@ -4473,6 +4715,35 @@ namespace boOX
 	    #endif	   
 	    return false;
 	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+/*	
 	if (!solver->solve())
 	{
   	    #ifdef sSTATISTICS
@@ -4487,6 +4758,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	}
 	#endif	
+*/
 	decode_RotationModel(solver, instance, MDD, sat_Model, agent_Paths);
 	
 	return true;
