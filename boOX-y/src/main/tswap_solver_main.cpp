@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                              boOX 0_iskra-158                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* tswap_solver_main.cpp / 0_iskra-156                                        */
+/* tswap_solver_main.cpp / 0_iskra-158                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
