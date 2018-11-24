@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-158                              */
+/*                              boOX 0_iskra-159                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* statistics.cpp / 0_iskra-158                                               */
+/* statistics.cpp / 0_iskra-159                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Statistical data collection and analytical tools.

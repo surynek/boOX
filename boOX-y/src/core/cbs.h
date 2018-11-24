@@ -1,14 +1,14 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-158                              */
+/*                              boOX 0_iskra-159                              */
 /*                                                                            */
 /*                      (C) Copyright 2018 Pavel Surynek                      */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 0_iskra-158                                                        */
+/* cbs.h / 0_iskra-159                                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and

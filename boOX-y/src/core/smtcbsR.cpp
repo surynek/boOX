@@ -8,37 +8,65 @@
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* config.h / 0_iskra-159                                                     */
+/* smtcbsR.cpp / 0_iskra-159                                                  */
 /*----------------------------------------------------------------------------*/
 //
-// Configuration file for auRIx package - global settings.
+// Conflict based search for a semi-continuous version of MAPF implemented
+// on top of SAT-modulo theories.
 //
 /*----------------------------------------------------------------------------*/
 
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#include <map>
+
+#include "config.h"
+#include "compile.h"
+#include "version.h"
+#include "defs.h"
+#include "types.h"
+#include "result.h"
+
+#include "core/smtcbsR.h"
+#include "util/statistics.h"
+
+
+using namespace std;
+using namespace boOX;
 
 
 /*----------------------------------------------------------------------------*/
+
 
 namespace boOX
 {
 
-
 /*----------------------------------------------------------------------------*/
+// sRealSMTCBS
 
-#define s__STANDARD_INDENT                "    "
-    
-#define s__DEFAULT_N_PARALLEL_THREADS          4
-#define s__DEFAULT_RANDOM_WALK_LENGTH    1048576
+/*
+    sRealSMTCBS::sRealSMTCBS(sInstance *instance)
+	: sCBSBase(instance)
+    {
+	// nothing
+    }
+*/
 
-#define s__DEFAULT_WRAP_LINE_LENGTH           80
-#define s__CONVERSION_BUFFER_SIZE            128
-    
+
+/*
+    sRealSMTCBS::sRealSMTCBS(sInstance *instance, sDouble timeout)
+	: sCBSBase(instance, timeout)
+    {
+	// nothing
+    }    
+*/
 
 
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
 
-#endif /* __CONFIG_H__ */
+

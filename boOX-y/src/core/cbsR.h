@@ -8,15 +8,32 @@
 /*                                                                            */
 /*                                                                            */
 /*============================================================================*/
-/* config.h / 0_iskra-159                                                     */
+/* cbsR.h / 0_iskra-159                                                       */
 /*----------------------------------------------------------------------------*/
 //
-// Configuration file for auRIx package - global settings.
+// Conflict based search for a semi-continuous version of MAPF.
 //
 /*----------------------------------------------------------------------------*/
 
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+
+#ifndef __CBSR_H__
+#define __CBSR_H__
+
+#include <vector>
+#include <list>
+#include <set>
+#include <map>
+#include <unordered_map>
+#include <unordered_set>
+
+#include "types.h"
+#include "result.h"
+
+#include "core/graph.h"
+#include "core/agent.h"
+
+
+using namespace std;
 
 
 /*----------------------------------------------------------------------------*/
@@ -26,19 +43,19 @@ namespace boOX
 
 
 /*----------------------------------------------------------------------------*/
+// sRealCBS
 
-#define s__STANDARD_INDENT                "    "
-    
-#define s__DEFAULT_N_PARALLEL_THREADS          4
-#define s__DEFAULT_RANDOM_WALK_LENGTH    1048576
-
-#define s__DEFAULT_WRAP_LINE_LENGTH           80
-#define s__CONVERSION_BUFFER_SIZE            128
-    
+    class sRealCBS
+    {
+    public:
+//	sCBS(sInstance *instance);
+//	sCBS(sInstance *instance, sDouble timeout);
+    };
 
 
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
 
-#endif /* __CONFIG_H__ */
+#endif /* __CBSR_H__ */
+    

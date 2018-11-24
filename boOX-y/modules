@@ -1,8 +1,8 @@
 Core_boOX
 library
 /src/core
-/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h types.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h
-types.cpp graph.cpp agent.cpp smtcbs.cpp cbs.cpp icts.cpp cnf.cpp
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h types.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h cbsR.h smtcbsR.h
+types.cpp graph.cpp agent.cpp smtcbs.cpp cbs.cpp icts.cpp cnf.cpp cbsR.cpp smtcbsR.cpp
 
 Util_boOX
 library
