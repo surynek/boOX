@@ -9,72 +9,52 @@
 /*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.h / 0_iskra-161                                           */
+/* agentR.cpp / 0_iskra-161                                                   */
 /*----------------------------------------------------------------------------*/
 //
-// Token Rotation Problem Solver - main program.
-//
-// A CBS-based solver for token rotation problem (swaps excluding).
+// Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
 //
 /*----------------------------------------------------------------------------*/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
-#ifndef __ROTA_SOLVER_MAIN_H__
-#define __ROTA_SOLVER_MAIN_H__
+#include <map>
 
 #include "config.h"
 #include "compile.h"
-#include "defs.h"
 #include "version.h"
+#include "defs.h"
+#include "types.h"
+#include "result.h"
+
+#include "core/agentR.h"
+#include "util/statistics.h"
+
 
 using namespace std;
+using namespace boOX;
 
 
 /*----------------------------------------------------------------------------*/
+
 
 namespace boOX
 {
 
-
 /*----------------------------------------------------------------------------*/
+// sRealConfiguration
 
-    struct sCommandParameters
-    {	
-	enum Algorithm
-	{
-	    ALGORITHM_CBS,
-	    ALGORITHM_CBS_PLUS,
-	    ALGORITHM_CBS_PLUS_PLUS,	    
-	    ALGORITHM_SMTCBS,
-	    ALGORITHM_SMTCBS_PLUS	    
-	};
+/*
+    sRealConfiguration::sRealConfiguration()
+    {
+	// nothing
+    }
+*/
 
-	sCommandParameters();
-        /*--------------------------------*/
-
-	sInt_32 m_cost_limit;
-	Algorithm m_algorithm;	
-
-	sString m_input_filename;		
-	sString m_output_filename;
-
-	sDouble m_timeout;
-    };
-
-
-/*----------------------------------------------------------------------------*/
-
-    void print_IntroductoryMessage(void);
-    void print_ConcludingMessage(void);
-    void print_Help(void);
-    
-    sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &parameters);
-    sResult solve_TokenRotationInstance(const sCommandParameters &parameters);
 
 
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
-
-
-#endif /* __ROTA_SOLVER_MAIN_H__ */
