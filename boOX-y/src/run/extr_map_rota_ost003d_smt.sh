@@ -8,5 +8,6 @@ do
   do            
     echo $ROBOTS,$SEED
      grep "machine TIME" 'rota-smt_ost003d_a'$ROBOTS'_'$SEED'.txt'
+     grep "clauses" 'rota-smt_ost003d_a'$ROBOTS'_'$SEED'.txt'
   done
 done

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* tswap_solver_main.cpp / 0_iskra-161                                        */
+/* tswap_solver_main.cpp / 0-279_zenon                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
@@ -79,7 +79,7 @@ namespace boOX
 	printf("                  --cost-limit=<int>\n");
 	printf("\n");
 	printf("Examples:\n");
-	printf("tswap_solver_boOX --input-file=grid_02x02_t04.tkn\n");
+	printf("tswap_solver_boOX --input-file=grid_02x02_t04.mpf\n");
 	printf("                  --output-file=output.txt\n");
 	printf("\n");
 	printf("Defaults: --cost-limit=65536\n");

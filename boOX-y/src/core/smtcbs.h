@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 0_iskra-161                                                     */
+/* smtcbs.h / 0-279_zenon                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -51,15 +51,12 @@ namespace boOX
 
 
 /*----------------------------------------------------------------------------*/
-// sSMTCBS
-    
-    class sSMTCBS
-	: public sCBSBase
+// sSMTCBSBase
+
+    class sSMTCBSBase
     {
     public:
-	typedef std::vector<Collision> Collisions_vector;
-	typedef std::vector<EdgeCollision> EdgeCollisions_vector;	
-	typedef std::vector<sInt_32> VariableIDs_vector;
+    	typedef std::vector<sInt_32> VariableIDs_vector;
 	typedef VariableIDs_vector VariableIDs_1vector;
 	
 	typedef std::vector<VariableIDs_1vector> VariableIDs_2vector;
@@ -116,6 +113,39 @@ namespace boOX
 
 	    Coordinates_vector m_variable_mapping;
 	};
+
+    public:
+	sSMTCBSBase(sBoolEncoder *solver_Encoder);
+	/*----------------------------------------------------------------------------*/
+
+	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_1vector &variable_vector, sInt_32 dim_1);
+	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_2vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2);
+	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_3vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3);
+	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_4vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4);
+	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_5vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4, sInt_32 dim_5);
+	/*----------------------------------------------------------------------------*/	
+	
+    private:
+	sSMTCBSBase(const sSMTCBSBase &smtcbs_base);
+	const sSMTCBSBase& operator=(const sSMTCBSBase &smtcbs_base);
+
+    public:
+	sBoolEncoder *m_solver_Encoder;	
+};
+
+
+
+
+/*----------------------------------------------------------------------------*/
+// sSMTCBS
+    
+    class sSMTCBS
+	: public sCBSBase
+	, public sSMTCBSBase
+    {
+    public:
+	typedef std::vector<Collision> Collisions_vector;
+	typedef std::vector<EdgeCollision> EdgeCollisions_vector;	
 
 	struct Context
 	{
@@ -903,22 +933,10 @@ namespace boOX
 				  const sInstance::MDD_vector &MDD,
 				  const Model                 &sat_Model,
 				  AgentPaths_vector           &agent_Paths) const;
-	/*----------------------------------------------------------------------------*/		
-	
-	
-	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_1vector &variable_vector, sInt_32 dim_1);
-	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_2vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2);
-	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_3vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3);
-	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_4vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4);
-	static sInt_32 alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_5vector &variable_vector, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4, sInt_32 dim_5);
-	/*----------------------------------------------------------------------------*/	
-    
+	/*----------------------------------------------------------------------------*/		           
     private:
 	sSMTCBS(const sSMTCBS &smt_cbs);
-	const sSMTCBS& operator=(const sSMTCBS &smt_cbs);
-	
-    public:
-	sBoolEncoder *m_solver_Encoder;
+	const sSMTCBS& operator=(const sSMTCBS &smt_cbs);	
  };
 
 

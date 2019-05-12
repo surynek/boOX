@@ -8,5 +8,6 @@ do
   do
     echo $ROBOTS,$SEED
     grep "machine TIME" 'mapf-smt_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "clauses" 'mapf-smt_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

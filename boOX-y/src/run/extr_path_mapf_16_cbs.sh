@@ -8,5 +8,6 @@ do
   do
     echo $ROBOTS,$SEED
     grep "machine TIME" 'mapf-cbs_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "steps" 'mapf-cbs_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

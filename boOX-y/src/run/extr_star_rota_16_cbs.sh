@@ -8,5 +8,6 @@ do
   do
     echo $ROBOTS,$SEED
     grep "machine TIME" 'rota-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "steps" 'rota-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

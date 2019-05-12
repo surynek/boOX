@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* types.h / 0_iskra-161                                                      */
+/* types.h / 0-279_zenon                                                      */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __TYPES_H__
@@ -98,6 +98,7 @@ extern const sString s8_INDENT;
 typedef float sFloat;
 typedef double sDouble;
 
+const sDouble s_EPSILON = 0.000000001;
 
 /*----------------------------------------------------------------------------*/
 

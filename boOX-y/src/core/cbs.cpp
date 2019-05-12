@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 0_iskra-161                                                      */
+/* cbs.cpp / 0-279_zenon                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -2261,6 +2261,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node &best_node = search_Queue.begin()->second;
 
@@ -2347,6 +2360,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -2448,6 +2474,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -2573,6 +2612,19 @@ namespace boOX
 		    printf("%d ", node->m_upd_agent_id);
 		}
 		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
 	    }
 	    #endif	    
 
@@ -2717,6 +2769,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -2895,6 +2960,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -3333,6 +3411,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node &best_node = search_Queue.begin()->second;
 
@@ -3419,6 +3510,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -3514,11 +3618,25 @@ namespace boOX
 		printf("Times: seq:%.3f rev:%.3f (bal:%.3f)\n", sequencing_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)(sequencing_cummul + revising_cummul));
 	    }
 	    #endif
+	    
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -3638,11 +3756,25 @@ namespace boOX
 		printf("Times: seq:%.3f rev:%.3f (bal:%.3f)\n", sequencing_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)(sequencing_cummul + revising_cummul));
 	    }
 	    #endif
+	    
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -3803,6 +3935,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -3967,8 +4112,9 @@ namespace boOX
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
-            #endif
-/*
+            #endif	    
+
+	    /*
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -3981,7 +4127,20 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
-*/
+	    */
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -4448,6 +4607,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node &best_node = search_Queue.begin()->second;
 
@@ -4534,6 +4706,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -4629,11 +4814,25 @@ namespace boOX
 		printf("Times: seq:%.3f rev:%.3f (bal:%.3f)\n", sequencing_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)(sequencing_cummul + revising_cummul));
 	    }
 	    #endif
+	    
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -4753,11 +4952,25 @@ namespace boOX
 		printf("Times: seq:%.3f rev:%.3f (bal:%.3f)\n", sequencing_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)(sequencing_cummul + revising_cummul));
 	    }
 	    #endif
+	    
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -4910,6 +5123,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -5088,6 +5314,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -5531,6 +5770,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node &best_node = search_Queue.begin()->second;
 
@@ -5617,6 +5869,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 	    
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -5712,11 +5977,25 @@ namespace boOX
 		printf("Times: seq:%.3f rev:%.3f (bal:%.3f)\n", sequencing_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)(sequencing_cummul + revising_cummul));
 	    }
 	    #endif
+	    
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
 	    }
             #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -5836,6 +6115,7 @@ namespace boOX
 		printf("Times: seq:%.3f rev:%.3f (bal:%.3f)\n", sequencing_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)CLOCKS_PER_SEC, revising_cummul / (double)(sequencing_cummul + revising_cummul));
 	    }
 	    #endif
+	    
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
@@ -5854,6 +6134,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    Node best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -6007,6 +6300,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());
@@ -6185,6 +6491,19 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
 
 	    NodeReference best_node = *search_Queue.begin();
 	    search_Queue.erase(search_Queue.begin());

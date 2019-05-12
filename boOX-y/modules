@@ -1,8 +1,8 @@
 Core_boOX
 library
 /src/core
-/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h types.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h cbsR.h smtcbsR.h
-types.cpp graph.cpp agent.cpp smtcbs.cpp cbs.cpp icts.cpp cnf.cpp cbsR.cpp smtcbsR.cpp
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h types.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h
+types.cpp graph.cpp agent.cpp smtcbs.cpp cbs.cpp icts.cpp cnf.cpp mapR.cpp kruhoR.cpp cbsR.cpp smtcbsR.cpp
 
 Util_boOX
 library
@@ -41,11 +41,35 @@ agent_test.cpp
 pthread z3
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
+test_kruhoR_boOX
+application
+/src/test
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h kruhoR_test.h
+kruhoR_test.cpp
+pthread z3
+/src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
 test_cbs_boOX
 application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h cbs_test.h
 cbs_test.cpp
+pthread z3
+/src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
+test_cbsR_boOX
+application
+/src/test
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h cbsR_test.h
+cbsR_test.cpp
+pthread z3
+/src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
+test_smtcbsR_boOX
+application
+/src/test
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h smtcbsR_test.h
+smtcbsR_test.cpp
 pthread z3
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
@@ -118,5 +142,13 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h rota_solver_main.h
 rota_solver_main.cpp
+pthread z3
+/src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
+mapR_convert_boOX
+application
+/src/main
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h mapR_convert_main.h
+mapR_convert_main.cpp
 pthread z3
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX

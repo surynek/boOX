@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0_iskra-161                                                    */
+/* graph.cpp / 0-279_zenon                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -115,6 +115,8 @@ namespace boOX
     }
 
 
+/*----------------------------------------------------------------------------*/
+    
     void sVertex::to_Screen(const sString &indent) const
     {
 	to_Stream(stdout, indent);
@@ -1927,15 +1929,24 @@ namespace boOX
     {
 	fprintf(fw, "%sUndirected graph: (|V|=%ld |E|=%ld) [\n", indent.c_str(), m_Vertices.size(), m_Edges.size());
 
-	for (Vertices_vector::const_iterator vertex = m_Vertices.begin(); vertex != m_Vertices.end(); ++vertex)
-	{
-	    vertex->to_Stream(fw, indent + s_INDENT);
+	fprintf(fw, "%s%sV = {\n", indent.c_str(), s_INDENT.c_str());
+	{	   
+	    for (Vertices_vector::const_iterator vertex = m_Vertices.begin(); vertex != m_Vertices.end(); ++vertex)
+	    {
+		vertex->to_Stream(fw, indent + s2_INDENT);
+	    }
 	}
+	fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());
 
-	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
-	{
-	    edge->to_Stream(fw, indent + s_INDENT);
+	fprintf(fw, "%s%sE = {\n", indent.c_str(), s_INDENT.c_str());
+	{	   
+	    for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	    {
+		edge->to_Stream(fw, indent + s2_INDENT);
+	    }
+	    fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());
 	}
+	
 	fprintf(fw, "%s]\n", indent.c_str());
     }
 
@@ -2738,6 +2749,85 @@ namespace boOX
     }    
 
 
+/*----------------------------------------------------------------------------*/
+
+    sResult sUndirectedGraph::to_File_mapR(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_mapR(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sUndirectedGraph::to_Stream_mapR(FILE *fw, const sString &indent) const
+    {
+	sInt_32 N_vertices = m_Vertices.size();
+	sInt_32 N_edges = m_Edges.size();
+	
+	fprintf(fw, "%sVertices: %d\n", indent.c_str(), N_vertices);	
+	fprintf(fw, "%sEdges: %d\n", indent.c_str(), N_edges);
+
+	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	{
+	    fprintf(fw, "%s{%d,%d}\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
+	}
+    }    
+
+    
+    sResult sUndirectedGraph::from_File_mapR(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	result = from_Stream_mapR(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sUndirectedGraph::from_Stream_mapR(FILE *fr)
+    {
+	sInt_32 N_vertices;
+	sInt_32 N_edges;	
+
+	fscanf(fr, "Vertices: %d\n", &N_vertices);
+	fscanf(fr, "Edges: %d\n", &N_edges);
+
+	add_Vertices(N_vertices);
+
+	for (sInt_32 edge_id = 0; edge_id < N_edges; ++edge_id)
+	{
+	    sInt_32 u_id, v_id;
+	    
+	    fscanf(fr, "{%d,%d}\n", &u_id, &v_id);
+	    add_Edge(u_id, v_id);	    
+	}
+	return sRESULT_SUCCESS;
+    }    
+
+
+
+    
 /*----------------------------------------------------------------------------*/
 // sVectorGraph
 

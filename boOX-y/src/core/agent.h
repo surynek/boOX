@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 0_iskra-161                                                      */
+/* agent.h / 0-279_zenon                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -64,6 +64,7 @@ namespace boOX
 	sConfiguration(sInt_32 N_Vertices, sInt_32 N_Agents, bool random = false);
 	sConfiguration(const sConfiguration &start_configuration, sInt_32 N_Vertices, sInt_32 N_Agents, bool random = false);
 	sConfiguration(const sConfiguration &start_configuration, sInt_32 N_Vertices, sInt_32 N_Agents, sInt_32 N_fixed, bool random = false);
+        /*----------------------------------------------------------------------------*/ 	
 	
 	bool operator==(const sConfiguration &agent_configuration) const;
 	bool operator<(const sConfiguration &agent_configuration) const;
@@ -82,6 +83,7 @@ namespace boOX
 	bool verify_Move(sInt_32 agent_id, sInt_32 dest_vertex_id) const;
 	bool check_Move(sInt_32 agent_id, sInt_32 dest_vertex_id) const;
 	bool verify_Move(sInt_32 agent_id, sInt_32 dest_vertex_id, const sUndirectedGraph &graph) const;
+        /*----------------------------------------------------------------------------*/	
 
 	void randomize(void);
 

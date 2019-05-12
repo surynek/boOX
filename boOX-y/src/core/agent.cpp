@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 0_iskra-161                                                    */
+/* agent.cpp / 0-279_zenon                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -182,7 +182,9 @@ namespace boOX
 	}
     }
 
-
+    
+/*----------------------------------------------------------------------------*/
+    
     bool sConfiguration::operator==(const sConfiguration &agent_configuration) const
     {
 	sASSERT(m_agent_Locs.size() == agent_configuration.m_agent_Locs.size());
@@ -228,7 +230,9 @@ namespace boOX
 	return false;
     }
 
-
+    
+/*----------------------------------------------------------------------------*/
+    
     sInt_32 sConfiguration::get_AgentCount(void) const
     {
 	return (m_agent_Locs.size() - 1);
@@ -757,7 +761,7 @@ namespace boOX
     void sConfiguration::to_Stream(FILE *fw, const sString &indent) const
     {
 	fprintf(fw, "%sAgent configuration: (|R| = %ld, |V| = %ld) [\n", indent.c_str(), m_agent_Locs.size() - 1, m_vertex_Occups.size());
-	fprintf(fw, "%s%s agent locations: {", indent.c_str(), s_INDENT.c_str());
+	fprintf(fw, "%s%sagent locations: {", indent.c_str(), s_INDENT.c_str());
 	
 	sInt_32 N_Agents_1 = m_agent_Locs.size();
 	for (sInt_32 i = 1; i < N_Agents_1; ++i)
@@ -766,7 +770,7 @@ namespace boOX
 	}
 	fprintf(fw, "}\n");
 
-	fprintf(fw, "%s%s vertex occupancy: {", indent.c_str(), s_INDENT.c_str());
+	fprintf(fw, "%s%svertex occupancy: {", indent.c_str(), s_INDENT.c_str());
 	
 	sInt_32 N_Vertices = m_vertex_Occups.size();
 	for (sInt_32 i = 0; i < N_Vertices; ++i)

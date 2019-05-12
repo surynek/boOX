@@ -479,7 +479,7 @@ email_file = open("email", "r")
 email = email_file.readline()
 email = email.rstrip('\n')
 email2 = email_file.readline()
-email = email2.rstrip('\n')
+email2 = email2.rstrip('\n')
 email_file.close()
 
 url_file = open("url", "r")
@@ -495,7 +495,7 @@ namespace_file.close()
 
 exceptions_file = open("exceptions", "r")
 # total_lines, code_lines, total_size = augment_directory("", ".", 80, 10, version, step, product, copyright, author, email, url, namespace, 0, 0, 0, exceptions_file)
-total_lines, code_lines, total_size = twin_augment_directory("", ".", 80, 11, version, step, product, copyright, author, email, url, email2, url2, namespace, 0, 0, 0, exceptions_file)
+total_lines, code_lines, total_size = twin_augment_directory("", ".", 80, 11, version, step, product, copyright, author, email, email2, url, url2, namespace, 0, 0, 0, exceptions_file)
 exceptions_file.close()
 
 print

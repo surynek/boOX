@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs_test.cpp / 0_iskra-161                                                 */
+/* cbs_test.cpp / 0-279_zenon                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
@@ -469,6 +469,66 @@ namespace boOX
 	}
 	printf("CBS test 8 ... finished\n");
     }
+
+
+    void test_cbs_9(void)
+    {
+	printf("CBS test 9 ...\n");
+
+	sUndirectedGraph graph_1;
+
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();	
+
+	graph_1.to_Screen();
+	graph_1.add_Edge(3, 0);
+	graph_1.add_Edge(3, 1);
+	graph_1.add_Edge(3, 2);
+	graph_1.add_Edge(3, 4);
+	graph_1.add_Edge(3, 5);
+	graph_1.add_Edge(3, 6);		
+	graph_1.to_Screen();
+
+	sConfiguration start_config(graph_1.get_VertexCount(), 3);
+	sConfiguration goal_config(graph_1.get_VertexCount(), 3);
+
+	start_config.place_Agent(1, 0);
+	start_config.place_Agent(2, 1);
+	start_config.place_Agent(3, 2);
+	
+	goal_config.place_Agent(1, 6);
+	goal_config.place_Agent(2, 5);
+	goal_config.place_Agent(3, 4);
+
+	sInstance instance_1(graph_1, start_config, goal_config);
+	sCBS CBS(&instance_1);
+
+	instance_1.to_Screen();
+
+	sCBS::AgentPaths_vector agent_Paths;
+	sInt_32 paths_cost = CBS.find_ShortestNonconflictingPaths_DeltaStar(instance_1, agent_Paths, 128);
+	
+	printf("Paths cost: %d\n", paths_cost);
+	if (paths_cost >= 0)
+	{
+	    for (sInt_32 agent_id = 1; agent_id < agent_Paths.size(); ++agent_id)
+	    {
+		sInt_32 path_length = agent_Paths[agent_id].size();
+		for (sInt_32 i = 0; i < path_length; ++i)
+		{
+		    printf("%d ", agent_Paths[agent_id][i]);
+		}
+		printf("\n");
+	    }
+	}
+	printf("CBS test 9 ... finished\n");
+    }    
+
     
 
 
@@ -491,5 +551,6 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
 //    test_cbs_5();
 //    test_cbs_6();
 //    test_cbs_7();
-    test_cbs_8();
+//    test_cbs_8();
+    test_cbs_9();
 }

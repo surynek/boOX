@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 0_iskra-161                                                   */
+/* smtcbs.cpp / 0-279_zenon                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -44,11 +44,95 @@ namespace boOX
 
 
 /*----------------------------------------------------------------------------*/
+// sSMTCBSBase
+
+    sSMTCBSBase::sSMTCBSBase(sBoolEncoder *solver_Encoder)
+	: m_solver_Encoder(solver_Encoder)
+    {
+	// nothing
+    }
+    
+
+/*----------------------------------------------------------------------------*/
+    
+    sInt_32 sSMTCBSBase::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_1vector &vector_Variables, sInt_32 dim_1)
+    {
+	sInt_32 variable_ID = first_variable_ID;
+
+	vector_Variables.resize(dim_1);
+
+	for (sInt_32 i = 0; i < dim_1; ++i)
+	{
+	    vector_Variables[i] = variable_ID++;
+	}
+	return variable_ID;
+    }
+
+    
+    sInt_32 sSMTCBSBase::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_2vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2)
+    {
+	sInt_32 variable_ID = first_variable_ID;
+
+	vector_Variables.resize(dim_1);
+
+	for (sInt_32 i = 0; i < dim_1; ++i)
+	{
+	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2);
+	}
+	return variable_ID;
+    }
+
+
+    sInt_32 sSMTCBSBase::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_3vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3)
+    {
+	sInt_32 variable_ID = first_variable_ID;
+
+	vector_Variables.resize(dim_1);
+
+	for (sInt_32 i = 0; i < dim_1; ++i)
+	{
+	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2, dim_3);
+	}
+	return variable_ID;
+    }
+
+
+    sInt_32 sSMTCBSBase::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_4vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4)
+    {
+	sInt_32 variable_ID = first_variable_ID;
+
+	vector_Variables.resize(dim_1);
+
+	for (sInt_32 i = 0; i < dim_1; ++i)
+	{
+	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2, dim_3, dim_4);
+	}
+	return variable_ID;
+    }
+
+
+    sInt_32 sSMTCBSBase::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_5vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4, sInt_32 dim_5)
+    {
+	sInt_32 variable_ID = first_variable_ID;
+
+	vector_Variables.resize(dim_1);
+
+	for (sInt_32 i = 0; i < dim_1; ++i)
+	{
+	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2, dim_3, dim_4, dim_5);
+	}
+	return variable_ID;
+    }    
+    
+
+
+    
+/*----------------------------------------------------------------------------*/
 // sSMTCBS
 
     sSMTCBS::sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance)
 	: sCBSBase(instance)
-	, m_solver_Encoder(solver_Encoder)
+	, sSMTCBSBase(solver_Encoder)
 
     {
 	// nothing
@@ -56,8 +140,8 @@ namespace boOX
 
     
     sSMTCBS::sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance, sDouble timeout)
-	: sCBSBase(instance, timeout)	  
-	, m_solver_Encoder(solver_Encoder)
+	: sCBSBase(instance, timeout)
+	, sSMTCBSBase(solver_Encoder)
 
     {
 	// nothing
@@ -228,6 +312,7 @@ namespace boOX
 		printf("Solving TSWAP cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
+	    
 	    if ((solution_cost = find_NonconflictingSwappingInverse(context, instance, agent_Paths, cost)) >= 0)
 	    {
 		return solution_cost;
@@ -1159,7 +1244,8 @@ namespace boOX
 		    printf("\n");
 		}
 	    }
-	    #endif   
+	    #endif
+	    
 	    Collisions.clear();
 	    
 	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
@@ -1271,7 +1357,8 @@ namespace boOX
 		    printf("\n");
 		}
 	    }
-	    #endif   
+	    #endif
+	    
 	    Collisions.clear();
 	    
 	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
@@ -8701,78 +8788,6 @@ namespace boOX
 	    }
 	}
     }
-
-   
-/*----------------------------------------------------------------------------*/
-    
-    sInt_32 sSMTCBS::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_1vector &vector_Variables, sInt_32 dim_1)
-    {
-	sInt_32 variable_ID = first_variable_ID;
-
-	vector_Variables.resize(dim_1);
-
-	for (sInt_32 i = 0; i < dim_1; ++i)
-	{
-	    vector_Variables[i] = variable_ID++;
-	}
-	return variable_ID;
-    }
-
-    
-    sInt_32 sSMTCBS::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_2vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2)
-    {
-	sInt_32 variable_ID = first_variable_ID;
-
-	vector_Variables.resize(dim_1);
-
-	for (sInt_32 i = 0; i < dim_1; ++i)
-	{
-	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2);
-	}
-	return variable_ID;
-    }
-
-
-    sInt_32 sSMTCBS::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_3vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3)
-    {
-	sInt_32 variable_ID = first_variable_ID;
-
-	vector_Variables.resize(dim_1);
-
-	for (sInt_32 i = 0; i < dim_1; ++i)
-	{
-	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2, dim_3);
-	}
-	return variable_ID;
-    }
-
-
-    sInt_32 sSMTCBS::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_4vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4)
-    {
-	sInt_32 variable_ID = first_variable_ID;
-
-	vector_Variables.resize(dim_1);
-
-	for (sInt_32 i = 0; i < dim_1; ++i)
-	{
-	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2, dim_3, dim_4);
-	}
-	return variable_ID;
-    }
-
-
-    sInt_32 sSMTCBS::alloc_VariableVector(sInt_32 first_variable_ID, VariableIDs_5vector &vector_Variables, sInt_32 dim_1, sInt_32 dim_2, sInt_32 dim_3, sInt_32 dim_4, sInt_32 dim_5)
-    {
-	sInt_32 variable_ID = first_variable_ID;
-
-	vector_Variables.resize(dim_1);
-
-	for (sInt_32 i = 0; i < dim_1; ++i)
-	{
-	    variable_ID = alloc_VariableVector(variable_ID, vector_Variables[i], dim_2, dim_3, dim_4, dim_5);
-	}
-	return variable_ID;
-    }    
     
     
 /*----------------------------------------------------------------------------*/

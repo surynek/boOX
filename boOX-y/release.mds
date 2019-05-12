@@ -5,6 +5,9 @@ test_basic_boOX
 test_graph_boOX
 test_agent_boOX
 test_cbs_boOX
+test_kruhoR_boOX
+test_cbsR_boOX
+test_smtcbsR_boOX
 gridgen_boOX
 randgen_boOX
 stargen_boOX
@@ -14,3 +17,4 @@ swap_solver_boOX
 mapf_solver_boOX
 perm_solver_boOX
 rota_solver_boOX
+mapR_convert_boOX

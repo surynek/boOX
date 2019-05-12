@@ -1,60 +1,48 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agentR.cpp / 0_iskra-161                                                   */
+/* kruhoR_test.h / 0-279_zenon                                                */
 /*----------------------------------------------------------------------------*/
 //
-// Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
+// Semi-continuous MAPF (MAPR-R), Kurhobots and related structures.
 //
 /*----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
 
-#include <map>
+#ifndef __KRUHO_R_TEST_H__
+#define __KRUHO_R_TEST_H__
 
-#include "config.h"
-#include "compile.h"
-#include "version.h"
-#include "defs.h"
-#include "types.h"
-#include "result.h"
+#include "core/kruhoR.h"
 
-#include "core/agentR.h"
-#include "util/statistics.h"
-
-
-using namespace std;
 using namespace boOX;
 
 
 /*----------------------------------------------------------------------------*/
 
-
 namespace boOX
 {
 
+
 /*----------------------------------------------------------------------------*/
-// sRealConfiguration
 
-/*
-    sRealConfiguration::sRealConfiguration()
-    {
-	// nothing
-    }
-*/
+    void print_Introduction(void);
+    
+    void test_KruhobotR_1(void);
+    void test_KruhobotR_2(void);
+    void test_KruhobotR_3(void);    
 
-
-
+    
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
+
+
+#endif /* __KRUHO_R_TEST_H__ */

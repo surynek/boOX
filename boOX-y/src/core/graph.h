@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 0_iskra-161                                                      */
+/* graph.h / 0-279_zenon                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -184,6 +184,7 @@ namespace boOX
 	typedef std::pair<sInt_32, sInt_32> Vertex_pair;
 	typedef std::vector<Vertex_pair> VertexPairs_vector;
 	typedef std::multimap<sInt_32, Vertex_pair, std::less<sInt_32> > VertexPairQueue_multimap;
+	/*----------------------------------------------------------------------------*/	
 
     public:
 	sUndirectedGraph();
@@ -306,6 +307,13 @@ namespace boOX
 
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
+	/*----------------------------------------------------------------------------*/
+	
+	virtual sResult to_File_mapR(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_mapR(FILE *fw, const sString &indent = "") const;
+
+	virtual sResult from_File_mapR(const sString &filename);
+	virtual sResult from_Stream_mapR(FILE *fr);		
 	/*----------------------------------------------------------------------------*/	
 		
     public:

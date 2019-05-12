@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 0_iskra-161                                                      */
+/* cnf.cpp / 0-279_zenon                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -205,6 +205,24 @@ namespace boOX
     }
 
 
+    void  sBoolEncoder::cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 sUNUSED(weight))	
+    {
+	for (VariableIDs_vector::const_iterator variable_A = variable_IDs_A.begin(); variable_A != variable_IDs_A.end(); ++variable_A)
+	{
+	    for (VariableIDs_vector::const_iterator variable_B = variable_IDs_B.begin(); variable_B != variable_IDs_B.end(); ++variable_B)
+	    {
+		cast_Clause(solver, -*variable_A, -*variable_B);		
+	
+                #ifdef sSTATISTICS
+		{
+		    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+		}
+      	        #endif
+	    }
+	}
+    }    
+
+
     void sBoolEncoder::cast_ConditionalAllMutexConstraint(Glucose::Solver    *solver,
 							  sInt_32            &spec_condition,
 							  VariableIDs_vector &variable_IDs,
@@ -381,8 +399,7 @@ namespace boOX
 	Literals.push_back(-variable_ID_PREC);
 
 	for (VariableIDs_vector::const_iterator variable_ID_POST = variable_IDs_POST.begin(); variable_ID_POST != variable_IDs_POST.end(); ++variable_ID_POST)
-	{
-	    
+	{	    
 	    Literals.push_back(*variable_ID_POST);
 	}
 	cast_Clause(solver, Literals);

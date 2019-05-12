@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-161                              */
+/*                              boOX 0-279_zenon                              */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
-/*          pavel.surynek@fit.cvut.cz | <pavel.surynek@fit.cvut.cz>           */
-/*        http://users.fit.cvut.cz/surynek | <http://www.surynek.com>         */
+/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 0_iskra-161                                                     */
+/* result.h / 0-279_zenon                                                     */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -121,6 +121,22 @@ enum sAgentInstance_Result
 };
 
 
+enum s2DMap_Result
+{
+    s2D_MAP_INFO       =  15000,
+    s2D_MAP_ERROR      = -15000,
+    s2D_MAP_OPEN_ERROR = (s2D_MAP_ERROR - 1),
+};
+
+
+enum sRealInstance_Result
+{
+    sREAL_INSTANCE_INFO       =  16000,
+    sREAL_INSTANCE_ERROR      = -16000,
+    sREAL_INSTANCE_OPEN_ERROR = (sREAL_INSTANCE_ERROR - 1),
+};
+
+
 enum sGridgenProgram_Result
 {
     sGRIDGEN_PROGRAM_INFO                         =  100000,
@@ -176,6 +192,13 @@ enum sMultiAgentPathfindingSolverProgram_Result
     sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_SOLVER_PROGRAM_ERROR - 1)
 };
 
+
+enum sRealMapConvertorProgram_Result
+{
+    sMAP_R_CONVERT_PROGRAM_INFO                         =  170000,
+    sMAP_R_CONVERT_PROGRAM_ERROR                        = -170000,
+    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 1)
+};
 
 
 /*----------------------------------------------------------------------------*/

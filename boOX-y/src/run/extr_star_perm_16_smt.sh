@@ -8,5 +8,6 @@ do
   do
     echo $ROBOTS,$SEED
     grep "machine TIME" 'perm-smt_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "clauses" 'perm-smt_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

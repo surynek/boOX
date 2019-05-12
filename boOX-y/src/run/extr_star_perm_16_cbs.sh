@@ -8,5 +8,6 @@ do
   do
     echo $ROBOTS,$SEED
     grep "machine TIME" 'perm-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "steps" 'perm-cbs_star_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done
