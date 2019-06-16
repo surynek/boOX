@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR_test.cpp / 0-279_zenon                                                */
+/* cbsR_test.cpp / 1-036_leibniz                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search.
@@ -1099,9 +1099,9 @@ namespace boOX
 	start_conjunction.place_Kruhobot(4, 3);		
 
 	sRealConjunction goal_conjunction(&crossing_map, 4);
-	goal_conjunction.place_Kruhobot(1, 7);
+	goal_conjunction.place_Kruhobot(1, 5);
 	goal_conjunction.place_Kruhobot(2, 6);
-	goal_conjunction.place_Kruhobot(3, 5);
+	goal_conjunction.place_Kruhobot(3, 7);
 	goal_conjunction.place_Kruhobot(4, 4);		
 
 	start_conjunction.to_Screen();
@@ -1114,6 +1114,9 @@ namespace boOX
 	instance.add_Kruhobot(3, kruhobot_3);	
 	instance.add_Kruhobot(4, kruhobot_4);	
 	instance.to_Screen();
+
+	instance.to_File_mpfR("layered_E.kruR");
+	crossing_map.to_File_mapR("layered_E.mapR");
 
 	sRealCBS real_CBS(&instance);
 	sRealCBS::KruhobotLocationConflicts_vector kruhobot_location_Conflicts;
@@ -1616,7 +1619,7 @@ namespace boOX
 	instance.add_Kruhobot(3, kruhobot_3);	
 	instance.to_Screen();
 
-	instance.to_File_mpfR("small002.mpfR");
+	instance.to_File_mpfR("small002.kruR");
 	crossing_map.to_File_mapR("small002.mapR");
 
 	s2DMap loaded_map;
@@ -1628,7 +1631,7 @@ namespace boOX
 
 		
 	sRealInstance loaded_instance(&loaded_map);	
-	loaded_instance.from_File_mpfR("small002.mpfR");
+	loaded_instance.from_File_mpfR("small002.kruR");
 
 	printf("Loaded real instance\n");
 	loaded_instance.to_Screen();	
@@ -1755,14 +1758,14 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
 //    test_CBS_R_B();
 //    test_CBS_R_C();
 //    test_CBS_R_D();
-//    test_CBS_R_E();
+    test_CBS_R_E();
 //    test_CBS_R_F();
 //    test_CBS_R_G();
 //    test_CBS_R_H();
 //    test_CBS_R_I();
 //    test_CBS_R_J();
 //    test_CBS_R_K();
-    test_CBS_R_L();    
+//    test_CBS_R_L();    
     
 //    test_CBS_R_E8();    
 }

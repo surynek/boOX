@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.h / 0-279_zenon                                                 */
+/* graph_test.h / 1-036_leibniz                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.

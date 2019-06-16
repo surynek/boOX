@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR_test.cpp / 0-279_zenon                                             */
+/* smtcbsR_test.cpp / 1-036_leibniz                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search implemented
@@ -442,8 +442,6 @@ namespace boOX
 							  *instance.m_start_conjunction.m_Map,
 							  instance.m_start_conjunction.m_kruhobot_Locations[kruhobot_id],
 							  instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id],
-							  10.0,
-							  10.0,					    
 							  kruhobot_location_Conflicts[kruhobot_id],
 							  kruhobot_linear_Conflicts[kruhobot_id],
 							  2.0,
@@ -708,11 +706,11 @@ namespace boOX
 	kruhobot_Schedules.resize(start_conjunction.get_KruhobotCount() + 1);
 
 	real_SMTCBS.find_NonconflictingSchedules(instance,
-					      kruhobot_location_Conflicts,
-					      kruhobot_linear_Conflicts,
-					      kruhobot_Schedules,
-					      100.0,
-					      10.0);
+						 kruhobot_location_Conflicts,
+						 kruhobot_linear_Conflicts,
+						 kruhobot_Schedules,
+						 100.0,
+						 10.0);
 	sRealCBSBase::to_Screen(kruhobot_Schedules);	
 /*
 	sDouble solution_cost = sRealCBS::calc_ScheduleCost(instance, kruhobot_Schedules);

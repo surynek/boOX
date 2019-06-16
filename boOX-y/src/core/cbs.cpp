@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 0-279_zenon                                                      */
+/* cbs.cpp / 1-036_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -11983,7 +11983,7 @@ namespace boOX
 	    }
 
 	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= m_goal_Distances[sink_id][source_id] + extra_cost)
-	    {	    
+	    {
 		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
 		{
 		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;

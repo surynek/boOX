@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 0-279_zenon                                                     */
+/* kruhoR.h / 1-036_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -164,6 +164,7 @@ namespace boOX
     {
     public:
 	typedef std::vector<sKruhobot> Kruhobots_vector;
+	typedef std::vector<sInt_32> LocationIDs_vector;	
 
     public:
 	sRealInstance(s2DMap *Map);
@@ -172,7 +173,11 @@ namespace boOX
     public:
 	void add_Kruhobot(const sKruhobot &kruhobot);
 	void add_Kruhobot(sInt_32 id, const sKruhobot &kruhobot);
-	
+        /*----------------------------------------------------------------------------*/
+
+	void collect_StartingLocations(LocationIDs_vector &start_location_IDs) const;
+	void collect_GoalLocations(LocationIDs_vector &goal_location_IDs) const;
+	void collect_StartingGoalLocations(LocationIDs_vector &start_goal_location_IDs) const;	
         /*----------------------------------------------------------------------------*/
 
 	virtual void to_Screen(const sString &indent = "") const;

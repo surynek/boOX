@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.cpp / 0-279_zenon                                             */
+/* gridgen_main.cpp / 1-036_leibniz                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -122,38 +122,41 @@ namespace boOX
 	sInstance instance;
 	sUndirectedGraph environment;
 
-	if (!parameters.m_usc_map_filename.empty())
+	if (parameters.is_Input_usc())
 	{
-	    if (!parameters.m_usc_agents_filename.empty())
+	    if (!parameters.m_usc_map_filename.empty())
 	    {
-		result = instance.from_File_usc(parameters.m_usc_map_filename, parameters.m_usc_agents_filename);
+		if (!parameters.m_usc_agents_filename.empty())
+		{
+		    result = instance.from_File_usc(parameters.m_usc_map_filename, parameters.m_usc_agents_filename);
 
-		if (sFAILED(result))
-		{
-		    printf("Error: Failed to read usc map and agents files %s,%s (code = %d).\n", parameters.m_usc_map_filename.c_str(), parameters.m_usc_agents_filename.c_str(), result);
-		    return result;
+		    if (sFAILED(result))
+		    {
+			printf("Error: Failed to read usc map and agents files %s,%s (code = %d).\n", parameters.m_usc_map_filename.c_str(), parameters.m_usc_agents_filename.c_str(), result);
+			return result;
+		    }
+		    instance.to_Screen();
 		}
-		instance.to_Screen();
-	    }
-	    else		
-	    {
-		result = environment.from_File_usc(parameters.m_usc_map_filename);
-				
-		sConfiguration initial_configuration;		
-		if (sFAILED(result = initial_configuration.generate_Nonconflicting(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), environment)))
+		else		
 		{
-		    printf("Error: Failed to generate initial configuration because of too many conflicts.\n");
-		    return result;
+		    result = environment.from_File_usc(parameters.m_usc_map_filename);
+		    
+		    sConfiguration initial_configuration;		
+		    if (sFAILED(result = initial_configuration.generate_Nonconflicting(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), environment)))
+		    {
+			printf("Error: Failed to generate initial configuration because of too many conflicts.\n");
+			return result;
+		    }
+		    sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);		
+		    goal_configuration.generate_NovelNonconflictingWalk(initial_configuration, environment);
+		    instance = sInstance(environment, initial_configuration, goal_configuration);
 		}
-		sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);		
-		goal_configuration.generate_NovelNonconflictingWalk(initial_configuration, environment);
-		instance = sInstance(environment, initial_configuration, goal_configuration);
 	    }
 	}
 	else
-	{       
+	{
 	    if (!parameters.m_map_filename.empty())
-	    {	    
+	    {
 		result = environment.from_File_map(parameters.m_map_filename);
 		
 		if (sFAILED(result))
@@ -174,7 +177,7 @@ namespace boOX
 		}
 	    }
 	    sConfiguration initial_configuration(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), true);
-	    
+	
 	    if (parameters.m_walk)
 	    {
 		sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);
@@ -187,11 +190,11 @@ namespace boOX
 		instance = sInstance(environment, initial_configuration, goal_configuration);
 	    }
 	}
-	
+        
 	if (!parameters.m_pddl_problem_filename.empty())
 	{
 	    result = instance.to_File_problemPDDL(parameters.m_pddl_problem_filename);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write PDDL problem file %s (code = %d).\n", parameters.m_pddl_problem_filename.c_str(), result);
@@ -201,7 +204,7 @@ namespace boOX
 	if (!parameters.m_pddl_domain_filename.empty())
 	{
 	    result = instance.to_File_domainPDDL(parameters.m_pddl_domain_filename);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write PDDL domain file %s (code = %d).\n", parameters.m_pddl_domain_filename.c_str(), result);
@@ -211,7 +214,7 @@ namespace boOX
 	if (!parameters.m_cpf_filename.empty())
 	{
 	    result = instance.to_File_cpf(parameters.m_cpf_filename);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write multirobot file %s (code = %d).\n", parameters.m_cpf_filename.c_str(), result);
@@ -221,7 +224,7 @@ namespace boOX
 	if (!parameters.m_mpf_filename.empty())
 	{
 	    result = instance.to_File_mpf(parameters.m_mpf_filename);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write multirobot file %s (code = %d).\n", parameters.m_mpf_filename.c_str(), result);
@@ -231,16 +234,44 @@ namespace boOX
 	if (!parameters.m_bgu_filename.empty())
 	{
 	    result = instance.to_File_bgu(parameters.m_bgu_filename, "", 1);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write multirobot file %s (code = %d).\n", parameters.m_bgu_filename.c_str(), result);
 		return result;
 	    }
 	}
-	#ifdef sSTATISTICS
+	
+	if (parameters.is_Output_usc())
 	{
-	  s_GlobalStatistics.to_Screen();
+	    if (!parameters.m_usc_map_filename.empty())
+	    {
+		if (!parameters.m_usc_agents_filename.empty())
+		{
+		    result = instance.to_File_usc(parameters.m_usc_map_filename, parameters.m_usc_agents_filename);
+
+		    if (sFAILED(result))
+		    {
+			printf("Error: Failed to write usc map and agents files %s,%s (code = %d).\n", parameters.m_usc_map_filename.c_str(), parameters.m_usc_agents_filename.c_str(), result);
+			return result;
+		    }
+		}
+		else		
+		{		    
+		    result = environment.from_File_usc(parameters.m_usc_map_filename);
+
+		    if (sFAILED(result))
+		    {
+			printf("Error: Failed to write usc map files %s (code = %d).\n", parameters.m_usc_map_filename.c_str(), result);
+			return result;
+		    }		    
+		}
+	    }
+	}
+	   
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.to_Screen();
 	}
 	#endif
 

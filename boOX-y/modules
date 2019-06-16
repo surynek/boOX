@@ -152,3 +152,19 @@ application
 mapR_convert_main.cpp
 pthread z3
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
+kruhoR_generate_boOX
+application
+/src/main
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h kruhoR_generate_main.h
+kruhoR_generate_main.cpp
+pthread z3
+/src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
+mapfR_solver_boOX
+application
+/src/main
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h mapfR_solver_main.h
+mapfR_solver_main.cpp
+pthread z3
+/src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX

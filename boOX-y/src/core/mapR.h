@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.h / 0-279_zenon                                                       */
+/* mapR.h / 1-036_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous maps for semi-continuous version of MAPF (MAPF-R).
@@ -66,7 +66,9 @@ namespace boOX
 	typedef std::vector<Location> Locations_vector;
 
 	typedef std::vector<sDouble> Distances_vector;
-	typedef std::vector<Distances_vector> Distances_2d_vector;	
+	typedef std::vector<Distances_vector> Distances_2d_vector;
+
+	typedef std::multimap<sDouble, sInt_32, std::less<sDouble> > DistanceLocationIDs_mmap;
 
     public:
 	s2DMap();
@@ -77,26 +79,49 @@ namespace boOX
 
 	void populate_Network(void);
 	void populate_Network(sDouble max_distance);
+
+	void populate_NetworkCircular(sDouble max_distance);
+	void populate_NetworkRadiant(sDouble max_distance);	
 	/*----------------------------------------------------------------------------*/
 
+	sDouble calc_StraightDistance(sInt_32 source_id, sInt_32 target_id) const;
+	
 	void calc_SingleSourceStraightDistances(sInt_32 s_id);
 	void calc_SingleSourceStraightDistances(sInt_32 s_id, Distances_vector &straight_Distances) const;
+
+	void calc_SingleSourceStraightNeighborDistances(sInt_32 s_id);
+	void calc_SingleSourceStraightNeighborDistances(sInt_32 s_id, Distances_vector &straight_Distances) const;	
 
 	void calc_AllPairsStraightDistances(void);
 	void calc_AllPairsStraightDistances(Distances_2d_vector &straight_Distances) const;
 
-	void calc_SelectedPairsStraightDistances(const LocationIDs_vector &selection_IDs) const;	
+	void calc_NetworkPairsStraightDistances(void);
+	void calc_NetworkPairsStraightDistances(Distances_2d_vector &straight_Distances) const;	
+
+	void calc_SelectedPairsStraightDistances(const LocationIDs_vector &selection_IDs);
 	void calc_SelectedPairsStraightDistances(const LocationIDs_vector &selection_IDs, Distances_2d_vector &straight_Distances) const;
+
+	void calc_SourceGoalStraightDistances(const LocationIDs_vector &source_IDs, const LocationIDs_vector &goal_IDs);
+	void calc_SourceGoalStraightDistances(const LocationIDs_vector &source_IDs, const LocationIDs_vector &goal_IDs, Distances_2d_vector &straight_Distances) const;
 	/*----------------------------------------------------------------------------*/	
 
 	void calc_SingleSourceShortestDistances(sInt_32 s_id);
 	void calc_SingleSourceShortestDistances(sInt_32 s_id, Distances_vector &shortest_Distances) const;
 
+	void calc_SingleSourceShortestNeighborDistances(sInt_32 s_id);
+	void calc_SingleSourceShortestNeighborDistances(sInt_32 s_id, Distances_vector &shortest_Distances) const;	
+
 	void calc_AllPairsShortestDistances(void);
 	void calc_AllPairsShortestDistances(Distances_2d_vector &shortest_Distances) const;
 
-	void calc_SelectedPairsShortestDistances(const LocationIDs_vector &selection_IDs) const;	
-	void calc_SelectedPairsShortestDistances(const LocationIDs_vector &selection_IDs, Distances_2d_vector &shortest_Distances) const;	
+	void calc_NetworkPairsShortestDistances(void);
+	void calc_NetworkPairsShortestDistances(Distances_2d_vector &shortest_Distances) const;	
+
+	void calc_SelectedPairsShortestDistances(const LocationIDs_vector &selection_IDs);	
+	void calc_SelectedPairsShortestDistances(const LocationIDs_vector &selection_IDs, Distances_2d_vector &shortest_Distances) const;
+
+	void calc_SourceGoalShortestDistances(const LocationIDs_vector &source_IDs, const LocationIDs_vector &goal_IDs);
+	void calc_SourceGoalShortestDistances(const LocationIDs_vector &source_IDs, const LocationIDs_vector &goal_IDs, Distances_2d_vector &shortest_Distances) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sDouble calc_PointDistance(sInt_32 point_1_id, sInt_32 point_2_id) const;

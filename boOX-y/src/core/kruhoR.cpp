@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 0-279_zenon                                                   */
+/* kruhoR.cpp / 1-036_leibniz                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -238,7 +238,6 @@ namespace boOX
 	{
 	    fprintf(fw, "%s%s%d->%d\n", indent.c_str(), s_INDENT.c_str(), i, m_kruhobot_Locations[i]);
 	}	
-	fprintf(fw, "%s\n", indent.c_str());	
     }
     
 
@@ -298,6 +297,78 @@ namespace boOX
 	}
 	m_Kruhobots[id] = kruhobot;
 	m_Kruhobots[id].m_id = id;
+    }
+    
+
+/*----------------------------------------------------------------------------*/
+
+    void sRealInstance::collect_StartingLocations(LocationIDs_vector &start_location_IDs) const
+    {
+	sInt_32 N_locations = m_start_conjunction.m_Map->m_Locations.size();
+	vector<sInt_32> collected;
+
+	collected.resize(N_locations, -1);
+	sInt_32 N_kruhobots = m_start_conjunction.get_KruhobotCount();
+	
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{
+	    sInt_32 start_loc_id = m_start_conjunction.m_kruhobot_Locations[kruhobot_id];
+	    if (collected[start_loc_id] < 0)
+	    {
+		start_location_IDs.push_back(start_loc_id);
+		collected[start_loc_id] = 1;
+	    }
+	}
+    }
+
+    
+    void sRealInstance::collect_GoalLocations(LocationIDs_vector &goal_location_IDs) const
+    {
+	sInt_32 N_locations = m_goal_conjunction.m_Map->m_Locations.size();
+	vector<sInt_32> collected;
+
+	collected.resize(N_locations, -1);
+	sInt_32 N_kruhobots = m_goal_conjunction.get_KruhobotCount();
+	
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{
+	    sInt_32 goal_loc_id = m_goal_conjunction.m_kruhobot_Locations[kruhobot_id];
+	    if (collected[goal_loc_id] < 0)
+	    {
+		goal_location_IDs.push_back(goal_loc_id);
+		collected[goal_loc_id] = 1;
+	    }
+	}
+    }
+
+    
+    void sRealInstance::collect_StartingGoalLocations(LocationIDs_vector &start_goal_location_IDs) const
+    {
+	sInt_32 N_locations = m_start_conjunction.m_Map->m_Locations.size();
+	sASSERT(N_locations == m_goal_conjunction.m_Map->m_Locations.size());
+	vector<sInt_32> collected;
+
+	collected.resize(N_locations, -1);
+	sInt_32 N_kruhobots = m_goal_conjunction.get_KruhobotCount();	
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{
+	    sInt_32 start_loc_id = m_start_conjunction.m_kruhobot_Locations[kruhobot_id];
+	    if (collected[start_loc_id] < 0)
+	    {
+		start_goal_location_IDs.push_back(start_loc_id);
+		collected[start_loc_id] = 1;
+	    }
+	}
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{
+	    sInt_32 goal_loc_id = m_goal_conjunction.m_kruhobot_Locations[kruhobot_id];
+	    if (collected[goal_loc_id] < 0)
+	    {
+		start_goal_location_IDs.push_back(goal_loc_id);
+		collected[goal_loc_id] = 1;
+	    }
+	}	
     }
     
 
@@ -398,12 +469,10 @@ namespace boOX
 	
 	for (sInt_32 i = 1; i < N_Kruhobots_1; ++i)
 	{
-	    m_Kruhobots[i].to_Screen();
 	    if (sFAILED(result = m_Kruhobots[i].from_Stream_mpfR(fr)))
 	    {
 		return result;
 	    }
-	    m_Kruhobots[i].to_Screen();
 	}
 	
 	fscanf(fr, "Start\n");

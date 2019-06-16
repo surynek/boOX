@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.cpp / 0-279_zenon                                        */
+/* mapR_convert_main.cpp / 1-036_leibniz                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -49,8 +49,10 @@ namespace boOX
 /*----------------------------------------------------------------------------*/
 
   sCommandParameters::sCommandParameters()
+      : m_neighbor_type(NEIGHBORHOOD_CIRCULAR)
+      , m_neighbor_radius(1.0)
   {
-      // nothing
+     // nothing
   }
 
 
@@ -58,10 +60,10 @@ namespace boOX
 
     void print_IntroductoryMessage(void)
     {
-	printf("----------------------------------------------------------------\n");
-	printf("%s : Continuous Map (mapR) Convertor\n", sPRODUCT); 
+	printf("--------------------------------------------------------------------------------\n");
+	printf("%s : Continuous Multi-Agent Path Finding Map (mapR) Convertor\n", sPRODUCT); 
 	printf("%s\n", sCOPYRIGHT);
-	printf("================================================================\n");	
+	printf("================================================================================\n");	
     }
 
 
@@ -75,13 +77,18 @@ namespace boOX
     {
 	printf("Usage:\n");
 	printf("mapR_convert_boOX  --input-map-file=<string>\n");
-	printf("                   --output-mapR-file=<sting>\n");
+	printf("                   --output-mapR-file=<string>\n");
+	printf("                  [--neighbor-type={circular|radiant}]\n");		
+	printf("                  [--neighbor-radius=<double>]\n");	
 	printf("\n");
 	printf("Examples:\n");
 	printf("mapR_convert_boOX --input-map-file=ost003d.map\n");
 	printf("                  --output-file=ost003d.mapR\n");
+	printf("                  --neighbor-type=circular\n");		
+	printf("                  --neighbor-radius=2.0\n");	
 	printf("\n");
-	printf("Defaults: <there are no defaults>\n");
+	printf("Defaults: --neighbor-type=circular\n");	
+	printf("          --neighbor-radius=1.0\n");	
 	printf("\n");
     }
 
@@ -106,6 +113,24 @@ namespace boOX
 		printf("Error: Failed to open grid map file %s (code = %d).\n", parameters.m_input_map_filename.c_str(), result);
 		return result;
 	    }
+	}
+	switch (parameters.m_neighbor_type)
+	{
+	case sCommandParameters::NEIGHBORHOOD_CIRCULAR:
+	{
+	    real_Map.populate_NetworkCircular(parameters.m_neighbor_radius);
+	    break;
+	}
+	case sCommandParameters::NEIGHBORHOOD_RADIANT:
+	{
+	    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+	    break;
+	}
+	default:
+	{
+	    sASSERT(false);
+	    break;
+	}
 	}
 
 	if (!parameters.m_output_mapR_filename.empty())
@@ -145,6 +170,27 @@ namespace boOX
 	{
 	    command_parameters.m_output_mapR_filename = parameter.substr(19, parameter.size());
 	}
+	else if (parameter.find("--neighbor-radius=") == 0)
+	{
+	    command_parameters.m_neighbor_radius = sDouble_from_String(parameter.substr(18, parameter.size()));
+	}
+	else if (parameter.find("--neighbor-type=") == 0)
+	{
+	    sString neighbor_type_str = parameter.substr(16, parameter.size());
+
+	    if (neighbor_type_str == "circular")
+	    {
+		command_parameters.m_neighbor_type = sCommandParameters::NEIGHBORHOOD_CIRCULAR;
+	    }
+	    else if (neighbor_type_str == "radiant")
+	    {
+		command_parameters.m_neighbor_type = sCommandParameters::NEIGHBORHOOD_RADIANT;
+	    }
+	    else
+	    {
+		return sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
+	    }
+	}	
 	else
 	{
 	    return sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

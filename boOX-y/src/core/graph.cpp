@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0-279_zenon                                                    */
+/* graph.cpp / 1-036_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -1424,6 +1424,8 @@ namespace boOX
     }
 
 
+/*----------------------------------------------------------------------------*/
+    
     sInt_32 sUndirectedGraph::calc_ShortestPath(sInt_32 u_id, sInt_32 v_id) const
     {
 	Distances_vector Distances;
@@ -1560,7 +1562,9 @@ namespace boOX
 	}
     }    
 
-
+    
+/*----------------------------------------------------------------------------*/
+    
     void sUndirectedGraph::find_ShortestPathBreadth(sInt_32 source_id, sInt_32 dest_id, VertexIDs_vector &shortest_Path)
     {
 	Distances_vector Distances;
@@ -2457,6 +2461,45 @@ namespace boOX
     }
 
 
+    sResult sUndirectedGraph::to_File_usc(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_usc(fw, indent);	
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sUndirectedGraph::to_Stream_usc(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_y_size, m_x_size);
+
+	for (sInt_32 j = 0; j < m_y_size; ++j)
+	{
+	    fprintf(fw, "%s", indent.c_str());
+	    for (sInt_32 i = 0; i < m_x_size; ++i)
+	    {
+		if (m_Matrix[j * m_x_size + i] >= 0)
+		{
+		    fprintf(fw, ".");
+		}
+		else
+		{
+		    fprintf(fw, "#");
+		}
+	    }
+	    fprintf(fw, "\n");
+	}	
+    }
+    
+    
     sResult sUndirectedGraph::from_File_usc(const sString &filename)
     {
 	sResult result;

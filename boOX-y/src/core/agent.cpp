@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 0-279_zenon                                                    */
+/* agent.cpp / 1-036_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1413,6 +1413,7 @@ namespace boOX
 
         #ifdef sDEBUG
 	{
+	    /*
 	    printf("<----\n");	
 	    printf("MDD printout\n");
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
@@ -1429,6 +1430,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    printf("<----\n");
+	    */
 	}
 	#endif
 	
@@ -2297,6 +2299,58 @@ namespace boOX
     }
 
 
+    sResult sInstance::to_File_usc(const sString &map_filename, const sString &agents_filename) const
+    {
+	FILE *fw_map, *fw_agents;
+
+	if ((fw_map = fopen(map_filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_USC_MAP_OPEN_ERROR;
+	}
+	if ((fw_agents = fopen(agents_filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR;
+	}
+	
+	to_Stream_usc(fw_map, fw_agents);
+	
+	fclose(fw_map);
+	fclose(fw_agents);	
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sInstance::to_Stream_usc(FILE *fw_map, FILE *fw_agents, const sString &indent) const
+    {
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	sASSERT(N_Agents == m_goal_configuration.get_AgentCount());
+
+	m_environment.to_Stream_usc(fw_map);
+        fprintf(fw_agents, "%s%d\n", indent.c_str(), N_Agents);
+
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    fprintf(fw_agents, "%s", indent.c_str());
+	    
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
+	    
+	    sInt_32 goal_row = m_environment.calc_GridRow(goal_vertex_id);
+	    sInt_32 goal_column = m_environment.calc_GridColumn(goal_vertex_id);
+	    
+	    fprintf(fw_agents, "%d,%d,", goal_row, goal_column);
+
+	    sInt_32 start_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+
+	    sInt_32 start_row = m_environment.calc_GridRow(start_vertex_id);
+	    sInt_32 start_column = m_environment.calc_GridColumn(start_vertex_id);	    
+
+	    fprintf(fw_agents, "%d,%d,", start_row, start_column);
+	    fprintf(fw_agents, "\n");
+	}	
+    }    
+
+
     sResult sInstance::from_File_usc(const sString &map_filename, const sString &agents_filename)
     {
 	sResult result;
@@ -2361,7 +2415,7 @@ namespace boOX
 	return sRESULT_SUCCESS;
     }
 
-
+    
     sResult sInstance::from_File_lusc(const sString &map_filename, const sString &agents_filename)
     {
 	sResult result;
@@ -2429,7 +2483,7 @@ namespace boOX
     }        
 
 
-    sResult sInstance::to_File_dibox(const sString &filename)
+    sResult sInstance::to_File_dibox(const sString &filename) const
     {
 	sResult result;
 	FILE *fw;
@@ -2451,7 +2505,7 @@ namespace boOX
     }
 
 
-    sResult sInstance::to_Stream_dibox(FILE *fw)
+    sResult sInstance::to_Stream_dibox(FILE *fw) const
     {
 	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
 

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 0-279_zenon                                                     */
+/* smtcbs.h / 1-036_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -180,6 +180,14 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingSwappingInverse(sInstance         &instance,
 							   AgentPaths_vector &agent_Paths,
 							   sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(sInstance         &instance,
+								   AgentPaths_vector &agent_Paths,
+								   sInt_32            cost_limit) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const;
@@ -196,7 +204,23 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingPathsInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingPathsInverse(sInstance         &instance,
 							AgentPaths_vector &agent_Paths,
-							sInt_32            cost_limit) const;	
+							sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
+	
+	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
+	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(sInstance         &instance,
+								 AgentPaths_vector &agent_Paths,
+								 sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
+	
+	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
+	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(sInstance         &instance,
+								AgentPaths_vector &agent_Paths,
+								sInt_32            cost_limit);			
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_ShortestNonconflictingPermutation(sSolution &solution, sInt_32 cost_limit) const;
@@ -213,7 +237,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingPermutationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingPermutationInverse(sInstance         &instance,
 							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit) const;	
+							      sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(sInstance         &instance,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const;
@@ -230,7 +262,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingRotationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingRotationInverse(sInstance         &instance,
 							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;	
+							   sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sInstance         &instance,
+								   AgentPaths_vector &agent_Paths,
+								   sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping(Context           &context,
@@ -248,6 +288,14 @@ namespace boOX
 						   sInstance         &instance,
 						   AgentPaths_vector &agent_Paths,
 						   sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingSwappingInverseDepleted(Context           &context,
+							   AgentPaths_vector &agent_Paths,
+							   sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingSwappingInverseDepleted(Context           &context,
+							   sInstance         &instance,
+							   AgentPaths_vector &agent_Paths,
+							   sInt_32            cost_limit) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingPaths(Context           &context,
@@ -264,7 +312,23 @@ namespace boOX
 	sInt_32 find_NonconflictingPathsInverse(Context           &context,
 						sInstance         &instance,
 						AgentPaths_vector &agent_Paths,
-						sInt_32            cost_limit) const;	
+						sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingPathsInverseSeparated(Context           &context,
+							 AgentPaths_vector &agent_Paths,
+							 sInt_32            cost_limit);	
+	sInt_32 find_NonconflictingPathsInverseSeparated(Context           &context,
+							 sInstance         &instance,
+							 AgentPaths_vector &agent_Paths,
+							 sInt_32            cost_limit);
+
+	sInt_32 find_NonconflictingPathsInverseDepleted(Context           &context,
+							AgentPaths_vector &agent_Paths,
+							sInt_32            cost_limit);	
+	sInt_32 find_NonconflictingPathsInverseDepleted(Context           &context,
+							sInstance         &instance,
+							AgentPaths_vector &agent_Paths,
+							sInt_32            cost_limit);			
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingPermutation(Context           &context,
@@ -281,7 +345,15 @@ namespace boOX
 	sInt_32 find_NonconflictingPermutationInverse(Context           &context,
 						      sInstance         &instance,
 						      AgentPaths_vector &agent_Paths,
-						      sInt_32            cost_limit) const;	
+						      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingPermutationInverseDepleted(Context           &context,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingPermutationInverseDepleted(Context           &context,
+							      sInstance         &instance,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit) const;	
 	/*----------------------------------------------------------------------------*/ 	
 
 	sInt_32 find_NonconflictingRotation(Context           &context,
@@ -298,7 +370,15 @@ namespace boOX
 	sInt_32 find_NonconflictingRotationInverse(Context           &context,
 						   sInstance         &instance,
 						   AgentPaths_vector &agent_Paths,
-						   sInt_32            cost_limit) const;	
+						   sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingRotationInverseDepleted(Context           &context,
+							   AgentPaths_vector &agent_Paths,
+							   sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingRotationInverseDepleted(Context           &context,
+							   sInstance         &instance,
+							   AgentPaths_vector &agent_Paths,
+							   sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
@@ -321,10 +401,37 @@ namespace boOX
 								  Context                      &context,
 								  sInstance::MDD_vector        &MDD,
 								  sInstance::MDD_vector        &extra_MDD,
-								  sInstance::InverseMDD_vector &inverse_MDD,								  
+								  sInstance::InverseMDD_vector &inverse_MDD,
 								  sInt_32                       extra_cost,
 								  AgentPaths_vector            &agent_Paths,
-								  sInt_32                       cost_limit) const;	
+								  sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseSeparated(const sInstance              &instance,
+									   Context                      &context,
+									   sInstance::MDD_vector        &MDD,
+									   sInstance::MDD_vector        &extra_MDD,
+									   sInstance::InverseMDD_vector &inverse_MDD,
+									   sInt_32                       extra_cost,
+									   AgentPaths_vector            &agent_Paths,
+									   sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseSemiseparated(const sInstance              &instance,
+									       Context                      &context,
+									       sInstance::MDD_vector        &MDD,
+									       sInstance::MDD_vector        &extra_MDD,
+									       sInstance::InverseMDD_vector &inverse_MDD,
+									       sInt_32                       extra_cost,
+									       AgentPaths_vector            &agent_Paths,
+									       sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+									  Context                      &context,
+									  sInstance::MDD_vector        &MDD,
+									  sInstance::MDD_vector        &extra_MDD,
+									  sInstance::InverseMDD_vector &inverse_MDD,
+									  sInt_32                       extra_cost,
+									  AgentPaths_vector            &agent_Paths,
+									  sInt_32                       cost_limit) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping_GlucosePrincipal(const sInstance       &instance,
@@ -351,6 +458,16 @@ namespace boOX
 								     sInt_32                       extra_cost,
 								     AgentPaths_vector            &agent_Paths,
 								     sInt_32                       cost_limit) const;
+
+
+	sInt_32 find_NonconflictingSwapping_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+									     Context                      &context,
+									     sInstance::MDD_vector        &MDD,
+									     sInstance::MDD_vector        &extra_MDD,
+									     sInstance::InverseMDD_vector &inverse_MDD,
+									     sInt_32                       extra_cost,
+									     AgentPaths_vector            &agent_Paths,
+									     sInt_32                       cost_limit) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingPermutation_GlucosePrincipal(const sInstance       &instance,
@@ -376,7 +493,16 @@ namespace boOX
 									sInstance::InverseMDD_vector &inverse_MDD,
 									sInt_32                       extra_cost,
 									AgentPaths_vector            &agent_Paths,
-									sInt_32                       cost_limit) const;	
+									sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingPermutation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+										Context                      &context,
+										sInstance::MDD_vector        &MDD,
+										sInstance::MDD_vector        &extra_MDD,
+										sInstance::InverseMDD_vector &inverse_MDD,
+										sInt_32                       extra_cost,
+										AgentPaths_vector            &agent_Paths,
+										sInt_32                       cost_limit) const;		
 	/*----------------------------------------------------------------------------*/		
 
 	sInt_32 find_NonconflictingRotation_GlucosePrincipal(const sInstance       &instance,
@@ -402,7 +528,16 @@ namespace boOX
 								     sInstance::InverseMDD_vector &inverse_MDD,
 								     sInt_32                       extra_cost,
 								     AgentPaths_vector            &agent_Paths,
-								     sInt_32                       cost_limit) const;		
+								     sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+									     Context                      &context,
+									     sInstance::MDD_vector        &MDD,
+									     sInstance::MDD_vector        &extra_MDD,
+									     sInstance::InverseMDD_vector &inverse_MDD,
+									     sInt_32                       extra_cost,
+									     AgentPaths_vector            &agent_Paths,
+									     sInt_32                       cost_limit) const;			
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingPaths(Glucose::Solver       *solver,
@@ -424,7 +559,18 @@ namespace boOX
 						    sInstance::InverseMDD_vector &inverse_MDD,
 						    sInt_32                       extra_cost,
 						    sInt_32                       cost_limit,
-						    AgentPaths_vector            &agent_Paths) const;	
+						    AgentPaths_vector            &agent_Paths) const;
+
+	bool find_InitialNonconflictingPathsInverse_validity(Glucose::Solver              *solver,
+							     Context                      &context,
+							     Model                        &sat_Model,
+							     const sInstance              &instance,
+							     sInstance::MDD_vector        &MDD,
+							     sInstance::MDD_vector        &extra_MDD,
+							     sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                       extra_cost,
+							     sInt_32                       cost_limit,
+							     AgentPaths_vector            &agent_Paths) const;		
 
 	bool find_NextNonconflictingPaths(Glucose::Solver       *solver,
 					  Context               &context,
@@ -458,7 +604,116 @@ namespace boOX
 						 sInstance::InverseMDD_vector &inverse_MDD,
 						 sInt_32                       extra_cost,
 						 sInt_32                       cost_limit,
-						 AgentPaths_vector            &agent_Paths) const;		
+						 AgentPaths_vector            &agent_Paths) const;
+
+	bool find_NextNonconflictingPathsInverse_initial(Glucose::Solver             *solver,
+							 Context                      &context,
+							 Model                        &sat_Model,
+							 const Collisions_vector      &Collisions,
+							 const sInstance              &instance,
+							 sInstance::MDD_vector        &MDD,
+							 sInstance::MDD_vector        &extra_MDD,
+							 sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                       extra_cost,
+							 sInt_32                       cost_limit,
+							 AgentPaths_vector            &agent_Paths) const;	
+
+	bool find_NextNonconflictingPathsInverse_validity(Glucose::Solver             *solver,
+							  Context                      &context,
+							  Model                        &sat_Model,
+							  const Collisions_vector      &Collisions,
+							  const sInstance              &instance,
+							  sInstance::MDD_vector        &MDD,
+							  sInstance::MDD_vector        &extra_MDD,
+							  sInstance::InverseMDD_vector &inverse_MDD,
+							  sInt_32                       extra_cost,
+							  sInt_32                       cost_limit,
+							  AgentPaths_vector            &agent_Paths) const;
+
+	bool find_NextNonconflictingPathsInverse_cost(Glucose::Solver             *solver,
+						      Context                      &context,
+						      Model                        &sat_Model,
+						      const Collisions_vector      &Collisions,
+						      const sInstance              &instance,
+						      sInstance::MDD_vector        &MDD,
+						      sInstance::MDD_vector        &extra_MDD,
+						      sInstance::InverseMDD_vector &inverse_MDD,
+						      sInt_32                       extra_cost,
+						      sInt_32                       cost_limit,
+						      AgentPaths_vector            &agent_Paths) const;
+
+
+
+	
+	bool find_InitialNonconflictingPathsInverseDepleted(Glucose::Solver              *solver,
+							    Context                      &context,
+							    Model                        &sat_Model,
+							    const sInstance              &instance,
+							    sInstance::MDD_vector        &MDD,
+							    sInstance::MDD_vector        &extra_MDD,
+							    sInstance::InverseMDD_vector &inverse_MDD,
+							    sInt_32                       extra_cost,
+							    sInt_32                       cost_limit,
+							    AgentPaths_vector            &agent_Paths) const;
+
+	bool find_InitialNonconflictingPathsInverseDepleted_validity(Glucose::Solver              *solver,
+								     Context                      &context,
+								     Model                        &sat_Model,
+								     const sInstance              &instance,
+								     sInstance::MDD_vector        &MDD,
+								     sInstance::MDD_vector        &extra_MDD,
+								     sInstance::InverseMDD_vector &inverse_MDD,
+								     sInt_32                       extra_cost,
+								     sInt_32                       cost_limit,
+								     AgentPaths_vector            &agent_Paths) const;		
+	
+	bool find_NextNonconflictingPathsInverseDepleted(Glucose::Solver             *solver,
+							 Context                      &context,
+							 Model                        &sat_Model,
+							 const Collisions_vector      &Collisions,
+							 const sInstance              &instance,
+							 sInstance::MDD_vector        &MDD,
+							 sInstance::MDD_vector        &extra_MDD,
+							 sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                       extra_cost,
+							 sInt_32                       cost_limit,
+							 AgentPaths_vector            &agent_Paths) const;
+
+	bool find_NextNonconflictingPathsInverseDepleted_initial(Glucose::Solver             *solver,
+								 Context                      &context,
+								 Model                        &sat_Model,
+								 const Collisions_vector      &Collisions,
+								 const sInstance              &instance,
+								 sInstance::MDD_vector        &MDD,
+								 sInstance::MDD_vector        &extra_MDD,
+								 sInstance::InverseMDD_vector &inverse_MDD,
+								 sInt_32                       extra_cost,
+								 sInt_32                       cost_limit,
+								 AgentPaths_vector            &agent_Paths) const;	
+
+	bool find_NextNonconflictingPathsInverseDepleted_validity(Glucose::Solver             *solver,
+								  Context                      &context,
+								  Model                        &sat_Model,
+								  const Collisions_vector      &Collisions,
+								  const sInstance              &instance,
+								  sInstance::MDD_vector        &MDD,
+								  sInstance::MDD_vector        &extra_MDD,
+								  sInstance::InverseMDD_vector &inverse_MDD,
+								  sInt_32                       extra_cost,
+								  sInt_32                       cost_limit,
+								  AgentPaths_vector            &agent_Paths) const;
+
+	bool find_NextNonconflictingPathsInverseDepleted_cost(Glucose::Solver             *solver,
+							      Context                      &context,
+							      Model                        &sat_Model,
+							      const Collisions_vector      &Collisions,
+							      const sInstance              &instance,
+							      sInstance::MDD_vector        &MDD,
+							      sInstance::MDD_vector        &extra_MDD,
+							      sInstance::InverseMDD_vector &inverse_MDD,
+							      sInt_32                       extra_cost,
+							      sInt_32                       cost_limit,
+							      AgentPaths_vector            &agent_Paths) const;
 
 	sInt_32 check_NonconflictingPaths(const sInstance         &instance,
 					  const AgentPaths_vector &agent_Paths,
@@ -524,7 +779,31 @@ namespace boOX
 						    sInstance::InverseMDD_vector &inverse_MDD,
 						    sInt_32                      extra_cost,
 						    sInt_32                      cost_limit,
-						    AgentPaths_vector           &agent_Paths) const;	
+						    AgentPaths_vector           &agent_Paths) const;
+
+	bool find_InitialNonconflictingSwappingInverseDepleted(Glucose::Solver             *solver,
+							       Context                      &context,
+							       Model                        &sat_Model,
+							       const sInstance              &instance,
+							       sInstance::MDD_vector        &MDD,
+							       sInstance::MDD_vector        &extra_MDD,
+							       sInstance::InverseMDD_vector &inverse_MDD,
+							       sInt_32                       extra_cost,
+							       sInt_32                       cost_limit,
+							       AgentPaths_vector            &agent_Paths) const;	
+
+	bool find_NextNonconflictingSwappingInverseDepleted(Glucose::Solver              *solver,
+							    Context                      &context,
+							    Model                        &sat_Model,
+							    const Collisions_vector      &Collisions,
+							    const EdgeCollisions_vector  &edge_Collisions,
+							    const sInstance              &instance,
+							    sInstance::MDD_vector        &MDD,
+							    sInstance::MDD_vector        &extra_MDD,
+							    sInstance::InverseMDD_vector &inverse_MDD,
+							    sInt_32                      extra_cost,
+							    sInt_32                      cost_limit,
+							    AgentPaths_vector           &agent_Paths) const;	
 
 	sInt_32 check_NonconflictingSwapping(const sInstance         &instance,
 					     const AgentPaths_vector &agent_Paths,
@@ -589,7 +868,30 @@ namespace boOX
 						       sInstance::InverseMDD_vector &inverse_MDD,
 						       sInt_32                       extra_cost,
 						       sInt_32                       cost_limit,
-						       AgentPaths_vector            &agent_Paths) const;	
+						       AgentPaths_vector            &agent_Paths) const;
+
+	bool find_InitialNonconflictingPermutationInverseDepleted(Glucose::Solver              *solver,
+								  Context                      &context,
+								  Model                        &sat_Model,
+								  const sInstance              &instance,
+								  sInstance::MDD_vector        &MDD,
+								  sInstance::MDD_vector        &extra_MDD,
+								  sInstance::InverseMDD_vector &inverse_MDD,
+								  sInt_32                       extra_cost,
+								  sInt_32                       cost_limit,
+								  AgentPaths_vector            &agent_Paths) const;	
+
+	bool find_NextNonconflictingPermutationInverseDepleted(Glucose::Solver              *solver,
+							       Context                      &context,
+							       Model                        &sat_Model,
+							       const Collisions_vector      &Collisions,
+							       const sInstance              &instance,
+							       sInstance::MDD_vector        &MDD,
+							       sInstance::MDD_vector        &extra_MDD,
+							       sInstance::InverseMDD_vector &inverse_MDD,
+							       sInt_32                       extra_cost,
+							       sInt_32                       cost_limit,
+							       AgentPaths_vector            &agent_Paths) const;		
 	
 	sInt_32 check_NonconflictingPermutation(const sInstance         &instance,
 						const AgentPaths_vector &agent_Paths,
@@ -655,7 +957,31 @@ namespace boOX
 						    sInstance::InverseMDD_vector &inverse_MDD,
 						    sInt_32                       extra_cost,
 						    sInt_32                       cost_limit,
-						    AgentPaths_vector            &agent_Paths) const;		
+						    AgentPaths_vector            &agent_Paths) const;
+
+	bool find_InitialNonconflictingRotationInverseDepleted(Glucose::Solver       *solver,
+							       Context               &context,
+							       Model                 &sat_Model,
+							       const sInstance       &instance,
+							       sInstance::MDD_vector &MDD,
+							       sInstance::MDD_vector &extra_MDD,
+							       sInstance::InverseMDD_vector &inverse_MDD,
+							       sInt_32                extra_cost,
+							       sInt_32                cost_limit,
+							       AgentPaths_vector     &agent_Paths) const;	
+	
+	bool find_NextNonconflictingRotationInverseDepleted(Glucose::Solver              *solver,
+							    Context                      &context,
+							    Model                        &sat_Model,
+							    const Collisions_vector      &Collisions,
+							    const EdgeCollisions_vector  &edge_Collisions,
+							    const sInstance              &instance,
+							    sInstance::MDD_vector        &MDD,
+							    sInstance::MDD_vector        &extra_MDD,
+							    sInstance::InverseMDD_vector &inverse_MDD,
+							    sInt_32                       extra_cost,
+							    sInt_32                       cost_limit,
+							    AgentPaths_vector            &agent_Paths) const;			
 
 	sInt_32 check_NonconflictingRotation(const sInstance         &instance,
 					     const AgentPaths_vector &agent_Paths,
@@ -735,6 +1061,41 @@ namespace boOX
 				  const Model                 &sat_Model,
 				  AgentPaths_vector           &agent_Paths) const;
 	/*----------------------------------------------------------------------------*/
+	
+	sInt_32 build_SwappingSmallModelVariablesInverse(Glucose::Solver                    *solver,
+							 Context                            &context,					 
+							 const sInstance                    &instance,
+							 const sInstance::MDD_vector        &MDD,
+							 const sInstance::MDD_vector        &extra_MDD,
+							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             extra_cost,
+							 Model                              &sat_Model) const;
+	
+	void build_SwappingSmallModelConstraintsInverse(Glucose::Solver                    *solver,
+							Context                            &context,
+							const sInstance                    &instance,
+							const sInstance::MDD_vector        &MDD,
+							const sInstance::MDD_vector        &extra_MDD,
+							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             extra_cost,
+							Model                              &sat_Model) const;
+	
+	void refine_SwappingSmallModelCollisionsInverse(Glucose::Solver                   *solver,
+							const Collisions_vector            &Collisions,
+							const EdgeCollisions_vector        &edge_Collisions,					    
+							const sInstance                    &instance,
+							const sInstance::MDD_vector        &MDD,
+							const sInstance::MDD_vector        &extra_MDD,
+							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             extra_cost,
+							Model                              &sat_Model) const;			
+
+	void decode_SwappingSmallModel(Glucose::Solver             *solver,
+				       const sInstance             &instance,
+				       const sInstance::MDD_vector &MDD,
+				       const Model                 &sat_Model,
+				       AgentPaths_vector           &agent_Paths) const;	
+	/*----------------------------------------------------------------------------*/
 
 	sInt_32 build_PathModelVariables(Glucose::Solver             *solver,
 					 Context                     &context,					 
@@ -751,7 +1112,8 @@ namespace boOX
 						const sInstance::MDD_vector        &extra_MDD,
 						const sInstance::InverseMDD_vector &inverse_MDD,
 						sInt_32                             extra_cost,
-						Model                              &sat_Model) const;		
+						Model                              &sat_Model) const;
+	
 	void build_PathModelConstraints(Glucose::Solver             *solver,
 					Context                     &context,
 					const sInstance             &instance,
@@ -767,7 +1129,25 @@ namespace boOX
 					       const sInstance::MDD_vector        &extra_MDD,
 					       const sInstance::InverseMDD_vector &inverse_MDD,
 					       sInt_32                             extra_cost,
-					       Model                              &sat_Model) const;	
+					       Model                              &sat_Model) const;
+
+	void build_PathModelConstraintsInverse_validity(Glucose::Solver                    *solver,
+							Context                            &context,
+							const sInstance                    &instance,
+							const sInstance::MDD_vector        &MDD,
+							const sInstance::MDD_vector        &extra_MDD,
+							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             extra_cost,
+							Model                              &sat_Model) const;
+
+	void build_PathModelConstraintsInverse_cost(Glucose::Solver                    *solver,
+						    Context                            &context,
+						    const sInstance                    &instance,
+						    const sInstance::MDD_vector        &MDD,
+						    const sInstance::MDD_vector        &extra_MDD,
+						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             extra_cost,
+						    Model                              &sat_Model) const;
 
 	void refine_PathModelCollision(Glucose::Solver             *solver,
 				       const Collision             &collision,
@@ -799,6 +1179,58 @@ namespace boOX
 			      const sInstance::MDD_vector &MDD,
 			      const Model                 &sat_Model,
 			      AgentPaths_vector           &agent_Paths) const;
+	/*----------------------------------------------------------------------------*/	
+
+	sInt_32 build_PathSmallModelVariablesInverse(Glucose::Solver                   *solver,
+						     Context                            &context,
+						     const sInstance                    &instance,
+						     const sInstance::MDD_vector        &MDD,
+						     const sInstance::MDD_vector        &extra_MDD,
+						     const sInstance::InverseMDD_vector &inverse_MDD,
+						     sInt_32                             extra_cost,
+						     Model                              &sat_Model) const;
+
+	void build_PathSmallModelConstraintsInverse(Glucose::Solver                    *solver,
+						    Context                            &context,
+						    const sInstance                    &instance,
+						    const sInstance::MDD_vector        &MDD,
+						    const sInstance::MDD_vector        &extra_MDD,
+						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             extra_cost,
+						    Model                              &sat_Model) const;	
+
+	void build_PathSmallModelConstraintsInverse_validity(Glucose::Solver                    *solver,
+							     Context                            &context,
+							     const sInstance                    &instance,
+							     const sInstance::MDD_vector        &MDD,
+							     const sInstance::MDD_vector        &extra_MDD,
+							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             extra_cost,
+							     Model                              &sat_Model) const;
+
+	void build_PathSmallModelConstraintsInverse_cost(Glucose::Solver                    *solver,
+							 Context                            &context,
+							 const sInstance                    &instance,
+							 const sInstance::MDD_vector        &MDD,
+							 const sInstance::MDD_vector        &extra_MDD,
+							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             extra_cost,
+							 Model                              &sat_Model) const;
+
+	void refine_PathSmallModelCollisionsInverse(Glucose::Solver                    *solver,
+						    const Collisions_vector            &Collisions,
+						    const sInstance                    &instance,
+						    const sInstance::MDD_vector        &MDD,
+						    const sInstance::MDD_vector        &extra_MDD,
+						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             extra_cost,
+						    Model                              &sat_Model) const;	
+
+	void decode_PathSmallModel(Glucose::Solver             *solver,
+				   const sInstance             &instance,
+				   const sInstance::MDD_vector &MDD,
+				   const Model                 &sat_Model,
+				   AgentPaths_vector           &agent_Paths) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 build_PermutationModelVariables(Glucose::Solver             *solver,
@@ -864,7 +1296,41 @@ namespace boOX
 				     const sInstance             &instance,
 				     const sInstance::MDD_vector &MDD,
 				     const Model                 &sat_Model,
-				     AgentPaths_vector           &agent_Paths) const;			
+				     AgentPaths_vector           &agent_Paths) const;
+	/*----------------------------------------------------------------------------*/
+
+	sInt_32 build_PermutationSmallModelVariablesInverse(Glucose::Solver                   *solver,
+							    Context                            &context,					 
+							    const sInstance                    &instance,
+							    const sInstance::MDD_vector        &MDD,
+							    const sInstance::MDD_vector        &extra_MDD,
+							    const sInstance::InverseMDD_vector &inverse_MDD,
+							    sInt_32                             extra_cost,
+							    Model                              &sat_Model) const;	
+	
+	void build_PermutationSmallModelConstraintsInverse(Glucose::Solver                    *solver,
+							   Context                            &context,
+							   const sInstance                    &instance,
+							   const sInstance::MDD_vector        &MDD,
+							   const sInstance::MDD_vector        &extra_MDD,
+							   const sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                             extra_cost,
+							   Model                              &sat_Model) const;	
+	
+	void refine_PermutationSmallModelCollisionsInverse(Glucose::Solver                    *solver,
+							   const Collisions_vector            &Collisions,
+							   const sInstance                    &instance,
+							   const sInstance::MDD_vector        &MDD,
+							   const sInstance::MDD_vector        &extra_MDD,
+							   const sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                             extra_cost,
+							   Model                              &sat_Model) const;	
+	
+	void decode_PermutationSmallModel(Glucose::Solver             *solver,
+					  const sInstance             &instance,
+					  const sInstance::MDD_vector &MDD,
+					  const Model                 &sat_Model,
+					  AgentPaths_vector           &agent_Paths) const;		
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 build_RotationModelVariables(Glucose::Solver                    *solver,
@@ -933,10 +1399,50 @@ namespace boOX
 				  const sInstance::MDD_vector &MDD,
 				  const Model                 &sat_Model,
 				  AgentPaths_vector           &agent_Paths) const;
-	/*----------------------------------------------------------------------------*/		           
+	/*----------------------------------------------------------------------------*/
+
+	sInt_32 build_RotationSmallModelVariablesInverse(Glucose::Solver             *solver,
+							 Context                     &context,
+							 const sInstance             &instance,
+							 const sInstance::MDD_vector &MDD,
+							 const sInstance::MDD_vector &extra_MDD,
+							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                      extra_cost,
+							 Model                       &sat_Model) const;
+
+	void build_RotationSmallModelConstraintsInverse(Glucose::Solver                   *solver,
+							Context                            &context,
+							const sInstance                    &instance,
+							const sInstance::MDD_vector        &MDD,
+							const sInstance::MDD_vector        &extra_MDD,
+							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             extra_cost,
+							Model                              &sat_Model) const;	
+	
+	void refine_RotationSmallModelCollisionsInverse(Glucose::Solver                   *solver,
+							const Collisions_vector            &Collisions,
+							const EdgeCollisions_vector        &edge_Collisions,
+							const sInstance                    &instance,
+							const sInstance::MDD_vector        &MDD,
+							const sInstance::MDD_vector        &extra_MDD,
+							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             extra_cost,
+							Model                              &sat_Model) const;			
+
+	void decode_RotationSmallModel(Glucose::Solver             *solver,
+				       const sInstance             &instance,
+				       const sInstance::MDD_vector &MDD,
+				       const Model                 &sat_Model,
+				       AgentPaths_vector           &agent_Paths) const;
+	/*----------------------------------------------------------------------------*/
+	
     private:
 	sSMTCBS(const sSMTCBS &smt_cbs);
-	const sSMTCBS& operator=(const sSMTCBS &smt_cbs);	
+	const sSMTCBS& operator=(const sSMTCBS &smt_cbs);
+
+    public:
+	sCBS m_cbs;
+	sInstance m_cbs_instance;
  };
 
 

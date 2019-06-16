@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,12 +9,12 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.h / 0-279_zenon                                           */
+/* swap_solver_main.h / 1-036_leibniz                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
 //
-// A CBS-based solver for token swapping problem.
+// CBS-based and SMT-based solver for token swapping problem.
 //
 /*----------------------------------------------------------------------------*/
 
@@ -46,7 +46,8 @@ namespace boOX
 	    ALGORITHM_CBS_PLUS,
 	    ALGORITHM_CBS_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS,
-	    ALGORITHM_SMTCBS_PLUS	    
+	    ALGORITHM_SMTCBS_PLUS,
+	    ALGORITHM_SMTCBS_PLUS_PLUS
 	};
 
 	sCommandParameters();

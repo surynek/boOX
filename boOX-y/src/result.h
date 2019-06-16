@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 0-279_zenon                                                     */
+/* result.h / 1-036_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -137,6 +137,14 @@ enum sRealInstance_Result
 };
 
 
+enum sRealCBS_Result
+{
+    sREAL_CBS_INFO       =  17000,
+    sREAL_CBS_ERROR      = -17000,
+    sREAL_CBS_OPEN_ERROR = (sREAL_CBS_ERROR - 1),
+};
+
+
 enum sGridgenProgram_Result
 {
     sGRIDGEN_PROGRAM_INFO                         =  100000,
@@ -179,9 +187,10 @@ enum sPathgenProgram_Result
 
 enum sTokenSwappingSolverProgram_Result
 {
-    sTSWAP_SOLVER_PROGRAM_INFO                         =  150000,
-    sTSWAP_SOLVER_PROGRAM_ERROR                        = -150000,
-    sTSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sTSWAP_SOLVER_PROGRAM_ERROR - 1)
+    sSWAP_SOLVER_PROGRAM_INFO                         =  150000,
+    sSWAP_SOLVER_PROGRAM_ERROR                        = -150000,
+    sSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sSWAP_SOLVER_PROGRAM_ERROR - 1),
+    sSWAP_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sSWAP_SOLVER_PROGRAM_ERROR - 2)    
 };
 
 
@@ -189,16 +198,55 @@ enum sMultiAgentPathfindingSolverProgram_Result
 {
     sMAPF_SOLVER_PROGRAM_INFO                         =  160000,
     sMAPF_SOLVER_PROGRAM_ERROR                        = -160000,
-    sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_SOLVER_PROGRAM_ERROR - 1)
+    sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_SOLVER_PROGRAM_ERROR - 1),
+    sMAPF_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sMAPF_SOLVER_PROGRAM_ERROR - 2)        
+};
+
+
+enum sTokenRotationSolverProgram_Result
+{
+    sROTA_SOLVER_PROGRAM_INFO                         =  170000,
+    sROTA_SOLVER_PROGRAM_ERROR                        = -170000,
+    sROTA_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sROTA_SOLVER_PROGRAM_ERROR - 1),
+    sROTA_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sROTA_SOLVER_PROGRAM_ERROR - 2)        
+};
+
+
+enum sTokenPermutationSolverProgram_Result
+{
+    sPERM_SOLVER_PROGRAM_INFO                         =  180000,
+    sPERM_SOLVER_PROGRAM_ERROR                        = -180000,
+    sPERM_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sPERM_SOLVER_PROGRAM_ERROR - 1),
+    sPERM_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sPERM_SOLVER_PROGRAM_ERROR - 2)        
 };
 
 
 enum sRealMapConvertorProgram_Result
 {
-    sMAP_R_CONVERT_PROGRAM_INFO                         =  170000,
-    sMAP_R_CONVERT_PROGRAM_ERROR                        = -170000,
+    sMAP_R_CONVERT_PROGRAM_INFO                         =  190000,
+    sMAP_R_CONVERT_PROGRAM_ERROR                        = -190000,
     sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 1)
 };
+
+
+enum sRealInstanceGeneratorProgram_Result
+{
+    sKRUHOBOT_R_GENERATE_PROGRAM_INFO                         =  200000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_ERROR                        = -200000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sKRUHOBOT_R_GENERATE_PROGRAM_ERROR - 1)
+};
+
+
+enum sRealMutliAgentPathfindingSolverProgram_Result
+{
+    sMAPF_R_SOLVER_PROGRAM_INFO                         =  210000,
+    sMAPF_R_SOLVER_PROGRAM_ERROR                        = -210000,
+    sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_R_SOLVER_PROGRAM_ERROR - 1),
+    sMAPF_R_SOLVER_PROGRAM_MISSING_MAP_FILE_ERROR       = (sMAPF_R_SOLVER_PROGRAM_ERROR - 2),
+    sMAPF_R_SOLVER_PROGRAM_MISSING_KRUHOBOT_FILE_ERROR  = (sMAPF_R_SOLVER_PROGRAM_ERROR - 3)    
+};
+
+
 
 
 /*----------------------------------------------------------------------------*/

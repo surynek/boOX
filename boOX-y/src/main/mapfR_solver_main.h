@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,18 +9,18 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* tswap_solver_main.h / 0-279_zenon                                          */
+/* mapfR_solver_main.h / 1-036_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
-// Token Swapping Problem Solver - main program.
+// Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.
 //
-// A CBS-based solver for token swapping problem.
+// CBS-based and SMT-based solver for Continuous Multi-Agent Path Finding.
 //
 /*----------------------------------------------------------------------------*/
 
 
-#ifndef __TSWAP_SOLVER_MAIN_H__
-#define __TSWAP_SOLVER_MAIN_H__
+#ifndef __MAPF_R_SOLVER_MAIN_H__
+#define __MAPF_R_SOLVER_MAIN_H__
 
 #include "config.h"
 #include "compile.h"
@@ -40,13 +40,27 @@ namespace boOX
 
     struct sCommandParameters
     {
+	enum Algorithm
+	{
+	    ALGORITHM_CBS_R,
+	    ALGORITHM_CBS_R_PLUS,
+	    ALGORITHM_CBS_R_PLUS_PLUS,	    
+	    ALGORITHM_SMTCBS_R,
+	    ALGORITHM_SMTCBS_R_PLUS,
+	    ALGORITHM_SMTCBS_R_PLUS_PLUS
+	};
+	
 	sCommandParameters();
         /*--------------------------------*/
 
-	sInt_32 m_cost_limit;
+	sDouble m_makespan_limit;
+	Algorithm m_algorithm;
 
-	sString m_input_filename;		
+	sString m_mapR_input_filename;
+	sString m_kruhoR_input_filename;	
 	sString m_output_filename;
+
+	sDouble m_timeout;
     };
 
 
@@ -57,7 +71,7 @@ namespace boOX
     void print_Help(void);
     
     sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &parameters);
-    sResult solve_TokenSwappingInstance(const sCommandParameters &parameters);
+    sResult solve_RealMultiAgentPathFindingInstance(const sCommandParameters &parameters);
 
 
 /*----------------------------------------------------------------------------*/
@@ -65,4 +79,4 @@ namespace boOX
 } // namespace boOX
 
 
-#endif /* __TSWAP_SOLVER_MAIN_H__ */
+#endif /* __MAPF_R_SOLVER_MAIN_H__ */

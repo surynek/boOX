@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 0-279_zenon                                                     */
+/* mapR.cpp / 1-036_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -84,24 +84,73 @@ namespace boOX
 	for (sInt_32 u_id = 0; u_id < m_Locations.size() - 1; ++u_id)
 	{
 	    for (sInt_32 v_id = u_id + 1; v_id < m_Locations.size(); ++v_id)
-	    {
-		m_Network.add_Edge(u_id, v_id);		
+	    {	
+		if (!m_Network.is_Adjacent(u_id, v_id))
+		{
+		    m_Network.add_Edge(u_id, v_id);
+		}
 	    }
 	}
     }
 
-    
+
     void s2DMap::populate_Network(sDouble max_distance)
+    {
+	populate_NetworkCircular(max_distance);
+    }
+
+    
+    void s2DMap::populate_NetworkCircular(sDouble max_distance)
     {
 	for (sInt_32 u_id = 0; u_id < m_Locations.size() - 1; ++u_id)
 	{
 	    for (sInt_32 v_id = u_id + 1; v_id < m_Locations.size(); ++v_id)
 	    {
 		sDouble distance = calc_PointDistance(u_id, v_id);
-
+		
 		if (distance <= max_distance)
 		{
-		    m_Network.add_Edge(u_id, v_id);
+		    if (!m_Network.is_Adjacent(u_id, v_id))
+		    {			
+			m_Network.add_Edge(u_id, v_id);
+		    }
+		}
+	    }
+	}	
+    }
+
+    
+    void s2DMap::populate_NetworkRadiant(sDouble max_distance)
+    {
+	for (sInt_32 u_id = 0; u_id < m_Locations.size() - 1; ++u_id)
+	{
+	    for (sInt_32 v_id = u_id + 1; v_id < m_Locations.size(); ++v_id)
+	    {
+		sDouble distance = calc_PointDistance(u_id, v_id);
+		
+		if (distance <= max_distance)
+		{
+		    bool underconnected = false;
+		    for (sInt_32 x_id = 0; x_id < m_Locations.size(); ++x_id)
+		    {
+			if (x_id != u_id && x_id != v_id)
+			{
+			    sDouble under_dist = calc_PointDistance(u_id, v_id, x_id);
+			    if (under_dist <= s_EPSILON)
+			    {
+				underconnected = true;
+				break;
+			    }
+			}
+		    }
+
+		    if (!underconnected)
+		    {
+			if (!m_Network.is_Adjacent(u_id, v_id))
+			{			
+			    m_Network.add_Edge(u_id, v_id);
+			}
+		    }
 		}
 	    }
 	}	
@@ -109,12 +158,18 @@ namespace boOX
     
 
 /*----------------------------------------------------------------------------*/
+
+    sDouble s2DMap::calc_StraightDistance(sInt_32 source_id, sInt_32 target_id) const
+    {
+	sDouble dx = m_Locations[source_id].m_x - m_Locations[target_id].m_x;
+	sDouble dy = m_Locations[source_id].m_y - m_Locations[target_id].m_y;
+	    
+	return sqrt(dx * dx + dy * dy);	
+    }
     
+	    
     void s2DMap::calc_SingleSourceStraightDistances(sInt_32 s_id)
     {
-	sInt_32 N_locations = m_Locations.size();
-	m_straight_Distances[s_id].resize(N_locations);
-	
 	calc_SingleSourceStraightDistances(s_id, m_straight_Distances[s_id]);
     }
 
@@ -122,6 +177,7 @@ namespace boOX
     void s2DMap::calc_SingleSourceStraightDistances(sInt_32 s_id, Distances_vector &straight_Distances) const
     {
 	sInt_32 N_locations = m_Locations.size();
+	straight_Distances.resize(N_locations);		
 	
 	for (sInt_32 t_id = 0; t_id < N_locations; ++t_id)
 	{
@@ -131,11 +187,35 @@ namespace boOX
 	    straight_Distances[t_id] = sqrt(dx * dx + dy * dy);
 	}
     }
+
+
+    void s2DMap::calc_SingleSourceStraightNeighborDistances(sInt_32 s_id)
+    {
+	calc_SingleSourceStraightNeighborDistances(s_id, m_straight_Distances[s_id]);
+    }
+
+
+    void s2DMap::calc_SingleSourceStraightNeighborDistances(sInt_32 s_id, Distances_vector &straight_Distances) const
+    {
+	sInt_32 N_locations = m_Locations.size();
+	straight_Distances.resize(N_locations);		
+
+	const sVertex::Neighbors_list &Neighbors = m_Network.m_Vertices[s_id].m_Neighbors;
+	for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
+	{
+	    sInt_32 t_id = (*neighbor)->m_target->m_id;
+		    
+	    sDouble dx = m_Locations[s_id].m_x - m_Locations[t_id].m_x;
+	    sDouble dy = m_Locations[s_id].m_y - m_Locations[t_id].m_y;
+	    
+	    straight_Distances[t_id] = sqrt(dx * dx + dy * dy);
+	}
+    }    
     
 
     void s2DMap::calc_AllPairsStraightDistances(void)
     {
-	sInt_32 N_locations = m_Locations.size();	
+	sInt_32 N_locations = m_Locations.size();
 	m_straight_Distances.resize(N_locations);
 
 	for (sInt_32 s_id = 0; s_id < N_locations; ++s_id)
@@ -148,6 +228,7 @@ namespace boOX
     void s2DMap::calc_AllPairsStraightDistances(Distances_2d_vector &straight_Distances) const
     {
 	sInt_32 N_locations = m_Locations.size();
+	straight_Distances.resize(N_locations);	
 	
 	for (sInt_32 s_id = 0; s_id < N_locations; ++s_id)
 	{
@@ -156,31 +237,118 @@ namespace boOX
     }
 
 
+    void s2DMap::calc_NetworkPairsStraightDistances(void)
+    {
+	sInt_32 N_locations = m_Locations.size();
+	m_straight_Distances.resize(N_locations);
+
+	for (sInt_32 s_id = 0; s_id < N_locations; ++s_id)
+	{
+	    calc_SingleSourceStraightNeighborDistances(s_id);
+	}
+    }
+
+    
+    void s2DMap::calc_NetworkPairsStraightDistances(Distances_2d_vector &straight_Distances) const
+    {
+	sInt_32 N_locations = m_Locations.size();
+	straight_Distances.resize(N_locations);	
+	
+	for (sInt_32 s_id = 0; s_id < N_locations; ++s_id)
+	{
+	    calc_SingleSourceStraightNeighborDistances(s_id, straight_Distances[s_id]);
+	}
+    }    
+
+
+    void s2DMap::calc_SelectedPairsStraightDistances(const LocationIDs_vector &selection_IDs)
+    {
+	sInt_32 N_locations = m_Locations.size();
+	m_straight_Distances.resize(N_locations);	
+
+	for (LocationIDs_vector::const_iterator selection_id = selection_IDs.begin(); selection_id != selection_IDs.end(); ++selection_id)
+	{	    
+	    calc_SingleSourceStraightDistances(*selection_id, m_straight_Distances[*selection_id]);
+	}	
+    }
+
+    
+    void s2DMap::calc_SelectedPairsStraightDistances(const LocationIDs_vector &selection_IDs, Distances_2d_vector &straight_Distances) const
+    {
+	sInt_32 N_locations = m_Locations.size();
+	straight_Distances.resize(N_locations);	
+
+	for (LocationIDs_vector::const_iterator selection_id = selection_IDs.begin(); selection_id != selection_IDs.end(); ++selection_id)	
+	{
+	    calc_SingleSourceStraightDistances(*selection_id, straight_Distances[*selection_id]);
+	}	
+    }
+
+
 /*----------------------------------------------------------------------------*/
 
     void s2DMap::calc_SingleSourceShortestDistances(sInt_32 s_id)
     {
-	sInt_32 N_locations = m_Locations.size();
-	m_shortest_Distances[s_id].resize(N_locations);
-	
 	calc_SingleSourceShortestDistances(s_id, m_shortest_Distances[s_id]);
     }
 
 
-    void s2DMap::calc_SingleSourceShortestDistances(sInt_32 sUNUSED(s_id), Distances_vector &sUNUSED(shortest_Distances)) const
+    void s2DMap::calc_SingleSourceShortestDistances(sInt_32 s_id, Distances_vector &shortest_Distances) const
     {
-	/* TODO
-	sInt_32 N_locations = m_Locations.size();
+	sInt_32 N_locations = m_Locations.size();       
+	shortest_Distances.resize(N_locations, -1.0);
+
+	DistanceLocationIDs_mmap distance_Queue;
 	
-	for (sInt_32 t_id = 0; t_id < N_locations; ++t_id)
+	distance_Queue.insert(DistanceLocationIDs_mmap::value_type(0.0, s_id));	
+	shortest_Distances[s_id] = 0.0;
+
+	std::vector<DistanceLocationIDs_mmap::iterator> distance_queue_Iters;
+	distance_queue_Iters.resize(N_locations);
+
+	while (!distance_Queue.empty())
 	{
-	    sDouble dx = m_Locations[s_id].m_x - m_Locations[t_id].m_x;
-	    sDouble dy = m_Locations[s_id].m_y - m_Locations[t_id].m_y;
-	    
-	    shortest_Distances[t_id] = sqrt(dx * dx + dy * dy);
-	}
-	*/
+	    sInt_32 front_location_id = distance_Queue.begin()->second;
+	    distance_Queue.erase(distance_Queue.begin());
+
+	    for (sVertex::Neighbors_list::const_iterator neighbor = m_Network.m_Vertices[front_location_id].m_Neighbors.begin(); neighbor != m_Network.m_Vertices[front_location_id].m_Neighbors.end(); ++neighbor)
+	    {
+		sInt_32 neighbor_location_id = (*neighbor)->m_target->m_id;
+
+		if (shortest_Distances[neighbor_location_id] < 0.0)
+		{
+		    sDouble init_distance = shortest_Distances[front_location_id] + calc_StraightDistance(front_location_id, neighbor_location_id);
+		    
+		    shortest_Distances[neighbor_location_id] = init_distance;
+		    distance_queue_Iters[neighbor_location_id] = distance_Queue.insert(DistanceLocationIDs_mmap::value_type(init_distance, neighbor_location_id));
+		}
+		else
+		{
+		    sDouble next_distance = shortest_Distances[front_location_id] + calc_StraightDistance(front_location_id, neighbor_location_id);
+
+		    if (shortest_Distances[neighbor_location_id] > next_distance)
+		    {
+			distance_Queue.erase(distance_queue_Iters[neighbor_location_id]);
+			
+			shortest_Distances[neighbor_location_id] = next_distance;
+			distance_queue_Iters[neighbor_location_id] = distance_Queue.insert(DistanceLocationIDs_mmap::value_type(next_distance, neighbor_location_id));
+		    }
+		}
+	    }
+	}	
     }
+
+
+    void s2DMap::calc_SingleSourceShortestNeighborDistances(sInt_32 s_id)
+    {
+	calc_SingleSourceShortestNeighborDistances(s_id, m_shortest_Distances[s_id]);
+    }
+
+
+    void s2DMap::calc_SingleSourceShortestNeighborDistances(sInt_32 s_id, Distances_vector &shortest_Distances) const
+    {
+	calc_SingleSourceStraightNeighborDistances(s_id, shortest_Distances);	
+    }    
     
 
     void s2DMap::calc_AllPairsShortestDistances(void)
@@ -198,12 +366,37 @@ namespace boOX
     void s2DMap::calc_AllPairsShortestDistances(Distances_2d_vector &shortest_Distances) const
     {
 	sInt_32 N_locations = m_Locations.size();
+	shortest_Distances.resize(N_locations);	
 		
 	for (sInt_32 s_id = 0; s_id < N_locations; ++s_id)
 	{
 	    calc_SingleSourceShortestDistances(s_id, shortest_Distances[s_id]);
 	}
     }
+
+
+    void s2DMap::calc_SelectedPairsShortestDistances(const LocationIDs_vector &selection_IDs)
+    {
+	sInt_32 N_locations = m_Locations.size();
+	m_shortest_Distances.resize(N_locations);	
+	
+	for (LocationIDs_vector::const_iterator selection_id = selection_IDs.begin(); selection_id != selection_IDs.end(); ++selection_id)
+	{	    
+	    calc_SingleSourceShortestDistances(*selection_id, m_shortest_Distances[*selection_id]);
+	}	
+    }
+
+    
+    void s2DMap::calc_SelectedPairsShortestDistances(const LocationIDs_vector &selection_IDs, Distances_2d_vector &shortest_Distances) const
+    {
+	sInt_32 N_locations = m_Locations.size();
+	shortest_Distances.resize(N_locations);	
+	
+	for (LocationIDs_vector::const_iterator selection_id = selection_IDs.begin(); selection_id != selection_IDs.end(); ++selection_id)	
+	{
+	    calc_SingleSourceShortestDistances(*selection_id, shortest_Distances[*selection_id]);
+	}	
+    }    
     
 
 /*----------------------------------------------------------------------------*/
@@ -689,7 +882,6 @@ namespace boOX
 	sInt_32 N_locations = m_Locations.size();
 	fprintf(fw, "%s2DMap: (|Locations| = %d)\n", indent.c_str(), N_locations);
 
-
 	if (!m_straight_Distances.empty())
 	{
 	    sInt_32 N_straight_distances = m_straight_Distances.size();
@@ -697,7 +889,7 @@ namespace boOX
 	
 	    for (sInt_32 s_id = 0; s_id < N_straight_distances; ++s_id)
 	    {
-		fprintf(fw, "%s%s%d (%.3f, %.3f):", indent.c_str(), s2_INDENT.c_str(), s_id, m_Locations[s_id].m_x, m_Locations[s_id].m_y);
+		fprintf(fw, "%s%s%d (%.3f, %.3f): {", indent.c_str(), s2_INDENT.c_str(), s_id, m_Locations[s_id].m_x, m_Locations[s_id].m_y);
 
 		sInt_32 N_location_straight_distances = m_straight_Distances[s_id].size();
 		for (sInt_32 t_id = 0; t_id < N_location_straight_distances; ++t_id)
@@ -716,7 +908,7 @@ namespace boOX
 	
 	    for (sInt_32 s_id = 0; s_id < N_shortest_distances; ++s_id)
 	    {
-		fprintf(fw, "%s%s%d (%.3f, %.3f):", indent.c_str(), s2_INDENT.c_str(), s_id, m_Locations[s_id].m_x, m_Locations[s_id].m_y);
+		fprintf(fw, "%s%s%d (%.3f, %.3f): {", indent.c_str(), s2_INDENT.c_str(), s_id, m_Locations[s_id].m_x, m_Locations[s_id].m_y);
 		
 		sInt_32 N_location_shortest_distances = m_shortest_Distances[s_id].size();
 		for (sInt_32 t_id = 0; t_id < N_location_shortest_distances; ++t_id)
@@ -834,12 +1026,12 @@ namespace boOX
     sResult s2DMap::from_Stream_map(FILE *fr)
     {
 	sResult result;
-	
+
 	if (sFAILED(result = m_Network.from_Stream_map(fr)))
 	{
 	    return result;
 	}
-
+	
 	m_Locations.resize(m_Network.m_Vertices.size());
 
 	for (sInt_32 y = 0; y < m_Network.m_y_size; ++y)

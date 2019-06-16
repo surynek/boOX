@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 0-279_zenon                                                    */
+/* version.h / 1-036_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -27,8 +27,8 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "0-279_zenon"
-#define sPRODUCT "boOX 0-279_zenon"
+#define sVERSION "1-036_leibniz"
+#define sPRODUCT "boOX 1-036_leibniz"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.com>"
 #define sCOPYRIGHT "(C) Copyright 2018 - 2019 Pavel Surynek"

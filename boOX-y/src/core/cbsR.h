@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 0-279_zenon                                                       */
+/* cbsR.h / 1-036_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -675,6 +675,7 @@ namespace boOX
 
 	static void to_Screen(const KruhobotSchedules_vector &kruhobot_Schedules, const sString &indent = "");
 	static void to_Stream(FILE *fw, const KruhobotSchedules_vector &kruhobot_Schedules, const sString &indent = "");
+	static sResult to_File(const sString &filename, const KruhobotSchedules_vector &kruhobot_Schedules, const sString &indent = "");	
         /*----------------------------------------------------------------------------*/	
 
     public:
@@ -859,12 +860,60 @@ namespace boOX
 						     sDouble                   extra_cost);
 	/*----------------------------------------------------------------------------*/	
 
+	sDouble find_ShortestNonconflictingSchedules_smart(sRealSolution &real_Solution, sDouble cost_limit);
+	sDouble find_ShortestNonconflictingSchedules_smart(const  sRealInstance &real_Instance,
+							     sRealSolution        &real_Solution,
+							     sDouble               cost_limit);
+	
+	sDouble find_ShortestNonconflictingSchedules_smart(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit);	
+	sDouble find_ShortestNonconflictingSchedules_smart(const sRealInstance      &real_Instance,
+							     KruhobotSchedules_vector &kruhobot_Schedules,
+							     sDouble                   cost_limit);
+
+	sDouble find_ShortestNonconflictingSchedules_smart(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit, sDouble extra_cost);
+	sDouble find_ShortestNonconflictingSchedules_smart(const sRealInstance      &real_Instance,
+							     KruhobotSchedules_vector &kruhobot_Schedules,
+							     sDouble                   cost_limit,
+							     sDouble                   extra_cost);	
+	/*----------------------------------------------------------------------------*/
+
+	sDouble find_ShortestNonconflictingSchedules_strong(sRealSolution &real_Solution, sDouble cost_limit);
+	sDouble find_ShortestNonconflictingSchedules_strong(const  sRealInstance &real_Instance,
+							    sRealSolution        &real_Solution,
+							    sDouble               cost_limit);
+	
+	sDouble find_ShortestNonconflictingSchedules_strong(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit);	
+	sDouble find_ShortestNonconflictingSchedules_strong(const sRealInstance      &real_Instance,
+							    KruhobotSchedules_vector &kruhobot_Schedules,
+							    sDouble                   cost_limit);
+
+	sDouble find_ShortestNonconflictingSchedules_strong(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit, sDouble extra_cost);
+	sDouble find_ShortestNonconflictingSchedules_strong(const sRealInstance      &real_Instance,
+							    KruhobotSchedules_vector &kruhobot_Schedules,
+							    sDouble                   cost_limit,
+							    sDouble                   extra_cost);	
+	/*----------------------------------------------------------------------------*/		
+
 	sDouble find_NonconflictingSchedules(const sRealInstance              &real_Instance,
 					     KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
 					     KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
 					     KruhobotSchedules_vector         &kruhobot_Schedules,
 					     sDouble                           cost_limit,
 					     sDouble                           extra_cost);
+
+	sDouble find_NonconflictingSchedules_smart(const sRealInstance              &real_Instance,
+						     KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+						     KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+						     KruhobotSchedules_vector         &kruhobot_Schedules,
+						     sDouble                           cost_limit,
+						     sDouble                           extra_cost);
+
+	sDouble find_NonconflictingSchedules_strong(const sRealInstance              &real_Instance,
+						    KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+						    KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+						    KruhobotSchedules_vector         &kruhobot_Schedules,
+						    sDouble                           cost_limit,
+						    sDouble                           extra_cost);		
 	
 	sDouble update_NonconflictingSchedule(sInt_32                           upd_kruhobot_id,
 					      const sRealInstance              &real_Instance,
@@ -874,6 +923,24 @@ namespace boOX
 					      sDouble                           makespan_bound,
 					      sDouble                           cost_limit,
 					      sDouble                           extra_cost) const;
+
+	sDouble update_NonconflictingSchedule_smart(sInt_32                           upd_kruhobot_id,
+						    const sRealInstance              &real_Instance,
+						    KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+						    KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+						    KruhobotSchedules_vector         &kruhobot_Schedules,
+						    sDouble                           makespan_bound,
+						    sDouble                           cost_limit,
+						    sDouble                           extra_cost) const;
+
+	sDouble update_NonconflictingSchedule_strong(sInt_32                           upd_kruhobot_id,
+						     const sRealInstance              &real_Instance,
+						     KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+						     KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+						     KruhobotSchedules_vector         &kruhobot_Schedules,
+						     sDouble                           makespan_bound,
+						     sDouble                           cost_limit,
+						     sDouble                           extra_cost) const;		
 
 	sDouble examine_NonconflictingSchedules(const sRealInstance              &real_Instance,
 						sInt_32                           upper_node_id,
@@ -896,6 +963,28 @@ namespace boOX
 						    const LinearConflicts__map    &linear_Conflicts,
 						    sDouble                        makespan_bound,
 						    Schedule_vector               &Schedule) const;
+
+	sDouble find_KruhobotNonconflictingSchedule_smart(const sKruhobot               &kruhobot,
+							  const s2DMap                  &map,
+							  sInt_32                        source_loc_id,
+							  sInt_32                        sink_loc_id,
+							  sDouble                        cost_limit,
+							  sDouble                        extra_cost,
+							  const LocationConflicts__umap &location_Conflicts,
+							  const LinearConflicts__map    &linear_Conflicts,
+							  sDouble                        makespan_bound,
+							  Schedule_vector               &Schedule) const;
+
+	sDouble find_KruhobotNonconflictingSchedule_strong(const sKruhobot               &kruhobot,
+							   const s2DMap                  &map,
+							   sInt_32                        source_loc_id,
+							   sInt_32                        sink_loc_id,
+							   sDouble                        cost_limit,
+							   sDouble                        extra_cost,
+							   const LocationConflicts__umap &location_Conflicts,
+							   const LinearConflicts__map    &linear_Conflicts,
+							   sDouble                        makespan_bound,
+							   Schedule_vector               &Schedule) const;	
 
 	void generate_KruhobotImportantPoints(const sKruhobot               &kruhobot,
 					      const s2DMap                  &map,

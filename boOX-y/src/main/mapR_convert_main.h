@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.h / 0-279_zenon                                          */
+/* mapR_convert_main.h / 1-036_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -41,11 +41,20 @@ namespace boOX
 
     struct sCommandParameters
     {
+	enum Neighborhood
+	{
+	    NEIGHBORHOOD_CIRCULAR,
+	    NEIGHBORHOOD_RADIANT
+	};
+	
 	sCommandParameters();
         /*--------------------------------*/
 
 	sString m_input_map_filename;		
 	sString m_output_mapR_filename;
+
+	Neighborhood m_neighbor_type;
+	sDouble m_neighbor_radius;
     };
 
 

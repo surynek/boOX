@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 0-279_zenon                                                      */
+/* agent.h / 1-036_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -161,6 +161,7 @@ namespace boOX
 
     public:
 	void collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const;
+	
 	sInt_32 estimate_TotalPathCost(sInt_32 &max_individual_cost);
 	sInt_32 estimate_TotalSwappingCost(sInt_32 &max_individual_cost);
 	sInt_32 estimate_TotalPermutationCost(sInt_32 &max_individual_cost);
@@ -243,14 +244,17 @@ namespace boOX
 	virtual sResult from_File_bgu(const sString &filename);
 	virtual sResult from_Stream_bgu(FILE *fr);	
 
+	virtual sResult to_File_usc(const sString &map_filename, const sString &agents_filename) const;
+	virtual void to_Stream_usc(FILE *map_fr, FILE *agents_fr, const sString &indent = "") const;
+       
 	virtual sResult from_File_usc(const sString &map_filename, const sString &agents_filename);
 	virtual sResult from_Stream_usc(FILE *map_fr, FILE *agents_fr);
 
 	virtual sResult from_File_lusc(const sString &map_filename, const sString &agents_filename);
 	virtual sResult from_Stream_lusc(FILE *map_fr, FILE *agents_fr); 
 
-	virtual sResult to_File_dibox(const sString &filename);
-	virtual sResult to_Stream_dibox(FILE *fr);			
+	virtual sResult to_File_dibox(const sString &filename) const;
+	virtual sResult to_Stream_dibox(FILE *fr) const;
 	
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);

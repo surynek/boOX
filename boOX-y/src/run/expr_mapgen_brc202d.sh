@@ -1,12 +1,8 @@
-ROBOT_LIST=`cat robots_maps`
-SEED_LIST=`cat seeds_10`
-SIZE=16
+AGENTS_LIST=`cat agents_maps`
+MAP=brc202d
 
-for ROBOTS in $ROBOT_LIST;
-do
-  for SEED in $SEED_LIST;	
-  do                
-    echo 'Generating map brc202d with '$ROBOTS' agents ...'
-   ../main/gridgen_boOX --map-file=../../maps/brc202d.map '--N-agents='$ROBOTS '--mpf-file=brc202d_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=brc202d_a'$ROBOTS'_'$SEED'.cpf'
-  done
+for AGENTS in $AGENTS_LIST;
+  do
+    ./gridgen_boOX '--map-file=../../maps/'$MAP'.map' '--mpf-file=map_'$MAP'_a'$AGENTS'.mpf' '--N-agents='$AGENTS
+    ./gridgen_boOX '--map-file=../../maps/'$MAP'.map' '--usc-map-file=map_'$MAP'.usc.map' '--usc-agents-file=map_'$MAP'_a'$AGENTS'.usc.agent' '--N-agents='$AGENTS
 done

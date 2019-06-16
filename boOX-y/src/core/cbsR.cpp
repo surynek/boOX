@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 0-279_zenon                                                     */
+/* cbsR.cpp / 1-036_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -678,6 +678,22 @@ namespace boOX
 	}
 	fprintf(fw, "%s]\n", indent.c_str());
     }
+
+
+    sResult sRealCBSBase::to_File(const sString &filename, const KruhobotSchedules_vector &kruhobot_Schedules, const sString &indent)
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sREAL_CBS_OPEN_ERROR;
+	}
+	
+	to_Stream(fw, kruhobot_Schedules, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }    
     
 
 
@@ -757,11 +773,11 @@ namespace boOX
     }
 
 
-    sDouble sRealCBS::find_ShortestNonconflictingSchedules(const sRealInstance      &sUNUSED(real_Instance),
-							   KruhobotSchedules_vector &sUNUSED(kruhobot_Schedules),
-							   sDouble                   sUNUSED(cost_limit))
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules(const sRealInstance      &real_Instance,
+							   KruhobotSchedules_vector &kruhobot_Schedules,
+							   sDouble                   cost_limit)
     {
-	return 0.0;
+	return find_ShortestNonconflictingSchedules(real_Instance, kruhobot_Schedules, cost_limit, 0.0);
     }    
 
     
@@ -779,10 +795,8 @@ namespace boOX
 	sDouble solution_cost;
 	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();	
 	
-	#ifdef sVERBOSE
 	sDouble start_time = sStatistics::get_CPU_Seconds();
-	#endif
-
+	
 	{    
 	    #ifdef sVERBOSE
 	    {
@@ -813,12 +827,254 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return -2.0;
 		}
 	    }
 	}
 
-	return -1;	
+	return -1.0;	
+    }
+
+
+/*----------------------------------------------------------------------------*/
+    
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_smart(sRealSolution &real_Solution, sDouble cost_limit)
+    {
+	return find_ShortestNonconflictingSchedules_smart(*m_real_Instance, real_Solution, cost_limit);	
+    }
+
+  
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_smart(const sRealInstance &real_Instance,
+								   sRealSolution       &sUNUSED(real_Solution),
+								   sDouble              cost_limit)
+    {
+	sInt_32 cost;
+	KruhobotSchedules_vector kruhobot_Schedules;
+
+	if ((cost = find_ShortestNonconflictingSchedules_smart(real_Instance, kruhobot_Schedules, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+/*
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+*/
+	return cost;	
+    }
+
+
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_smart(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit)
+    {
+	return find_ShortestNonconflictingSchedules_smart(*m_real_Instance, kruhobot_Schedules, cost_limit);	
+    }
+
+
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_smart(const sRealInstance      &real_Instance,
+								   KruhobotSchedules_vector &kruhobot_Schedules,
+								   sDouble                   cost_limit)
+    {
+	return find_ShortestNonconflictingSchedules_smart(real_Instance, kruhobot_Schedules, cost_limit, 0.0);
+    }    
+
+    
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_smart(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit, sDouble extra_cost)
+    {
+	return find_ShortestNonconflictingSchedules_smart(*m_real_Instance, kruhobot_Schedules, cost_limit, extra_cost);	
+    }
+
+    
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_smart(const sRealInstance      &real_Instance,
+								   KruhobotSchedules_vector &kruhobot_Schedules,
+								   sDouble                   cost_limit,
+								   sDouble                   extra_cost)
+    {
+	sDouble solution_cost;
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();	
+	
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	{    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAPF-R (elapsed time [seconds]: %.3f)...\n", (end_time - start_time));
+	    }
+	    #endif
+
+	    KruhobotLocationConflicts_vector kruhobot_location_Conflicts;
+	    KruhobotLinearConflicts_vector kruhobot_linear_Conflicts;
+
+	    kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	    kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+	    kruhobot_Schedules.resize(N_kruhobots + 1);  
+	    
+	    if ((solution_cost = find_NonconflictingSchedules_smart(real_Instance,
+								      kruhobot_location_Conflicts,
+								      kruhobot_linear_Conflicts,
+								      kruhobot_Schedules,
+								      cost_limit,
+								      extra_cost)) >= 0.0)
+	    {
+		return solution_cost;
+	    }
+	    
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+	}
+
+	return -1.0;	
+    }
+
+
+/*----------------------------------------------------------------------------*/
+    
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_strong(sRealSolution &real_Solution, sDouble cost_limit)
+    {
+	return find_ShortestNonconflictingSchedules_strong(*m_real_Instance, real_Solution, cost_limit);	
+    }
+
+  
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_strong(const sRealInstance &real_Instance,
+								   sRealSolution       &sUNUSED(real_Solution),
+								   sDouble              cost_limit)
+    {
+	sInt_32 cost;
+	KruhobotSchedules_vector kruhobot_Schedules;
+
+	if ((cost = find_ShortestNonconflictingSchedules_strong(real_Instance, kruhobot_Schedules, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+/*
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+*/
+	return cost;	
+    }
+
+
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_strong(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit)
+    {
+	return find_ShortestNonconflictingSchedules_strong(*m_real_Instance, kruhobot_Schedules, cost_limit);	
+    }
+
+
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_strong(const sRealInstance      &real_Instance,
+								  KruhobotSchedules_vector &kruhobot_Schedules,
+								  sDouble                   cost_limit)
+    {
+	return find_ShortestNonconflictingSchedules_strong(real_Instance, kruhobot_Schedules, cost_limit, 0.0);
+    }    
+
+    
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_strong(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit, sDouble extra_cost)
+    {
+	return find_ShortestNonconflictingSchedules_strong(*m_real_Instance, kruhobot_Schedules, cost_limit, extra_cost);	
+    }
+
+    
+    sDouble sRealCBS::find_ShortestNonconflictingSchedules_strong(const sRealInstance      &real_Instance,
+								  KruhobotSchedules_vector &kruhobot_Schedules,
+								  sDouble                   cost_limit,
+								  sDouble                   extra_cost)
+    {
+	sDouble solution_cost;
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();	
+	
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	{    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAPF-R (elapsed time [seconds]: %.3f)...\n", (end_time - start_time));
+	    }
+	    #endif
+
+	    KruhobotLocationConflicts_vector kruhobot_location_Conflicts;
+	    KruhobotLinearConflicts_vector kruhobot_linear_Conflicts;
+
+	    kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	    kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+	    kruhobot_Schedules.resize(N_kruhobots + 1);  
+	    
+	    if ((solution_cost = find_NonconflictingSchedules_strong(real_Instance,
+								     kruhobot_location_Conflicts,
+								     kruhobot_linear_Conflicts,
+								     kruhobot_Schedules,
+								     cost_limit,
+								     extra_cost)) >= 0.0)
+	    {
+		return solution_cost;
+	    }
+	    
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+	}
+
+	return -1.0;	
     }
 
 
@@ -918,7 +1174,6 @@ namespace boOX
 		    return -2.0;
 		}
 	    }
-	       
             #ifdef sSTATISTICS
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
@@ -1027,6 +1282,410 @@ namespace boOX
     }
 
 
+    sDouble sRealCBS::find_NonconflictingSchedules_smart(const sRealInstance              &real_Instance,
+							 KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							 KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							 KruhobotSchedules_vector         &kruhobot_Schedules,
+							 sDouble                           cost_limit,
+							 sDouble                           extra_cost)
+    {
+	sDouble cummulative;
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Node initial_node(0);
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_update_kruhobot_id = -1;
+
+	initial_node.m_left_node_id = -1;
+	initial_node.m_right_node_id = -1;
+	
+	initial_node.m_kruhobot_location_Conflicts = kruhobot_location_Conflicts;
+	initial_node.m_kruhobot_linear_Conflicts = kruhobot_linear_Conflicts;
+	initial_node.m_kruhobot_Schedules.resize(N_kruhobots + 1);
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{
+	    sDouble kruhobot_cost;
+	    if ((kruhobot_cost = find_KruhobotNonconflictingSchedule_smart(real_Instance.m_Kruhobots[kruhobot_id],
+									     *real_Instance.m_start_conjunction.m_Map,
+									     real_Instance.m_start_conjunction.m_kruhobot_Locations[kruhobot_id],
+									     real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id],
+									     cost_limit,
+									     extra_cost,					    
+									     initial_node.m_kruhobot_location_Conflicts[kruhobot_id],
+									     initial_node.m_kruhobot_linear_Conflicts[kruhobot_id],
+									     -1.0,
+									     initial_node.m_kruhobot_Schedules[kruhobot_id])) < 0.0)
+	    {
+		return -1.0;
+	    }
+	}
+	
+	augment_Schedules(real_Instance, initial_node.m_kruhobot_Schedules);
+	
+	initial_node.m_makespan = calc_ScheduleMakespan(real_Instance, initial_node.m_kruhobot_Schedules);
+	initial_node.m_cost = calc_ScheduleCost(real_Instance, initial_node.m_kruhobot_Schedules);
+	
+	initial_node.m_conflicting = 0.0;
+
+	#ifdef sDEBUG
+	{
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	    {
+		sASSERT(check_KruhobotNonconflictingSchedule(initial_node.m_kruhobot_Schedules[kruhobot_id],
+							     initial_node.m_kruhobot_location_Conflicts[kruhobot_id],
+							     initial_node.m_kruhobot_linear_Conflicts[kruhobot_id]));
+	    }
+	}
+	#endif	
+	Nodes_vector search_Store;
+//	NodeReferences_vector search_Queue;
+	NodeReferences_mset search_Queue;	
+	
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+//	search_Queue.push_back(NodeReference(0, &search_Store));
+
+	NodeReference best_node = *search_Queue.begin();
+	search_Queue.erase(search_Queue.begin());	
+
+	if ((cummulative = examine_NonconflictingSchedules(real_Instance,
+							   best_node.m_node_id,
+							   search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts,
+							   search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts,
+							   search_Store[best_node.m_node_id].m_kruhobot_Schedules,
+							   cost_limit,
+							   extra_cost,
+							   search_Store,
+							   search_Queue)) >= 0.0)
+	{
+	    kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;
+	    return search_Store[best_node.m_node_id].m_makespan;	    
+	}	
+
+	while (!search_Queue.empty())
+	{	    
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+            #ifdef sDEBUG
+	    {
+//		printf("Search queue size:%ld [%d] (%ld) - %.3f\n", search_Queue.size(), best_node.m_node_id, search_Store.size(), search_Store[best_node.m_node_id].m_cost);
+/*
+		printf("Search queue kruhobots:\n");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d [%.3f,%.3f] ", search_Store[node->m_node_id].m_update_kruhobot_id, search_Store[node->m_node_id].m_makespan, search_Store[node->m_node_id].m_cost);
+		}
+		printf("\n");
+		*/
+//		search_Store[best_node.m_node_id].to_Screen();
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s, make %.3f, cost %.3f)\n",
+			   s_GlobalStatistics.get_CurrentPhase().m_search_Steps,
+			   end_time - start_time,
+			   search_Store[best_node.m_node_id].m_makespan,
+			   search_Store[best_node.m_node_id].m_cost);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif
+	    sInt_32 update_kruhobot_id = search_Store[best_node.m_node_id].m_update_kruhobot_id;
+	    sASSERT(update_kruhobot_id >= -1.0);
+	    
+	    if(update_kruhobot_id > 0)
+	    {
+		sDouble makespan_bound = search_Store[best_node.m_node_id].m_makespan;
+/*
+		printf("Before\n");
+		search_Store[best_node.m_node_id].to_Screen();		
+*/		
+		if (update_NonconflictingSchedule_smart(update_kruhobot_id,
+							  real_Instance,
+							  search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts,
+							  search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts,
+							  search_Store[best_node.m_node_id].m_kruhobot_Schedules,
+							  makespan_bound,
+							  cost_limit,
+							  extra_cost) < 0.0)
+		{
+		    continue;
+		}
+		augment_Schedules(real_Instance, search_Store[best_node.m_node_id].m_kruhobot_Schedules);
+/*
+		printf("After\n");		
+		search_Store[best_node.m_node_id].to_Screen();		
+*/		
+		search_Store[best_node.m_node_id].m_makespan = calc_ScheduleMakespan(real_Instance, search_Store[best_node.m_node_id].m_kruhobot_Schedules);
+		search_Store[best_node.m_node_id].m_cost = calc_ScheduleCost(real_Instance, search_Store[best_node.m_node_id].m_kruhobot_Schedules);
+		
+		sASSERT(check_KruhobotNonconflictingSchedule(search_Store[best_node.m_node_id].m_kruhobot_Schedules[update_kruhobot_id],
+							     search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts[update_kruhobot_id],
+							     search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts[update_kruhobot_id]));
+	    }
+	    else
+	    {
+                #ifdef sVERBOSE	    
+		{
+		    sDouble end_time = sStatistics::get_CPU_Seconds();
+		    printf("Final search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		}
+		#endif
+		kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;
+		return search_Store[best_node.m_node_id].m_makespan;
+	    }
+
+	    if ((cummulative = examine_NonconflictingSchedules(real_Instance,
+							       best_node.m_node_id,
+							       search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts,
+							       search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts,
+							       search_Store[best_node.m_node_id].m_kruhobot_Schedules,
+							       cost_limit,
+							       extra_cost,
+							       search_Store,
+							       search_Queue)) >= 0.0)
+	    {
+		Node recheck_node = search_Store[best_node.m_node_id];
+		recheck_node.m_node_id = search_Store.size();
+		recheck_node.m_update_kruhobot_id = -1;
+		
+		search_Store.push_back(recheck_node);
+		search_Queue.insert(NodeReference(recheck_node.m_node_id, &search_Store));		
+	    }
+	}
+
+	return -1.0;
+    }
+
+
+    sDouble sRealCBS::find_NonconflictingSchedules_strong(const sRealInstance              &real_Instance,
+							  KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							  KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							  KruhobotSchedules_vector         &kruhobot_Schedules,
+							  sDouble                           cost_limit,
+							  sDouble                           extra_cost)
+    {
+	sDouble cummulative;
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Node initial_node(0);
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_update_kruhobot_id = -1;
+
+	initial_node.m_left_node_id = -1;
+	initial_node.m_right_node_id = -1;
+	
+	initial_node.m_kruhobot_location_Conflicts = kruhobot_location_Conflicts;
+	initial_node.m_kruhobot_linear_Conflicts = kruhobot_linear_Conflicts;
+	initial_node.m_kruhobot_Schedules.resize(N_kruhobots + 1);
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{
+	    sDouble kruhobot_cost;
+	    if ((kruhobot_cost = find_KruhobotNonconflictingSchedule_strong(real_Instance.m_Kruhobots[kruhobot_id],
+									    *real_Instance.m_start_conjunction.m_Map,
+									    real_Instance.m_start_conjunction.m_kruhobot_Locations[kruhobot_id],
+									    real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id],
+									    cost_limit,
+									    extra_cost,					    
+									    initial_node.m_kruhobot_location_Conflicts[kruhobot_id],
+									    initial_node.m_kruhobot_linear_Conflicts[kruhobot_id],
+									    -1.0,
+									    initial_node.m_kruhobot_Schedules[kruhobot_id])) < 0.0)
+	    {
+		return -1.0;
+	    }
+	}
+	
+	augment_Schedules(real_Instance, initial_node.m_kruhobot_Schedules);
+	
+	initial_node.m_makespan = calc_ScheduleMakespan(real_Instance, initial_node.m_kruhobot_Schedules);
+	initial_node.m_cost = calc_ScheduleCost(real_Instance, initial_node.m_kruhobot_Schedules);
+	
+	initial_node.m_conflicting = 0.0;
+
+	#ifdef sDEBUG
+	{
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	    {
+		sASSERT(check_KruhobotNonconflictingSchedule(initial_node.m_kruhobot_Schedules[kruhobot_id],
+							     initial_node.m_kruhobot_location_Conflicts[kruhobot_id],
+							     initial_node.m_kruhobot_linear_Conflicts[kruhobot_id]));
+	    }
+	}
+	#endif	
+	Nodes_vector search_Store;
+//	NodeReferences_vector search_Queue;
+	NodeReferences_mset search_Queue;	
+	
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+//	search_Queue.push_back(NodeReference(0, &search_Store));
+
+	NodeReference best_node = *search_Queue.begin();
+	search_Queue.erase(search_Queue.begin());	
+
+	if ((cummulative = examine_NonconflictingSchedules(real_Instance,
+							   best_node.m_node_id,
+							   search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts,
+							   search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts,
+							   search_Store[best_node.m_node_id].m_kruhobot_Schedules,
+							   cost_limit,
+							   extra_cost,
+							   search_Store,
+							   search_Queue)) >= 0.0)
+	{
+	    kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;
+	    return search_Store[best_node.m_node_id].m_makespan;	    
+	}	
+
+	while (!search_Queue.empty())
+	{	    
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+            #ifdef sDEBUG
+	    {
+//		printf("Search queue size:%ld [%d] (%ld) - %.3f\n", search_Queue.size(), best_node.m_node_id, search_Store.size(), search_Store[best_node.m_node_id].m_cost);
+/*
+		printf("Search queue kruhobots:\n");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d [%.3f,%.3f] ", search_Store[node->m_node_id].m_update_kruhobot_id, search_Store[node->m_node_id].m_makespan, search_Store[node->m_node_id].m_cost);
+		}
+		printf("\n");
+		*/
+//		search_Store[best_node.m_node_id].to_Screen();
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s, make %.3f, cost %.3f)\n",
+			   s_GlobalStatistics.get_CurrentPhase().m_search_Steps,
+			   end_time - start_time,
+			   search_Store[best_node.m_node_id].m_makespan,
+			   search_Store[best_node.m_node_id].m_cost);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif
+	    sInt_32 update_kruhobot_id = search_Store[best_node.m_node_id].m_update_kruhobot_id;
+	    sASSERT(update_kruhobot_id >= -1.0);
+	    
+	    if(update_kruhobot_id > 0)
+	    {
+		sDouble makespan_bound = search_Store[best_node.m_node_id].m_makespan;
+/*
+		printf("Before\n");
+		search_Store[best_node.m_node_id].to_Screen();		
+*/		
+		if (update_NonconflictingSchedule_strong(update_kruhobot_id,
+							 real_Instance,
+							 search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts,
+							 search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts,
+							 search_Store[best_node.m_node_id].m_kruhobot_Schedules,
+							 makespan_bound,
+							 cost_limit,
+							 extra_cost) < 0.0)
+		{
+		    continue;
+		}
+		augment_Schedules(real_Instance, search_Store[best_node.m_node_id].m_kruhobot_Schedules);
+/*
+		printf("After\n");		
+		search_Store[best_node.m_node_id].to_Screen();		
+*/		
+		search_Store[best_node.m_node_id].m_makespan = calc_ScheduleMakespan(real_Instance, search_Store[best_node.m_node_id].m_kruhobot_Schedules);
+		search_Store[best_node.m_node_id].m_cost = calc_ScheduleCost(real_Instance, search_Store[best_node.m_node_id].m_kruhobot_Schedules);
+		
+		sASSERT(check_KruhobotNonconflictingSchedule(search_Store[best_node.m_node_id].m_kruhobot_Schedules[update_kruhobot_id],
+							     search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts[update_kruhobot_id],
+							     search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts[update_kruhobot_id]));
+	    }
+	    else
+	    {
+                #ifdef sVERBOSE	    
+		{
+		    sDouble end_time = sStatistics::get_CPU_Seconds();
+		    printf("Final search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		}
+		#endif
+		kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;
+		return search_Store[best_node.m_node_id].m_makespan;
+	    }
+
+	    if ((cummulative = examine_NonconflictingSchedules(real_Instance,
+							       best_node.m_node_id,
+							       search_Store[best_node.m_node_id].m_kruhobot_location_Conflicts,
+							       search_Store[best_node.m_node_id].m_kruhobot_linear_Conflicts,
+							       search_Store[best_node.m_node_id].m_kruhobot_Schedules,
+							       cost_limit,
+							       extra_cost,
+							       search_Store,
+							       search_Queue)) >= 0.0)
+	    {
+		Node recheck_node = search_Store[best_node.m_node_id];
+		recheck_node.m_node_id = search_Store.size();
+		recheck_node.m_update_kruhobot_id = -1;
+		
+		search_Store.push_back(recheck_node);
+		search_Queue.insert(NodeReference(recheck_node.m_node_id, &search_Store));		
+	    }
+	}
+
+	return -1.0;
+    }        
+
+
     sDouble sRealCBS::update_NonconflictingSchedule(sInt_32                           upd_kruhobot_id,
 						    const sRealInstance              &real_Instance,
 						    KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
@@ -1060,7 +1719,79 @@ namespace boOX
 					 makespan_bound);
 */
 	return cummulative;
-    }  
+    }
+
+
+    sDouble sRealCBS::update_NonconflictingSchedule_smart(sInt_32                           upd_kruhobot_id,
+							  const sRealInstance              &real_Instance,
+							  KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							  KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							  KruhobotSchedules_vector         &kruhobot_Schedules,
+							  sDouble                           makespan_bound,
+							  sDouble                           cost_limit,
+							  sDouble                           extra_cost) const
+    {
+	sDouble cummulative;
+
+	cummulative = find_KruhobotNonconflictingSchedule_smart(real_Instance.m_Kruhobots[upd_kruhobot_id],
+								*real_Instance.m_start_conjunction.m_Map,
+								real_Instance.m_start_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+								real_Instance.m_goal_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+								cost_limit,
+								extra_cost,
+								kruhobot_location_Conflicts[upd_kruhobot_id],
+								kruhobot_linear_Conflicts[upd_kruhobot_id],
+								makespan_bound,
+								kruhobot_Schedules[upd_kruhobot_id]);
+/*
+	generate_KruhobotImportantPoints(real_Instance.m_Kruhobots[upd_kruhobot_id],
+					 *real_Instance.m_start_conjunction.m_Map,
+					 real_Instance.m_start_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+					 real_Instance.m_goal_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+					 cost_limit,
+					 extra_cost,
+					 kruhobot_location_Conflicts[upd_kruhobot_id],
+					 kruhobot_linear_Conflicts[upd_kruhobot_id],
+					 makespan_bound);
+*/
+	return cummulative;
+    }
+
+
+    sDouble sRealCBS::update_NonconflictingSchedule_strong(sInt_32                           upd_kruhobot_id,
+							   const sRealInstance              &real_Instance,
+							   KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							   KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							   KruhobotSchedules_vector         &kruhobot_Schedules,
+							   sDouble                           makespan_bound,
+							   sDouble                           cost_limit,
+							   sDouble                           extra_cost) const
+    {
+	sDouble cummulative;
+	
+	cummulative = find_KruhobotNonconflictingSchedule_strong(real_Instance.m_Kruhobots[upd_kruhobot_id],
+								 *real_Instance.m_start_conjunction.m_Map,
+								 real_Instance.m_start_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+								 real_Instance.m_goal_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+								 cost_limit,
+								 extra_cost,
+								 kruhobot_location_Conflicts[upd_kruhobot_id],
+								 kruhobot_linear_Conflicts[upd_kruhobot_id],
+								 makespan_bound,
+								 kruhobot_Schedules[upd_kruhobot_id]);
+/*
+	generate_KruhobotImportantPoints(real_Instance.m_Kruhobots[upd_kruhobot_id],
+					 *real_Instance.m_start_conjunction.m_Map,
+					 real_Instance.m_start_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+					 real_Instance.m_goal_conjunction.m_kruhobot_Locations[upd_kruhobot_id],
+					 cost_limit,
+					 extra_cost,
+					 kruhobot_location_Conflicts[upd_kruhobot_id],
+					 kruhobot_linear_Conflicts[upd_kruhobot_id],
+					 makespan_bound);
+*/
+	return cummulative;
+    }          
 
 
     sDouble sRealCBS::examine_NonconflictingSchedules(const sRealInstance              &real_Instance,
@@ -1275,7 +2006,7 @@ namespace boOX
 		}
 	    }
 	    #endif
-	    if (front_transition.m_time + map.m_straight_Distances[front_transition.m_location_id][sink_loc_id] <= cost_limit)
+	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit)
 	    {
 		for (s2DMap::Locations_vector::const_iterator location = map.m_Locations.begin(); location != map.m_Locations.end(); ++location) /* regular actions */
 		{
@@ -1574,6 +2305,848 @@ namespace boOX
     }
 
 
+    sDouble sRealCBS::find_KruhobotNonconflictingSchedule_smart(const sKruhobot               &kruhobot,
+								const s2DMap                  &map,
+								sInt_32                        source_loc_id,
+								sInt_32                        sink_loc_id,
+								sDouble                        cost_limit,
+								sDouble                        sUNUSED(extra_cost),
+								const LocationConflicts__umap &location_Conflicts,
+								const LinearConflicts__map    &linear_Conflicts,
+								sDouble                        makespan_bound,
+								Schedule_vector               &Schedule) const
+    {
+	Transitions_mmap transition_Queue;
+	Transitions_map explored_Transitions;
+	Transitions_vector transition_Store;
+
+	LocationConflicts__umap::const_iterator initial_Conflict = location_Conflicts.find(source_loc_id);
+	if (initial_Conflict != location_Conflicts.end())
+	{
+	    LocationConflicts_map::const_iterator lower_initial_conflict = initial_Conflict->second.lower_bound(Interval(0.0, 0.0));
+	    if (lower_initial_conflict != initial_Conflict->second.end())
+	    {
+		if (lower_initial_conflict->second.overlaps(Interval(0.0, 0.0)))
+		{
+		    return -1.0;
+		}
+	    }
+	}
+
+	Transition initial_transition(transition_Store.size(), 0.0, 0.0, source_loc_id, -1);	
+	transition_Queue.insert(Transitions_mmap::value_type(0.0, initial_transition));
+	transition_Store.push_back(initial_transition);
+
+	explored_Transitions.insert(Transitions_map::value_type(0.0, LocationIDs_uset()));
+	explored_Transitions[0.0].insert(source_loc_id);
+
+	LocationIDs_uset bound_explored_Transitions;
+
+	while (!transition_Queue.empty())
+	{
+	    #ifdef sDEBUG
+	    {
+		/*
+		printf("Transition queue: %ld (bnd:%ld)\n", transition_Queue.size(), bound_explored_Transitions.size());
+		*/
+	    }
+	    #endif
+	    const Transition &front_transition = transition_Queue.begin()->second;
+	    
+	    if (front_transition.m_location_id == sink_loc_id)
+	    {
+		bool sink_free_to_enter = true;
+		
+		LocationConflicts__umap::const_iterator sink_Conflict = location_Conflicts.find(sink_loc_id);
+
+		if (sink_Conflict != location_Conflicts.end())
+		{
+		    LocationConflicts_map::const_iterator lower_sink_conflict = sink_Conflict->second.lower_bound(Interval(front_transition.m_time, front_transition.m_time));
+				
+		    if (lower_sink_conflict != sink_Conflict->second.end())
+		    {
+			sink_free_to_enter = false;
+		    }			    
+		}
+
+		if (sink_free_to_enter)
+		{
+		    sInt_32 transition_id = front_transition.m_trans_id;
+		    
+		    Transitions_vector reversed_Schedule;
+		    while (transition_id >= 0)
+		    {
+			reversed_Schedule.push_back(transition_Store[transition_id]);
+			transition_id = transition_Store[transition_id].m_prev_trans_id;
+		    }
+		    Schedule_vector raw_Schedule;
+		    sInt_32 N_Events = reversed_Schedule.size();			
+		    
+		    for (sInt_32 i = N_Events - 1; i >= 1; --i)
+		    {	    
+			raw_Schedule.push_back(Event(reversed_Schedule[i].m_location_id, reversed_Schedule[i - 1].m_location_id,
+						     reversed_Schedule[i].m_time, reversed_Schedule[i -1].m_time));
+		    }
+		    Schedule.clear();
+		    smooth_Schedule(raw_Schedule, Schedule);
+
+		    return front_transition.m_time;
+		}
+	    }
+	    if (front_transition.m_time <= makespan_bound)
+	    {
+		Transitions_map::const_iterator explored_transition = explored_Transitions.find(front_transition.m_time);
+
+		if (explored_transition == explored_Transitions.end())
+		{
+		    explored_Transitions.insert(Transitions_map::value_type(front_transition.m_time, LocationIDs_uset()));
+		}
+	    }
+	    #ifdef sDEGBUG
+	    {
+		static sInt_32 cost_hit = 0;
+		if (front_transition.m_time + map.m_Distances[front_transition.m_location_id][sink_loc_id] > cost_limit)
+		{
+		    printf("cost hit: %d\n", cost_hit);
+		    ++cost_hit;
+		}
+	    }
+	    #endif
+//	    if (front_transition.m_time + map.m_straight_Distances[front_transition.m_location_id][sink_loc_id] <= makespan_bound + s_EPSILON)	    
+	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit + s_EPSILON)
+	    {
+
+		const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
+		for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
+		{
+		    sInt_32 neighbor_location_id = (*neighbor)->m_target->m_id;		    
+/*		
+		for (s2DMap::Locations_vector::const_iterator location = map.m_Locations.begin(); location != map.m_Locations.end(); ++location)
+		{
+		    sInt_32 neighbor_location_id = location->m_id;
+
+		    if (neighbor_location_id != front_transition.m_location_id && map.m_Network.is_Adjacent(neighbor_location_id, front_transition.m_location_id))
+*/
+		    
+		    {
+			sDouble transition_distance = map.m_straight_Distances[front_transition.m_location_id][neighbor_location_id];
+			sDouble transition_delta_time = transition_distance / kruhobot.m_properties.m_linear_velo;
+			sDouble transition_finish_time = front_transition.m_time + transition_delta_time;
+			sDouble transition_finish_cost = front_transition.m_cost + transition_delta_time;
+
+//			printf("MOVE: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+
+			LocationIDs_uset *next_explored_Transitions;
+			
+			if (front_transition.m_time <= makespan_bound)
+			{
+			    Transitions_map::const_iterator explored_transition = explored_Transitions.find(transition_finish_time);			
+			    if (explored_transition == explored_Transitions.end())
+			    {
+				explored_Transitions.insert(Transitions_map::value_type(transition_finish_time, LocationIDs_uset()));
+			    }
+			    next_explored_Transitions = &explored_Transitions[transition_finish_time];
+			}
+			else
+			{
+			    next_explored_Transitions = &bound_explored_Transitions;
+			}
+
+			// TODO: more efficient IFs
+			if (next_explored_Transitions->find(neighbor_location_id) == next_explored_Transitions->end())
+			{
+			    bool location_conflicting = false;
+
+			    LocationConflicts__umap::const_iterator location_Conflict = location_Conflicts.find(neighbor_location_id);
+
+			    if (location_Conflict != location_Conflicts.end())
+			    {
+				LocationConflicts_map::const_iterator lower_location_conflict = location_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				if (lower_location_conflict != location_Conflict->second.end())
+				{
+				    if (lower_location_conflict->second.m_interval.overlaps(Interval(front_transition.m_time, transition_finish_time)))
+				    {
+					location_conflicting = true;
+				    }
+				}
+				else
+				{
+				    LocationConflicts_map::const_reverse_iterator bound_location_conflict = location_Conflict->second.rbegin();
+				    if (bound_location_conflict->second.m_infinity && bound_location_conflict->second.m_interval.m_upper >= makespan_bound)
+				    {
+					/*
+					printf("Kruhobot X: %d\n", kruhobot.m_id);
+					printf("movex: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+					printf("bnd: %.3f\n", makespan_bound);
+					bound_location_conflict->second.m_interval.to_Screen();
+					*/
+					location_conflicting = true;					
+				    }
+				}
+			    }
+
+			    bool origin_location_conflicting = false;			    
+
+			    LocationConflicts__umap::const_iterator origin_location_Conflict = location_Conflicts.find(front_transition.m_location_id);
+				
+			    if (origin_location_Conflict != location_Conflicts.end())
+			    {
+				LocationConflicts_map::const_iterator lower_origin_location_conflict = origin_location_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				if (lower_origin_location_conflict != origin_location_Conflict->second.end())
+				{
+				    if (lower_origin_location_conflict->second.m_interval.overlaps(Interval(front_transition.m_time, transition_finish_time)))
+				    {
+					origin_location_conflicting = true;
+				    }
+				}
+				else
+				{
+				    LocationConflicts_map::const_reverse_iterator bound_location_conflict = origin_location_Conflict->second.rbegin();
+				    if (bound_location_conflict->second.m_infinity && bound_location_conflict->second.m_interval.m_upper >= makespan_bound)
+				    {
+                                        /*
+					printf("Kruhobot Y: %d\n", kruhobot.m_id);
+					printf("movex: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+					printf("bnd: %.3f\n", makespan_bound);
+					bound_location_conflict->second.m_interval.to_Screen();
+				     	*/
+					origin_location_conflicting = true;					
+				    }
+				}				
+			    }
+
+			    bool linear_conflicting = false;
+			    LinearConflicts__map::const_iterator linear_Conflict = linear_Conflicts.find(Uline(front_transition.m_location_id, neighbor_location_id));
+
+			    if (linear_Conflict != linear_Conflicts.end())
+			    {
+				LinearConflicts_map::const_iterator lower_linear_conflict = linear_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				if (lower_linear_conflict != linear_Conflict->second.end())
+				{
+				    if (lower_linear_conflict->second.m_interval.overlaps(Interval(front_transition.m_time, transition_finish_time)))
+				    {
+					linear_conflicting = true;
+				    }
+				}
+			    }
+			    
+			    if (!location_conflicting && !origin_location_conflicting && !linear_conflicting)
+			    {
+//				printf("    ++: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+							
+				Transition neighbor_transition(transition_Store.size(), transition_finish_time, transition_finish_cost, neighbor_location_id, front_transition.m_trans_id);
+				transition_Store.push_back(neighbor_transition);
+				
+				next_explored_Transitions->insert(neighbor_location_id);
+//				transition_Queue.insert(Transitions_mmap::value_type(neighbor_transition.m_time, neighbor_transition));
+				transition_Queue.insert(Transitions_mmap::value_type(neighbor_transition.m_cost, neighbor_transition));
+			    }
+			}
+		    }
+		}
+		{ /* wait action */
+		    sDouble wait_location_finish_time = -1.0;
+		    sDouble wait_linear_finish_time = -1.0;
+
+		    const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
+		    for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
+		    {
+			sInt_32 neighbor_location_id = (*neighbor)->m_target->m_id;		    
+/*		    
+		    for (s2DMap::Locations_vector::const_iterator interacting_loc = map.m_Locations.begin(); interacting_loc != map.m_Locations.end(); ++interacting_loc)
+		    {
+			sInt_32 neighbor_location_id = interacting_loc->m_id;
+			
+			if (neighbor_location_id != front_transition.m_location_id && map.m_Network.is_Adjacent(neighbor_location_id, front_transition.m_location_id))
+*/
+			{
+			    sDouble transition_distance = map.m_straight_Distances[front_transition.m_location_id][neighbor_location_id];
+			    sDouble transition_delta_time = transition_distance / kruhobot.m_properties.m_linear_velo;
+			    sDouble transition_finish_time = front_transition.m_time + transition_delta_time;
+
+			    LocationConflicts__umap::const_iterator location_Conflict = location_Conflicts.find(neighbor_location_id);
+			    sDouble first_non_conf_location_time = -1.0;
+			    
+			    if (location_Conflict != location_Conflicts.end())
+			    {
+				LocationConflicts_map::const_iterator lower_location_conflict = location_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+
+				while (lower_location_conflict != location_Conflict->second.end())
+				{
+				    if (lower_location_conflict->second.m_infinity && lower_location_conflict->second.m_interval.m_upper >= makespan_bound)
+				    {
+					break;
+				    }
+				    else
+				    {
+					bool future_conflicting = false;
+					
+					LocationConflicts_map::const_iterator future_location_conflict = lower_location_conflict;
+					for (++future_location_conflict; future_location_conflict != location_Conflict->second.end(); ++future_location_conflict)
+					{
+					    if (future_location_conflict->second.overlaps(Interval(lower_location_conflict->second.m_interval.m_upper, lower_location_conflict->second.m_interval.m_upper + transition_delta_time)))
+					    {
+						future_conflicting = true;
+						break;
+					    }
+					}
+					if (!future_conflicting)
+					{
+					    first_non_conf_location_time = lower_location_conflict->second.m_interval.m_upper;
+					    break;
+					}
+				    }
+				    ++lower_location_conflict;
+				}
+			    }
+			    
+			    if (first_non_conf_location_time >= 0.0)
+			    {
+				if (wait_location_finish_time < 0.0)
+				{
+				    wait_location_finish_time = first_non_conf_location_time;
+				}			    
+				else
+				{
+				    if (wait_location_finish_time > first_non_conf_location_time)
+				    {
+					wait_location_finish_time = first_non_conf_location_time;
+				    }
+				}
+			    }
+			    
+			    LinearConflicts__map::const_iterator linear_Conflict = linear_Conflicts.find(Uline(front_transition.m_location_id, neighbor_location_id));
+			    sDouble first_non_conf_linear_time = -1.0;
+			    
+			    if (linear_Conflict != linear_Conflicts.end())
+			    {
+				LinearConflicts_map::const_iterator lower_linear_conflict = linear_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				while (lower_linear_conflict != linear_Conflict->second.end())
+				{
+				    bool future_conflicting = false;
+				    LinearConflicts_map::const_iterator future_linear_conflict = lower_linear_conflict;
+				    for (++future_linear_conflict; future_linear_conflict != linear_Conflict->second.end(); ++future_linear_conflict)
+				    {
+					if (future_linear_conflict->second.overlaps(Interval(lower_linear_conflict->second.m_interval.m_upper, lower_linear_conflict->second.m_interval.m_upper + transition_delta_time)))
+					{
+					    future_conflicting = true;
+					    break;
+					}
+				    }
+				    if (!future_conflicting)
+				    {
+					first_non_conf_linear_time = lower_linear_conflict->second.m_interval.m_upper;
+					break;					    
+				    }
+				    ++lower_linear_conflict;
+				}
+			    }
+
+			    if (first_non_conf_linear_time >= 0.0)
+			    {
+				if (wait_linear_finish_time < 0.0)
+				{
+				    wait_linear_finish_time = first_non_conf_linear_time;
+				}			    
+				else
+				{
+				    if (wait_linear_finish_time > first_non_conf_linear_time)
+				    {
+					wait_linear_finish_time = first_non_conf_linear_time;
+				    }
+				}
+			    }
+			}
+		    }
+		    sDouble wait_finish_time = sMAX(0.0, sMAX(wait_location_finish_time, wait_linear_finish_time));
+
+//		    printf("WAIT: %d (%.3f, %.3f)\n", front_transition.m_location_id, front_transition.m_time, wait_finish_time);  
+		    if (wait_finish_time > front_transition.m_time + s_EPSILON)
+		    {
+			bool free_to_wait = true;
+
+			LocationConflicts__umap::const_iterator wait_location_Conflict = location_Conflicts.find(front_transition.m_location_id);
+			if (wait_location_Conflict != location_Conflicts.end())
+			{
+			    LocationConflicts_map::const_iterator lower_wait_conflict = wait_location_Conflict->second.lower_bound(Interval(front_transition.m_time, wait_finish_time));
+				
+			    if (lower_wait_conflict->second.overlaps(Interval(front_transition.m_time, wait_finish_time)))
+			    {
+				free_to_wait = false;
+			    }
+			    else
+			    {
+				LocationConflicts_map::const_reverse_iterator bound_wait_conflict = wait_location_Conflict->second.rbegin();
+				if (bound_wait_conflict->second.m_infinity && bound_wait_conflict->second.m_interval.m_upper >= makespan_bound)
+				{
+				    free_to_wait = false;
+				}
+			    }
+			}
+			if (free_to_wait)
+			{
+//			    printf("    --: %d (%.3f, %.3f)\n", front_transition.m_location_id, front_transition.m_time, wait_finish_time);  			    
+			    LocationIDs_uset *wait_explored_Transitions;
+
+			    if (front_transition.m_time <= makespan_bound)
+			    {
+				Transitions_map::const_iterator explored_transition = explored_Transitions.find(wait_finish_time);
+				
+				if (explored_transition == explored_Transitions.end())
+				{
+				    explored_Transitions.insert(Transitions_map::value_type(wait_finish_time, LocationIDs_uset()));
+				}
+				wait_explored_Transitions = &explored_Transitions[wait_finish_time];
+			    }
+			    else
+			    {
+				wait_explored_Transitions = &bound_explored_Transitions;				
+			    }
+			    if (wait_explored_Transitions->find(front_transition.m_location_id) == wait_explored_Transitions->end())
+			    {
+				sDouble wait_cost = (wait_finish_time - front_transition.m_time) * kruhobot.m_properties.m_wait_factor;
+				Transition wait_transition(transition_Store.size(), wait_finish_time, front_transition.m_cost + wait_cost, front_transition.m_location_id, front_transition.m_trans_id);
+				transition_Store.push_back(wait_transition);
+				
+				wait_explored_Transitions->insert(front_transition.m_location_id);
+//				transition_Queue.insert(Transitions_mmap::value_type(wait_transition.m_time, wait_transition));
+				transition_Queue.insert(Transitions_mmap::value_type(wait_transition.m_cost, wait_transition));				
+			    }
+			}
+		    }
+		}				
+	    }
+	    transition_Queue.erase(transition_Queue.begin());
+	}
+	return -1.0;	
+    }
+
+
+    sDouble sRealCBS::find_KruhobotNonconflictingSchedule_strong(const sKruhobot               &kruhobot,
+								 const s2DMap                  &map,
+								 sInt_32                        source_loc_id,
+								 sInt_32                        sink_loc_id,
+								 sDouble                        cost_limit,
+								 sDouble                        sUNUSED(extra_cost),
+								 const LocationConflicts__umap &location_Conflicts,
+								 const LinearConflicts__map    &linear_Conflicts,
+								 sDouble                        makespan_bound,
+								 Schedule_vector               &Schedule) const
+    {
+	Transitions_mmap transition_Queue;
+	Transitions_map explored_Transitions;
+	Transitions_vector transition_Store;
+
+	LocationConflicts__umap::const_iterator initial_Conflict = location_Conflicts.find(source_loc_id);
+	if (initial_Conflict != location_Conflicts.end())
+	{
+	    LocationConflicts_map::const_iterator lower_initial_conflict = initial_Conflict->second.lower_bound(Interval(0.0, 0.0));
+	    if (lower_initial_conflict != initial_Conflict->second.end())
+	    {
+		if (lower_initial_conflict->second.overlaps(Interval(0.0, 0.0)))
+		{
+		    return -1.0;
+		}
+	    }
+	}
+
+	Transition initial_transition(transition_Store.size(), 0.0, 0.0, source_loc_id, -1);	
+	transition_Queue.insert(Transitions_mmap::value_type(0.0, initial_transition));
+	transition_Store.push_back(initial_transition);
+
+	explored_Transitions.insert(Transitions_map::value_type(0.0, LocationIDs_uset()));
+	explored_Transitions[0.0].insert(source_loc_id);
+
+	LocationIDs_uset bound_explored_Transitions;
+
+	while (!transition_Queue.empty())
+	{
+	    #ifdef sDEBUG
+	    {
+		/*
+		printf("Transition queue: %ld (bnd:%ld)\n", transition_Queue.size(), bound_explored_Transitions.size());
+		*/
+	    }
+	    #endif
+	    const Transition &front_transition = transition_Queue.begin()->second;
+	    
+	    if (front_transition.m_location_id == sink_loc_id)
+	    {
+		bool sink_free_to_enter = true;
+		
+		LocationConflicts__umap::const_iterator sink_Conflict = location_Conflicts.find(sink_loc_id);
+
+		if (sink_Conflict != location_Conflicts.end())
+		{
+		    LocationConflicts_map::const_iterator lower_sink_conflict = sink_Conflict->second.lower_bound(Interval(front_transition.m_time, front_transition.m_time));
+				
+		    if (lower_sink_conflict != sink_Conflict->second.end())
+		    {
+			sink_free_to_enter = false;
+		    }			    
+		}
+
+		if (sink_free_to_enter)
+		{
+		    sInt_32 transition_id = front_transition.m_trans_id;
+		    
+		    Transitions_vector reversed_Schedule;
+		    while (transition_id >= 0)
+		    {
+			reversed_Schedule.push_back(transition_Store[transition_id]);
+			transition_id = transition_Store[transition_id].m_prev_trans_id;
+		    }
+		    Schedule_vector raw_Schedule;
+		    sInt_32 N_Events = reversed_Schedule.size();			
+		    
+		    for (sInt_32 i = N_Events - 1; i >= 1; --i)
+		    {	    
+			raw_Schedule.push_back(Event(reversed_Schedule[i].m_location_id, reversed_Schedule[i - 1].m_location_id,
+						     reversed_Schedule[i].m_time, reversed_Schedule[i -1].m_time));
+		    }
+		    Schedule.clear();
+		    smooth_Schedule(raw_Schedule, Schedule);
+
+		    return front_transition.m_time;
+		}
+	    }
+	    if (front_transition.m_time <= makespan_bound)
+	    {
+		Transitions_map::const_iterator explored_transition = explored_Transitions.find(front_transition.m_time);
+
+		if (explored_transition == explored_Transitions.end())
+		{
+		    explored_Transitions.insert(Transitions_map::value_type(front_transition.m_time, LocationIDs_uset()));
+		}
+	    }
+	    #ifdef sDEGBUG
+	    {
+		static sInt_32 cost_hit = 0;
+		if (front_transition.m_time + map.m_Distances[front_transition.m_location_id][sink_loc_id] > cost_limit)
+		{
+		    printf("cost hit: %d\n", cost_hit);
+		    ++cost_hit;
+		}
+	    }
+	    #endif
+//	    if (front_transition.m_time + map.m_straight_Distances[front_transition.m_location_id][sink_loc_id] <= makespan_bound + s_EPSILON)	    
+	    if (front_transition.m_time + map.m_shortest_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit + s_EPSILON)
+	    {
+
+		const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
+		for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
+		{
+		    sInt_32 neighbor_location_id = (*neighbor)->m_target->m_id;		    
+/*		
+		for (s2DMap::Locations_vector::const_iterator location = map.m_Locations.begin(); location != map.m_Locations.end(); ++location)
+		{
+		    sInt_32 neighbor_location_id = location->m_id;
+
+		    if (neighbor_location_id != front_transition.m_location_id && map.m_Network.is_Adjacent(neighbor_location_id, front_transition.m_location_id))
+*/
+		    
+		    {
+			sDouble transition_distance = map.m_straight_Distances[front_transition.m_location_id][neighbor_location_id];
+			sDouble transition_delta_time = transition_distance / kruhobot.m_properties.m_linear_velo;
+			sDouble transition_finish_time = front_transition.m_time + transition_delta_time;
+			sDouble transition_finish_cost = front_transition.m_cost + transition_delta_time;
+
+//			printf("MOVE: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+
+			LocationIDs_uset *next_explored_Transitions;
+			
+			if (front_transition.m_time <= makespan_bound)
+			{
+			    Transitions_map::const_iterator explored_transition = explored_Transitions.find(transition_finish_time);			
+			    if (explored_transition == explored_Transitions.end())
+			    {
+				explored_Transitions.insert(Transitions_map::value_type(transition_finish_time, LocationIDs_uset()));
+			    }
+			    next_explored_Transitions = &explored_Transitions[transition_finish_time];
+			}
+			else
+			{
+			    next_explored_Transitions = &bound_explored_Transitions;
+			}
+
+			// TODO: more efficient IFs
+			if (next_explored_Transitions->find(neighbor_location_id) == next_explored_Transitions->end())
+			{
+			    bool location_conflicting = false;
+
+			    LocationConflicts__umap::const_iterator location_Conflict = location_Conflicts.find(neighbor_location_id);
+
+			    if (location_Conflict != location_Conflicts.end())
+			    {
+				LocationConflicts_map::const_iterator lower_location_conflict = location_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				if (lower_location_conflict != location_Conflict->second.end())
+				{
+				    if (lower_location_conflict->second.m_interval.overlaps(Interval(front_transition.m_time, transition_finish_time)))
+				    {
+					location_conflicting = true;
+				    }
+				}
+				else
+				{
+				    LocationConflicts_map::const_reverse_iterator bound_location_conflict = location_Conflict->second.rbegin();
+				    if (bound_location_conflict->second.m_infinity && bound_location_conflict->second.m_interval.m_upper >= makespan_bound)
+				    {
+					/*
+					printf("Kruhobot X: %d\n", kruhobot.m_id);
+					printf("movex: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+					printf("bnd: %.3f\n", makespan_bound);
+					bound_location_conflict->second.m_interval.to_Screen();
+					*/
+					location_conflicting = true;					
+				    }
+				}
+			    }
+
+			    bool origin_location_conflicting = false;			    
+
+			    LocationConflicts__umap::const_iterator origin_location_Conflict = location_Conflicts.find(front_transition.m_location_id);
+				
+			    if (origin_location_Conflict != location_Conflicts.end())
+			    {
+				LocationConflicts_map::const_iterator lower_origin_location_conflict = origin_location_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				if (lower_origin_location_conflict != origin_location_Conflict->second.end())
+				{
+				    if (lower_origin_location_conflict->second.m_interval.overlaps(Interval(front_transition.m_time, transition_finish_time)))
+				    {
+					origin_location_conflicting = true;
+				    }
+				}
+				else
+				{
+				    LocationConflicts_map::const_reverse_iterator bound_location_conflict = origin_location_Conflict->second.rbegin();
+				    if (bound_location_conflict->second.m_infinity && bound_location_conflict->second.m_interval.m_upper >= makespan_bound)
+				    {
+                                        /*
+					printf("Kruhobot Y: %d\n", kruhobot.m_id);
+					printf("movex: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+					printf("bnd: %.3f\n", makespan_bound);
+					bound_location_conflict->second.m_interval.to_Screen();
+				     	*/
+					origin_location_conflicting = true;					
+				    }
+				}				
+			    }
+
+			    bool linear_conflicting = false;
+			    LinearConflicts__map::const_iterator linear_Conflict = linear_Conflicts.find(Uline(front_transition.m_location_id, neighbor_location_id));
+
+			    if (linear_Conflict != linear_Conflicts.end())
+			    {
+				LinearConflicts_map::const_iterator lower_linear_conflict = linear_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				if (lower_linear_conflict != linear_Conflict->second.end())
+				{
+				    if (lower_linear_conflict->second.m_interval.overlaps(Interval(front_transition.m_time, transition_finish_time)))
+				    {
+					linear_conflicting = true;
+				    }
+				}
+			    }
+			    
+			    if (!location_conflicting && !origin_location_conflicting && !linear_conflicting)
+			    {
+//				printf("    ++: %d --> %d (%.3f, %.3f)\n", front_transition.m_location_id, neighbor_location_id, front_transition.m_time, transition_finish_time);
+							
+				Transition neighbor_transition(transition_Store.size(), transition_finish_time, transition_finish_cost, neighbor_location_id, front_transition.m_trans_id);
+				transition_Store.push_back(neighbor_transition);
+				
+				next_explored_Transitions->insert(neighbor_location_id);
+//				transition_Queue.insert(Transitions_mmap::value_type(neighbor_transition.m_time, neighbor_transition));
+				transition_Queue.insert(Transitions_mmap::value_type(neighbor_transition.m_cost, neighbor_transition));
+			    }
+			}
+		    }
+		}
+		{ /* wait action */
+		    sDouble wait_location_finish_time = -1.0;
+		    sDouble wait_linear_finish_time = -1.0;
+
+		    const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
+		    for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
+		    {
+			sInt_32 neighbor_location_id = (*neighbor)->m_target->m_id;		    
+/*		    
+		    for (s2DMap::Locations_vector::const_iterator interacting_loc = map.m_Locations.begin(); interacting_loc != map.m_Locations.end(); ++interacting_loc)
+		    {
+			sInt_32 neighbor_location_id = interacting_loc->m_id;
+			
+			if (neighbor_location_id != front_transition.m_location_id && map.m_Network.is_Adjacent(neighbor_location_id, front_transition.m_location_id))
+*/
+			{
+			    sDouble transition_distance = map.m_straight_Distances[front_transition.m_location_id][neighbor_location_id];
+			    sDouble transition_delta_time = transition_distance / kruhobot.m_properties.m_linear_velo;
+			    sDouble transition_finish_time = front_transition.m_time + transition_delta_time;
+
+			    LocationConflicts__umap::const_iterator location_Conflict = location_Conflicts.find(neighbor_location_id);
+			    sDouble first_non_conf_location_time = -1.0;
+			    
+			    if (location_Conflict != location_Conflicts.end())
+			    {
+				LocationConflicts_map::const_iterator lower_location_conflict = location_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+
+				while (lower_location_conflict != location_Conflict->second.end())
+				{
+				    if (lower_location_conflict->second.m_infinity && lower_location_conflict->second.m_interval.m_upper >= makespan_bound)
+				    {
+					break;
+				    }
+				    else
+				    {
+					bool future_conflicting = false;
+					
+					LocationConflicts_map::const_iterator future_location_conflict = lower_location_conflict;
+					for (++future_location_conflict; future_location_conflict != location_Conflict->second.end(); ++future_location_conflict)
+					{
+					    if (future_location_conflict->second.overlaps(Interval(lower_location_conflict->second.m_interval.m_upper, lower_location_conflict->second.m_interval.m_upper + transition_delta_time)))
+					    {
+						future_conflicting = true;
+						break;
+					    }
+					}
+					if (!future_conflicting)
+					{
+					    first_non_conf_location_time = lower_location_conflict->second.m_interval.m_upper;
+					    break;
+					}
+				    }
+				    ++lower_location_conflict;
+				}
+			    }
+			    
+			    if (first_non_conf_location_time >= 0.0)
+			    {
+				if (wait_location_finish_time < 0.0)
+				{
+				    wait_location_finish_time = first_non_conf_location_time;
+				}			    
+				else
+				{
+				    if (wait_location_finish_time > first_non_conf_location_time)
+				    {
+					wait_location_finish_time = first_non_conf_location_time;
+				    }
+				}
+			    }
+			    
+			    LinearConflicts__map::const_iterator linear_Conflict = linear_Conflicts.find(Uline(front_transition.m_location_id, neighbor_location_id));
+			    sDouble first_non_conf_linear_time = -1.0;
+			    
+			    if (linear_Conflict != linear_Conflicts.end())
+			    {
+				LinearConflicts_map::const_iterator lower_linear_conflict = linear_Conflict->second.lower_bound(Interval(front_transition.m_time, transition_finish_time));
+				
+				while (lower_linear_conflict != linear_Conflict->second.end())
+				{
+				    bool future_conflicting = false;
+				    LinearConflicts_map::const_iterator future_linear_conflict = lower_linear_conflict;
+				    for (++future_linear_conflict; future_linear_conflict != linear_Conflict->second.end(); ++future_linear_conflict)
+				    {
+					if (future_linear_conflict->second.overlaps(Interval(lower_linear_conflict->second.m_interval.m_upper, lower_linear_conflict->second.m_interval.m_upper + transition_delta_time)))
+					{
+					    future_conflicting = true;
+					    break;
+					}
+				    }
+				    if (!future_conflicting)
+				    {
+					first_non_conf_linear_time = lower_linear_conflict->second.m_interval.m_upper;
+					break;					    
+				    }
+				    ++lower_linear_conflict;
+				}
+			    }
+
+			    if (first_non_conf_linear_time >= 0.0)
+			    {
+				if (wait_linear_finish_time < 0.0)
+				{
+				    wait_linear_finish_time = first_non_conf_linear_time;
+				}			    
+				else
+				{
+				    if (wait_linear_finish_time > first_non_conf_linear_time)
+				    {
+					wait_linear_finish_time = first_non_conf_linear_time;
+				    }
+				}
+			    }
+			}
+		    }
+		    sDouble wait_finish_time = sMAX(0.0, sMAX(wait_location_finish_time, wait_linear_finish_time));
+
+//		    printf("WAIT: %d (%.3f, %.3f)\n", front_transition.m_location_id, front_transition.m_time, wait_finish_time);  
+		    if (wait_finish_time > front_transition.m_time + s_EPSILON)
+		    {
+			bool free_to_wait = true;
+
+			LocationConflicts__umap::const_iterator wait_location_Conflict = location_Conflicts.find(front_transition.m_location_id);
+			if (wait_location_Conflict != location_Conflicts.end())
+			{
+			    LocationConflicts_map::const_iterator lower_wait_conflict = wait_location_Conflict->second.lower_bound(Interval(front_transition.m_time, wait_finish_time));
+				
+			    if (lower_wait_conflict->second.overlaps(Interval(front_transition.m_time, wait_finish_time)))
+			    {
+				free_to_wait = false;
+			    }
+			    else
+			    {
+				LocationConflicts_map::const_reverse_iterator bound_wait_conflict = wait_location_Conflict->second.rbegin();
+				if (bound_wait_conflict->second.m_infinity && bound_wait_conflict->second.m_interval.m_upper >= makespan_bound)
+				{
+				    free_to_wait = false;
+				}
+			    }
+			}
+			if (free_to_wait)
+			{
+//			    printf("    --: %d (%.3f, %.3f)\n", front_transition.m_location_id, front_transition.m_time, wait_finish_time);  			    
+			    LocationIDs_uset *wait_explored_Transitions;
+
+			    if (front_transition.m_time <= makespan_bound)
+			    {
+				Transitions_map::const_iterator explored_transition = explored_Transitions.find(wait_finish_time);
+				
+				if (explored_transition == explored_Transitions.end())
+				{
+				    explored_Transitions.insert(Transitions_map::value_type(wait_finish_time, LocationIDs_uset()));
+				}
+				wait_explored_Transitions = &explored_Transitions[wait_finish_time];
+			    }
+			    else
+			    {
+				wait_explored_Transitions = &bound_explored_Transitions;				
+			    }
+			    if (wait_explored_Transitions->find(front_transition.m_location_id) == wait_explored_Transitions->end())
+			    {
+				sDouble wait_cost = (wait_finish_time - front_transition.m_time) * kruhobot.m_properties.m_wait_factor;
+				Transition wait_transition(transition_Store.size(), wait_finish_time, front_transition.m_cost + wait_cost, front_transition.m_location_id, front_transition.m_trans_id);
+				transition_Store.push_back(wait_transition);
+				
+				wait_explored_Transitions->insert(front_transition.m_location_id);
+//				transition_Queue.insert(Transitions_mmap::value_type(wait_transition.m_time, wait_transition));
+				transition_Queue.insert(Transitions_mmap::value_type(wait_transition.m_cost, wait_transition));				
+			    }
+			}
+		    }
+		}				
+	    }
+	    transition_Queue.erase(transition_Queue.begin());
+	}
+	return -1.0;	
+    }        
+
+
     void sRealCBS::generate_KruhobotImportantPoints(const sKruhobot               &kruhobot,
 						    const s2DMap                  &map,
 						    sInt_32                        source_loc_id,
@@ -1668,7 +3241,7 @@ namespace boOX
 		}
 	    }
 
-	    if (front_transition.m_time + map.m_straight_Distances[front_transition.m_location_id][sink_loc_id] <= cost_limit + extra_cost)
+	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit + extra_cost)
 	    {
                 #ifdef sDEBUG
 		{
@@ -1689,7 +3262,7 @@ namespace boOX
 
 			LocationIDs_uset *next_explored_Transitions;
 			
-			if (front_transition.m_time <= makespan_bound)
+			if (front_transition.m_time <= makespan_bound + s_EPSILON)
 			{
 			    Transitions_map::const_iterator explored_transition = explored_Transitions.find(transition_finish_time);			
 			    if (explored_transition == explored_Transitions.end())

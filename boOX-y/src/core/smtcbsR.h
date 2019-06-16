@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.h / 0-279_zenon                                                    */
+/* smtcbsR.h / 1-036_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -116,12 +116,19 @@ namespace boOX
 	typedef std::map<sDouble, sInt_32, std::less<sDouble> > Desisions_map;
 	typedef std::vector<Desisions_map> KruhobotDesisions_vector;
 
-	typedef std::multimap<sDouble, sInt_32, std::less<sDouble> > KruhobotDecisionIDs_mmap;
+	typedef std::map<sDouble, sInt_32, std::less<sDouble> > KruhobotDecisionIDs_map;
+	typedef std::multimap<sDouble, sInt_32, std::less<sDouble> > KruhobotDecisionIDs_mmap;	
+	
 	typedef std::map<sInt_32, KruhobotDecisionIDs_mmap, std::less<sInt_32> > KruhobotDecisionMapping_map;
+	typedef std::vector<KruhobotDecisionIDs_mmap> KruhobotDecisionMapping_vector;
+	    
 	typedef std::vector<KruhobotDecisionMapping_map> KruhobotDecisionMappings_vector;
 
 	typedef std::unordered_map<sInt_32, sInt_32> Explorations_umap;
 	typedef std::map<sDouble, Explorations_umap> TransitionExplorations_map;
+
+	typedef std::set<sDouble, std::less<sDouble> > DecisionTimes_set;
+	typedef std::vector<DecisionTimes_set> LocationDecisionTimes_vector;
 
 	struct RealCoordinate
 	{
@@ -186,37 +193,79 @@ namespace boOX
 	sRealSMTCBS(sBoolEncoder *solver_Encoder, sRealInstance *real_Instance, sDouble timeout);
 	/*----------------------------------------------------------------------------*/
 
-	sDouble find_ShortestNonconflictingSchedules(sRealSolution &real_Solution, sDouble cost_limit);
+	sDouble find_ShortestNonconflictingSchedules(sRealSolution &real_Solution, sDouble makespan_limit);
 	sDouble find_ShortestNonconflictingSchedules(const  sRealInstance &real_Instance,
 						     sRealSolution        &real_Solution,
-						     sDouble               cost_limit);
+						     sDouble               makespan_limit);
 	
-	sDouble find_ShortestNonconflictingSchedules(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit);	
+	sDouble find_ShortestNonconflictingSchedules(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit);	
 	sDouble find_ShortestNonconflictingSchedules(const sRealInstance      &real_Instance,
 						     KruhobotSchedules_vector &kruhobot_Schedules,
-						     sDouble                   cost_limit);
+						     sDouble                   makespan_limit);
 
-	sDouble find_ShortestNonconflictingSchedules(KruhobotSchedules_vector &kruhobot_Schedules, sDouble cost_limit, sDouble extra_cost);
+	sDouble find_ShortestNonconflictingSchedules(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble extra_makespan);
 	sDouble find_ShortestNonconflictingSchedules(const sRealInstance      &real_Instance,
 						     KruhobotSchedules_vector &kruhobot_Schedules,
-						     sDouble                   cost_limit,
-						     sDouble                   extra_cost);
+						     sDouble                   makespan_limit,
+						     sDouble                   extra_makespan);
+	/*----------------------------------------------------------------------------*/
+
+	sDouble find_ShortestNonconflictingSchedules_pruningSmart(sRealSolution &real_Solution, sDouble makespan_limit);
+	sDouble find_ShortestNonconflictingSchedules_pruningSmart(const  sRealInstance &real_Instance,
+								  sRealSolution        &real_Solution,
+								  sDouble               makespan_limit);
+	
+	sDouble find_ShortestNonconflictingSchedules_pruningSmart(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit);
+	sDouble find_ShortestNonconflictingSchedules_pruningSmart(const sRealInstance      &real_Instance,
+								  KruhobotSchedules_vector &kruhobot_Schedules,
+								  sDouble                   makespan_limit);
+
+	sDouble find_ShortestNonconflictingSchedules_pruningSmart(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble extra_makespan);
+	sDouble find_ShortestNonconflictingSchedules_pruningSmart(const sRealInstance      &real_Instance,
+								  KruhobotSchedules_vector &kruhobot_Schedules,
+								  sDouble                   makespan_limit,
+								  sDouble                   extra_makespan);	
+	/*----------------------------------------------------------------------------*/
+
+	sDouble find_ShortestNonconflictingSchedules_pruningStrong(sRealSolution &real_Solution, sDouble makespan_limit);
+	sDouble find_ShortestNonconflictingSchedules_pruningStrong(const  sRealInstance &real_Instance,
+								  sRealSolution        &real_Solution,
+								  sDouble               makespan_limit);
+	
+	sDouble find_ShortestNonconflictingSchedules_pruningStrong(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit);
+	sDouble find_ShortestNonconflictingSchedules_pruningStrong(const sRealInstance      &real_Instance,
+								  KruhobotSchedules_vector &kruhobot_Schedules,
+								  sDouble                   makespan_limit);
+
+	sDouble find_ShortestNonconflictingSchedules_pruningStrong(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble extra_makespan);
+	sDouble find_ShortestNonconflictingSchedules_pruningStrong(const sRealInstance      &real_Instance,
+								  KruhobotSchedules_vector &kruhobot_Schedules,
+								  sDouble                   makespan_limit,
+								  sDouble                   extra_makespan);	
 	/*----------------------------------------------------------------------------*/	
 
 	sDouble find_NonconflictingSchedules(const sRealInstance              &real_Instance,
 					     KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
 					     KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
 					     KruhobotSchedules_vector         &kruhobot_Schedules,
-					     sDouble                           cost_limit,
-					     sDouble                           extra_cost);
+					     sDouble                           makespan_limit,
+					     sDouble                           extra_makespan);
 
 	sDouble find_KruhobotIgnoringSchedule(const sKruhobot &kruhobot,
 					      const s2DMap    &map,
 					      sInt_32          source_loc_id,
 					      sInt_32          sink_loc_id,
-					      sDouble          cost_limit,
-					      sDouble          extra_cost,
-					      Schedule_vector &Schedule) const;	
+					      sDouble          makespan_limit,
+					      sDouble          extra_makespan,
+					      Schedule_vector &Schedule) const;
+
+	sDouble find_KruhobotIgnoringSchedule_strong(const sKruhobot &kruhobot,
+						     const s2DMap    &map,
+						     sInt_32          source_loc_id,
+						     sInt_32          sink_loc_id,
+						     sDouble          makespan_limit,
+						     sDouble          extra_makespan,
+						     Schedule_vector &Schedule) const;	
 
 	void reflect_KruhobotCollision(const KruhobotCollision          &kruhobot_collision,
 				       KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
@@ -230,8 +279,22 @@ namespace boOX
 					     KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
 					     KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
 					     KruhobotSchedules_vector               &kruhobot_Schedules,
-					     sDouble                                 cost_limit,
-					     sDouble                                 extra_cost);
+					     sDouble                                 makespan_limit,
+					     sDouble                                 extra_makespan);
+
+	sDouble find_NonconflictingSchedules_pruningSmart(const sRealInstance                    &real_Instance,
+							  KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+							  KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+							  KruhobotSchedules_vector               &kruhobot_Schedules,
+							  sDouble                                 makespan_limit,
+							  sDouble                                 extra_makespan);
+
+	sDouble find_NonconflictingSchedules_pruningStrong(const sRealInstance                    &real_Instance,
+							   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+							   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+							   KruhobotSchedules_vector               &kruhobot_Schedules,
+							   sDouble                                 makespan_limit,
+							   sDouble                                 extra_makespan);		
 
 	void reflect_KruhobotCollisions(const KruhobotCollisions_mset          &kruhobot_Collisions,
 					KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
@@ -277,45 +340,88 @@ namespace boOX
 					      const KruhobotCollisions_mset         &kruhobot_Collisions,
 					      const KruhobotCollisions_mset         &next_kruhobot_Collisions,					      
 					      RealModel                             &real_sat_Model,
-					      KruhobotSchedules_vector              &kruhobot_Schedules) const;			
+					      KruhobotSchedules_vector              &kruhobot_Schedules) const;
 	/*----------------------------------------------------------------------------*/		
 
 	sDouble build_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
 						  const s2DMap                   &map,
 						  sInt_32                         source_loc_id,
 						  sInt_32                         sink_loc_id,
-						  sDouble                         cost_limit,
-						  sDouble                         extra_cost,
 						  const LocationConflicts__umap  &location_Conflicts,
 						  const LinearConflicts__map     &linear_Conflicts,
-						  sDouble                         makespan_bound,					       
+						  sDouble                         makespan_bound,
 						  KruhobotDecisionDiagram_vector &kruhobot_RDD,
 						  KruhobotDecisionMapping_map    &kruhobot_RDD_mapping) const;
 
-	sDouble build_KruhobotRealDecisionDiagram(const sKruhobot                      &kruhobot,
-						  const s2DMap                         &map,
-						  sInt_32                               source_loc_id,
-						  sInt_32                               sink_loc_id,
-						  sDouble                               cost_limit,
-						  sDouble                               extra_cost,
-						  const LocationConflicts_upper__umap  &location_Conflicts,
-						  const LinearConflicts_upper__map     &linear_Conflicts,
-						  sDouble                               makespan_bound,					       
-						  KruhobotDecisionDiagram_vector       &kruhobot_RDD,
-						  KruhobotDecisionMapping_map          &kruhobot_RDD_mapping) const;
+	sDouble build_KruhobotRealDecisionDiagram(const sKruhobot                     &kruhobot,
+						  const s2DMap                        &map,
+						  sInt_32                              source_loc_id,
+						  sInt_32                              sink_loc_id,
+						  const LocationConflicts_upper__umap &location_Conflicts,
+						  const LinearConflicts_upper__map    &linear_Conflicts,
+						  sDouble                              makespan_bound,
+						  KruhobotDecisionDiagram_vector      &kruhobot_RDD,
+						  KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;
+
+	sDouble build_KruhobotRealDecisionDiagram_pruning(const sKruhobot                     &kruhobot,
+							  const s2DMap                        &map,
+							  sInt_32                              source_loc_id,
+							  sInt_32                              sink_loc_id,
+							  const LocationConflicts_upper__umap &location_Conflicts,
+							  const LinearConflicts_upper__map    &linear_Conflicts,
+							  sDouble                              makespan_bound,
+							  KruhobotDecisionDiagram_vector      &kruhobot_RDD,
+							  KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;
+
+	sDouble build_KruhobotRealDecisionDiagram_pruningSmart(const sKruhobot                     &kruhobot,
+							       const s2DMap                        &map,
+							       sInt_32                              source_loc_id,
+							       sInt_32                              sink_loc_id,
+							       const LocationConflicts_upper__umap &location_Conflicts,
+							       const LinearConflicts_upper__map    &linear_Conflicts,
+							       sDouble                              makespan_bound,
+							       KruhobotDecisionDiagram_vector      &kruhobot_RDD,
+							       KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;
+
+	sDouble build_KruhobotRealDecisionDiagram_pruningStrong(const sKruhobot                     &kruhobot,
+							       const s2DMap                        &map,
+							       sInt_32                              source_loc_id,
+							       sInt_32                              sink_loc_id,
+							       const LocationConflicts_upper__umap &location_Conflicts,
+							       const LinearConflicts_upper__map    &linear_Conflicts,
+							       sDouble                              makespan_bound,
+							       KruhobotDecisionDiagram_vector      &kruhobot_RDD,
+							       KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;	
+	
+	Explorations_umap* obtain_ExploredTransitions(TransitionExplorations_map &explored_Transitions, sDouble time) const;
+	/*----------------------------------------------------------------------------*/	
 
 	void interconnect_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
 						      const s2DMap                   &map,
 						      KruhobotDecisionDiagram_vector &kruhobot_RDD,
 						      KruhobotDecisionMapping_map    &kruhobot_RDD_mapping) const;
 
+	void interconnect_KruhobotRealDecisionDiagram_smart(const sKruhobot                &kruhobot,
+							    const s2DMap                   &map,
+							    KruhobotDecisionDiagram_vector &kruhobot_RDD,
+							    KruhobotDecisionMapping_map    &kruhobot_RDD_mapping) const;	
+
 	void trim_KruhobotRealDecisionDiagram(sDouble makespan_bound, KruhobotDecisionDiagram_vector &kruhobot_RDD) const;
 	void trim_KruhobotRealDecisionDiagrams(sDouble makespan_bound, KruhobotDecisionDiagrams_vector &kruhobot_RDDs) const;
 
 	void collect_CharacteristicMakespans(const sRealInstance &real_Instance, const KruhobotDecisionDiagrams_vector &kruhobot_RDDs, Makespans_vector &characteristic_Makespans) const;
-	bool compare_CharacteristicMakespans(const sRealInstance &real_Instance, const Makespans_vector &characteristic_Makespans, const Makespans_vector &next_characteristic_Makespans) const;	
+	bool compare_CharacteristicMakespans(const sRealInstance &real_Instance, const Makespans_vector &characteristic_Makespans, const Makespans_vector &next_characteristic_Makespans) const;
+	/*----------------------------------------------------------------------------*/
 	
-	bool compare_KruhobotRealDecisionDiagrams(const KruhobotDecisionDiagram_vector &kruhobot_RDD, const KruhobotDecisionDiagram_vector &next_kruhobot_RDD) const;
+	bool compare_KruhobotRealDecisionDiagrams(const s2DMap                         &map,
+						  const KruhobotDecisionDiagram_vector &kruhobot_RDD,
+						  const KruhobotDecisionDiagram_vector &next_kruhobot_RDD) const;
+	bool compare_KruhobotRealDecisionDiagrams_smart(const s2DMap                         &map,
+							const KruhobotDecisionDiagram_vector &kruhobot_RDD,
+							const KruhobotDecisionDiagram_vector &next_kruhobot_RDD) const;
+
+	void represent_DecisionTime(DecisionTimes_set &decision_Times, sDouble time) const;
+	DecisionTimes_set::const_iterator obtain_DecisionTime(DecisionTimes_set &decision_Times, sDouble time) const;
 
 	/*----------------------------------------------------------------------------*/
 

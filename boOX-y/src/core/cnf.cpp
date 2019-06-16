@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 0-279_zenon                                                      */
+/* cnf.cpp / 1-036_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -162,7 +162,12 @@ namespace boOX
 
     void sBoolEncoder::cast_AdaptiveAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight)
     {
-	if (variable_IDs.size() <= 32)
+//	if (variable_IDs.size() <= 0)		
+//	if (variable_IDs.size() <= 4)
+//	if (variable_IDs.size() <= 6)
+	if (variable_IDs.size() <= 16)	    
+//	if (variable_IDs.size() <= 32)
+//	if (variable_IDs.size() <= 64)	
 //	if (variable_IDs.size() <= 512)
 	{
 	    cast_AllMutexConstraint(solver, variable_IDs, weight);
@@ -203,6 +208,30 @@ namespace boOX
 	}
 	#endif	
     }
+
+
+    void sBoolEncoder::cast_3Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 sUNUSED(weight))
+    {
+	cast_Clause(solver, -variable_ID_A, -variable_ID_B, -variable_ID_C);
+	
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif	
+    }
+
+
+    void sBoolEncoder::cast_4Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 variable_ID_D, sInt_32 sUNUSED(weight))
+    {
+	cast_Clause(solver, -variable_ID_A, -variable_ID_B, -variable_ID_C, -variable_ID_D);
+	
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif	
+    }        
 
 
     void  sBoolEncoder::cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 sUNUSED(weight))	
@@ -664,6 +693,18 @@ namespace boOX
 		
 	cast_Clause(solver, Lits);
     }
+
+
+    void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3,sInt_32 lit_4)
+    {
+	std::vector<int> Lits;
+	Lits.push_back(lit_1);
+	Lits.push_back(lit_2);
+	Lits.push_back(lit_3);
+	Lits.push_back(lit_4);	
+		
+	cast_Clause(solver, Lits);
+    }    
 
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, std::vector<int> &Lits)

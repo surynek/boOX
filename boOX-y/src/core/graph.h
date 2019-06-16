@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0-279_zenon                              */
+/*                             boOX 1-036_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 0-279_zenon                                                      */
+/* graph.h / 1-036_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -282,7 +282,7 @@ namespace boOX
 	virtual void to_Stream_cpf(FILE *fw, const sString &indent = "") const;
 
 	virtual sResult to_File_mpf(const sString &filename, const sString &indent = "") const;
-	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;	
+	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;
 
 	virtual sResult from_File_cpf(const sString &filename);
 	virtual sResult from_Stream_cpf(FILE *fr);
@@ -296,8 +296,11 @@ namespace boOX
 	virtual sResult from_File_bgu(const sString &filename);
 	virtual sResult from_Stream_bgu(FILE *fr);
 
+	virtual sResult to_File_usc(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_usc(FILE *fw, const sString &indent = "") const;			
+	
 	virtual sResult from_File_usc(const sString &filename);
-	virtual sResult from_Stream_usc(FILE *fr);
+	virtual sResult from_Stream_usc(FILE *fr);      
 
 	virtual sResult from_File_lusc(const sString &filename);
 	virtual sResult from_Stream_lusc(FILE *fr);	
