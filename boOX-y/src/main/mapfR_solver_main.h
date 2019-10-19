@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapfR_solver_main.h / 1-036_leibniz                                        */
+/* mapfR_solver_main.h / 1-109_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.
@@ -47,7 +47,9 @@ namespace boOX
 	    ALGORITHM_CBS_R_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS_R,
 	    ALGORITHM_SMTCBS_R_PLUS,
-	    ALGORITHM_SMTCBS_R_PLUS_PLUS
+	    ALGORITHM_SMTCBS_R_PLUS_PLUS,
+	    ALGORITHM_SMTCBS_R_PLUS_PLUS_PLUS,
+	    ALGORITHM_SMTCBS_R_4_PLUS
 	};
 	
 	sCommandParameters();

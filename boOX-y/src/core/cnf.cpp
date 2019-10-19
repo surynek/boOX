@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 1-036_leibniz                                                    */
+/* cnf.cpp / 1-109_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -240,7 +240,7 @@ namespace boOX
 	{
 	    for (VariableIDs_vector::const_iterator variable_B = variable_IDs_B.begin(); variable_B != variable_IDs_B.end(); ++variable_B)
 	    {
-		cast_Clause(solver, -*variable_A, -*variable_B);		
+		cast_Clause(solver, -*variable_A, -*variable_B);	
 	
                 #ifdef sSTATISTICS
 		{
@@ -249,7 +249,25 @@ namespace boOX
       	        #endif
 	    }
 	}
-    }    
+    }
+
+
+    void sBoolEncoder::cast_CapacityMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 sUNUSED(weight))
+    {
+	std::vector<int> Literals;
+			    
+	for (VariableIDs_vector::const_iterator variable_id = variable_IDs.begin(); variable_id != variable_IDs.end(); ++variable_id)
+	{
+	    Literals.push_back(-(*variable_id));
+	}		
+	cast_Clause(solver, Literals);
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+      	#endif	
+    }
 
 
     void sBoolEncoder::cast_ConditionalAllMutexConstraint(Glucose::Solver    *solver,

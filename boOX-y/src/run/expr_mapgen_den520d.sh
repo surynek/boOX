@@ -1,8 +1,12 @@
-AGENTS_LIST=`cat agents_maps`
-MAP=den520d
+ROBOT_LIST=`cat robots_maps`
+SEED_LIST=`cat seeds_10`
+SIZE=16
 
-for AGENTS in $AGENTS_LIST;
+for ROBOTS in $ROBOT_LIST;
 do
-    ./gridgen_boOX '--map-file=../../maps/'$MAP'.map' '--mpf-file=map_'$MAP'_a'$AGENTS'.mpf' '--N-agents='$AGENTS
-    ./gridgen_boOX '--map-file=../../maps/'$MAP'.map' '--usc-map-file=map_'$MAP'.usc.map' '--usc-agents-file=map_'$MAP'_a'$AGENTS'.usc.agent' '--N-agents='$AGENTS
+  for SEED in $SEED_LIST;	
+  do                
+    echo 'Generating map den520 with '$ROBOTS' agents ...'
+   ../main/gridgen_boOX --map-file=../../maps/den520d.map '--N-agents='$ROBOTS '--mpf-file=den520d_a'$ROBOTS'_'$SEED'.mpf' '--cpf-file=den520d_a'$ROBOTS'_'$SEED'.cpf'
+  done
 done

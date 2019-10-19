@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 1-036_leibniz                                                   */
+/* mapR.cpp / 1-109_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -444,6 +444,16 @@ namespace boOX
 	qx2 = m_Locations[line_2_v_id].m_x;
 	qy2 = m_Locations[line_2_v_id].m_y;
 
+	/*
+	sDouble distance = calc_LineDistance(px1, py1, px2, py2, qx1, qy1, qx2, qy2);
+
+	if (sABS(distance) <= s_EPSILON)
+	{
+	    printf("line coords: %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f\n", px1, py1, px2, py2, qx1, qy1, qx2, qy2);
+	    printf("distance: %.3f\n", distance);
+	}
+	return distance;
+	*/
 	return calc_LineDistance(px1, py1, px2, py2, qx1, qy1, qx2, qy2);
     }
 
@@ -478,8 +488,8 @@ namespace boOX
 	sDouble px1_ = px1;
 	sDouble py1_ = py1;
 
-	sDouble px1__ = px1 + dpx;
-	sDouble py1__ = py1 + dpy;	
+	sDouble px1__ = px2; //px1 + dpx;
+	sDouble py1__ = py2; //py1 + dpy;	
 
 //	px1_ + ss * npx = qx1 + tt * dqx;
 //	py1_ + ss * npy = qy1 + tt * dqy;
@@ -487,8 +497,8 @@ namespace boOX
 	sDouble qx1_ = qx1;
 	sDouble qy1_ = qy1;
 
-	sDouble qx1__ = qx1 + dqx;
-	sDouble qy1__ = qy1 + dqy;		
+	sDouble qx1__ = qx2; //qx1 + dqx;
+	sDouble qy1__ = qy2; //qy1 + dqy;		
 	
 //	px1 + ss * dpx = qx1_ + tt * nqx;
 //	py1 + ss * dpy = qy1_ + tt * nqy;	
@@ -500,18 +510,92 @@ namespace boOX
 	{
 	    sDouble ddd = npx * dqy - npy * dqx;	    
 	    sDouble ss = (py1 * dqx - qy1 * dqx - px1 * dqy + qx1 * dqy) / ddd;
-	    sDouble tt;
+	    sDouble tt1, tt2;
 	    
 	    if (sABS(dqx) > sABS(dqy))
 	    {
-		tt = (px1 + ss * npx - qx1) / dqx;
+		tt1 = (px1 + ss * npx - qx1) / dqx;
+		tt2 = (px2 + ss * npx - qx1) / dqx;		
 	    }
 	    else
 	    {
-		tt = (py1 + ss * npy - qy1) / dqy;
+		tt1 = (py1 + ss * npy - qy1) / dqy;
+		tt2 = (py2 + ss * npy - qy1) / dqy;		
 	    }
 
-	    sDouble dist = calc_PointDistance(px1, py1, qx1 + tt * dqx, qy1 + tt * dqy);
+	    sDouble dist;// = calc_PointDistance(px1, py1, qx1 + tt1 * dqx, qy1 + tt1 * dqy);
+	    
+	    if (tt1 >= 0.0)
+	    {
+		if (tt1 <= 1.0)
+		{
+		    dist = calc_PointDistance(px1, py1, qx1 + tt1 * dqx, qy1 + tt1 * dqy);		    
+		}
+		else
+		{
+		    if (tt2 >= 0.0)
+		    {
+			if (tt2 <= 1.0)
+			{
+			    dist = calc_PointDistance(px2, py2, qx1 + tt2 * dqx, qy1 + tt2 * dqy);
+			}
+			else
+			{
+			    if (tt1 < tt2)
+			    {
+				dist = calc_PointDistance(px1, py1, qx2, qy2);
+			    }
+			    else
+			    {
+				dist = calc_PointDistance(px2, py2, qx2, qy2);
+			    }
+			}
+		    }
+		    else
+		    {			
+			dist = calc_PointDistance(px1, py1, qx1 + tt1 * dqx, qy1 + tt1 * dqy);
+		    }
+		}
+	    }
+	    else
+	    {
+		if (tt2 >= 0.0)
+		{
+		    if (tt2 <= 1.0)
+		    {
+			dist = calc_PointDistance(px2, py2, qx1 + tt2 * dqx, qy1 + tt2 * dqy);
+		    }
+		    else
+		    {
+			dist = calc_PointDistance(px1, py1, qx1 + tt1 * dqx, qy1 + tt1 * dqy);
+		    }
+		}		
+		else
+		{
+		    if (tt2 >= 0.0)
+		    {
+			if (tt2 <= 1.0)
+			{
+			    dist = calc_PointDistance(px2, py2, qx1 + tt2 * dqx, qy1 + tt2 * dqy);
+			}
+			else
+			{
+			    dist = calc_PointDistance(px1, py1, qx1 + tt1 * dqx, qy1 + tt1 * dqy);
+			}
+		    }
+		    else
+		    {
+			if (tt1 < tt2)
+			{
+			    dist = calc_PointDistance(px1, py1, qx1, qy1);
+			}
+			else
+			{
+			    dist = calc_PointDistance(px2, py2, qx1, qy1);
+			}			
+		    }
+		}		
+	    }
 
 	    if (line_distance < 0.0)
 	    {
@@ -719,7 +803,6 @@ namespace boOX
 		}
 	    }
 	}
-
 	sDouble pair_dist1 = calc_PointDistance(px1, py1, qx1, qy1);
 	sDouble pair_dist2 = calc_PointDistance(px1, py1, qx2, qy2);
 	sDouble pair_dist3 = calc_PointDistance(px2, py2, qx1, qy1);

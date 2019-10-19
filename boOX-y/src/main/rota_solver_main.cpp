@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.cpp / 1-036_leibniz                                       */
+/* rota_solver_main.cpp / 1-109_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.
@@ -52,6 +52,7 @@ namespace boOX
 
   sCommandParameters::sCommandParameters()
       : m_cost_limit(65536)
+      , m_capacitated(false)
       , m_timeout(-1.0)	
   {
       // nothing
@@ -83,6 +84,7 @@ namespace boOX
 	printf("                 [--cost-limit=<int>]\n");
 	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+|smtcbs++}]\n");
         printf("		 [--timeout=<double>]\n");
+	printf("		 [--capacitated]\n");
 	printf("\n");
 	printf("Examples:\n");
 	printf("tswap_solver_boOX --input-file=grid_02x02_t04.mpf\n");
@@ -102,8 +104,14 @@ namespace boOX
 
 	if (!parameters.m_input_filename.empty())
 	{
-	    result = instance.from_File_mpf(parameters.m_input_filename);
-
+	    if (parameters.m_capacitated)
+	    {
+		result = instance.from_File_cmpf(parameters.m_input_filename);
+	    }
+	    else
+	    {
+		result = instance.from_File_mpf(parameters.m_input_filename);
+	    }
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to open token rotation instance %s (code = %d).\n", parameters.m_input_filename.c_str(), result);
@@ -125,7 +133,16 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingRotation(solution, parameters.m_cost_limit);
+	    
+	    if (parameters.m_capacitated)
+	    {
+		printf("Wrong combination of command line parameters.\n");
+		return sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR;
+	    }
+	    else
+	    {
+		cost = cbs_Solver.find_ShortestNonconflictingRotation(solution, parameters.m_cost_limit);
+	    }
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_CBS_PLUS:
@@ -137,7 +154,16 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingRotation_Delta(solution, parameters.m_cost_limit);
+	    
+	    if (parameters.m_capacitated)
+	    {
+		printf("Wrong combination of command line parameters.\n");
+		return sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR;
+	    }
+	    else
+	    {	    
+		cost = cbs_Solver.find_ShortestNonconflictingRotation_Delta(solution, parameters.m_cost_limit);
+	    }
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS:
@@ -149,7 +175,16 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingRotation_DeltaStar(solution, parameters.m_cost_limit);
+
+	    if (parameters.m_capacitated)
+	    {
+		printf("Wrong combination of command line parameters.\n");
+		return sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR;
+	    }
+	    else
+	    {	    
+		cost = cbs_Solver.find_ShortestNonconflictingRotation_DeltaStar(solution, parameters.m_cost_limit);
+	    }
 	    break;
 	}			
 	case sCommandParameters::ALGORITHM_SMTCBS:
@@ -162,7 +197,16 @@ namespace boOX
 	    
 	    sBoolEncoder encoder;
 	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
-	    cost = smtcbs_Solver.find_ShortestNonconflictingRotation(solution, parameters.m_cost_limit);
+
+	    if (parameters.m_capacitated)
+	    {
+		printf("Wrong combination of command line parameters.\n");
+		return sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR;
+	    }
+	    else
+	    {	    	    
+		cost = smtcbs_Solver.find_ShortestNonconflictingRotation(solution, parameters.m_cost_limit);
+	    }
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_SMTCBS_PLUS:
@@ -175,7 +219,16 @@ namespace boOX
 	    
 	    sBoolEncoder encoder;
 	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
-	    cost = smtcbs_Solver.find_ShortestNonconflictingRotationInverse(solution, parameters.m_cost_limit);
+
+	    if (parameters.m_capacitated)
+	    {
+		printf("Wrong combination of command line parameters.\n");
+		return sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR;
+	    }
+	    else
+	    {
+		cost = smtcbs_Solver.find_ShortestNonconflictingRotationInverse(solution, parameters.m_cost_limit);
+	    }
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS:
@@ -188,7 +241,15 @@ namespace boOX
 	    
 	    sBoolEncoder encoder;
 	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
-	    cost = smtcbs_Solver.find_ShortestNonconflictingRotationInverseDepleted(solution, parameters.m_cost_limit);
+
+	    if (parameters.m_capacitated)
+	    {
+		cost = smtcbs_Solver.find_ShortestNonconflictingCapacitatedRotationInverseDepleted(solution, parameters.m_cost_limit);
+	    }
+	    else
+	    {
+		cost = smtcbs_Solver.find_ShortestNonconflictingRotationInverseDepleted(solution, parameters.m_cost_limit);
+	    }
 	    break;
 	}				
 	default:
@@ -258,6 +319,10 @@ namespace boOX
 	{
 	    command_parameters.m_cost_limit = sInt_32_from_String(parameter.substr(13, parameter.size()));
 	}
+	else if (parameter.find("--capacitated") == 0)
+	{
+	    command_parameters.m_capacitated = true;
+	}	
 	else if (parameter.find("--algorithm=") == 0)
 	{
 	    sString algorithm_str = parameter.substr(12, parameter.size());

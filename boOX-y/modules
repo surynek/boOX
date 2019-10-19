@@ -30,7 +30,7 @@ application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h graph_test.h
 graph_test.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 test_agent_boOX
@@ -38,7 +38,7 @@ application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h agent_test.h
 agent_test.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 test_kruhoR_boOX
@@ -46,7 +46,7 @@ application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h kruhoR_test.h
 kruhoR_test.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 test_cbs_boOX
@@ -54,7 +54,7 @@ application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h cbs_test.h
 cbs_test.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 test_cbsR_boOX
@@ -62,7 +62,7 @@ application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h cbsR_test.h
 cbsR_test.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 test_smtcbsR_boOX
@@ -70,7 +70,7 @@ application
 /src/test
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h smtcbsR_test.h
 smtcbsR_test.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 gridgen_boOX
@@ -78,7 +78,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h gridgen_main.h
 gridgen_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 randgen_boOX
@@ -86,7 +86,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h randgen_main.h
 randgen_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 stargen_boOX
@@ -94,7 +94,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h stargen_main.h
 stargen_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 cliquegen_boOX
@@ -102,7 +102,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h cliquegen_main.h
 cliquegen_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 pathgen_boOX
@@ -110,7 +110,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h pathgen_main.h
 pathgen_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 swap_solver_boOX
@@ -118,7 +118,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h swap_solver_main.h
 swap_solver_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 mapf_solver_boOX
@@ -126,7 +126,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h mapf_solver_main.h
 mapf_solver_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 perm_solver_boOX
@@ -134,7 +134,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h perm_solver_main.h
 perm_solver_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 rota_solver_boOX
@@ -142,7 +142,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h rota_solver_main.h
 rota_solver_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 mapR_convert_boOX
@@ -150,7 +150,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h mapR_convert_main.h
 mapR_convert_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 kruhoR_generate_boOX
@@ -158,7 +158,7 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h kruhoR_generate_main.h
 kruhoR_generate_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
 mapfR_solver_boOX
@@ -166,5 +166,5 @@ application
 /src/main
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h mapfR_solver_main.h
 mapfR_solver_main.cpp
-pthread z3
+pthread
 /src/core/Core_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX

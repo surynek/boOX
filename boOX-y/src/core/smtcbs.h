@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 1-036_leibniz                                                   */
+/* smtcbs.h / 1-109_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -156,6 +156,7 @@ namespace boOX
 	    
 	    Collisions_vector m_trans_Collisions;
 	    EdgeCollisions_vector m_trans_edge_Collisions;
+	    CapacitatedCollisions_vector m_trans_capacitated_Collisions;	    
 	};
 	
 	typedef std::vector<sConfiguration> Configurations_vector;
@@ -270,7 +271,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sInstance         &instance,
 								   AgentPaths_vector &agent_Paths,
-								   sInt_32            cost_limit) const;		
+								   sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance         &instance,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping(Context           &context,
@@ -378,7 +387,15 @@ namespace boOX
 	sInt_32 find_NonconflictingRotationInverseDepleted(Context           &context,
 							   sInstance         &instance,
 							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;		
+							   sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingCapacitatedRotationInverseDepleted(Context           &context,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;
+	sInt_32 find_NonconflictingCapacitatedRotationInverseDepleted(Context           &context,
+								      sInstance         &instance,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
@@ -537,7 +554,16 @@ namespace boOX
 									     sInstance::InverseMDD_vector &inverse_MDD,
 									     sInt_32                       extra_cost,
 									     AgentPaths_vector            &agent_Paths,
-									     sInt_32                       cost_limit) const;			
+									     sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingCapacitatedRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+											Context                      &context,
+											sInstance::MDD_vector        &MDD,
+											sInstance::MDD_vector        &extra_MDD,
+											sInstance::InverseMDD_vector &inverse_MDD,
+											sInt_32                       extra_cost,
+											AgentPaths_vector            &agent_Paths,
+											sInt_32                       cost_limit) const;
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingPaths(Glucose::Solver       *solver,
@@ -981,7 +1007,32 @@ namespace boOX
 							    sInstance::InverseMDD_vector &inverse_MDD,
 							    sInt_32                       extra_cost,
 							    sInt_32                       cost_limit,
-							    AgentPaths_vector            &agent_Paths) const;			
+							    AgentPaths_vector            &agent_Paths) const;
+
+	bool find_InitialNonconflictingCapacitatedRotationInverseDepleted(Glucose::Solver       *solver,
+									  Context               &context,
+									  Model                 &sat_Model,
+									  const sInstance       &instance,
+									  sInstance::MDD_vector &MDD,
+									  sInstance::MDD_vector &extra_MDD,
+									  sInstance::InverseMDD_vector &inverse_MDD,
+									  sInt_32                extra_cost,
+									  sInt_32                cost_limit,
+									  AgentPaths_vector     &agent_Paths) const;	
+	
+	bool find_NextNonconflictingCapacitatedRotationInverseDepleted(Glucose::Solver                   *solver,
+								       Context                            &context,
+								       Model                              &sat_Model,
+								       const Collisions_vector            &Collisions,
+								       const EdgeCollisions_vector        &edge_Collisions,
+								       const CapacitatedCollisions_vector &capacitated_Collisions,
+								       const sInstance                    &instance,
+								       sInstance::MDD_vector              &MDD,
+								       sInstance::MDD_vector              &extra_MDD,
+								       sInstance::InverseMDD_vector       &inverse_MDD,
+								       sInt_32                             extra_cost,
+								       sInt_32                             cost_limit,
+								       AgentPaths_vector                  &agent_Paths) const;
 
 	sInt_32 check_NonconflictingRotation(const sInstance         &instance,
 					     const AgentPaths_vector &agent_Paths,
@@ -991,6 +1042,17 @@ namespace boOX
 					     const AgentPaths_vector &agent_Paths,
 					     Collisions_vector       &Collisions,
 					     EdgeCollisions_vector   &edge_Collisions) const;
+
+	sInt_32 check_NonconflictingCapacitatedRotation(const sInstance         &instance,
+							const AgentPaths_vector &agent_Paths,
+							Collision               &principal_collision,
+							CapacitatedCollision    &principal_capacitated_collision) const;
+	
+	sInt_32 check_NonconflictingCapacitatedRotation(const sInstance              &instance,
+							const AgentPaths_vector      &agent_Paths,
+							Collisions_vector            &Collisions,
+							EdgeCollisions_vector        &edge_Collisions,
+							CapacitatedCollisions_vector &capacitated_Collisions) const;	
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 build_SwappingModelVariables(Glucose::Solver             *solver,
@@ -1003,7 +1065,7 @@ namespace boOX
 
 
 	sInt_32 build_SwappingModelVariablesInverse(Glucose::Solver                    *solver,
-						    Context                            &context,					 
+						    Context                            &context,
 						    const sInstance                    &instance,
 						    const sInstance::MDD_vector        &MDD,
 						    const sInstance::MDD_vector        &extra_MDD,
@@ -1435,6 +1497,42 @@ namespace boOX
 				       const Model                 &sat_Model,
 				       AgentPaths_vector           &agent_Paths) const;
 	/*----------------------------------------------------------------------------*/
+
+	sInt_32 build_RotationSmallCapacitatedModelVariablesInverse(Glucose::Solver             *solver,
+								    Context                     &context,
+								    const sInstance             &instance,
+								    const sInstance::MDD_vector &MDD,
+								    const sInstance::MDD_vector &extra_MDD,
+								    const sInstance::InverseMDD_vector &inverse_MDD,
+								    sInt_32                      extra_cost,
+								    Model                       &sat_Model) const;
+
+	void build_RotationSmallCapacitatedModelConstraintsInverse(Glucose::Solver                   *solver,
+								   Context                            &context,
+								   const sInstance                    &instance,
+								   const sInstance::MDD_vector        &MDD,
+								   const sInstance::MDD_vector        &extra_MDD,
+								   const sInstance::InverseMDD_vector &inverse_MDD,
+								   sInt_32                             extra_cost,
+								   Model                              &sat_Model) const;
+	
+	void refine_RotationSmallCapacitatedModelCollisionsInverse(Glucose::Solver                   *solver,
+								   const Collisions_vector            &Collisions,
+								   const EdgeCollisions_vector        &edge_Collisions,
+								   const CapacitatedCollisions_vector &capacitated_Collisions,
+								   const sInstance                    &instance,
+								   const sInstance::MDD_vector        &MDD,
+								   const sInstance::MDD_vector        &extra_MDD,
+								   const sInstance::InverseMDD_vector &inverse_MDD,
+								   sInt_32                             extra_cost,
+								   Model                              &sat_Model) const;
+
+	void decode_RotationSmallCapacitatedModel(Glucose::Solver             *solver,
+						  const sInstance             &instance,
+						  const sInstance::MDD_vector &MDD,
+						  const Model                 &sat_Model,
+						  AgentPaths_vector           &agent_Paths) const;
+	/*----------------------------------------------------------------------------*/	
 	
     private:
 	sSMTCBS(const sSMTCBS &smt_cbs);

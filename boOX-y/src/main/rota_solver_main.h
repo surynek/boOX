@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.h / 1-036_leibniz                                         */
+/* rota_solver_main.h / 1-109_leibniz                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.
@@ -54,7 +54,8 @@ namespace boOX
         /*--------------------------------*/
 
 	sInt_32 m_cost_limit;
-	Algorithm m_algorithm;	
+	Algorithm m_algorithm;
+	bool m_capacitated;
 
 	sString m_input_filename;		
 	sString m_output_filename;

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 1-036_leibniz                                                    */
+/* graph.h / 1-109_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -60,6 +60,7 @@ namespace boOX
     public:
 	sVertex();
 	sVertex(sInt_32 id);
+	sVertex(sInt_32 id, sInt_32 capacity);	
 	sVertex(const sVertex &vertex);
 	const sVertex& operator=(const sVertex &vertex);
 
@@ -81,6 +82,8 @@ namespace boOX
 	bool m_visited;
 	sInt_32 m_distance;
 	sInt_32 m_prev_id;
+
+	sInt_32 m_capacity;
 
 	VertexIDs_vector m_Conflicts;
     };
@@ -215,8 +218,11 @@ namespace boOX
 	/*----------------------------------------------------------------------------*/
 
 	void initialize_InverseMatrix(void);
+	void set_Capacities(sInt_32 capacity);
+	/*----------------------------------------------------------------------------*/	
 	
 	void add_Vertex(void);
+	void add_Vertex(sInt_32 id, sInt_32 capacity);
 	void add_Vertices(sInt_32 Vertex_cnt = 1);
 
 	sInt_32 get_VertexCount(void) const;
@@ -281,14 +287,26 @@ namespace boOX
 	virtual sResult to_File_cpf(const sString &filename, const sString &indent = "") const;
 	virtual void to_Stream_cpf(FILE *fw, const sString &indent = "") const;
 
+	virtual sResult to_File_ccpf(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_ccpf(FILE *fw, const sString &indent = "") const;	
+
 	virtual sResult to_File_mpf(const sString &filename, const sString &indent = "") const;
 	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;
+
+	virtual sResult to_File_cmpf(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_cmpf(FILE *fw, const sString &indent = "") const;	
 
 	virtual sResult from_File_cpf(const sString &filename);
 	virtual sResult from_Stream_cpf(FILE *fr);
 
+	virtual sResult from_File_ccpf(const sString &filename);
+	virtual sResult from_Stream_ccpf(FILE *fr);	
+
 	virtual sResult from_File_mpf(const sString &filename);
-	virtual sResult from_Stream_mpf(FILE *fr);	
+	virtual sResult from_Stream_mpf(FILE *fr);
+
+	virtual sResult from_File_cmpf(const sString &filename);
+	virtual sResult from_Stream_cmpf(FILE *fr);		
 
 	virtual sResult from_File_map(const sString &filename);
 	virtual sResult from_Stream_map(FILE *fr);

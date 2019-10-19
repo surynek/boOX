@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.h / 1-036_leibniz                                             */
+/* gridgen_main.h / 1-109_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -44,13 +44,14 @@ namespace boOX
 	sCommandParameters();
         /*--------------------------------*/
 
-	bool m_walk;
+	bool m_walk;	
 	sInt_32 m_x_size;
 	sInt_32 m_y_size;
 	sInt_32 m_N_agents;
 	sInt_32 m_seed;
 	sDouble m_obstacle_probability;	
 	sInt_32 m_N_obstacles;
+	sInt_32 m_capacity;
 
 	sString m_map_filename;
 	sString m_cpf_filename;

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 1-036_leibniz                                                     */
+/* cbsR.h / 1-109_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -96,6 +96,11 @@ namespace boOX
 	    {
 		return (m_lower < interval.m_lower || (m_lower == interval.m_lower && m_upper < interval.m_upper));
 	    }
+
+	    bool compare_colexicographic(const Interval &interval) const
+	    {
+		return (m_upper < interval.m_upper || (m_upper == interval.m_upper && m_lower < interval.m_lower));
+	    }	    
 	   
 	    bool compare_lower_less(const Interval &interval) const
 	    {
@@ -195,6 +200,14 @@ namespace boOX
 		}
 	    };
 
+	    struct CompareColexicographic : public std::binary_function<Interval, Interval, bool>
+	    {
+		bool operator()(const Interval& interval_A, const Interval& interval_B) const
+		{
+		    return interval_A.compare_colexicographic(interval_B);
+		}
+	    };	    
+
 	    struct CompareNonoverlapping : public std::binary_function<Interval, Interval, bool>
 	    {
 		bool operator()(const Interval& interval_A, const Interval& interval_B) const
@@ -242,6 +255,11 @@ namespace boOX
 	struct KruhobotCollision
 	{
 	    KruhobotCollision() { /* nothig */ }
+	
+	    KruhobotCollision(const Traversal &traversal_A, const Traversal &traversal_B)
+	    : m_importance(-1.0)
+	    , m_traversal_A(traversal_A)
+	    , m_traversal_B(traversal_B) { /* nothing */ }    
 	    
 	    KruhobotCollision(sDouble importance, const Traversal &traversal_A, const Traversal &traversal_B)
 	    : m_importance(importance)
@@ -304,6 +322,12 @@ namespace boOX
 	    , m_location_id(location_id)
 	    , m_interval(interval) { /* nothing */ }
 
+	    LocationConflict(sInt_32 conflict_id, sInt_32 location_id, const Interval &interval, bool infinity = false)
+	    : m_conflict_id(conflict_id)
+	    , m_infinity(infinity)
+	    , m_location_id(location_id)
+	    , m_interval(interval) { /* nothing */ }	    
+
 	    bool operator<(const LocationConflict &location_conflict) const
 	    {
 		return (m_interval < location_conflict.m_interval);
@@ -328,14 +352,16 @@ namespace boOX
 	    {
 		if (m_infinity)
 		{
-		    fprintf(fw, "%s%d+: [%.3f,%.3f]\n", indent.c_str(), m_location_id, m_interval.m_lower, m_interval.m_upper);
+		    fprintf(fw, "%s%d:%d+: [%.3f,%.3f]\n", indent.c_str(), m_conflict_id, m_location_id, m_interval.m_lower, m_interval.m_upper);
 		}
 		else
 		{
-		    fprintf(fw, "%s%d: [%.3f,%.3f]\n", indent.c_str(), m_location_id, m_interval.m_lower, m_interval.m_upper);		    
+		    fprintf(fw, "%s%d:%d: [%.3f,%.3f]\n", indent.c_str(), m_conflict_id, m_location_id, m_interval.m_lower, m_interval.m_upper);
 		}
 	    }
-
+	    
+	    sInt_32 m_conflict_id;
+	    
 	    bool m_infinity;
 	    sInt_32 m_location_id;
 	    Interval m_interval;
@@ -348,6 +374,12 @@ namespace boOX
 	    : m_line_u_id(line_u_id)
 	    , m_line_v_id(line_v_id)	    
 	    , m_interval(interval) { /* nothing */ }
+
+	    LinearConflict(sInt_32 conflict_id, sInt_32 line_u_id, sInt_32 line_v_id, const Interval &interval)
+	    : m_conflict_id(conflict_id)
+	    , m_line_u_id(line_u_id)
+	    , m_line_v_id(line_v_id)	    
+	    , m_interval(interval) { /* nothing */ }	    
 
 	    bool operator<(const LinearConflict &linear_conflict) const
 	    {
@@ -371,8 +403,10 @@ namespace boOX
 	    
 	    void to_Stream(FILE *fw, const sString &indent = "") const
 	    {
-		fprintf(fw, "%s%d<->%d: [%.3f,%.3f]\n", indent.c_str(), m_line_u_id, m_line_v_id, m_interval.m_lower, m_interval.m_upper);
+		fprintf(fw, "%s%d:%d<->%d: [%.3f,%.3f]\n", indent.c_str(), m_conflict_id, m_line_u_id, m_line_v_id, m_interval.m_lower, m_interval.m_upper);
 	    }
+	    
+	    sInt_32 m_conflict_id;	    
 
 	    sInt_32 m_line_u_id;
 	    sInt_32 m_line_v_id;	    
@@ -592,10 +626,11 @@ namespace boOX
 	struct Transition
 	{
 	    Transition() { /* nothing */ }
-	    Transition(sInt_32 trans_id, sDouble time, sDouble cost, sInt_32 location_id, sInt_32 prev_trans_id)
+	    Transition(sInt_32 trans_id, sDouble time, sDouble cost, sDouble makespan, sInt_32 location_id, sInt_32 prev_trans_id)
 	    : m_trans_id(trans_id)
 	    , m_time(time)
 	    , m_cost(cost)
+	    , m_makespan(makespan)
 	    , m_location_id(location_id)
 	    , m_prev_trans_id(prev_trans_id)
 	    , m_corr_dec_id(-1) { /* nothing */ }
@@ -607,13 +642,14 @@ namespace boOX
 	    
 	    void to_Stream(FILE *fw, const sString &indent = "") const
 	    {
-		fprintf(fw, "%s%d [%.3f {%.3f}] (%d <-- %d) @%d\n", indent.c_str(), m_location_id, m_time, m_cost, m_trans_id, m_prev_trans_id, m_corr_dec_id);
+		fprintf(fw, "%s%d [%.3f {cost: %.3f, make:%.3f}] (%d <-- %d) @%d\n", indent.c_str(), m_location_id, m_time, m_cost, m_makespan, m_trans_id, m_prev_trans_id, m_corr_dec_id);
 	    }	    	    
 
 	    sInt_32 m_trans_id;
 	    
 	    sDouble m_time;
 	    sDouble m_cost;
+	    sDouble m_makespan;
 	    sInt_32 m_location_id;
 	    sInt_32 m_prev_trans_id;
 	    sInt_32 m_corr_dec_id;
@@ -626,7 +662,7 @@ namespace boOX
 	typedef std::multimap<sDouble, Transition, std::less<sDouble> > Transitions_mmap;
 	typedef std::vector<Transition> Transitions_vector;
 
-	typedef std::map<Interval, KruhobotIDs_uset, Interval::CompareLexicographic> Cooccupations_map;
+	typedef std::map<Interval, KruhobotIDs_uset, Interval::CompareColexicographic> Cooccupations_map;
 	typedef std::unordered_map<sInt_32, Cooccupations_map> LocationCooccupations_umap;
 	typedef std::map<Uline, Cooccupations_map, std::less<Uline> > LinearCooccupations_map;
 	
@@ -638,6 +674,44 @@ namespace boOX
 	sDouble analyze_NonconflictingSchedules(const sRealInstance            &real_Instance,
 						const KruhobotSchedules_vector &kruhobot_Schedules,
 						KruhobotCollisions_mset        &kruhobot_Collisions) const;
+
+	sDouble analyze_NonconflictingSchedules_nonprioritized(const sRealInstance            &real_Instance,
+							       const KruhobotSchedules_vector &kruhobot_Schedules,
+							       KruhobotCollisions_mset        &kruhobot_Collisions) const;
+        /*----------------------------------------------------------------------------*/
+
+	void resolve_KruhobotCollision(const sRealInstance              &real_Instance,
+				       const Traversal                  &kruhobot_traversal_A,
+				       const Traversal                  &kruhobot_traversal_B,				       
+				       KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+				       KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+				       sInt_32                          &last_conflict_id,
+				       bool                              infinity = false) const;
+
+	void resolve_KruhobotCollision_location_X_location(const sRealInstance              &real_Instance,
+							   const Traversal                  &kruhobot_traversal_A,
+							   const Traversal                  &kruhobot_traversal_B,
+							   KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							   KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							   sInt_32                          &last_conflict_id,
+							   bool                              infinity = false) const;
+
+	void resolve_KruhobotCollision_location_X_linear(const sRealInstance              &real_Instance,
+							 const Traversal                  &kruhobot_traversal_A,
+							 const Traversal                  &kruhobot_traversal_B,
+							 KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							 KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							 sInt_32                          &last_conflict_id,
+							 bool                              infinity = false) const;
+
+	void resolve_KruhobotCollision_linear_X_linear(const sRealInstance              &real_Instance,
+						       const Traversal                  &kruhobot_traversal_A,
+						       const Traversal                  &kruhobot_traversal_B,
+						       KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+						       KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+						       sInt_32                          &last_conflict_id,
+						       bool                              infinity = false) const;		
+        /*----------------------------------------------------------------------------*/		
 
 	void introduce_KruhobotConflict(const Traversal                  &kruhobot_traversal,
 					KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
@@ -657,7 +731,33 @@ namespace boOX
 	void introduce_KruhobotConflict(const Traversal                        &kruhobot_traversal,
 					KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
 					KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-					bool                                    infinity = false) const;		
+					bool                                    infinity = false) const;
+        /*----------------------------------------------------------------------------*/
+
+	void introduce_KruhobotConflict(const Traversal                  &kruhobot_traversal,
+					KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+					KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+					sInt_32                          &last_conflict_id,
+					bool                              infinity = false) const;
+
+	void introduce_KruhobotConflict(const Traversal                                &kruhobot_traversal,
+					KruhobotLocationConflicts_lexicographic_vector &kruhobot_location_Conflicts,
+					KruhobotLinearConflicts_lexicographic_vector   &kruhobot_linear_Conflicts,
+					sInt_32                                        &last_conflict_id,
+					bool                                            infinity = false) const;
+	
+	void introduce_KruhobotConflict(const Traversal                        &kruhobot_traversal,
+					KruhobotLocationConflicts_lower_vector &kruhobot_location_Conflicts,
+					KruhobotLinearConflicts_lower_vector   &kruhobot_linear_Conflicts,
+					sInt_32                                &last_conflict_id,					
+					bool                                    infinity = false) const;
+
+	void introduce_KruhobotConflict(const Traversal                        &kruhobot_traversal,
+					KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+					KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+					sInt_32                                &last_conflict_id,
+					bool                                    infinity = false) const;
+        /*----------------------------------------------------------------------------*/		
 
 	sDouble calc_KruhobotCollisionImportance(const Traversal            &traversal_A,
 						 const Traversal            &traversal_B,

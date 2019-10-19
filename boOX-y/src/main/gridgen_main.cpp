@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.cpp / 1-036_leibniz                                           */
+/* gridgen_main.cpp / 1-109_leibniz                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -55,6 +55,7 @@ namespace boOX
       , m_seed(0)
       , m_obstacle_probability(0.0)
       , m_N_obstacles(-1)
+      , m_capacity(1)
   {
       // nothing
   }
@@ -86,6 +87,7 @@ namespace boOX
 	printf("             [--obstacle-probability=<double>]\n");
 	printf("             [--walk]\n");		
 	printf("             [--N-obstacles=<int>]\n");
+	printf("             [--capacity=<int>]\n");	
 	printf("             [--seed=<int>\n");
 	printf("             [--cpf-file=<string>]\n");
 	printf("             [--mpf-file=<string>]\n");		
@@ -107,6 +109,7 @@ namespace boOX
 	printf("Defaults: --x-size=4\n");
 	printf("          --y-size=4\n");
 	printf("          --N-agents=5\n");
+	printf("          --capacity=1\n");
 	printf("          --seed=0\n");
 	printf("          --obstacle-probability=0.0\n");
 	printf("\n");
@@ -175,6 +178,10 @@ namespace boOX
 		{
 		    environment = sUndirectedGraph(parameters.m_x_size, parameters.m_y_size, parameters.m_obstacle_probability);
 		}
+		if (parameters.m_capacity > 1)
+		{
+		    environment.set_Capacities(parameters.m_capacity);
+		}
 	    }
 	    sConfiguration initial_configuration(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), true);
 	
@@ -213,7 +220,14 @@ namespace boOX
 	}
 	if (!parameters.m_cpf_filename.empty())
 	{
-	    result = instance.to_File_cpf(parameters.m_cpf_filename);
+	    if (parameters.m_capacity > 1)
+	    {
+		result = instance.to_File_ccpf(parameters.m_cpf_filename);
+	    }
+	    else
+	    {
+		result = instance.to_File_cpf(parameters.m_cpf_filename);
+	    }
 	    
 	    if (sFAILED(result))
 	    {
@@ -223,7 +237,14 @@ namespace boOX
 	}
 	if (!parameters.m_mpf_filename.empty())
 	{
-	    result = instance.to_File_mpf(parameters.m_mpf_filename);
+	    if (parameters.m_capacity > 1)
+	    {	    
+		result = instance.to_File_cmpf(parameters.m_mpf_filename);
+	    }
+	    else
+	    {
+		result = instance.to_File_mpf(parameters.m_mpf_filename);		
+	    }
 	    
 	    if (sFAILED(result))
 	    {
@@ -305,6 +326,10 @@ namespace boOX
 	{
 	    command_parameters.m_N_obstacles = sInt_32_from_String(parameter.substr(14, parameter.size()));
 	}
+	else if (parameter.find("--capacity=") == 0)
+	{
+	    command_parameters.m_capacity = sInt_32_from_String(parameter.substr(11, parameter.size()));
+	}	
 	else if (parameter.find("--walk") == 0)
 	{
 	    command_parameters.m_walk = true;

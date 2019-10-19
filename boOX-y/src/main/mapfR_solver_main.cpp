@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapfR_solver_main.cpp / 1-036_leibniz                                      */
+/* mapfR_solver_main.cpp / 1-109_leibniz                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.
@@ -81,7 +81,7 @@ namespace boOX
 	printf("                   --input-kruhoR-file=<sting>\n");
 	printf("                   --output-file=<sting>\n");
 	printf("                  [--makespan-limit=<double>]\n");
-	printf("                  [--algorithm={cbsR|cbsR+|smtcbsR|smtcbsR+|smtcbsR++}]\n");
+	printf("                  [--algorithm={cbsR|cbsR+|cbsR++|smtcbsR|smtcbsR+|smtcbsR++|smtcbsR+++|smtcbsR4+}]\n");
         printf("	 	  [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
@@ -225,7 +225,35 @@ namespace boOX
 	    
 	    makespan = real_SMTCBS_Solver.find_ShortestNonconflictingSchedules_pruningStrong(kruhobot_Schedules, command_parameters.m_makespan_limit);
 	    break;
-	}		
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_R_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMT-CBS-R+++");
+	    }
+  	    #endif
+
+	    sBoolEncoder boolean_Encoder;
+	    sRealSMTCBS real_SMTCBS_Solver(&boolean_Encoder, &real_Instance, command_parameters.m_timeout);
+	    
+	    makespan = real_SMTCBS_Solver.find_ShortestNonconflictingSchedules_conflictRespectful(kruhobot_Schedules, command_parameters.m_makespan_limit);
+	    break;
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_R_4_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMT-CBS-R-4+");
+	    }
+  	    #endif
+
+	    sBoolEncoder boolean_Encoder;
+	    sRealSMTCBS real_SMTCBS_Solver(&boolean_Encoder, &real_Instance, command_parameters.m_timeout);
+	    
+	    makespan = real_SMTCBS_Solver.find_ShortestNonconflictingSchedules_individualizedConflictRespectful(kruhobot_Schedules, command_parameters.m_makespan_limit);
+	    break;
+	}				
 	default:
 	{
 	    sASSERT(false);
@@ -327,10 +355,18 @@ namespace boOX
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_R_PLUS;
 	    }
-	    else if (algorithm_str == "smtcbsR++")
+	    else if (algorithm_str == "smtcbsR++" || algorithm_str == "smtcbsR2+")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_R_PLUS_PLUS;
-	    }	    	    
+	    }
+	    else if (algorithm_str == "smtcbsR+++" || algorithm_str == "smtcbsR3+")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_R_PLUS_PLUS_PLUS;
+	    }
+	    else if (algorithm_str == "smtcbsR++++" || algorithm_str == "smtcbsR4+")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_R_4_PLUS;
+	    }	    	    	    	    
 	    else
 	    {
 		return sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

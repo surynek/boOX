@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 1-036_leibniz                                                      */
+/* cnf.h / 1-109_leibniz                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -85,7 +85,8 @@ namespace boOX
 	void cast_Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 weight = 0);
 	void cast_3Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 weight = 0);
 	void cast_4Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 variable_ID_D, sInt_32 weight = 0);	
-	void cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 weight = 0);	
+	void cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 weight = 0);
+	void cast_CapacityMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);		
 	void cast_ConditionalAllMutexConstraint(Glucose::Solver *solver, sInt_32  &spec_condition, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);	
 	void cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);	
 	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);	

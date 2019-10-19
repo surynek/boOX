@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 1-036_leibniz                                                   */
+/* result.h / 1-109_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -109,15 +109,17 @@ enum sAgentInstance_Result
 {
     sAGENT_INSTANCE_INFO                =  14000,
     sAGENT_INSTANCE_ERROR               = -14000,
-    sAGENT_INSTANCE_OPEN_ERROR          = (sAGENT_INSTANCE_ERROR - 1),
-    sAGENT_INSTANCE_PDDL_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR - 2),
-    sAGENT_INSTANCE_CPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 3),
-    sAGENT_INSTANCE_BGU_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 4),
-    sAGENT_INSTANCE_USC_MAP_OPEN_ERROR  = (sAGENT_INSTANCE_ERROR - 5),
-    sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR - 6),    
-    sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR - 7),    
-    sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 8),
-    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 9)
+    sAGENT_INSTANCE_OPEN_ERROR          = (sAGENT_INSTANCE_ERROR -  1),
+    sAGENT_INSTANCE_PDDL_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  2),
+    sAGENT_INSTANCE_CPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  3),
+    sAGENT_INSTANCE_CCPF_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  4),
+    sAGENT_INSTANCE_MPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  5),
+    sAGENT_INSTANCE_BGU_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  6),
+    sAGENT_INSTANCE_USC_MAP_OPEN_ERROR  = (sAGENT_INSTANCE_ERROR -  7),
+    sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR -  8),    
+    sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR -  9),    
+    sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 10),
+    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 11)
 };
 
 
@@ -208,7 +210,8 @@ enum sTokenRotationSolverProgram_Result
     sROTA_SOLVER_PROGRAM_INFO                         =  170000,
     sROTA_SOLVER_PROGRAM_ERROR                        = -170000,
     sROTA_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sROTA_SOLVER_PROGRAM_ERROR - 1),
-    sROTA_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sROTA_SOLVER_PROGRAM_ERROR - 2)        
+    sROTA_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sROTA_SOLVER_PROGRAM_ERROR - 2),
+    sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR       = (sROTA_SOLVER_PROGRAM_ERROR - 3)
 };
 
 

@@ -2,21 +2,21 @@ all: debug
 
 debug:	smtcbsR_test.o_dbg cbsR_test.o_dbg agent_test.o_dbg cbs_test.o_dbg basic_test.o_dbg graph_test.o_dbg kruhoR_test.o_dbg 
 	g++ basic_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_basic_boOX
-	g++ graph_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_graph_boOX
-	g++ agent_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_agent_boOX
-	g++ kruhoR_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_kruhoR_boOX
-	g++ cbs_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_cbs_boOX
-	g++ cbsR_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_cbsR_boOX
-	g++ smtcbsR_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -lz3 -otest_smtcbsR_boOX
+	g++ graph_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -otest_graph_boOX
+	g++ agent_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -otest_agent_boOX
+	g++ kruhoR_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -otest_kruhoR_boOX
+	g++ cbs_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -otest_cbs_boOX
+	g++ cbsR_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -otest_cbsR_boOX
+	g++ smtcbsR_test.o_dbg -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_dbg -lUtil_boOX_dbg -lGlucose_boOX_dbg -pthread -otest_smtcbsR_boOX
 
 optimized:	agent_test.o_opt kruhoR_test.o_opt basic_test.o_opt cbsR_test.o_opt cbs_test.o_opt graph_test.o_opt smtcbsR_test.o_opt 
 	g++ basic_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_basic_boOX
-	g++ graph_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_graph_boOX
-	g++ agent_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_agent_boOX
-	g++ kruhoR_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_kruhoR_boOX
-	g++ cbs_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_cbs_boOX
-	g++ cbsR_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_cbsR_boOX
-	g++ smtcbsR_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -lz3 -otest_smtcbsR_boOX
+	g++ graph_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -otest_graph_boOX
+	g++ agent_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -otest_agent_boOX
+	g++ kruhoR_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -otest_kruhoR_boOX
+	g++ cbs_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -otest_cbs_boOX
+	g++ cbsR_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -otest_cbsR_boOX
+	g++ smtcbsR_test.o_opt -L../../src/glucose -L../../src/core -L../../src/util -lCore_boOX_opt -lUtil_boOX_opt -lGlucose_boOX_opt -pthread -otest_smtcbsR_boOX
 
 basic_test.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h ../../src/core/types.h ../../src/core/graph.h ../../src/core/agent.h ../../src/core/smtcbs.h ../../src/core/cbs.h ../../src/core/icts.h ../../src/core/cnf.h ../../src/core/mapR.h ../../src/core/kruhoR.h ../../src/core/cbsR.h ../../src/core/smtcbsR.h ../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h ../../src/util/statistics.h ../../src/glucose/Alg.h ../../src/glucose/Alloc.h ../../src/glucose/BoundedQueue.h ../../src/glucose/Constants.h ../../src/glucose/Dimacs.h ../../src/glucose/Heap.h ../../src/glucose/IntTypes.h ../../src/glucose/Map.h ../../src/glucose/Options.h ../../src/glucose/ParseUtils.h ../../src/glucose/Queue.h ../../src/glucose/Solver.h ../../src/glucose/SolverTypes.h ../../src/glucose/Sort.h ../../src/glucose/System.h ../../src/glucose/Vec.h ../../src/glucose/XAlloc.h ../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h basic_test.h basic_test.cpp
 	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/glucose -I../../src/core -I../../src/util -obasic_test.o_dbg basic_test.cpp

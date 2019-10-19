@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-036_leibniz                             */
+/*                             boOX 1-109_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR_test.cpp / 1-036_leibniz                                              */
+/* cbsR_test.cpp / 1-109_leibniz                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search.
@@ -1731,6 +1731,71 @@ namespace boOX
     }
 
 
+    void test_Collision_1(void)
+    {
+	printf("CBS-R collision 1 ...\n");	
+
+	s2DMap grid_map(3);
+
+	grid_map.add_Location(0, 0.0, 0.0);
+	grid_map.add_Location(1, 1.0, 0.25);
+	grid_map.add_Location(2, 2.0, 0.0);
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+	
+	sRealCBS::Traversal wait_traversal(2, 1, 1, sRealCBS::Interval(0.2, 1.7));
+	sRealCBS::Traversal pass_traversal(1, 0, 2, sRealCBS::Interval(0.0, 2.0));
+
+	wait_traversal.to_Screen();
+	pass_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision_location_X_linear(instance,
+							     wait_traversal,
+							     pass_traversal,
+							     kruhobot_location_Conflicts,
+							     kruhobot_linear_Conflicts,
+							     last_conflict_id,
+							     false);
+	
+	printf("CBS-R collision 1 ... finished\n");
+    }
+    
+
     
     
 /*----------------------------------------------------------------------------*/
@@ -1758,7 +1823,7 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
 //    test_CBS_R_B();
 //    test_CBS_R_C();
 //    test_CBS_R_D();
-    test_CBS_R_E();
+//    test_CBS_R_E();
 //    test_CBS_R_F();
 //    test_CBS_R_G();
 //    test_CBS_R_H();
@@ -1767,5 +1832,6 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
 //    test_CBS_R_K();
 //    test_CBS_R_L();    
     
-//    test_CBS_R_E8();    
+//    test_CBS_R_E8();
+      test_Collision_1();    
 }
