@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-109_leibniz                             */
+/*                             boOX 1-119_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.h / 1-109_leibniz                                                  */
+/* smtcbsR.h / 1-119_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -386,7 +386,6 @@ namespace boOX
 	};
 
 	typedef std::vector<sDouble> Makespans_vector;
-	typedef std::vector<sInt_32> KruhobotAffections_vector;
 	
     public:
 	sRealSMTCBS(sBoolEncoder *solver_Encoder, sRealInstance *real_Instance);
@@ -476,7 +475,24 @@ namespace boOX
 										      KruhobotSchedules_vector &kruhobot_Schedules,
 										      sDouble                   makespan_limit,
 										      sDouble                   extra_makespan);	
-	/*----------------------------------------------------------------------------*/	
+	/*----------------------------------------------------------------------------*/
+
+	sDouble find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(sRealSolution &real_Solution, sDouble makespan_limit);	
+	sDouble find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance  &real_Instance,
+											   sRealSolution        &real_Solution,
+											   sDouble               makespan_limit);
+	
+	sDouble find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit);
+	sDouble find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+											   KruhobotSchedules_vector &kruhobot_Schedules,
+											   sDouble                   makespan_limit);
+
+	sDouble find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble extra_makespan);
+	sDouble find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+											   KruhobotSchedules_vector &kruhobot_Schedules,
+											   sDouble                   makespan_limit,
+											   sDouble                   extra_makespan);	
+	/*----------------------------------------------------------------------------*/		
 
 	sDouble find_NonconflictingSchedules(const sRealInstance              &real_Instance,
 					     KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
@@ -568,7 +584,14 @@ namespace boOX
 									      KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
 									      KruhobotSchedules_vector               &kruhobot_Schedules,
 									      sDouble                                 makespan_limit,
-									      sDouble                                 extra_makespan);	
+									      sDouble                                 extra_makespan);
+
+	sDouble find_ExactNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance                    &real_Instance,
+										   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+										   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+										   KruhobotSchedules_vector               &kruhobot_Schedules,
+										   sDouble                                 makespan_limit,
+										   sDouble                                 extra_makespan);		
 	/*---------------------------------------------------------------------------*/			
 
 	void reflect_KruhobotCollisions(const KruhobotCollisions_mset          &kruhobot_Collisions,

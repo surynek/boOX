@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-109_leibniz                             */
+/*                             boOX 1-119_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 1-109_leibniz                                                     */
+/* cbsR.h / 1-119_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -142,6 +142,11 @@ namespace boOX
 	    {		
 		return (m_lower > m_upper);
 	    }
+
+	    sDouble size(void) const
+	    {		
+		return (m_upper - m_lower);
+	    }	    
 
 	    Interval intersect(const Interval &interval) const
 	    {
@@ -665,6 +670,9 @@ namespace boOX
 	typedef std::map<Interval, KruhobotIDs_uset, Interval::CompareColexicographic> Cooccupations_map;
 	typedef std::unordered_map<sInt_32, Cooccupations_map> LocationCooccupations_umap;
 	typedef std::map<Uline, Cooccupations_map, std::less<Uline> > LinearCooccupations_map;
+
+	typedef std::vector<sInt_32> KruhobotAffections_vector;
+	typedef std::pair<sInt_32, sInt_32> KruhobotAffection_pair;
 	
     public:
 	sRealCBSBase(sRealInstance *real_Instance);
@@ -678,39 +686,51 @@ namespace boOX
 	sDouble analyze_NonconflictingSchedules_nonprioritized(const sRealInstance            &real_Instance,
 							       const KruhobotSchedules_vector &kruhobot_Schedules,
 							       KruhobotCollisions_mset        &kruhobot_Collisions) const;
+
+	sDouble analyze_NonconflictingSchedules_exactNonprioritized(const sRealInstance            &real_Instance,
+								    const KruhobotSchedules_vector &kruhobot_Schedules,
+								    KruhobotCollisions_mset        &kruhobot_Collisions) const;	
         /*----------------------------------------------------------------------------*/
 
-	void resolve_KruhobotCollision(const sRealInstance              &real_Instance,
-				       const Traversal                  &kruhobot_traversal_A,
-				       const Traversal                  &kruhobot_traversal_B,				       
-				       KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
-				       KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
-				       sInt_32                          &last_conflict_id,
-				       bool                              infinity = false) const;
+	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
+							 const Traversal                        &kruhobot_traversal_A,
+							 const Traversal                        &kruhobot_traversal_B,				       
+							 KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+							 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+							 sInt_32                                &last_conflict_id,
+							 bool                                    infinity = false) const;
 
-	void resolve_KruhobotCollision_location_X_location(const sRealInstance              &real_Instance,
-							   const Traversal                  &kruhobot_traversal_A,
-							   const Traversal                  &kruhobot_traversal_B,
-							   KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
-							   KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
-							   sInt_32                          &last_conflict_id,
-							   bool                              infinity = false) const;
+	KruhobotAffection_pair resolve_KruhobotCollision_location_X_location(const sRealInstance                    &real_Instance,
+									     const Traversal                        &kruhobot_traversal_A,
+									     const Traversal                        &kruhobot_traversal_B,
+									     KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+									     KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+									     sInt_32                                &last_conflict_id,
+									     bool                                    infinity = false) const;
+	
+	KruhobotAffection_pair resolve_KruhobotCollision_location_X_linear(const sRealInstance                    &real_Instance,
+									   const Traversal                        &kruhobot_traversal_A,
+									   const Traversal                        &kruhobot_traversal_B,
+									   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+									   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+									   sInt_32                                &last_conflict_id,
+									   bool                                    infinity = false) const;
 
-	void resolve_KruhobotCollision_location_X_linear(const sRealInstance              &real_Instance,
-							 const Traversal                  &kruhobot_traversal_A,
-							 const Traversal                  &kruhobot_traversal_B,
-							 KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
-							 KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
-							 sInt_32                          &last_conflict_id,
-							 bool                              infinity = false) const;
+	KruhobotAffection_pair resolve_KruhobotCollision_linear_X_location(const sRealInstance                    &real_Instance,
+									   const Traversal                        &kruhobot_traversal_A_linear,
+									   const Traversal                        &kruhobot_traversal_B_location,
+									   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+									   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+									   sInt_32                                &last_conflict_id,
+									   bool                                    infinity) const;	
 
-	void resolve_KruhobotCollision_linear_X_linear(const sRealInstance              &real_Instance,
-						       const Traversal                  &kruhobot_traversal_A,
-						       const Traversal                  &kruhobot_traversal_B,
-						       KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
-						       KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
-						       sInt_32                          &last_conflict_id,
-						       bool                              infinity = false) const;		
+	KruhobotAffection_pair resolve_KruhobotCollision_linear_X_linear(const sRealInstance                    &real_Instance,
+									 const Traversal                        &kruhobot_traversal_A,
+									 const Traversal                        &kruhobot_traversal_B,
+									 KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+									 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+									 sInt_32                                &last_conflict_id,
+									 bool                                    infinity = false) const;		
         /*----------------------------------------------------------------------------*/		
 
 	void introduce_KruhobotConflict(const Traversal                  &kruhobot_traversal,

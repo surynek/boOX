@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-109_leibniz                             */
+/*                             boOX 1-119_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.cpp / 1-109_leibniz                                                */
+/* smtcbsR.cpp / 1-119_leibniz                                                */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -669,6 +669,130 @@ namespace boOX
 												   kruhobot_Schedules,
 												   makespan_limit,
 												   extra_makespan)) >= 0.0)
+	    {
+		return solution_makespan;
+	    }
+	    
+	    if (m_timeout >= 0.0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+	}
+
+	return -1.0;	
+    }
+    
+
+/*----------------------------------------------------------------------------*/
+
+    sDouble sRealSMTCBS::find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(sRealSolution &real_Solution, sDouble cost_limit)
+    {
+	return find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(*m_real_Instance, real_Solution, cost_limit);	
+    }
+
+  
+    sDouble sRealSMTCBS::find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance &real_Instance,
+												    sRealSolution       &sUNUSED(real_Solution),
+												    sDouble              makespan_limit)
+    {
+	sInt_32 cost;
+	KruhobotSchedules_vector kruhobot_Schedules;
+
+	if ((cost = find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(real_Instance, kruhobot_Schedules, makespan_limit)) < 0)
+	{
+	    return cost;
+	}
+/*
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    { 	
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+*/
+	return cost;	
+    }
+
+
+    sDouble sRealSMTCBS::find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit)
+    {
+	return find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(*m_real_Instance, kruhobot_Schedules, makespan_limit);	
+    }
+
+
+    sDouble sRealSMTCBS::find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+												    KruhobotSchedules_vector &kruhobot_Schedules,
+												    sDouble                   makespan_limit)
+    {
+	return find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(real_Instance, kruhobot_Schedules, makespan_limit, 0.0);
+    }    
+
+    
+    sDouble sRealSMTCBS::find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble extra_makespan)
+    {
+	return find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(*m_real_Instance, kruhobot_Schedules, makespan_limit, extra_makespan);	
+    }
+
+    
+    sDouble sRealSMTCBS::find_ExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+												    KruhobotSchedules_vector &kruhobot_Schedules,
+												    sDouble                   makespan_limit,
+												    sDouble                   extra_makespan)
+    {
+	sDouble solution_makespan;
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();	
+	
+	sDouble start_time = sStatistics::get_CPU_Seconds();	
+
+	{    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAPF-R (elapsed time [seconds]: %.3f)...\n", (end_time - start_time));
+	    }
+	    #endif
+
+//	    KruhobotLocationConflicts_vector kruhobot_location_Conflicts;
+//	    KruhobotLinearConflicts_vector kruhobot_linear_Conflicts;
+
+	    KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	    KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;	    
+
+	    kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	    kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+	    kruhobot_Schedules.resize(N_kruhobots + 1);
+
+	    if ((solution_makespan = find_ExactNonconflictingSchedules_individualizedConflictRespectful(real_Instance,
+													kruhobot_location_Conflicts,
+													kruhobot_linear_Conflicts,
+													kruhobot_Schedules,
+													makespan_limit,
+													extra_makespan)) >= 0.0)
 	    {
 		return solution_makespan;
 	    }
@@ -3158,8 +3282,611 @@ namespace boOX
 	}	
 	
 	return -1.0;
+    }
+
+
+    sDouble sRealSMTCBS::find_ExactNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance                    &real_Instance,
+											    KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+											    KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+											    KruhobotSchedules_vector               &kruhobot_Schedules,
+											    sDouble                                 makespan_limit,
+											    sDouble                                 extra_makespan)
+    {
+	sInt_32 last_conflict_id = 0;
+	
+	sDouble makespan_bound = 0.0;	    
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();	
+
+	#ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	std::vector<sDouble> kruhobot_makespan_lower_Bounds;
+	kruhobot_makespan_lower_Bounds.resize(N_kruhobots + 1);
+
+	std::vector<sDouble> kruhobot_next_makespan_Bounds;	
+	kruhobot_next_makespan_Bounds.resize(N_kruhobots + 1);	
+
+	KruhobotAffections_vector affected_Kruhobots;
+	affected_Kruhobots.resize(N_kruhobots + 1, 1);
+
+	KruhobotDecisionDiagrams_vector kruhobot_RDDs;
+	kruhobot_RDDs.resize(N_kruhobots + 1);
+	
+	KruhobotDecisionMappings_vector kruhobot_RDD_Mappings;
+	kruhobot_RDD_Mappings.resize(N_kruhobots + 1);
+	
+	RealContext real_context(0.0);
+	RealModel real_sat_Model;
+
+	Glucose::Solver *solver;
+	solver = new Glucose::Solver;
+	solver->s_Glucose_timeout = m_timeout;	
+	
+	{    	    
+	    sDouble next_makespan_bound = -1.0;
+	    sDouble makespan_lower_bound = 0.0;
+
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	    {
+		sDouble kruhobot_makespan_lower_bound;
+		
+		if ((kruhobot_makespan_lower_bound = find_KruhobotIgnoringSchedule_strong(real_Instance.m_Kruhobots[kruhobot_id],
+											  *real_Instance.m_start_conjunction.m_Map,
+											  real_Instance.m_start_conjunction.m_kruhobot_Locations[kruhobot_id],
+											  real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id],
+											  makespan_limit,
+											  extra_makespan,
+											  kruhobot_Schedules[kruhobot_id])) < 0.0)
+		{
+		    return -1.0;
+		}
+		makespan_lower_bound = (makespan_lower_bound < kruhobot_makespan_lower_bound) ? kruhobot_makespan_lower_bound : makespan_lower_bound;
+		kruhobot_makespan_lower_Bounds[kruhobot_id] = kruhobot_next_makespan_Bounds[kruhobot_id] = kruhobot_makespan_lower_bound;
+	    }
+
+	    real_context.m_makespan_bound = makespan_bound = makespan_lower_bound;
+	    
+            #ifdef sVERBOSE	    
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		
+		printf("Solving MAPF-R (elapsed time [seconds]: %.3f, current makespan: %.3f)...\n",
+		       (end_time - start_time),
+		       makespan_bound);
+	    }
+	    #endif
+
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	    {
+		sDouble nx_makespan_bound;
+		nx_makespan_bound = build_KruhobotRealDecisionDiagram_individualizedConflictRespectfulBucketing(real_Instance.m_Kruhobots[kruhobot_id],
+														*real_Instance.m_start_conjunction.m_Map,
+														real_Instance.m_start_conjunction.m_kruhobot_Locations[kruhobot_id],
+														real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id],
+														kruhobot_location_Conflicts[kruhobot_id],
+														kruhobot_linear_Conflicts[kruhobot_id],
+														makespan_lower_bound,
+														kruhobot_next_makespan_Bounds[kruhobot_id],
+														-1,
+														kruhobot_RDDs[kruhobot_id],
+														kruhobot_RDD_Mappings[kruhobot_id]);
+		if (nx_makespan_bound > 0.0)
+		{
+		    next_makespan_bound = (next_makespan_bound < 0.0) ? nx_makespan_bound : sMIN(next_makespan_bound, nx_makespan_bound);
+		}
+	    }
+	    to_Screen(kruhobot_RDDs);	    
+		    
+	    sASSERT(next_makespan_bound > 0.0);
+	    
+            #ifdef sVERBOSE	    
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		
+		printf("Solving MAPF-R (elapsed time [seconds]: %.3f, current makespan: %.3f)...\n",
+		       (end_time - start_time),
+		       makespan_bound);
+	    }
+	    #endif
+
+	    kruhobot_Schedules.clear();
+	    find_InitialNonconflictingSchedules(solver,
+						real_context,					 
+						real_Instance,
+						kruhobot_RDDs,
+						kruhobot_RDD_Mappings,
+						real_sat_Model,
+						kruhobot_Schedules);
+	    augment_Schedules(real_Instance, kruhobot_Schedules);    
+//	    delete solver;
+    
+	    if (m_timeout >= 0.0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+	    if (makespan_bound > makespan_limit + extra_makespan)
+	    {
+		return -3.0;
+	    }
+	}
+	
+	sDouble cumulative_makespan;
+	KruhobotCollisions_mset kruhobot_Collisions;
+	KruhobotCollisions_mset next_kruhobot_Collisions;	
+
+	cumulative_makespan = analyze_NonconflictingSchedules_exactNonprioritized(real_Instance,
+										  kruhobot_Schedules,
+										  next_kruhobot_Collisions);
+	
+	if (next_kruhobot_Collisions.empty())	
+	{
+	    printf("COLLISION-FREE solution found !\n");	    
+	    return cumulative_makespan;
+	}
+
+	affected_Kruhobots.clear();
+	affected_Kruhobots.resize(N_kruhobots + 1, 0);
+
+	for (KruhobotCollisions_mset::const_iterator next_collision = next_kruhobot_Collisions.begin(); next_collision != next_kruhobot_Collisions.end(); ++next_collision)
+	{		    
+	    if (verify_KruhobotCollisionDuplicities(*next_collision, kruhobot_Collisions))
+	    {
+		kruhobot_Collisions.insert(*next_collision);
+
+		/*
+		reflect_KruhobotCollision(*next_collision,
+					  kruhobot_location_Conflicts,
+					  kruhobot_linear_Conflicts,
+					  affected_Kruhobots,
+					  last_conflict_id);			
+		*/
+		KruhobotAffection_pair kruhobot_affection = resolve_KruhobotCollision(real_Instance,
+										      next_collision->m_traversal_A,
+										      next_collision->m_traversal_B,
+										      kruhobot_location_Conflicts,
+										      kruhobot_linear_Conflicts,
+										      last_conflict_id);
+
+		affected_Kruhobots[sABS(next_collision->m_traversal_A.m_kruhobot_id)] += kruhobot_affection.first;
+		affected_Kruhobots[sABS(next_collision->m_traversal_B.m_kruhobot_id)] += kruhobot_affection.second;			
+	    }
+	}
+
+	/*
+	reflect_KruhobotCollisions(kruhobot_Collisions,
+				   kruhobot_location_Conflicts,
+				   kruhobot_linear_Conflicts,
+				   affected_Kruhobots,
+				   last_conflict_id);
+	*/
+        #ifdef sDEBUG		
+	{
+	    printf("Affection [%ld]: ", next_kruhobot_Collisions.size());
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	    {
+		printf("%d ", affected_Kruhobots[kruhobot_id]);			
+	    }
+	    printf("\n");
+	}
+	#endif	
+
+  	#ifdef sDEBUG
+	{
+	    /*
+	    printf("All collisions:\n");
+	    for (KruhobotCollisions_mset::const_iterator collision = kruhobot_Collisions.begin(); collision != kruhobot_Collisions.end(); ++collision)
+	    {
+		collision->to_Screen();
+	    }
+	    */
+	}
+	#endif		
+
+	//Glucose::Solver *solver = NULL;
+
+	/*
+	KruhobotDecisionDiagrams_vector kruhobot_RDDs;
+	kruhobot_RDDs.resize(N_kruhobots + 1);
+	
+	KruhobotDecisionMappings_vector kruhobot_RDD_Mappings;
+	kruhobot_RDD_Mappings.resize(N_kruhobots + 1);
+	*/
+
+        #ifdef sVERBOSE	    
+	{
+	    sDouble end_time = sStatistics::get_CPU_Seconds();
+			
+	    printf("Solving MAPF-R (elapsed time [seconds]: %.3f, current makespan: %.3f)...\n",
+		   (end_time - start_time),
+		   makespan_bound);
+	}
+	#endif
+
+	//KruhobotAffections_vector affected_Kruhobots;
+	//affected_Kruhobots.resize(N_kruhobots + 1, 1);
+
+	sInt_32 fingerprint_limit = 1;
+	
+	while (true)
+	{	    
+	    if (m_timeout >= 0.0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2.0;
+		}
+	    }
+	    if (makespan_bound > makespan_limit + extra_makespan)
+	    {
+		return -3.0;
+	    }
+	    
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Solving MAPF-R (elapsed time [seconds]: %.3f, current makespan: %.3f)...\n",
+			   (end_time - start_time),
+			   makespan_bound);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+		{
+		    printf("%.3f ", kruhobot_makespan_lower_Bounds[kruhobot_id]);
+		}
+		printf("\n");
+	    }
+	    #endif
+	    
+	    {
+	    KruhobotDecisionDiagrams_vector next_kruhobot_RDDs;
+	    next_kruhobot_RDDs.resize(N_kruhobots + 1);
+
+	    KruhobotDecisionMappings_vector next_kruhobot_RDD_Mappings;
+	    next_kruhobot_RDD_Mappings.resize(N_kruhobots + 1);	    
+
+	    {
+		bool next_iteration = false;
+		sDouble next_makespan_bound = -1.0;
+
+		kruhobot_next_makespan_Bounds = kruhobot_makespan_lower_Bounds;
+		//sDouble build_begin_time = sStatistics::get_CPU_Seconds();		
+
+		for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+		{
+		    sDouble nx_makespan_bound;
+
+		    nx_makespan_bound = build_KruhobotRealDecisionDiagram_individualizedConflictRespectfulBucketing(real_Instance.m_Kruhobots[kruhobot_id],
+														    *real_Instance.m_start_conjunction.m_Map,
+														    real_Instance.m_start_conjunction.m_kruhobot_Locations[kruhobot_id],
+														    real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id],	    
+														    kruhobot_location_Conflicts[kruhobot_id],
+														    kruhobot_linear_Conflicts[kruhobot_id],
+														    makespan_bound,
+														    kruhobot_next_makespan_Bounds[kruhobot_id],
+														    fingerprint_limit,
+														    next_kruhobot_RDDs[kruhobot_id],
+														    next_kruhobot_RDD_Mappings[kruhobot_id]);
+
+		    /*
+		    printf("mappo: %ld (%.3f)\n", kruhobot_RDD_Mappings[kruhobot_id].size(), kruhobot_makespan_lower_Bounds[kruhobot_id]);
+		    
+		    nx_makespan_bound = makespan_bound;
+		    next_kruhobot_RDDs[kruhobot_id] = kruhobot_RDDs[kruhobot_id];
+		    next_kruhobot_RDD_Mappings[kruhobot_id] = kruhobot_RDD_Mappings[kruhobot_id];
+		    */
+		    if (nx_makespan_bound > 0.0)
+		    {
+			next_makespan_bound = (next_makespan_bound < 0.0) ? nx_makespan_bound : sMIN(next_makespan_bound, nx_makespan_bound);
+		    }
+		    if (kruhobot_RDDs[kruhobot_id].size() != next_kruhobot_RDDs[kruhobot_id].size())
+		    {
+			next_iteration = true;
+		    }
+		    else
+		    {
+			if (!compare_KruhobotRealDecisionDiagrams_smart(*real_Instance.m_start_conjunction.m_Map, kruhobot_RDDs[kruhobot_id], next_kruhobot_RDDs[kruhobot_id]))
+			{
+			    next_iteration = true;
+			}
+		    }
+		
+		    #ifdef sDEBUG
+		    {
+			/*
+			to_Screen(kruhobot_RDDs[kruhobot_id]);
+
+			printf("Kruhobot location conflicts: %d\n", kruhobot_id);
+			for (LocationConflicts_upper__umap::const_iterator location_Conflict = kruhobot_location_Conflicts[kruhobot_id].begin(); location_Conflict != kruhobot_location_Conflicts[kruhobot_id].end(); ++location_Conflict)
+			{
+			    printf("  %d, %ld\n", location_Conflict->first, location_Conflict->second.size());
+			    for (LocationConflicts_map::const_iterator location_conflict = location_Conflict->second.begin(); location_conflict != location_Conflict->second.end(); ++location_conflict)
+			    {
+				location_conflict->second.to_Screen();
+			    }
+			}
+			printf("Kruhobot linear conflicts: %d\n", kruhobot_id);
+			for (LinearConflicts_upper__map::const_iterator linear_Conflict = kruhobot_linear_Conflicts[kruhobot_id].begin(); linear_Conflict != kruhobot_linear_Conflicts[kruhobot_id].end(); ++linear_Conflict)
+			{
+			    printf("  %ld\n", linear_Conflict->second.size());
+			    for (LinearConflicts_map::const_iterator linear_conflict = linear_Conflict->second.begin(); linear_conflict != linear_Conflict->second.end(); ++linear_conflict)
+			    {
+				linear_conflict->second.to_Screen();
+			    }
+			}
+
+ 		        printf("Next makespan bound: %.3f\n", next_makespan_bound);		
+			*/
+		    }
+		    #endif
+		}
+		printf("Next\n");
+		to_Screen(next_kruhobot_RDDs);
+		//sDouble build_end_time = sStatistics::get_CPU_Seconds();				
+
+		sASSERT(next_makespan_bound > 0.0);
+	
+		if (next_iteration)
+		{
+		    printf("  Next 1\n");
+		    RealModel next_real_sat_Model;
+
+		    if (solver != NULL)
+		    {
+			delete solver;
+		    }		
+		    solver = new Glucose::Solver;
+		    solver->setIncrementalMode();
+		    solver->s_Glucose_timeout = m_timeout;		    
+		    
+		    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+		    {
+			kruhobot_RDDs[kruhobot_id] = next_kruhobot_RDDs[kruhobot_id];
+			kruhobot_RDD_Mappings[kruhobot_id] = next_kruhobot_RDD_Mappings[kruhobot_id];
+		    }
+		    kruhobot_Schedules.clear();
+		    printf("  Next 2\n");		    
+
+		    bool finding_result = find_NextNonconflictingSchedules(solver,
+									   real_context,
+									   real_Instance,
+									   kruhobot_RDDs,
+									   kruhobot_RDD_Mappings,
+									   kruhobot_Collisions,
+									   /*next_kruhobot_Collisions,*/
+									   next_real_sat_Model,
+									   kruhobot_Schedules);
+		    printf("  Next 3\n");
+
+		    if (!finding_result)
+		    {
+			sASSERT(next_makespan_bound > makespan_bound + s_EPSILON);
+						
+                        #ifdef sVERBOSE	    
+			{
+			    sDouble end_time = sStatistics::get_CPU_Seconds();
+			    
+			    printf("%sUnable to solve newly built instance (elapsed time [seconds]: %.3f, current makespan: %.3f, next makespan: %.3f)...\n",
+				   s_INDENT.c_str(),
+				   (end_time - start_time),
+				   makespan_bound,
+				   next_makespan_bound);
+			}
+	                #endif
+			bool individual_increase = false;
+			    
+			for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+			{
+			    if (kruhobot_next_makespan_Bounds[kruhobot_id] > 0.0)
+			    {
+				sDouble next_kruhobot_makespan_bound = sMIN(kruhobot_next_makespan_Bounds[kruhobot_id], makespan_bound);				
+				if (kruhobot_makespan_lower_Bounds[kruhobot_id] < next_kruhobot_makespan_bound)
+				{
+				    kruhobot_makespan_lower_Bounds[kruhobot_id] = next_kruhobot_makespan_bound;
+				    individual_increase = true;
+				}
+			    }
+			}
+			if (!individual_increase)
+			{
+			    if (fingerprint_limit < 0)
+			    {
+				for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+				{
+				    if (sABS(kruhobot_makespan_lower_Bounds[kruhobot_id] - makespan_bound) <= s_EPSILON)
+				    {
+					kruhobot_makespan_lower_Bounds[kruhobot_id] = next_makespan_bound;
+				    }				
+				}
+				real_context.m_makespan_bound = makespan_bound = (next_makespan_bound < 0.0) ? makespan_bound : next_makespan_bound;
+				fingerprint_limit = 1;
+			    }
+			    else
+			    {
+				fingerprint_limit = -1;
+			    }
+			}
+			real_sat_Model = next_real_sat_Model;			
+			continue;
+		    }
+		    else
+		    {
+			real_sat_Model = next_real_sat_Model;
+		    }
+		}
+		else
+		{
+		    printf("  Next 4\n");
+		    kruhobot_Schedules.clear();
+
+		    bool finding_result = find_NearNonconflictingSchedules(solver,
+									   real_context,
+									   real_Instance,
+									   kruhobot_RDDs,
+									   kruhobot_RDD_Mappings,
+									   kruhobot_Collisions,
+									   next_kruhobot_Collisions,
+									   real_sat_Model,
+									   kruhobot_Schedules);
+		    printf("  Next 5\n");		    
+
+		    if (!finding_result)
+		    {
+//			sASSERT(next_makespan_bound > makespan_bound + s_EPSILON);
+			
+                        #ifdef sVERBOSE	    
+			{
+			    sDouble end_time = sStatistics::get_CPU_Seconds();
+
+			    printf("%sUnable to solve augmented instance (elapsed time [seconds]: %.3f, current makespan: %.3f, next makespan: %.3f)...\n",
+				   s_INDENT.c_str(),
+				   (end_time - start_time),
+				   makespan_bound,
+				   next_makespan_bound);
+			}
+	                #endif
+			bool individual_increase = false;			
+
+			for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+			{
+			    if (kruhobot_next_makespan_Bounds[kruhobot_id] > 0.0)
+			    {
+				sDouble next_kruhobot_makespan_bound = sMIN(kruhobot_next_makespan_Bounds[kruhobot_id], makespan_bound);			
+				if (kruhobot_makespan_lower_Bounds[kruhobot_id] < next_kruhobot_makespan_bound)
+				{
+				    kruhobot_makespan_lower_Bounds[kruhobot_id] = next_kruhobot_makespan_bound;
+				    individual_increase = true;
+				}
+			    }
+			}
+			if (!individual_increase)
+			{
+			    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+			    {
+				if (sABS(kruhobot_makespan_lower_Bounds[kruhobot_id] - makespan_bound) <= s_EPSILON)
+				{				
+				    kruhobot_makespan_lower_Bounds[kruhobot_id] = next_makespan_bound;
+				}
+			    }			    
+			    real_context.m_makespan_bound = makespan_bound = (next_makespan_bound < 0.0) ? makespan_bound : next_makespan_bound;
+			}
+			continue;
+		    }
+		}
+		augment_Schedules(real_Instance, kruhobot_Schedules);
+		printf("  Next 10\n");		
+
+		sDouble cumulative_makespan;
+		next_kruhobot_Collisions.clear();
+
+		sRealCBSBase::to_Screen(kruhobot_Schedules);
+
+		cumulative_makespan = analyze_NonconflictingSchedules_exactNonprioritized(real_Instance,
+											  kruhobot_Schedules,
+											  next_kruhobot_Collisions);
+		
+		if (next_kruhobot_Collisions.empty())
+		{
+		    printf("COLLISION-FREE solution found !\n");
+
+  	            #ifdef sVERBOSE
+		    {
+			sDouble end_time = sStatistics::get_CPU_Seconds();
+			printf("Elapsed time [seconds]: %.3f)...\n", (end_time - start_time));
+		    }
+ 	            #endif
+		    
+		    return cumulative_makespan;
+		}
+
+  	        #ifdef sDEBUG
+		{
+		    /*  
+		    printf("Collisions:\n");
+		    for (KruhobotCollisions_mset::const_iterator collision = kruhobot_Collisions.begin(); collision != kruhobot_Collisions.end(); ++collision)
+		    {
+			collision->to_Screen(s_INDENT);
+		    }
+		    
+		    printf("Next collisions:\n");
+		    for (KruhobotCollisions_mset::const_iterator collision = next_kruhobot_Collisions.begin(); collision != next_kruhobot_Collisions.end(); ++collision)
+		    {
+			collision->to_Screen(s_INDENT);
+		    }
+		    */
+		}
+	        #endif
+
+		affected_Kruhobots.clear();
+		affected_Kruhobots.resize(N_kruhobots + 1, 0);
+
+		for (KruhobotCollisions_mset::const_iterator next_collision = next_kruhobot_Collisions.begin(); next_collision != next_kruhobot_Collisions.end(); ++next_collision)
+		{		    
+		    if (verify_KruhobotCollisionDuplicities(*next_collision, kruhobot_Collisions))			
+		    {
+			printf("Next collision:\n");
+			next_collision->to_Screen();
+			getchar();			
+			
+			kruhobot_Collisions.insert(*next_collision);
+
+			KruhobotAffection_pair kruhobot_affection = resolve_KruhobotCollision(real_Instance,
+											      next_collision->m_traversal_A,
+											      next_collision->m_traversal_B,
+											      kruhobot_location_Conflicts,
+											      kruhobot_linear_Conflicts,
+											      last_conflict_id);
+			
+			affected_Kruhobots[sABS(next_collision->m_traversal_A.m_kruhobot_id)] += kruhobot_affection.first;
+			affected_Kruhobots[sABS(next_collision->m_traversal_B.m_kruhobot_id)] += kruhobot_affection.second;
+			/*
+			reflect_KruhobotCollision(*next_collision,
+						  kruhobot_location_Conflicts,
+						  kruhobot_linear_Conflicts,
+						  affected_Kruhobots,
+						  last_conflict_id);
+			*/
+		    }
+		}
+                #ifdef sDEBUG		
+		{
+		    printf("Affection [%ld]: ", next_kruhobot_Collisions.size());
+		    for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+		    {
+			printf("%d ", affected_Kruhobots[kruhobot_id]);			
+		    }
+		    printf("\n");
+		}
+		#endif
+	    }
+	    }	    
+	}	
+	
+	return -1.0;
     }                    
 
+    
+/*----------------------------------------------------------------------------*/
 
     sDouble sRealSMTCBS::find_KruhobotIgnoringSchedule(const sKruhobot &kruhobot,
 						       const s2DMap    &map,
@@ -3667,6 +4394,7 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
 	    }
 	    #endif
+	    printf("solve 0\n");
 	    return false;
 	}
 	
@@ -3678,7 +4406,8 @@ namespace boOX
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
 	    }
-	    #endif	    
+	    #endif
+	    printf("solve 1\n");
 	}
 	else if (result == l_False)
 	{
@@ -3686,17 +4415,20 @@ namespace boOX
 	    {
 		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
 	    }
-	    #endif	    	    
+	    #endif
+	    printf("solve 2\n");
 	    return false;
 	}
 	else if (result == l_Undef)
 	{
+	    printf("solve 3\n");
 	    return false;
 	}
 	else
 	{
 	    sASSERT(false);
 	}
+	printf("solve 4\n");
 	decode_PathModel(solver, real_Instance, kruhobot_RDDs, real_sat_Model, kruhobot_Schedules);
 	sASSERT(verify_KruhobotSchedules(real_Instance, kruhobot_Schedules));
 	
@@ -6115,7 +6847,7 @@ namespace boOX
 	    {
 		const RespectfulTransition &front_respectful_transition = front_respectful_transition_Queue.begin()->second;
 		sDouble effective_makespan_bound = makespan_bound;
-		
+
 		if (front_respectful_transition.m_time + map.m_shortest_Distances[sink_loc_id][front_respectful_transition.m_location_id] <= effective_makespan_bound + s_EPSILON)
 		{
 		    if (sink_loc_id == front_respectful_transition.m_location_id)
@@ -6803,10 +7535,16 @@ namespace boOX
 		}
 		#endif
 		const RespectfulTransition &front_respectful_transition = front_respectful_transition_Queue.begin()->second;
+
+		printf("normalo\n");
+		front_respectful_transition.to_Screen();
+		
 		sDouble effective_makespan_bound = sMIN(individual_makespan_bound + front_respectful_transition.m_waited, makespan_bound);
+		printf("NBOUNDS: %.3f, %.3f\n", front_respectful_transition.m_time + map.m_shortest_Distances[sink_loc_id][front_respectful_transition.m_location_id], effective_makespan_bound + s_EPSILON);
 		
 		if (front_respectful_transition.m_time + map.m_shortest_Distances[sink_loc_id][front_respectful_transition.m_location_id] <= effective_makespan_bound + s_EPSILON)
 		{
+		    printf("  beta 1.1\n");
 		    RespectfulExplorations_map::iterator respectful_exploration = respectful_Explorations.find(front_respectful_transition.m_conflict_fingerprint);
 		    sASSERT(respectful_exploration != respectful_Explorations.end());
 				    
@@ -6851,6 +7589,7 @@ namespace boOX
 		    for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
 		    {
 			sInt_32 neighbor_location_id = (*neighbor)->m_target->m_id;
+			printf("  Neigh: %d\n", neighbor_location_id);
 			{
 			    sDouble transition_distance = map.m_straight_Distances[front_respectful_transition.m_location_id][neighbor_location_id];
 			    sDouble transition_delta_time = transition_distance / kruhobot.m_properties.m_linear_velo;
@@ -6867,8 +7606,20 @@ namespace boOX
 							 linear_Conflicts,
 							 front_respectful_transition.m_conflict_fingerprint))
 			    {
+				printf("  beta 1.2\n");
 				if (!is_UnifiedlyVisited(neighbor_location_id, transition_finish_time, unified_Visits))
-				{				    
+				{
+				    printf("  beta 1.3: %ld\n", respectful_exploration->second.size());
+				    front_respectful_transition.m_conflict_fingerprint.to_Screen();
+				    printf("\n");
+
+				    printf("  RE: ");
+				    for (RespectfulVisits_umap::const_iterator re = respectful_exploration->second.begin(); re != respectful_exploration->second.end(); ++re)
+				    {
+					printf("%d ", re->first);
+				    }
+				    printf("\n");
+				    
 				    RespectfulVisits_umap::iterator next_respectful_visit = respectful_exploration->second.find(neighbor_location_id);
 				    
 				    RespectfulTransition neighbor_respectful_transition(last_transition_id++,
@@ -6885,13 +7636,18 @@ namespace boOX
 
 				    if (next_respectful_visit == respectful_exploration->second.end()) /* visiting for the first time in a given fingerprint */
 				    {
+					printf("  beta 1.4\n");
 					sDouble estimated_remaining = map.m_shortest_Distances[sink_loc_id][neighbor_location_id] / kruhobot.m_properties.m_linear_velo;
 					sDouble effective_makespan_bound = sMIN(individual_makespan_bound + neighbor_respectful_transition.m_waited, makespan_bound);
 
 					if (neighbor_respectful_transition.m_time + estimated_remaining <= effective_makespan_bound + s_EPSILON)
 					{
+					    printf("  beta 1.5: %d\n", neighbor_location_id);
+					    printf("    ");
+					    respectful_exploration->first.to_Screen();
+					    printf("\n");
+					    
 					    RespectfulVisit neighbor_respectful_visit(neighbor_respectful_transition.m_time, neighbor_respectful_transition.m_trans_id);
-
 					    RespectfulVisits_umap::iterator neighbor_respectful_visit_iter = respectful_exploration->second.insert(RespectfulVisits_umap::value_type(neighbor_location_id,
 																						     neighbor_respectful_visit)).first;
 					    /*
@@ -6907,16 +7663,20 @@ namespace boOX
 					}
 					else
 					{
+					    printf("  beta 1.6\n");
 					    sREAL_SMT_CBS_UPDATE_NEXT_MAKESPAN_BOUND(neighbor_respectful_transition.m_time + estimated_remaining);
 					    sREAL_SMT_CBS_UPDATE_NEXT_INDIVIDUAL_MAKESPAN_BOUND(neighbor_respectful_transition.m_time + estimated_remaining - neighbor_respectful_transition.m_waited);
 					}
 				    }
 				    else /* visiting for the next time in a given fingerprint */
 				    {
+					printf("  beta 1.7\n");
 					sASSERT(next_respectful_visit != respectful_exploration->second.end());
-					
+
+					printf("7BOUNDS: %.3f, %.3f\n", next_respectful_visit->second.m_time, neighbor_respectful_transition.m_time + s_EPSILON);					
 					if (next_respectful_visit->second.m_time > neighbor_respectful_transition.m_time + s_EPSILON) /* update neighbor */
 					{
+					    printf("  beta 1.8\n");
 					    next_respectful_visit->second.m_time = neighbor_respectful_transition.m_time;
 					    next_respectful_visit->second.m_trans_id = neighbor_respectful_transition.m_trans_id;
 
@@ -7182,8 +7942,12 @@ namespace boOX
 											  bypass_transition_waited,
 											  neighbor_location_id,
 											  front_respectful_transition.m_trans_id);
+				
 					bypass_respectful_transition.m_prev_corr_dec_id = front_kruhobot_decision_id;
 					bypass_respectful_transition.m_conflict_fingerprint = next_conflict_fingerprint;
+
+					printf("bypasso: %d --> %d [%.3f,%.3f)\n", front_respectful_transition.m_location_id, neighbor_location_id, front_respectful_transition.m_time, bypass_transition_finish_time);
+					bypass_respectful_transition.to_Screen();					
 				    
 					if (!is_TransitionConflicting(front_respectful_transition.m_location_id,
 								      neighbor_location_id,
@@ -7193,6 +7957,7 @@ namespace boOX
 								      linear_Conflicts,
 								      bypass_respectful_transition.m_conflict_fingerprint))
 					{
+					    printf("  non conflicto ---->\n");
 					    if (!is_UnifiedlyVisited(neighbor_location_id, bypass_transition_finish_time, unified_Visits))
 					    {				
 						if (front_respectful_transition.m_conflict_fingerprint.m_conflict_IDs.find(wait_culprit_conflict_id) == front_respectful_transition.m_conflict_fingerprint.m_conflict_IDs.end())
@@ -7218,7 +7983,10 @@ namespace boOX
 							if (next_respectful_visit == respectful_exploration->second.end()) /* visiting for the first time in a given fingerprint */
 							{
 							    RespectfulVisit bypass_respectful_visit(bypass_respectful_transition.m_time, bypass_respectful_transition.m_trans_id);
-							    
+
+							    printf("  by: %d\n", bypass_respectful_transition.m_location_id);
+							    respectful_exploration->first.to_Screen();
+							    printf("\n");
 							    RespectfulVisits_umap::iterator bypass_respectful_visit_iter = respectful_exploration->second.insert(RespectfulVisits_umap::value_type(bypass_respectful_transition.m_location_id,
 																								   bypass_respectful_visit)).first;
 							    RespectfulTransitions_mmap::iterator queue_iter = bucketed_respectful_transition_Queues[bypass_respectful_transition.m_conflict_fingerprint].insert(RespectfulTransitions_mmap::value_type(bypass_respectful_transition.m_makespan,
@@ -7263,17 +8031,22 @@ namespace boOX
 											front_respectful_transition.m_waited + waited,
 											front_respectful_transition.m_location_id,
 											front_respectful_transition.m_trans_id);
-					sREAL_SMT_CBS_UPDATE_NEXT_MAKESPAN_BOUND(wait_respectful_transition.m_time);
-					
-					wait_respectful_transition.m_conflict_fingerprint = next_conflict_fingerprint;			
+				
+					sREAL_SMT_CBS_UPDATE_NEXT_MAKESPAN_BOUND(wait_respectful_transition.m_time);					
+					wait_respectful_transition.m_conflict_fingerprint = next_conflict_fingerprint;
+
+					printf("waito\n");
+					wait_respectful_transition.to_Screen();					
 
 					if (respectful_exploration == respectful_Explorations.end()) /* non-existent fingerprint */
 					{
 					    sDouble estimated_remaining = map.m_shortest_Distances[sink_loc_id][wait_respectful_transition.m_location_id] / kruhobot.m_properties.m_linear_velo;
 					    sDouble effective_makespan_bound = sMIN(individual_makespan_bound + wait_respectful_transition.m_waited, makespan_bound);
+					    printf("BOUNDS: %.3f, %.3f\n", wait_respectful_transition.m_time + estimated_remaining, effective_makespan_bound + s_EPSILON);
 					    
 					    if (wait_respectful_transition.m_time + estimated_remaining <= effective_makespan_bound + s_EPSILON)
 					    {
+						printf("beta 1\n");
 						RespectfulVisits_umap extended_conflict_Visits;
 						RespectfulVisit wait_respectful_visit(wait_respectful_transition.m_time, wait_respectful_transition.m_trans_id);
 					    
@@ -7287,6 +8060,7 @@ namespace boOX
 					    }
 					    else
 					    {
+						printf("beta 2\n");
 						sREAL_SMT_CBS_UPDATE_NEXT_MAKESPAN_BOUND(wait_respectful_transition.m_time + estimated_remaining);
 						sREAL_SMT_CBS_UPDATE_NEXT_INDIVIDUAL_MAKESPAN_BOUND(wait_respectful_transition.m_time + estimated_remaining - wait_respectful_transition.m_waited);
 					    }
@@ -7297,12 +8071,19 @@ namespace boOX
 					    
 					    if (wait_respectful_visit == respectful_exploration->second.end()) /* visiting for the first time */
 					    {
+						printf("beta 3\n");
 						sDouble estimated_remaining = map.m_shortest_Distances[sink_loc_id][wait_respectful_transition.m_location_id] / kruhobot.m_properties.m_linear_velo;
 						sDouble effective_makespan_bound = sMIN(individual_makespan_bound + wait_respectful_transition.m_waited, makespan_bound);
 						
 						if (wait_respectful_transition.m_time + estimated_remaining <= effective_makespan_bound + s_EPSILON)
 						{
+						    printf("beta 4\n");
 						    RespectfulVisit wait_respectful_visit(wait_respectful_transition.m_time, wait_respectful_transition.m_trans_id);
+
+						    printf("  wa: %d\n", wait_respectful_transition.m_location_id);
+						    respectful_exploration->first.to_Screen();
+						    printf("\n");
+						    
 						    RespectfulVisits_umap::iterator wait_respectful_visit_iter = respectful_exploration->second.insert(RespectfulVisits_umap::value_type(wait_respectful_transition.m_location_id,
 																							 wait_respectful_visit)).first;
 						    RespectfulTransitions_mmap::iterator queue_iter = bucketed_respectful_transition_Queues[wait_respectful_transition.m_conflict_fingerprint].insert(RespectfulTransitions_mmap::value_type(wait_respectful_transition.m_makespan,
@@ -7311,16 +8092,19 @@ namespace boOX
 						}
 						else
 						{
+						    printf("beta 5\n");
 						    sREAL_SMT_CBS_UPDATE_NEXT_MAKESPAN_BOUND(wait_respectful_transition.m_time + estimated_remaining);
 						    sREAL_SMT_CBS_UPDATE_NEXT_INDIVIDUAL_MAKESPAN_BOUND(wait_respectful_transition.m_time + estimated_remaining - wait_respectful_transition.m_waited);
 						}
 					    }
 					    else /* visiting for the next time, almost same as first time */
 					    {
+						printf("beta 6\n");
 						sASSERT(wait_respectful_visit != respectful_exploration->second.end());
 						
 						if (wait_respectful_visit->second.m_time > wait_respectful_transition.m_time)
 						{
+						    printf("beta 7\n");
 						    wait_respectful_visit->second.m_time = wait_respectful_transition.m_time;
 						    wait_respectful_visit->second.m_trans_id = wait_respectful_transition.m_trans_id;
 						    
@@ -7477,7 +8261,7 @@ namespace boOX
 	       
 	if (location_Conflict != location_Conflicts.end())
 	{
-	    for (LocationConflicts_upper_map::const_iterator lower_location_conflict = location_Conflict->second.lower_bound(Interval(start_time, finish_time));		
+	    for (LocationConflicts_upper_map::const_iterator lower_location_conflict = location_Conflict->second.lower_bound(Interval(start_time, start_time));		
 		 lower_location_conflict != location_Conflict->second.end(); ++lower_location_conflict)
 	    {
 		if (lower_location_conflict->second.overlaps(Interval(start_time, finish_time)))
@@ -7495,12 +8279,22 @@ namespace boOX
 	}
 
 	LinearConflicts_upper__map::const_iterator linear_Conflict = linear_Conflicts.find(Uline(location_u_id, location_v_id));
-				
+	
 	if (linear_Conflict != linear_Conflicts.end())
 	{
-	    for (LinearConflicts_upper_map::const_iterator lower_linear_conflict = linear_Conflict->second.lower_bound(Interval(start_time, finish_time));
+	    printf("    lino 1: %.3f, %.3f\n", start_time, finish_time);
+
+	    for (LinearConflicts_upper_map::const_iterator lower_linear_conflict = linear_Conflict->second.begin(); lower_linear_conflict != linear_Conflict->second.end(); ++lower_linear_conflict)
+	    {
+		lower_linear_conflict->first.to_Screen();
+	    }
+	    
+	    for (LinearConflicts_upper_map::const_iterator lower_linear_conflict = linear_Conflict->second.lower_bound(Interval(start_time, start_time));
 		 lower_linear_conflict != linear_Conflict->second.end(); ++lower_linear_conflict)
 	    {
+		printf("  cc:\n");
+		lower_linear_conflict->second.to_Screen("    ");
+		
 		if (lower_linear_conflict->second.overlaps(Interval(start_time, finish_time)))
 		{
 		    if (conflict_Fingerprint.m_conflict_IDs.find(lower_linear_conflict->second.m_conflict_id) != conflict_Fingerprint.m_conflict_IDs.end())
@@ -8374,7 +9168,10 @@ namespace boOX
 						  RealModel                             &real_sat_Model) const
     {
 	for (KruhobotCollisions_mset::const_iterator kruhobot_collision = kruhobot_Collisions.begin(); kruhobot_collision != kruhobot_Collisions.end(); ++kruhobot_collision)
-	{    
+	{
+	    printf("refining collision ---->\n");
+	    kruhobot_collision->to_Screen();
+	    
 	    std::vector<sInt_32> variable_A_IDs, variable_B_IDs;	    
 	    sInt_32 kruhobot_A_id = sABS(kruhobot_collision->m_traversal_A.m_kruhobot_id);
 
