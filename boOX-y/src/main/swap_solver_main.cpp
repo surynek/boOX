@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-144_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.cpp / 1-119_leibniz                                       */
+/* swap_solver_main.cpp / 1-144_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.

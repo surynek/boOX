@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-144_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapfR_solver_main.h / 1-119_leibniz                                        */
+/* mapfR_solver_main.h / 1-144_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-144_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 1-119_leibniz                                                   */
+/* cbsR.cpp / 1-144_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -75,7 +75,7 @@ namespace boOX
 	sDouble cummulative = 0.0;
 	
 	LocationCooccupations_umap location_Cooccupations;
-	LinearCooccupations_map linear_Cooccupations;
+	UlinearCooccupations_map linear_Cooccupations;
 	
 	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
 
@@ -115,7 +115,7 @@ namespace boOX
 //		    location_Cooccupations[event->m_to_loc_id][Interval(event->m_start_time, event->m_finish_time)].insert(kruhobot_id);		    		    
 
 		    linear_Cooccupations[Uline(event->m_from_loc_id, event->m_to_loc_id)][Interval(event->m_start_time, event->m_finish_time)].insert(kruhobot_id);
-		    printf("%d->%d [%.3f,%.3f)\n", event->m_from_loc_id, event->m_to_loc_id, event->m_start_time, event->m_finish_time);
+		    //printf("%d->%d [%.3f,%.3f)\n", event->m_from_loc_id, event->m_to_loc_id, event->m_start_time, event->m_finish_time);
 		}
 		cummulative = sMAX(cummulative, event->m_finish_time);
 	    }
@@ -141,8 +141,8 @@ namespace boOX
 		    printf("\n");
 		}
 	    }
-	    printf("Linear\n");
-	    for (LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
+	    printf("Ulinear\n");
+	    for (UlinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
 	    {
 		printf("  lin: %d<->%d\n", linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id);
 
@@ -185,10 +185,6 @@ namespace boOX
 
 			sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);			
 			kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-			printf("alpha 1\n");
-			traversal_A.to_Screen();
-			traversal_B.to_Screen();
 		    }
 
 		    /* kruhobors share a vertex for overlapping time intervals */
@@ -202,6 +198,7 @@ namespace boOX
 				Interval intersection = coop->first.intersect(next_coop->first);
 				
 				sASSERT(!intersection.empty());
+				/*
 				if (*kruhobot == *next_kruhobot)
 				{
 				    printf("%d x %d\n", *kruhobot, *next_kruhobot);
@@ -210,15 +207,12 @@ namespace boOX
 				    intersection.to_Screen();
 				    sASSERT(false);
 				}
+				*/
 			
 				Traversal traversal_A(*kruhobot, location_Coop->first, location_Coop->first, Interval(intersection.m_lower, intersection.m_upper));
 				Traversal traversal_B(*next_kruhobot, location_Coop->first, location_Coop->first, Interval(intersection.m_lower, intersection.m_upper));
 				sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);				
 				kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-				printf("alpha 2\n");
-				traversal_A.to_Screen();
-				traversal_B.to_Screen();				
 			    }
 			}
 			else
@@ -230,7 +224,7 @@ namespace boOX
 	    }
 	}
 
-	for (LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
+	for (UlinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
 	{	    
 	    const Cooccupations_map &cooccupations = linear_Coop->second;
 
@@ -252,10 +246,6 @@ namespace boOX
 		       
 			sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);
 			kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-			printf("alpha 3\n");
-			traversal_A.to_Screen();
-			traversal_B.to_Screen();			
 		    }
 
 		    /* kruhobots used the line for overlapping time intervals */
@@ -276,10 +266,6 @@ namespace boOX
 
 				sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);
 				kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-				
-				printf("alpha 4\n");
-				traversal_A.to_Screen();
-				traversal_B.to_Screen();				
 			    }
 			}
 			else
@@ -311,10 +297,6 @@ namespace boOX
 
 					sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);
 					kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-					printf("alpha 5\n");
-					traversal_A.to_Screen();
-					traversal_B.to_Screen();					
 				    }
 				}				
 			    }
@@ -344,10 +326,6 @@ namespace boOX
 
 					sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);
 					kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-					printf("alpha 6\n");
-					traversal_A.to_Screen();
-					traversal_B.to_Screen();					
 				    }
 				}				
 			    }
@@ -385,10 +363,6 @@ namespace boOX
 
 					    sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);
 					    kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-					    printf("alpha 7\n");
-					    traversal_A.to_Screen();
-					    traversal_B.to_Screen();
 					}
 				    }
 				}
@@ -398,7 +372,7 @@ namespace boOX
 		}
 
 		// Lines vs. lines collisions
-		LinearCooccupations_map::const_iterator other_linear_Coop = linear_Coop;		
+		UlinearCooccupations_map::const_iterator other_linear_Coop = linear_Coop;		
 		for (++other_linear_Coop; other_linear_Coop != linear_Cooccupations.end(); ++other_linear_Coop)
 		{
 		    sDouble line_distance = map.calc_LineDistance(linear_Coop->first.m_lower_id,
@@ -429,10 +403,6 @@ namespace boOX
 					    
 					    sDouble importance = calc_KruhobotCollisionImportance(traversal_A, traversal_B, location_Cooccupations, linear_Cooccupations);
 					    kruhobot_Collisions.insert(KruhobotCollision(importance, traversal_A, traversal_B));
-
-					    printf("alpha 8\n");
-					    traversal_A.to_Screen();
-					    traversal_B.to_Screen();					    
 					}
 				    }
 				}
@@ -453,7 +423,7 @@ namespace boOX
 	sDouble cummulative = 0.0;
 	
 	LocationCooccupations_umap location_Cooccupations;
-	LinearCooccupations_map linear_Cooccupations;
+	UlinearCooccupations_map linear_Cooccupations;
 	
 	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
 
@@ -518,8 +488,8 @@ namespace boOX
 		    printf("\n");
 		}
 	    }
-	    printf("Linear\n");
-	    for (LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
+	    printf("Ulinear\n");
+	    for (UlinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
 	    {
 		printf("  lin: %d<->%d\n", linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id);
 
@@ -604,7 +574,7 @@ namespace boOX
 	    }
 	}
 
-	for (LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
+	for (UlinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
 	{	    
 	    const Cooccupations_map &cooccupations = linear_Coop->second;
 
@@ -623,9 +593,6 @@ namespace boOX
 			
 			Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
 			Traversal traversal_B(*next_kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
-
-			printf("identical line [%d,%d]\n", *kruhobot, *next_kruhobot);
-			printf("gamma 40: %d,%d,%d,%d\n", linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, linear_Coop->first.m_lower_id);
 		       
 			kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
 		    }
@@ -764,7 +731,7 @@ namespace boOX
 		}
 
 		// Lines vs. lines collisions
-		LinearCooccupations_map::const_iterator other_linear_Coop = linear_Coop;		
+		UlinearCooccupations_map::const_iterator other_linear_Coop = linear_Coop;		
 		for (++other_linear_Coop; other_linear_Coop != linear_Cooccupations.end(); ++other_linear_Coop)
 		{
 		    sDouble line_distance = map.calc_LineDistance(linear_Coop->first.m_lower_id,
@@ -828,7 +795,7 @@ namespace boOX
 	sDouble cummulative = 0.0;
 	
 	LocationCooccupations_umap location_Cooccupations;
-	LinearCooccupations_map linear_Cooccupations;
+	UlinearCooccupations__map linear_Cooccupations;
 	
 	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
 
@@ -867,7 +834,14 @@ namespace boOX
 //		    location_Cooccupations[event->m_from_loc_id][Interval(event->m_start_time, event->m_finish_time)].insert(kruhobot_id);
 //		    location_Cooccupations[event->m_to_loc_id][Interval(event->m_start_time, event->m_finish_time)].insert(kruhobot_id);		    		    
 
-		    linear_Cooccupations[Uline(event->m_from_loc_id, event->m_to_loc_id)][Interval(event->m_start_time, event->m_finish_time)].insert(kruhobot_id);
+		    if (event->m_from_loc_id <= event->m_to_loc_id)
+		    {
+			linear_Cooccupations[Uline(event->m_from_loc_id, event->m_to_loc_id)][Interval(event->m_start_time, event->m_finish_time)].insert(KruhobotIDs_umap::value_type(kruhobot_id, 1));
+		    }
+		    else
+		    {
+			linear_Cooccupations[Uline(event->m_from_loc_id, event->m_to_loc_id)][Interval(event->m_start_time, event->m_finish_time)].insert(KruhobotIDs_umap::value_type(kruhobot_id, -1));
+		    }
 		}
 		cummulative = sMAX(cummulative, event->m_finish_time);
 	    }
@@ -893,8 +867,8 @@ namespace boOX
 		    printf("\n");
 		}
 	    }
-	    printf("Linear\n");
-	    for (LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
+	    printf("Ulinear\n");
+	    for (UlinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
 	    {
 		printf("  lin: %d<->%d\n", linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id);
 
@@ -953,7 +927,7 @@ namespace boOX
 				Traversal traversal_A(*kruhobot, location_Coop->first, location_Coop->first, coop->first);
 				Traversal traversal_B(*next_kruhobot, location_Coop->first, location_Coop->first, next_coop->first);
 						
-				kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
+				kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));			
 			    }
 			}
 			else
@@ -965,59 +939,78 @@ namespace boOX
 	    }
 	}
 
-	for (LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
+	for (UlinearCooccupations__map::const_iterator linear_Coop = linear_Cooccupations.begin(); linear_Coop != linear_Cooccupations.end(); ++linear_Coop)
 	{	    
-	    const Cooccupations_map &cooccupations = linear_Coop->second;
+	    const Cooccupations__map &cooccupations = linear_Coop->second;
 
 	    /* Line sharing collisions */
-	    for (Cooccupations_map::const_iterator coop = cooccupations.begin(); coop != cooccupations.end(); ++coop)
+	    for (Cooccupations__map::const_iterator coop = cooccupations.begin(); coop != cooccupations.end(); ++coop)
 	    {
 		sASSERT(!coop->second.empty());
 
-		for (KruhobotIDs_uset::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
+		for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
 		{
 		    /* kruhobots use the line for identical time intervals */
-		    KruhobotIDs_uset::const_iterator next_kruhobot = kruhobot;
+		    KruhobotIDs_umap::const_iterator next_kruhobot = kruhobot;
 		    for (++next_kruhobot; next_kruhobot != coop->second.end(); ++next_kruhobot)
 		    {
 			sASSERT(*kruhobot != *next_kruhobot);
-			
-			Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
-			Traversal traversal_B(*next_kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
 
-			printf("identical line [%d,%d]\n", *kruhobot, *next_kruhobot);
-			printf("gamma 40: %d,%d,%d,%d\n", linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, linear_Coop->first.m_lower_id);
-		       
+			Traversal traversal_A;
+
+			if (kruhobot->second >= 0)
+			{
+			    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+			}
+			else
+			{
+			    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));			    
+			}
+			
+			Traversal traversal_B;
+			
+			if (next_kruhobot->second >= 0)
+			{
+			    traversal_B = Traversal(next_kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+			}
+			else
+			{
+			    traversal_B = Traversal(next_kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));
+			}			
 			kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
 		    }
 
 		    /* kruhobots used the line for overlapping time intervals */
-		    Cooccupations_map::const_iterator next_coop = coop;
+		    Cooccupations__map::const_iterator next_coop = coop;
 		    for (++next_coop; next_coop != cooccupations.end(); ++next_coop)
-		    {
-			/*
-			printf("G1\n");
-			coop->first.to_Screen();
-			next_coop->first.to_Screen();
-			*/
-			
+		    {			
 			if (coop->first.overlaps(next_coop->first))
 			{					
-			    for (KruhobotIDs_uset::const_iterator next_kruhobot = next_coop->second.begin(); next_kruhobot != next_coop->second.end(); ++next_kruhobot)
+			    for (KruhobotIDs_umap::const_iterator next_kruhobot = next_coop->second.begin(); next_kruhobot != next_coop->second.end(); ++next_kruhobot)
 			    {
 				sASSERT(*kruhobot != *next_kruhobot);
 			
-				Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, coop->first);
-				Traversal traversal_B(*next_kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, next_coop->first);
-				/*
-
-				printf("    same line [%d,%d]\n", *kruhobot, *next_kruhobot);
-				printf("    gamma 30: %d,%d,%d,%d\n", linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id);
- 
-				traversal_A.to_Screen("    ");
-				traversal_B.to_Screen("    ");
-				*/
-
+				Traversal traversal_A;
+				
+				if (kruhobot->second >= 0)
+				{
+				    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+				}
+				else
+				{
+				    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));			    
+				}
+				
+				Traversal traversal_B;
+			
+				if (next_kruhobot->second >= 0)
+				{
+				    traversal_B = Traversal(next_kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(next_coop->first.m_lower, next_coop->first.m_upper));
+				}
+				else
+				{
+				    traversal_B = Traversal(next_kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(next_coop->first.m_lower, next_coop->first.m_upper));
+				}				
 				kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
 			    }
 			}
@@ -1036,15 +1029,29 @@ namespace boOX
 		    {
 			if (coop->first.overlaps(other_coop->first))
 			{
-			    for (KruhobotIDs_uset::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
+			    for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
 			    {
 				for (KruhobotIDs_uset::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
 				{
-				    if (*kruhobot != *other_kruhobot)
+				    if (kruhobot->first != *other_kruhobot)
 				    {
+					/*
 					Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, coop->first);
 					Traversal traversal_B(*other_kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_lower_id, other_coop->first);
+					*/
 
+					Traversal traversal_A;
+					
+					if (kruhobot->second >= 0)
+					{
+					    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+					}
+					else
+					{
+					    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));			    
+					}
+					Traversal traversal_B(*other_kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_lower_id, other_coop->first);
+					
 					kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
 				    }
 				}				
@@ -1061,14 +1068,27 @@ namespace boOX
 		    {
 			if (coop->first.overlaps(other_coop->first))
 			{					    
-			    for (KruhobotIDs_uset::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
+			    for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
 			    {
 				for (KruhobotIDs_uset::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
 				{
-				    if (*kruhobot != *other_kruhobot)
+				    if (kruhobot->first != *other_kruhobot)
 				    {
+					/*
 					Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, coop->first);
 					Traversal traversal_B(*other_kruhobot, linear_Coop->first.m_upper_id, linear_Coop->first.m_upper_id, other_coop->first);
+					*/
+					Traversal traversal_A;
+					
+					if (kruhobot->second >= 0)
+					{
+					    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+					}
+					else
+					{
+					    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));			    
+					}
+					Traversal traversal_B(*other_kruhobot, linear_Coop->first.m_upper_id, linear_Coop->first.m_upper_id, other_coop->first);					
 
 					kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
 				    }
@@ -1085,22 +1105,31 @@ namespace boOX
 								    linear_Coop->first.m_upper_id,
 								    other_location_cooccupations->first);
 
-
 //		    for (Cooccupations_map::const_iterator other_coop = other_location_cooccupations->second.begin(); other_coop != other_location_cooccupations->second.end(); ++other_coop)
 		    for (Cooccupations_map::const_iterator other_coop = other_location_cooccupations->second.lower_bound(Interval(coop->first.m_lower, coop->first.m_lower));
 			 other_coop != other_location_cooccupations->second.end(); ++other_coop)		    
 		    {
 			if (coop->first.overlaps(other_coop->first))
 			{			    
-			    for (KruhobotIDs_uset::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
+			    for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
 			    {
 				for (KruhobotIDs_uset::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
 				{
-				    if (point_distance < real_Instance.m_Kruhobots[sABS(*kruhobot)].m_properties.m_radius + real_Instance.m_Kruhobots[sABS(*other_kruhobot)].m_properties.m_radius)
+				    if (point_distance < real_Instance.m_Kruhobots[sABS(kruhobot->first)].m_properties.m_radius + real_Instance.m_Kruhobots[sABS(*other_kruhobot)].m_properties.m_radius)
 				    {				    
-					if (sABS(*kruhobot) != sABS(*other_kruhobot))
+					if (sABS(kruhobot->first) != sABS(*other_kruhobot))
 					{
-					    Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, coop->first);
+					    Traversal traversal_A;
+					    
+					    if (kruhobot->second >= 0)
+					    {
+						traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+					    }
+					    else
+					    {
+						traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));			    
+					    }					    
+					    // Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, coop->first);
 					    Traversal traversal_B(*other_kruhobot, other_location_cooccupations->first, other_location_cooccupations->first, other_coop->first);
 
 					    kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
@@ -1113,7 +1142,7 @@ namespace boOX
 		}
 
 		// Lines vs. lines collisions
-		LinearCooccupations_map::const_iterator other_linear_Coop = linear_Coop;		
+		UlinearCooccupations__map::const_iterator other_linear_Coop = linear_Coop;		
 		for (++other_linear_Coop; other_linear_Coop != linear_Cooccupations.end(); ++other_linear_Coop)
 		{
 		    sDouble line_distance = map.calc_LineDistance(linear_Coop->first.m_lower_id,
@@ -1121,27 +1150,50 @@ namespace boOX
 								  other_linear_Coop->first.m_lower_id,
 								  other_linear_Coop->first.m_upper_id);
 
-		    if (linear_Coop->first.m_upper_id != other_linear_Coop->first.m_lower_id && other_linear_Coop->first.m_upper_id != linear_Coop->first.m_lower_id)
+		    //if (linear_Coop->first.m_upper_id != other_linear_Coop->first.m_lower_id && other_linear_Coop->first.m_upper_id != linear_Coop->first.m_lower_id)
 		    {		    
-			const Cooccupations_map &other_linear_cooccupations = other_linear_Coop->second;
+			const Cooccupations__map &other_linear_cooccupations = other_linear_Coop->second;
 
 //		        for (Cooccupations_map::const_iterator other_coop = other_linear_cooccupations.begin(); other_coop != other_linear_cooccupations.end(); ++other_coop)
-			for (Cooccupations_map::const_iterator other_coop = other_linear_cooccupations.lower_bound(Interval(coop->first.m_lower, coop->first.m_lower));
+			for (Cooccupations__map::const_iterator other_coop = other_linear_cooccupations.lower_bound(Interval(coop->first.m_lower, coop->first.m_lower));
 			     other_coop != other_linear_cooccupations.end(); ++other_coop)
 			{
 			    if (coop->first.overlaps(other_coop->first))
 			    {
-				for (KruhobotIDs_uset::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
+				for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
 				{				    
-				    for (KruhobotIDs_uset::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
+				    for (KruhobotIDs_umap::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
 				    {
-					if (line_distance < real_Instance.m_Kruhobots[sABS(*kruhobot)].m_properties.m_radius + real_Instance.m_Kruhobots[sABS(*other_kruhobot)].m_properties.m_radius)
+					if (line_distance < real_Instance.m_Kruhobots[sABS(kruhobot->first)].m_properties.m_radius + real_Instance.m_Kruhobots[sABS(other_kruhobot->first)].m_properties.m_radius)
 					{
-					    if (sABS(*kruhobot) != sABS(*other_kruhobot))
+					    if (sABS(kruhobot->first) != sABS(other_kruhobot->first))
 					    {
+
+						Traversal traversal_A;
+						
+						if (kruhobot->second >= 0)
+						{
+						    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, Interval(coop->first.m_lower, coop->first.m_upper));
+						}
+						else
+						{
+						    traversal_A = Traversal(kruhobot->first, linear_Coop->first.m_upper_id, linear_Coop->first.m_lower_id, Interval(coop->first.m_lower, coop->first.m_upper));			    
+						}
+				
+						Traversal traversal_B;
+						
+						if (other_kruhobot->second >= 0)
+						{
+						    traversal_B = Traversal(other_kruhobot->first, other_linear_Coop->first.m_lower_id, other_linear_Coop->first.m_upper_id, Interval(other_coop->first.m_lower, other_coop->first.m_upper));
+						}
+						else
+						{
+						    traversal_B = Traversal(other_kruhobot->first, other_linear_Coop->first.m_upper_id, other_linear_Coop->first.m_lower_id, Interval(other_coop->first.m_lower, other_coop->first.m_upper));
+						}
+						/*
 						Traversal traversal_A(*kruhobot, linear_Coop->first.m_lower_id, linear_Coop->first.m_upper_id, coop->first);
 						Traversal traversal_B(*other_kruhobot, other_linear_Coop->first.m_lower_id, other_linear_Coop->first.m_upper_id, other_coop->first);
-						
+						*/
 						kruhobot_Collisions.insert(KruhobotCollision(traversal_A, traversal_B));
 					    }
 					}
@@ -1159,11 +1211,88 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
 
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision(const sRealInstance              &real_Instance,
+										 const Traversal                  &kruhobot_traversal_A,
+										 const Traversal                  &kruhobot_traversal_B,				       
+										 KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+										 KruhobotUlinearConflicts_vector   &kruhobot_linear_Conflicts,
+										 sInt_32                          &last_conflict_id,
+										 bool                              infinity) const
+    {
+	
+	return resolve_KruhobotCollision<KruhobotLocationConflicts_vector, KruhobotUlinearConflicts_vector>(real_Instance,
+													   kruhobot_traversal_A,
+													   kruhobot_traversal_B,				       
+													   kruhobot_location_Conflicts,
+													   kruhobot_linear_Conflicts,
+													   last_conflict_id,
+													   infinity);
+    }
+
+    
     sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
 										 const Traversal                        &kruhobot_traversal_A,
 										 const Traversal                        &kruhobot_traversal_B,				       
 										 KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-										 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+										 KruhobotUlinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+										 sInt_32                                &last_conflict_id,
+										 bool                                    infinity) const
+    {
+	
+	return resolve_KruhobotCollision<KruhobotLocationConflicts_upper_vector, KruhobotUlinearConflicts_upper_vector>(real_Instance,
+														       kruhobot_traversal_A,
+														       kruhobot_traversal_B,				       
+														       kruhobot_location_Conflicts,
+														       kruhobot_linear_Conflicts,
+														       last_conflict_id,
+														       infinity);
+    }
+
+
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
+										 const Traversal                        &kruhobot_traversal_A,
+										 const Traversal                        &kruhobot_traversal_B,				       
+										 KruhobotLocationConflicts_lower_vector &kruhobot_location_Conflicts,
+										 KruhobotUlinearConflicts_lower_vector   &kruhobot_linear_Conflicts,
+										 sInt_32                                &last_conflict_id,
+										 bool                                    infinity) const
+    {
+	
+	return resolve_KruhobotCollision<KruhobotLocationConflicts_lower_vector, KruhobotUlinearConflicts_lower_vector>(real_Instance,
+														       kruhobot_traversal_A,
+														       kruhobot_traversal_B,				       
+														       kruhobot_location_Conflicts,
+														       kruhobot_linear_Conflicts,
+														       last_conflict_id,
+														       infinity);
+    }    
+
+
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision(const sRealInstance                            &real_Instance,
+										 const Traversal                                &kruhobot_traversal_A,
+										 const Traversal                                &kruhobot_traversal_B,				       
+										 KruhobotLocationConflicts_lexicographic_vector &kruhobot_location_Conflicts,
+										 KruhobotUlinearConflicts_lexicographic_vector   &kruhobot_linear_Conflicts,
+										 sInt_32                                        &last_conflict_id,
+										 bool                                            infinity) const
+    {
+	
+	return resolve_KruhobotCollision<KruhobotLocationConflicts_lexicographic_vector, KruhobotUlinearConflicts_lexicographic_vector>(real_Instance,
+																       kruhobot_traversal_A,
+																       kruhobot_traversal_B,				       
+																       kruhobot_location_Conflicts,
+																       kruhobot_linear_Conflicts,
+																       last_conflict_id,
+																       infinity);
+    }    
+
+
+    template<class T1, class T2>
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
+										 const Traversal                        &kruhobot_traversal_A,
+										 const Traversal                        &kruhobot_traversal_B,				       
+										 T1                                     &kruhobot_location_Conflicts,
+										 T2                                     &kruhobot_linear_Conflicts,
 										 sInt_32                                &last_conflict_id,
 										 bool                                    infinity) const
     {
@@ -1171,56 +1300,57 @@ namespace boOX
 	{
 	    if (kruhobot_traversal_B.m_u_loc_id == kruhobot_traversal_B.m_v_loc_id)
 	    {
-		return resolve_KruhobotCollision_location_X_location(real_Instance,
-								     kruhobot_traversal_A,
-								     kruhobot_traversal_B,				       
-								     kruhobot_location_Conflicts,
-								     kruhobot_linear_Conflicts,
-								     last_conflict_id,
+		return resolve_KruhobotCollision_location_X_location<T1, T2>(real_Instance,
+									     kruhobot_traversal_A,
+									     kruhobot_traversal_B,				       
+									     kruhobot_location_Conflicts,
+									     kruhobot_linear_Conflicts,
+									     last_conflict_id,
 								     infinity);
 	    }
 	    else
 	    {
-		return resolve_KruhobotCollision_location_X_linear(real_Instance,
-								   kruhobot_traversal_A,
-								   kruhobot_traversal_B,				       
-								   kruhobot_location_Conflicts,
-								   kruhobot_linear_Conflicts,
-								   last_conflict_id,
-								   infinity);		
+		return resolve_KruhobotCollision_location_X_linear<T1, T2>(real_Instance,
+									   kruhobot_traversal_A,
+									   kruhobot_traversal_B,				       
+									   kruhobot_location_Conflicts,
+									   kruhobot_linear_Conflicts,
+									   last_conflict_id,
+									   infinity);		
 	    }
 	}
 	else	    
 	{
 	    if (kruhobot_traversal_B.m_u_loc_id == kruhobot_traversal_B.m_v_loc_id)
 	    {
-		return resolve_KruhobotCollision_linear_X_location(real_Instance,
-								   kruhobot_traversal_A,
-								   kruhobot_traversal_B,				       
-								   kruhobot_location_Conflicts,
-								   kruhobot_linear_Conflicts,
-								   last_conflict_id,
-								   infinity);				
+		return resolve_KruhobotCollision_linear_X_location<T1, T2>(real_Instance,
+									   kruhobot_traversal_A,
+									   kruhobot_traversal_B,				       
+									   kruhobot_location_Conflicts,
+									   kruhobot_linear_Conflicts,
+									   last_conflict_id,
+									   infinity);				
 	    }
 	    else
 	    {
-		return resolve_KruhobotCollision_linear_X_linear(real_Instance,
-								 kruhobot_traversal_A,
-								 kruhobot_traversal_B,				       
-								 kruhobot_location_Conflicts,
-								 kruhobot_linear_Conflicts,
-								 last_conflict_id,
-								 infinity);		
+		return resolve_KruhobotCollision_linear_X_linear<T1, T2>(real_Instance,
+									 kruhobot_traversal_A,
+									 kruhobot_traversal_B,				       
+									 kruhobot_location_Conflicts,
+									 kruhobot_linear_Conflicts,
+									 last_conflict_id,
+									 infinity);		
 	    }
 	}
-    }
+    }    
 
-    
+
+    template<class T1, class T2>
     sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_location_X_location(const sRealInstance                    &real_Instance,
 												     const Traversal                        &kruhobot_traversal_location_A,
 												     const Traversal                        &kruhobot_traversal_location_B,				       
-												     KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-												     KruhobotLinearConflicts_upper_vector   &sUNUSED(kruhobot_linear_Conflicts),
+												     T1                                     &kruhobot_location_Conflicts,
+												     T2                                     &sUNUSED(kruhobot_linear_Conflicts),
 												     sInt_32                                &last_conflict_id,
 												     bool                                    infinity) const
     {
@@ -1260,16 +1390,17 @@ namespace boOX
 	}
 
 	return KruhobotAffection_pair(affection_A, affection_B);
-    } 
+    }     
 
-  
-    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_location_X_linear(const sRealInstance                    &real_Instance,
-												   const Traversal                        &kruhobot_traversal_A_location,
-												   const Traversal                        &kruhobot_traversal_B_linear,
-												   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-												   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-												   sInt_32                                &last_conflict_id,
-												   bool                                    infinity) const
+
+    template<class T1, class T2>    
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_location_X_linear(const sRealInstance &real_Instance,
+												   const Traversal     &kruhobot_traversal_A_location,
+												   const Traversal     &kruhobot_traversal_B_linear,
+												   T1                  &kruhobot_location_Conflicts,
+												   T2                  &kruhobot_linear_Conflicts,
+												   sInt_32             &last_conflict_id,
+												   bool                 sUNUSED(infinity)) const
     {
 	sASSERT(kruhobot_traversal_A_location.m_u_loc_id == kruhobot_traversal_A_location.m_v_loc_id);
 	sASSERT(kruhobot_traversal_B_linear.m_u_loc_id != kruhobot_traversal_B_linear.m_v_loc_id);
@@ -1287,154 +1418,125 @@ namespace boOX
 	sDouble x1A = map.m_Locations[kruhobot_traversal_A_location.m_u_loc_id].m_x;
 	sDouble y1A = map.m_Locations[kruhobot_traversal_A_location.m_u_loc_id].m_y;
 	
-	sDouble x1B = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
-	sDouble x2B = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
-	sDouble y1B = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
-	sDouble y2B = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
+	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
+	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
+	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
+	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
 
-	sDouble dxB = x2B - x1B;
-	sDouble dyB = y2B - y1B;
+	sDouble dxB = x2B_ - x1B_;
+	sDouble dyB = y2B_ - y1B_;
 
 	sDouble d2B = dxB * dxB + dyB * dyB;
-	sDouble dB = sqrt(d2B);
+	sDouble dB = sqrt(d2B);		
 
+	sDouble x1B = x1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
+	//sDouble x2B = x2B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;
+	//sDouble y2B = y2B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;
+
+	/*
 	sDouble dxAB = x1B - x1A;
 	sDouble dyAB = y1B - y1A;
+	*/
 	sDouble rAB = rA + rB;
-	
-	sDouble alpha = vB * vB;
-	sDouble beta_1 = 2 * vB * vB;
-	sDouble beta_2 = (2 * vB / dB) * (dxAB * dxB + dyAB * dyB);
-	sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	
-	sDouble AA = beta_1 * beta_1 - 4 * alpha * alpha;
-	sDouble BB = 2 * beta_1 * beta_2 - 4 * alpha * beta_2;
-	sDouble CC = beta_2 * beta_2 - 4 * alpha * gamma;
 
-	sDouble lower_unsafe_A, upper_unsafe_A;
-	sDouble lower_unsafe_B, upper_unsafe_B;
-	sDouble D1, D2;
-
+	sDouble dxBA = x1B - x1A;
+	sDouble dyBA = y1B - y1A;		
+	
 	sInt_32 affection_A = 0;
-	sInt_32 affection_B = 0;
-
-	{
-	    sDouble tau = kruhobot_traversal_A_location.m_interval.m_lower - kruhobot_traversal_B_linear.m_interval.m_lower;
+	sInt_32 affection_B = 0;	
 	
-	    sDouble AAA = beta_1 * beta_1;
-	    sDouble BBB = 2 * beta_1 * beta_2 + 4 * alpha * beta_1 * tau;
-	    sDouble CCC = beta_2 * beta_2 + 4 * alpha * beta_2 * tau + 4 * alpha * alpha * tau * tau;
-
-	    sDouble A = AA - AAA;
-	    sDouble B = BB - BBB;
-	    sDouble C = CC - CCC;
-
-	    D1 = B * B - 4 * A * C;
-
-	    printf("D1: %.3f\n", D1);
-	    if (D1 > s_EPSILON)
-	    {
-		sDouble t0_1 = (-B - sqrt(D1)) / (2 * A); 
-		sDouble t0_2 = (-B + sqrt(D1)) / (2 * A);
-
-		printf("Shifting t0: %.4f, %.4f\n", t0_1, t0_2);
-
-		lower_unsafe_A = kruhobot_traversal_B_linear.m_interval.m_lower + kruhobot_traversal_A_location.m_interval.m_lower + t0_2;
-		lower_unsafe_B = kruhobot_traversal_B_linear.m_interval.m_lower + kruhobot_traversal_B_linear.m_interval.m_lower - t0_1;
-	    }
-	}
-
 	{
-	    sDouble tau = kruhobot_traversal_A_location.m_interval.m_upper - kruhobot_traversal_B_linear.m_interval.m_lower;
-	
-	    sDouble AAA = beta_1 * beta_1;
-	    sDouble BBB = 2 * beta_1 * beta_2 + 4 * alpha * beta_1 * tau;
-	    sDouble CCC = beta_2 * beta_2 + 4 * alpha * beta_2 * tau + 4 * alpha * alpha * tau * tau;
-
-	    sDouble A = AA - AAA;
-	    sDouble B = BB - BBB;
-	    sDouble C = CC - CCC;
-
-	    D2 = B * B - 4 * A * C;
-
-	    printf("D2: %.3f\n", D2);
-	    if (D2 > s_EPSILON)
-	    {	    
-		sDouble t0_1 = (-B - sqrt(D2)) / (2 * A);
-		sDouble t0_2 = (-B + sqrt(D2)) / (2 * A);
-
-		printf("Shifting t0: %.4f, %.4f\n", t0_1, t0_2);
-
-		upper_unsafe_A = kruhobot_traversal_B_linear.m_interval.m_lower + kruhobot_traversal_A_location.m_interval.m_upper + t0_1;
-		upper_unsafe_B = kruhobot_traversal_B_linear.m_interval.m_lower + kruhobot_traversal_B_linear.m_interval.m_lower - t0_2;
-	    }
-	}
-
-	sASSERT((D1 >= 0 && D2 >= 0) || (D1 <= 0 && D2 <= 0));
-
-	if (D1 > s_EPSILON && D2 > s_EPSILON)
-	{
-	    printf("Current interval: %.3f,%.3f\n", kruhobot_traversal_B_linear.m_interval.m_lower, kruhobot_traversal_B_linear.m_interval.m_upper);
-	    printf("Unsafe interval B: %.3f, %.3f\n", lower_unsafe_B, upper_unsafe_B);
-	    printf("Unsafe interval A: %.3f, %.3f\n", lower_unsafe_A, upper_unsafe_A);	
-
-	    Interval avoid_interval_A(sMAX(0, sMIN(lower_unsafe_A, upper_unsafe_A)), sMAX(0, sMAX(lower_unsafe_A, upper_unsafe_A)));
-
-	    if (avoid_interval_A.size() > s_DELTION)
+	    sDouble gamma = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
+	    sDouble beta = 2 * vB * (dxBA * dxB + dyBA * dyB) / dB;    
+	    sDouble alpha = vB * vB;
+	    
+	    sDouble discriminant = beta * beta - 4 * alpha * gamma;
+		
+	    if (discriminant <= s_EPSILON)
 	    {
-		if (kruhobot_traversal_A_location.m_interval.overlaps(avoid_interval_A))
-		{
-		    printf("--> avoidance needed for A\n");
-		    LocationConflict location_conflict_A(last_conflict_id++, kruhobot_traversal_A_location.m_u_loc_id, avoid_interval_A, infinity);
-		    kruhobot_location_Conflicts[kruhobot_A_id][kruhobot_traversal_A_location.m_u_loc_id].insert(LocationConflicts_map::value_type(avoid_interval_A, location_conflict_A));
-		    ++affection_A;		    
-		}		
+		return KruhobotAffection_pair(0, 0);
 	    }
+	    else
+	    {
+		sDouble tau_1 = (-beta - sqrt(discriminant)) / (2 * alpha); 
+		sDouble tau_2 = (-beta + sqrt(discriminant)) / (2 * alpha);
 
-	    Interval avoid_interval_B(sMAX(0, sMIN(lower_unsafe_B, upper_unsafe_B)), sMAX(0, sMAX(lower_unsafe_B, upper_unsafe_B)));
+		Interval check_intersection_A = kruhobot_traversal_A_location.m_interval.intersect(Interval(tau_1, tau_2));
+		Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
 
-	    if (avoid_interval_B.size() > s_DELTION)
-	    {	    
-		if (kruhobot_traversal_B_linear.m_interval.overlaps(avoid_interval_B))
+		if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
 		{
-		    printf("--> avoidance needed for B\n");
-		    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, avoid_interval_B);
-		    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(avoid_interval_B, linear_conflict_B));
-		    ++affection_B;
+		    return KruhobotAffection_pair(0, 0);
 		}
-	    }
+		else
+		{
+		    sDouble delta_tau_A = tau_2 - kruhobot_traversal_A_location.m_interval.m_lower;
+		    sDouble delta_tau_B = kruhobot_traversal_A_location.m_interval.m_upper - tau_1;
+
+		    Interval avoid_interval_A(kruhobot_traversal_A_location.m_interval.m_lower, kruhobot_traversal_A_location.m_interval.m_lower + delta_tau_A);
+
+		    if (avoid_interval_A.size() > s_DELTION)
+		    {
+			Interval intersection_A = kruhobot_traversal_A_location.m_interval.intersect(avoid_interval_A);
+			
+			if (intersection_A.size() > s_DELTION)
+			{
+			    LocationConflict location_conflict_A(last_conflict_id++, kruhobot_traversal_A_location.m_u_loc_id, intersection_A);
+			    kruhobot_location_Conflicts[kruhobot_A_id][kruhobot_traversal_A_location.m_u_loc_id].insert(LocationConflicts_map::value_type(intersection_A, location_conflict_A));
+			    ++affection_A;
+			}
+		    }		    		    		    
+		    
+		    Interval avoid_interval_B(kruhobot_traversal_B_linear.m_interval.m_lower, kruhobot_traversal_B_linear.m_interval.m_lower + delta_tau_B);
+
+		    if (avoid_interval_B.size() > s_DELTION)
+		    {
+			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);
+			
+			if (intersection_B.size() > s_DELTION)
+			{
+			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B);
+			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_B));
+			    ++affection_B;
+			}
+		    }		    		    
+		}
+	    }	    
 	}
 	return KruhobotAffection_pair(affection_A, affection_B);	
     }
 
 
+    template<class T1, class T2>    
     sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_linear_X_location(const sRealInstance                    &real_Instance,
 												   const Traversal                        &kruhobot_traversal_A_linear,
 												   const Traversal                        &kruhobot_traversal_B_location,
-												   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-												   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+												   T1                                     &kruhobot_location_Conflicts,
+												   T2                                     &kruhobot_linear_Conflicts,
 												   sInt_32                                &last_conflict_id,
 												   bool                                    infinity) const
     {
-	KruhobotAffection_pair kruhobot_affection = resolve_KruhobotCollision_location_X_linear(real_Instance,
-												kruhobot_traversal_B_location,
-												kruhobot_traversal_A_linear,
-												kruhobot_location_Conflicts,
-												kruhobot_linear_Conflicts,
-												last_conflict_id,
-												infinity);
+	KruhobotAffection_pair kruhobot_affection = resolve_KruhobotCollision_location_X_linear<T1, T2>(real_Instance,
+													kruhobot_traversal_B_location,
+													kruhobot_traversal_A_linear,
+													kruhobot_location_Conflicts,
+													kruhobot_linear_Conflicts,
+													last_conflict_id,
+													infinity);
 
 	return KruhobotAffection_pair(kruhobot_affection.second, kruhobot_affection.first);
     }
 
-    
-    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_linear_X_linear(const sRealInstance                    &real_Instance,
-												 const Traversal                        &kruhobot_traversal_A_linear,
-												 const Traversal                        &kruhobot_traversal_B_linear,
-												 KruhobotLocationConflicts_upper_vector &sUNUSED(kruhobot_location_Conflicts),
-												 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-												 sInt_32                                &last_conflict_id,
-												 bool                                    sUNUSED(infinity)) const
+
+    template<class T1, class T2>
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_linear_X_linear(const sRealInstance &real_Instance,
+												 const Traversal     &kruhobot_traversal_A_linear,
+												 const Traversal     &kruhobot_traversal_B_linear,
+												 T1                  &sUNUSED(kruhobot_location_Conflicts),
+												 T2                  &kruhobot_linear_Conflicts,
+												 sInt_32             &last_conflict_id,
+												 bool                 sUNUSED(infinity)) const
     {
 	sASSERT(kruhobot_traversal_A_linear.m_u_loc_id != kruhobot_traversal_A_linear.m_v_loc_id);
 	sASSERT(kruhobot_traversal_B_linear.m_u_loc_id != kruhobot_traversal_B_linear.m_v_loc_id);
@@ -1472,29 +1574,51 @@ namespace boOX
 	sDouble d2B = dxB * dxB + dyB * dyB;
 	sDouble dB = sqrt(d2B);
 
-	sDouble x1A = x1A_ + (vA * kruhobot_traversal_A_linear.m_interval.m_lower * dxA) / dA;
-	sDouble x2A = x1A_ + (vA * kruhobot_traversal_A_linear.m_interval.m_upper * dxA) / dA;
-	sDouble y1A = y1A_ + (vA * kruhobot_traversal_A_linear.m_interval.m_lower * dyA) / dA;
-	sDouble y2A = y1A_ + (vA * kruhobot_traversal_A_linear.m_interval.m_upper * dyA) / dA;
+	sDouble x1A = x1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dxA) / dA;
+//	sDouble x2A = x2A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dxA) / dA;
+	sDouble y1A = y1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dyA) / dA;
+//	sDouble y2A = y2A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dyA) / dA;
 
-	sDouble x1B = x1B_ + (vB * kruhobot_traversal_B_linear.m_interval.m_lower * dxB) / dB;
-	sDouble x2B = x1B_ + (vB * kruhobot_traversal_B_linear.m_interval.m_upper * dxB) / dB;
-	sDouble y1B = y1B_ + (vB * kruhobot_traversal_B_linear.m_interval.m_lower * dyB) / dB;
-	sDouble y2B = y1B_ + (vB * kruhobot_traversal_B_linear.m_interval.m_upper * dyB) / dB;	
-
-	printf("Origo A: %.3f, %.3f, %.3f, %.3f\n", x1A_, y1A_, x2A_, y2A_);
-	printf("Origo B: %.3f, %.3f, %.3f, %.3f\n", x1B_, y1B_, x2B_, y2B_);	
-	
-	printf("Augmented A: %.3f, %.3f, %.3f, %.3f\n", x1A, y1A, x2A, y2A);
-	printf("Augmented B: %.3f, %.3f, %.3f, %.3f\n", x1B, y1B, x2B, y2B);	
+	sDouble x1B = x1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
+//	sDouble x2B = x2B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;
+//	sDouble y2B = y2B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;	
 
 	sDouble dxAB = x1A - x1B;
 	sDouble dyAB = y1A - y1B;
 	sDouble rAB = rA + rB;
 
 	sInt_32 affection_A = 0;
-	sInt_32 affection_B = 0;	
+	sInt_32 affection_B = 0;
 
+	{
+	    sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	    sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	    sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
+	    sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
+	    sDouble alpha = beta_x * beta_x + beta_y * beta_y;
+	    
+	    sDouble discriminant = beta * beta - 4 * alpha * gamma;
+		
+	    if (discriminant <= s_EPSILON)
+	    {
+		return KruhobotAffection_pair(0, 0);
+	    }
+	    else
+	    {
+		sDouble tau_1 = (-beta - sqrt(discriminant)) / (2 * alpha); 
+		sDouble tau_2 = (-beta + sqrt(discriminant)) / (2 * alpha);
+
+		Interval check_intersection_A = kruhobot_traversal_A_linear.m_interval.intersect(Interval(tau_1, tau_2));
+		Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
+
+		if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
+		{
+		    return KruhobotAffection_pair(0, 0);
+		}
+	    }
+	}
+	    
 	{
 	    sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
 	    sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
@@ -1512,44 +1636,134 @@ namespace boOX
 	    sDouble A = beta_1 * beta_1 - 4 * alpha * gamma_2;
 	    sDouble B = 2 * beta_0 * beta_1 - 4 * alpha * gamma_1;
 	    sDouble C = beta_0 * beta_0 - 4 * alpha * gamma_0;
-
-	    sDouble D = B * B - 4 * A * C;
-
-	    printf("D: %.3f\n", D);
 	    
-	    if (D > s_EPSILON)
+	    if (sABS(A) > s_EPSILON)
 	    {
-		sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
-		sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
+		sDouble D = B * B - 4 * A * C;
 
-		printf("Shifting t0: %.4f, %.4f\n", t0_1, t0_2);
-
-		lower_unsafe_A = t0_1 - kruhobot_traversal_A_linear.m_interval.m_lower;
-		upper_unsafe_A = kruhobot_traversal_A_linear.m_interval.m_lower + t0_2;
-
-		Interval avoid_interval_A(sMAX(0, sMIN(lower_unsafe_A, upper_unsafe_A)), sMAX(0, sMAX(lower_unsafe_A, upper_unsafe_A)));
-
-		if (avoid_interval_A.size() > s_DELTION)
+		if (D > s_EPSILON)
 		{
-		    if (kruhobot_traversal_A_linear.m_interval.overlaps(avoid_interval_A))
+		    sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
+		    sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
+
+		    lower_unsafe_A = -t0_1 + kruhobot_traversal_A_linear.m_interval.m_lower;		    
+		    upper_unsafe_A = -t0_2 + kruhobot_traversal_A_linear.m_interval.m_lower;
+		    
+		    Interval avoid_interval_A(sMAX(0, sMIN(lower_unsafe_A, upper_unsafe_A)), sMAX(0, sMAX(lower_unsafe_A, upper_unsafe_A)));
+
+		    if (avoid_interval_A.size() > s_DELTION)
 		    {
-			printf("--> avoidance needed for A\n");
-			LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, avoid_interval_A);
-			kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(avoid_interval_A, linear_conflict_A));
-			++affection_A;
+			Interval intersection_A = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_A);
+			
+			if (intersection_A.size() > s_DELTION)
+			{
+			    LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, intersection_A);
+			    kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_A, linear_conflict_A));
+			    ++affection_A;
+			    /*
+			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_A);
+			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_A, linear_conflict_B));
+			    ++affection_B;
+			    */
+			}
 		    }
-		    avoid_interval_A.to_Screen();
 		}
+	    }
+	    else
+	    {
+		/*
+		sDouble dxAB2 = x1A_ - x2B_;
+		sDouble dyAB2 = y1A_ - y2B_;
+
+		sDouble gamma = dxAB2 * dxAB2 + dyAB2 * dyAB2 - rAB * rAB;
+		sDouble beta = 2 * vA * (dxAB2 * dxA + dyAB2 * dyA) / dA;
+		sDouble alpha = vA * vA;
+		*/
+		sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+		sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+		sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
+		sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
+		sDouble alpha = beta_x * beta_x + beta_y * beta_y;
 		
+		sDouble disc = beta * beta - 4 * alpha * gamma;
+
+		if (disc > s_EPSILON)
+		{
+		    sDouble time0_1 = (-beta - sqrt(disc)) / (2 * alpha); 
+		    sDouble time0_2 = (-beta + sqrt(disc)) / (2 * alpha);
+
+		    //lower_unsafe_A = kruhobot_traversal_B_linear.m_interval.m_upper - time0_1;
+		    //upper_unsafe_A = kruhobot_traversal_B_linear.m_interval.m_upper - time0_2;
+
+		    lower_unsafe_A = time0_1;
+		    upper_unsafe_A = time0_2;
+
+		    Interval avoid_interval_A(sMAX(0, sMIN(lower_unsafe_A, upper_unsafe_A)), sMAX(0, sMAX(lower_unsafe_A, upper_unsafe_A)));
+
+		    if (avoid_interval_A.size() > s_DELTION)
+		    {
+			Interval intersection_A = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_A);
+		    
+			if (intersection_A.size() > s_DELTION)
+			{
+			    sDouble AA = vA * vA + vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+			    sDouble BB0 = 2 * (vA * (dxAB * dxA + dyAB * dyA) / dA - vB * (dxAB * dxB + dyAB * dyB) / dB);
+			    sDouble BB1 = 2 * vA * vA - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+			    sDouble CC0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+			    sDouble CC1 = 2 * vA * (dxAB * dxA + dyAB * dyA) / dA;
+			    sDouble CC2 = vA * vA;
+
+			    sDouble tB2 = kruhobot_traversal_B_linear.m_interval.m_upper;
+
+			    sDouble A = AA * CC2;
+			    sDouble B = AA * BB1 * tB2 + AA * CC1;
+			    sDouble C = AA * BB0 * tB2 + AA * CC0 + AA * AA * tB2 * tB2;
+
+			    sDouble DD = B * B - 4 * A * C;
+
+			    if (DD > s_EPSILON)
+			    {
+				sDouble T0_1 = (-B - sqrt(DD)) / (2 * A); 
+				sDouble T0_2 = (-B + sqrt(DD)) / (2 * A);
+				
+				sDouble lower_unsafe_A_ = kruhobot_traversal_A_linear.m_interval.m_lower - sMIN(0, T0_1);
+				sDouble upper_unsafe_A_ = kruhobot_traversal_A_linear.m_interval.m_lower - sMIN(0, T0_2);
+
+				Interval avoid_interval_A_(sMAX(0, sMIN(lower_unsafe_A_, upper_unsafe_A_)), sMAX(0, sMAX(lower_unsafe_A_, upper_unsafe_A_)));
+				
+				if (avoid_interval_A_.size() > s_DELTION)
+				{
+				    Interval intersection_A_ = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_A_);
+				    
+				    if (intersection_A_.size() > s_DELTION)
+				    {
+					LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, intersection_A_);
+					kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_A_, linear_conflict_A));
+					++affection_A;
+				    }
+				}
+			    }
+			    else
+			    {
+				LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, kruhobot_traversal_A_linear.m_interval);
+				kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_A_linear.m_interval, linear_conflict_A));
+				++affection_A;				
+			    }
+			}
+		    }		    
+		}		
 	    }
 	}
 
+	sDouble dxBA = x1B - x1A;
+	sDouble dyBA = y1B - y1A;
+
 	{
-	    sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	    sDouble gamma_1 = 2 * (vB * (dxAB * dxB + dyAB * dyB)) / dB;	
+	    sDouble gamma_0 = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
+	    sDouble gamma_1 = 2 * (vB * (dxBA * dxB + dyBA * dyB)) / dB;	
 	    sDouble gamma_2 = vB * vB;
 
-	    sDouble beta_0 = 2 * ((vB * dxAB * dxB / dB) - ((vA * dxAB * dxA) / dA) + (vB * dyAB * dyB / dB) - ((vA * dyAB * dyA) / dA));
+	    sDouble beta_0 = 2 * ((vB * dxBA * dxB / dB) - ((vA * dxBA * dxA) / dA) + (vB * dyBA * dyB / dB) - ((vA * dyBA * dyA) / dA));
 	    sDouble beta_x = (vB * dxB / dB) - (vA * dxA / dA);
 	    sDouble beta_y = (vB * dyB / dB) - (vA * dyA / dA);
 	    sDouble beta_1 = 2 * ((vB * dxB * beta_x) / dB + (vB * dyB * beta_y) / dB);	    
@@ -1562,36 +1776,128 @@ namespace boOX
 	    sDouble B = 2 * beta_0 * beta_1 - 4 * alpha * gamma_1;
 	    sDouble C = beta_0 * beta_0 - 4 * alpha * gamma_0;
 
-	    sDouble D = B * B - 4 * A * C;
-
-	    printf("D: %.3f\n", D);
-	    
-	    if (D > s_EPSILON)
+	    if (sABS(A) > s_EPSILON)
 	    {
-		sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
-		sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
+		sDouble D = B * B - 4 * A * C;
 
-		printf("Shifting t0: %.4f, %.4f\n", t0_1, t0_2);
-
-		lower_unsafe_B = t0_1 - kruhobot_traversal_B_linear.m_interval.m_lower;
-		upper_unsafe_B = kruhobot_traversal_B_linear.m_interval.m_lower + t0_2;
-
-		Interval avoid_interval_B(sMAX(0, sMIN(lower_unsafe_B, upper_unsafe_B)), sMAX(0, sMAX(lower_unsafe_B, upper_unsafe_B)));
-
-		if (avoid_interval_B.size() > s_DELTION)
+		if (D > s_EPSILON)
 		{
-		    if (kruhobot_traversal_B_linear.m_interval.overlaps(avoid_interval_B))
+		    sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
+		    sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
+
+		    lower_unsafe_B = -t0_1 + kruhobot_traversal_B_linear.m_interval.m_lower;
+		    upper_unsafe_B = -t0_2 + kruhobot_traversal_B_linear.m_interval.m_lower;
+
+		    Interval avoid_interval_B(sMAX(0, sMIN(lower_unsafe_B, upper_unsafe_B)), sMAX(0, sMAX(lower_unsafe_B, upper_unsafe_B)));
+
+		    if (avoid_interval_B.size() > s_DELTION)
 		    {
-			printf("--> avoidance needed for B\n");
-			LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, avoid_interval_B);
-			kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(avoid_interval_B, linear_conflict_B));
-			++affection_B;
+			Interval intersection_B = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_B);
+		    
+			if (intersection_B.size() > s_DELTION)
+			{
+			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B);
+			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_B));
+			    ++affection_B;
+/*
+			    LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, intersection_B);
+			    kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_A));
+			    ++affection_A;
+*/
+			}
 		    }
-		    avoid_interval_B.to_Screen();
 		}
 	    }
+	    else
+	    {
+		/*
+		sDouble dxBA2 = x1B_ - x2A_;
+		sDouble dyBA2 = y1B_ - y2A_;
+
+		sDouble gamma = dxBA2 * dxBA2 + dyBA2 * dyBA2 - rAB * rAB;
+		sDouble beta = 2 * vB * (dxBA2 * dxB + dyBA2 * dyB) / dB;
+		sDouble alpha = vB * vB;
+		*/
+		/*
+		sDouble gamma = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
+		sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+		sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
+		sDouble beta = 2 * (beta_x + beta_y);
+		sDouble alpha = beta_x * beta_x + beta_y * beta_y;		
+		*/
+		sDouble gamma = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
+		sDouble beta_x = vB * dxB / dB - vA * dxA / dA;
+		sDouble beta_y = vB * dyB / dB - vA * dyA / dA;
+		sDouble beta = 2 * (dxBA * beta_x + dyBA * beta_y);
+		sDouble alpha = beta_x * beta_x + beta_y * beta_y;		
+
+		sDouble disc = beta * beta - 4 * alpha * gamma;
+
+		if (disc > s_EPSILON)
+		{
+		    sDouble time0_1 = (-beta - sqrt(disc)) / (2 * alpha); 
+		    sDouble time0_2 = (-beta + sqrt(disc)) / (2 * alpha);
+
+		    lower_unsafe_B = time0_1;
+		    upper_unsafe_B = time0_2;		    
+
+		    Interval avoid_interval_B(sMAX(0, sMIN(lower_unsafe_B, upper_unsafe_B)), sMAX(0, sMAX(lower_unsafe_B, upper_unsafe_B)));
+
+		    if (avoid_interval_B.size() > s_DELTION)
+		    {
+			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);
+		    
+			if (intersection_B.size() > s_DELTION)
+			{
+			    sDouble AA = vA * vA + vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+			    sDouble BB0 = 2 * (vB * (dxBA * dxB + dyBA * dyB) / dB - vA * (dxBA * dxA + dyBA * dyA) / dA);
+			    sDouble BB1 = 2 * vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);			    
+			    sDouble CC0 = dxBA * dxBA + dyBA * dyBA - rAB * rAB;			    
+			    sDouble CC1 = 2 * vB * (dxBA * dxB + dyBA * dyB) / dB;
+			    sDouble CC2 = vB * vB;
+
+			    sDouble tB2 = kruhobot_traversal_A_linear.m_interval.m_upper;
+
+			    sDouble A = AA * CC2;
+			    sDouble B = AA * BB1 * tB2 + AA * CC1;
+			    sDouble C = AA * BB0 * tB2 + AA * CC0 + AA * AA * tB2 * tB2;
+
+			    sDouble DD = B * B - 4 * A * C;
+
+			    if (DD > s_EPSILON)
+			    {
+				sDouble T0_1 = (-B - sqrt(DD)) / (2 * A); 
+				sDouble T0_2 = (-B + sqrt(DD)) / (2 * A);
+			    
+				sDouble lower_unsafe_B_ = kruhobot_traversal_B_linear.m_interval.m_lower - sMIN(0, T0_1);
+				sDouble upper_unsafe_B_ = kruhobot_traversal_B_linear.m_interval.m_lower - sMIN(0, T0_2);
+				
+				Interval avoid_interval_B_(sMAX(0, sMIN(lower_unsafe_B_, upper_unsafe_B_)), sMAX(0, sMAX(lower_unsafe_B_, upper_unsafe_B_)));
+				
+				if (avoid_interval_B_.size() > s_DELTION)
+				{
+				    Interval intersection_B_ = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_B_);
+				    
+				    if (intersection_B_.size() > s_DELTION)
+				    {
+					LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B_);
+					kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B_, linear_conflict_B));
+					++affection_B;			    				    
+				    }
+				}
+			    }
+			    else
+			    {
+				LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, kruhobot_traversal_B_linear.m_interval);
+				kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_B_linear.m_interval, linear_conflict_B));
+				++affection_B;			    				    				
+			    }
+			}
+		    }		    
+		}		
+	    }
 	}
-	return KruhobotAffection_pair(affection_A, affection_B);	
+	return KruhobotAffection_pair(affection_A, affection_B);
     } 
 
     
@@ -1768,7 +2074,7 @@ namespace boOX
     sDouble sRealCBSBase::calc_KruhobotCollisionImportance(const Traversal            &traversal_A,
 							   const Traversal            &traversal_B,
 							   LocationCooccupations_umap &location_Cooccupations,
-							   LinearCooccupations_map    &linear_Cooccupations) const
+							   UlinearCooccupations_map    &linear_Cooccupations) const
     {
 	sDouble collision_importance =   calc_KruhobotCollisionImportance(traversal_A, location_Cooccupations, linear_Cooccupations)
 	                               + calc_KruhobotCollisionImportance(traversal_B, location_Cooccupations, linear_Cooccupations);
@@ -1779,7 +2085,7 @@ namespace boOX
 
     sDouble sRealCBSBase::calc_KruhobotCollisionImportance(const Traversal            &traversal,
 							   LocationCooccupations_umap &location_Cooccupations,
-							   LinearCooccupations_map    &linear_Cooccupations) const
+							   UlinearCooccupations_map    &linear_Cooccupations) const
     {
 	sDouble traversal_importance = 0.0;
 	
@@ -1811,7 +2117,7 @@ namespace boOX
 	    }
 	}
 
-	LinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.find(Uline(traversal.m_u_loc_id, traversal.m_v_loc_id));
+	UlinearCooccupations_map::const_iterator linear_Coop = linear_Cooccupations.find(Uline(traversal.m_u_loc_id, traversal.m_v_loc_id));
 	
 	if (linear_Coop != linear_Cooccupations.end())
 	{
@@ -3284,14 +3590,14 @@ namespace boOX
 	    #ifdef sDEGBUG
 	    {
 		static sInt_32 cost_hit = 0;
-		if (front_transition.m_time + map.m_Distances[front_transition.m_location_id][sink_loc_id] > cost_limit)
+		if (front_transition.m_time + (map.m_Distances[front_transition.m_location_id][sink_loc_id] / kruhobot.m_properties.m_linear_velo) > cost_limit)
 		{
 		    printf("cost hit: %d\n", cost_hit);
 		    ++cost_hit;
 		}
 	    }
 	    #endif
-	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit)
+	    if (front_transition.m_time + (map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] / kruhobot.m_properties.m_linear_velo) <= cost_limit)
 //	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= makespan_bound)	    
 	    {
 		for (s2DMap::Locations_vector::const_iterator location = map.m_Locations.begin(); location != map.m_Locations.end(); ++location) /* regular actions */
@@ -3693,7 +3999,7 @@ namespace boOX
 	    #ifdef sDEGBUG
 	    {
 		static sInt_32 cost_hit = 0;
-		if (front_transition.m_time + map.m_Distances[front_transition.m_location_id][sink_loc_id] > cost_limit)
+		if (front_transition.m_time + (map.m_Distances[front_transition.m_location_id][sink_loc_id] / / kruhobot.m_properties.m_linear_velo) > cost_limit)
 		{
 		    printf("cost hit: %d\n", cost_hit);
 		    ++cost_hit;
@@ -3701,7 +4007,7 @@ namespace boOX
 	    }
 	    #endif
 //	    if (front_transition.m_time + map.m_straight_Distances[front_transition.m_location_id][sink_loc_id] <= makespan_bound + s_EPSILON)	    
-	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit + s_EPSILON)
+	    if (front_transition.m_time + (map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] / kruhobot.m_properties.m_linear_velo) <= cost_limit + s_EPSILON)
 	    {
 
 		const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
@@ -4117,7 +4423,7 @@ namespace boOX
 	    #ifdef sDEGBUG
 	    {
 		static sInt_32 cost_hit = 0;
-		if (front_transition.m_time + map.m_Distances[front_transition.m_location_id][sink_loc_id] > cost_limit)
+		if (front_transition.m_time + (map.m_Distances[front_transition.m_location_id][sink_loc_id] / kruhobot.m_properties.m_linear_velo) > cost_limit)
 		{
 		    printf("cost hit: %d\n", cost_hit);
 		    ++cost_hit;
@@ -4125,7 +4431,7 @@ namespace boOX
 	    }
 	    #endif
 //	    if (front_transition.m_time + map.m_straight_Distances[front_transition.m_location_id][sink_loc_id] <= makespan_bound + s_EPSILON)
-	    if (front_transition.m_time + map.m_shortest_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit + s_EPSILON)
+	    if (front_transition.m_time + (map.m_shortest_Distances[sink_loc_id][front_transition.m_location_id] / kruhobot.m_properties.m_linear_velo) <= cost_limit + s_EPSILON)
 	    {
 
 		const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
@@ -4534,7 +4840,7 @@ namespace boOX
 		}
 	    }
 
-	    if (front_transition.m_time + map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] <= cost_limit + extra_cost)
+	    if (front_transition.m_time + (map.m_straight_Distances[sink_loc_id][front_transition.m_location_id] / kruhobot.m_properties.m_linear_velo) <= cost_limit + extra_cost)
 	    {
                 #ifdef sDEBUG
 		{
@@ -4754,8 +5060,6 @@ namespace boOX
 	    }
 	    transition_Queue.erase(transition_Queue.begin());
 	}
-	printf("--> Generated: %d\n", generated);
-	getchar();
     }    
 
 

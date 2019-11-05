@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-144_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.h / 1-119_leibniz                                                  */
+/* smtcbsR.h / 1-144_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -765,6 +765,13 @@ namespace boOX
 				      const ConflictFingerprint           &conflict_Fingerprint) const;
 	/*----------------------------------------------------------------------------*/	
 
+	void augment_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
+						 sInt_32                         source_loc_id,
+						 sInt_32                         sink_loc_id,
+						 sDouble                         makespan_bound,
+						 KruhobotDecisionDiagram_vector &kruhobot_RDD,
+						 KruhobotDecisionMapping_map    &kruhobot_RDD_mapping) const;
+	
 	void interconnect_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
 						      const s2DMap                   &map,
 						      KruhobotDecisionDiagram_vector &kruhobot_RDD,
