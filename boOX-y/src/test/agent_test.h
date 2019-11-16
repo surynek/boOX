@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-145_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent_test.h / 1-119_leibniz                                               */
+/* agent_test.h / 1-145_leibniz                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures - testing program.

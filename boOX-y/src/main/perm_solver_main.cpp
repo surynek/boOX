@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-145_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.cpp / 1-119_leibniz                                       */
+/* perm_solver_main.cpp / 1-145_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.

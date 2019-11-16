@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-119_leibniz                             */
+/*                             boOX 1-145_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 1-119_leibniz                                                     */
+/* cbsR.h / 1-145_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -313,9 +313,13 @@ namespace boOX
 	typedef std::vector<Occupation_umap> Occupations_vector;
 	*/
 	typedef std::unordered_set<sInt_32> KruhobotIDs_uset;
+	typedef std::unordered_map<sInt_32, sInt_32> KruhobotIDs_umap;	
 	
 	typedef std::unordered_map<sInt_32, KruhobotIDs_uset> Cooccupation_umap;
 	typedef std::vector<Cooccupation_umap> Cooccupations_vector;
+
+	typedef std::unordered_map<sInt_32, KruhobotIDs_umap> Cooccupation__umap;
+	typedef std::vector<Cooccupation_umap> Cooccupations__vector;
 
 	typedef std::multiset<KruhobotCollision, std::less<KruhobotCollision> > KruhobotCollisions_mset;
 
@@ -465,24 +469,59 @@ namespace boOX
 	    sInt_32 m_upper_id;
 	};
 
+	
+	struct Line
+	{
+	    Line() { /* nothing */ }
+	    Line(sInt_32 u_id, sInt_32 v_id)
+	    {
+		m_u_id = u_id;
+		m_v_id = v_id;
+	    }
+
+	    bool operator<(const Line &line) const
+	    {
+		return (m_u_id < line.m_u_id || (m_u_id ==  line.m_u_id && m_v_id < line.m_v_id));
+	    }
+
+	    bool operator==(const Line &line) const
+	    {
+		return (m_u_id ==  line.m_u_id && m_v_id == line.m_v_id);
+	    }
+
+	    std::pair<sInt_32, sInt_32> get_Pair(void) const
+	    {
+		return std::pair<sInt_32, sInt_32>(m_u_id, m_v_id);
+	    }
+
+	    sInt_32 m_u_id;
+	    sInt_32 m_v_id;
+	};
+	
 
 	typedef std::map<Interval, LocationConflict, Interval::CompareNonoverlapping> LocationConflicts_map;
 	typedef std::map<Interval, LinearConflict, Interval::CompareNonoverlapping> LinearConflicts_map;
+	typedef std::map<Interval, LinearConflict, Interval::CompareNonoverlapping> UlinearConflicts_map;	
 
 	typedef std::map<Interval, LocationConflict, Interval::CompareLexicographic > LocationConflicts_lexicographic_map;
 	typedef std::map<Interval, LinearConflict, Interval::CompareLexicographic > LinearConflicts_lexicographic_map;
+	typedef std::map<Interval, LinearConflict, Interval::CompareLexicographic > UlinearConflicts_lexicographic_map;	
 	
 	typedef std::map<Interval, LocationConflict, Interval::CompareLowerLess> LocationConflicts_lower_map;
 	typedef std::map<Interval, LinearConflict, Interval::CompareLowerLess> LinearConflicts_lower_map;
+	typedef std::map<Interval, LinearConflict, Interval::CompareLowerLess> UlinearConflicts_lower_map;	
 
 	typedef std::map<Interval, LocationConflict, Interval::CompareUpperLess> LocationConflicts_upper_map;
 	typedef std::map<Interval, LinearConflict, Interval::CompareUpperLess> LinearConflicts_upper_map;
+	typedef std::map<Interval, LinearConflict, Interval::CompareUpperLess> UlinearConflicts_upper_map;	
 
 	typedef std::map<Interval, LocationConflicts_map::iterator, Interval::CompareLowerLess> LocationConflicts_lowerProjection_map;
 	typedef std::map<Interval, LinearConflicts_map::iterator, Interval::CompareLowerLess> LinearConflicts_lowerProjection_map;
+	typedef std::map<Interval, UlinearConflicts_map::iterator, Interval::CompareLowerLess> UlinearConflicts_lowerProjection_map;
 
 	typedef std::map<Interval, LocationConflicts_map::iterator, Interval::CompareUpperLess> LocationConflicts_upperProjection_map;
-	typedef std::map<Interval, LinearConflicts_map::iterator, Interval::CompareUpperLess> LinearConflicts_upperProjection_map;	
+	typedef std::map<Interval, LinearConflicts_map::iterator, Interval::CompareUpperLess> LinearConflicts_upperProjection_map;
+	typedef std::map<Interval, UlinearConflicts_map::iterator, Interval::CompareUpperLess> UlinearConflicts_upperProjection_map;	
 
 	struct LocationConflicts_projection_map
 	{
@@ -596,37 +635,104 @@ namespace boOX
 
 	    LinearConflicts_lowerProjection_map m_lower_Projection;
 	    LinearConflicts_upperProjection_map m_upper_Projection;	    
-	};	
+	};
+	
+	struct UlinearConflicts_projection_map
+	{
+	    UlinearConflicts_projection_map() { }
+	    
+	    void insert(const Interval &interval, const LinearConflict &linear_conflict)
+	    {
+		UlinearConflicts_lexicographic_map::iterator conflict_iter = m_Conflicts.insert(UlinearConflicts_lexicographic_map::value_type(interval, linear_conflict)).first;
 
+		m_lower_Projection.insert(UlinearConflicts_lowerProjection_map::value_type(interval, conflict_iter));
+		m_upper_Projection.insert(UlinearConflicts_upperProjection_map::value_type(interval, conflict_iter));		
+	    }
+
+	    void to_Screen(const sString &indent = "") const
+	    {
+		to_Stream(stdout, indent);
+	    }
+	    
+	    void to_Stream(FILE *fw, const sString &indent = "") const
+	    {
+		
+		fprintf(fw, "%sLinear conflicts [projection map] {\n", indent.c_str());
+
+		if (!m_Conflicts.empty())
+		{
+		    fprintf(fw, "%s%slex [\n", indent.c_str(), s_INDENT.c_str());
+
+		    for (UlinearConflicts_lexicographic_map::const_iterator lex_conflict = m_Conflicts.begin(); lex_conflict != m_Conflicts.end(); ++lex_conflict)
+		    {
+			lex_conflict->second.to_Screen(indent + s2_INDENT);
+		    }
+		    fprintf(fw, "%s%s]\n", indent.c_str(), s_INDENT.c_str());
+
+		    fprintf(fw, "%s%slow [\n", indent.c_str(), s_INDENT.c_str());
+
+		    for (UlinearConflicts_lowerProjection_map::const_iterator low_conflict = m_lower_Projection.begin(); low_conflict != m_lower_Projection.end(); ++low_conflict)
+		    {
+			low_conflict->second->second.to_Screen(indent + s2_INDENT);
+		    }
+		    fprintf(fw, "%s%s]\n", indent.c_str(), s_INDENT.c_str());
+
+		    fprintf(fw, "%s%slow [\n", indent.c_str(), s_INDENT.c_str());
+
+		    for (UlinearConflicts_upperProjection_map::const_iterator up_conflict = m_upper_Projection.begin(); up_conflict != m_upper_Projection.end(); ++up_conflict)
+		    {
+			up_conflict->second->second.to_Screen(indent + s2_INDENT);
+		    }
+		    fprintf(fw, "%s%s]\n", indent.c_str(), s_INDENT.c_str());		    		    		    
+		}
+		fprintf(fw, "%s}\n", indent.c_str());		
+	    }	    	    	    	    
+
+	    UlinearConflicts_lexicographic_map m_Conflicts;
+
+	    UlinearConflicts_lowerProjection_map m_lower_Projection;
+	    UlinearConflicts_upperProjection_map m_upper_Projection;	    
+	};	
+	
 	typedef std::unordered_map<sInt_32, LocationConflicts_map> LocationConflicts__umap;
 	typedef std::map<Uline, LinearConflicts_map, std::less<Uline> > LinearConflicts__map;
+	typedef std::map<Uline, UlinearConflicts_map, std::less<Uline> > UlinearConflicts__map;
 
 	typedef std::vector<LocationConflicts__umap> KruhobotLocationConflicts_vector;
 	typedef std::vector<LinearConflicts__map> KruhobotLinearConflicts_vector;
+	typedef std::vector<UlinearConflicts__map> KruhobotUlinearConflicts_vector;
 	
 	typedef std::unordered_map<sInt_32, LocationConflicts_projection_map> LocationConflicts_projection__umap;
 	typedef std::map<Uline, LinearConflicts_projection_map, std::less<Uline> > LinearConflicts_projection__map;
+	typedef std::map<Uline, UlinearConflicts_projection_map, std::less<Uline> > UlinearConflicts_projection__map;	
 
 	typedef std::vector<LocationConflicts_projection__umap> KruhobotLocationConflicts_projection_vector;
 	typedef std::vector<LinearConflicts_projection__map> KruhobotLinearConflicts_projection_vector;
+	typedef std::vector<UlinearConflicts_projection__map> KruhobotUlinearConflicts_projection_vector;	
 
 	typedef std::unordered_map<sInt_32, LocationConflicts_lexicographic_map> LocationConflicts_lexicographic__umap;
 	typedef std::map<Uline, LinearConflicts_lexicographic_map, std::less<Uline> > LinearConflicts_lexicographic__map;
+	typedef std::map<Uline, UlinearConflicts_lexicographic_map, std::less<Uline> > UlinearConflicts_lexicographic__map;	
 
 	typedef std::vector<LocationConflicts_lexicographic__umap> KruhobotLocationConflicts_lexicographic_vector;
 	typedef std::vector<LinearConflicts_lexicographic__map> KruhobotLinearConflicts_lexicographic_vector;
+	typedef std::vector<UlinearConflicts_lexicographic__map> KruhobotUlinearConflicts_lexicographic_vector;	
 
 	typedef std::unordered_map<sInt_32, LocationConflicts_lower_map> LocationConflicts_lower__umap;
 	typedef std::map<Uline, LinearConflicts_lower_map, std::less<Uline> > LinearConflicts_lower__map;
+	typedef std::map<Uline, UlinearConflicts_lower_map, std::less<Uline> > UlinearConflicts_lower__map;	
 
 	typedef std::vector<LocationConflicts_lower__umap> KruhobotLocationConflicts_lower_vector;
-	typedef std::vector<LinearConflicts_lower__map> KruhobotLinearConflicts_lower_vector;		
+	typedef std::vector<LinearConflicts_lower__map> KruhobotLinearConflicts_lower_vector;
+	typedef std::vector<UlinearConflicts_lower__map> KruhobotUlinearConflicts_lower_vector;			
 
 	typedef std::unordered_map<sInt_32, LocationConflicts_upper_map> LocationConflicts_upper__umap;
 	typedef std::map<Uline, LinearConflicts_upper_map, std::less<Uline> > LinearConflicts_upper__map;
+	typedef std::map<Uline, UlinearConflicts_upper_map, std::less<Uline> > UlinearConflicts_upper__map;	
 
 	typedef std::vector<LocationConflicts_upper__umap> KruhobotLocationConflicts_upper_vector;
-	typedef std::vector<LinearConflicts_upper__map> KruhobotLinearConflicts_upper_vector;	
+	typedef std::vector<LinearConflicts_upper__map> KruhobotLinearConflicts_upper_vector;
+	typedef std::vector<UlinearConflicts_upper__map> KruhobotUlinearConflicts_upper_vector;		
 
 	struct Transition
 	{
@@ -670,6 +776,12 @@ namespace boOX
 	typedef std::map<Interval, KruhobotIDs_uset, Interval::CompareColexicographic> Cooccupations_map;
 	typedef std::unordered_map<sInt_32, Cooccupations_map> LocationCooccupations_umap;
 	typedef std::map<Uline, Cooccupations_map, std::less<Uline> > LinearCooccupations_map;
+	typedef std::map<Uline, Cooccupations_map, std::less<Uline> > UlinearCooccupations_map;
+
+	typedef std::map<Interval, KruhobotIDs_umap, Interval::CompareColexicographic> Cooccupations__map;
+	typedef std::unordered_map<sInt_32, Cooccupations_map> LocationCooccupations__umap;
+	typedef std::map<Uline, Cooccupations__map, std::less<Uline> > LinearCooccupaions__map;
+	typedef std::map<Uline, Cooccupations__map, std::less<Uline> > UlinearCooccupations__map;		
 
 	typedef std::vector<sInt_32> KruhobotAffections_vector;
 	typedef std::pair<sInt_32, sInt_32> KruhobotAffection_pair;
@@ -692,45 +804,82 @@ namespace boOX
 								    KruhobotCollisions_mset        &kruhobot_Collisions) const;	
         /*----------------------------------------------------------------------------*/
 
+	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance              &real_Instance,
+							 const Traversal                  &kruhobot_traversal_A,
+							 const Traversal                  &kruhobot_traversal_B,				       
+							 KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
+							 KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
+							 sInt_32                          &last_conflict_id,
+							 bool                              infinity = false) const;
+
+	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
+							 const Traversal                        &kruhobot_traversal_A,
+							 const Traversal                        &kruhobot_traversal_B,				       
+							 KruhobotLocationConflicts_lower_vector &kruhobot_location_Conflicts,
+							 KruhobotLinearConflicts_lower_vector   &kruhobot_linear_Conflicts,
+							 sInt_32                                &last_conflict_id,
+							 bool                                    infinity = false) const;
+	
 	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
 							 const Traversal                        &kruhobot_traversal_A,
 							 const Traversal                        &kruhobot_traversal_B,				       
 							 KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
 							 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
 							 sInt_32                                &last_conflict_id,
-							 bool                                    infinity = false) const;
-
-	KruhobotAffection_pair resolve_KruhobotCollision_location_X_location(const sRealInstance                    &real_Instance,
-									     const Traversal                        &kruhobot_traversal_A,
-									     const Traversal                        &kruhobot_traversal_B,
-									     KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-									     KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-									     sInt_32                                &last_conflict_id,
-									     bool                                    infinity = false) const;
+							 bool                                    infinity = false) const;		
 	
-	KruhobotAffection_pair resolve_KruhobotCollision_location_X_linear(const sRealInstance                    &real_Instance,
-									   const Traversal                        &kruhobot_traversal_A,
-									   const Traversal                        &kruhobot_traversal_B,
-									   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-									   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-									   sInt_32                                &last_conflict_id,
-									   bool                                    infinity = false) const;
+	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                            &real_Instance,
+							 const Traversal                                &kruhobot_traversal_A,
+							 const Traversal                                &kruhobot_traversal_B,				       
+							 KruhobotLocationConflicts_lexicographic_vector &kruhobot_location_Conflicts,
+							 KruhobotLinearConflicts_lexicographic_vector   &kruhobot_linear_Conflicts,
+							 sInt_32                                        &last_conflict_id,
+							 bool                                            infinity = false) const;
 
-	KruhobotAffection_pair resolve_KruhobotCollision_linear_X_location(const sRealInstance                    &real_Instance,
-									   const Traversal                        &kruhobot_traversal_A_linear,
-									   const Traversal                        &kruhobot_traversal_B_location,
-									   KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-									   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-									   sInt_32                                &last_conflict_id,
-									   bool                                    infinity) const;	
+	template<class T1, class T2>
+	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance &real_Instance,
+							 const Traversal     &kruhobot_traversal_A,
+							 const Traversal     &kruhobot_traversal_B,
+							 T1                  &kruhobot_location_Conflicts,
+							 T2                  &kruhobot_linear_Conflicts,
+							 sInt_32             &last_conflict_id,
+							 bool                 infinity = false) const;	
 
-	KruhobotAffection_pair resolve_KruhobotCollision_linear_X_linear(const sRealInstance                    &real_Instance,
-									 const Traversal                        &kruhobot_traversal_A,
-									 const Traversal                        &kruhobot_traversal_B,
-									 KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
-									 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
-									 sInt_32                                &last_conflict_id,
-									 bool                                    infinity = false) const;		
+	template<class T1, class T2>
+	KruhobotAffection_pair resolve_KruhobotCollision_location_X_location(const sRealInstance   &real_Instance,
+									     const Traversal       &kruhobot_traversal_A,
+									     const Traversal       &kruhobot_traversal_B,
+									     T1                    &kruhobot_location_Conflicts,
+									     T2                    &kruhobot_linear_Conflicts,
+									     sInt_32               &last_conflict_id,
+									     bool                   infinity = false) const;	
+
+	template<class T1, class T2>
+	KruhobotAffection_pair resolve_KruhobotCollision_location_X_linear(const sRealInstance &real_Instance,
+									   const Traversal     &kruhobot_traversal_A,
+									   const Traversal     &kruhobot_traversal_B,
+									   T1                  &kruhobot_location_Conflicts,
+									   T2                  &kruhobot_linear_Conflicts,
+									   sInt_32             &last_conflict_id,
+									   bool                 infinity = false) const;
+
+	template<class T1, class T2>
+	KruhobotAffection_pair resolve_KruhobotCollision_linear_X_location(const sRealInstance &real_Instance,
+									   const Traversal     &kruhobot_traversal_A_linear,
+									   const Traversal     &kruhobot_traversal_B_location,
+									   T1                  &kruhobot_location_Conflicts,
+									   T2                  &kruhobot_linear_Conflicts,
+									   sInt_32             &last_conflict_id,
+									   bool                 infinity) const;		
+
+	template<class T1, class T2>
+	KruhobotAffection_pair resolve_KruhobotCollision_linear_X_linear(const sRealInstance &real_Instance,
+									 const Traversal     &kruhobot_traversal_A,
+									 const Traversal     &kruhobot_traversal_B,
+									 T1                  &kruhobot_location_Conflicts,
+									 T2                  &kruhobot_linear_Conflicts,
+									 sInt_32             &last_conflict_id,
+									 bool                 infinity = false) const;			
         /*----------------------------------------------------------------------------*/		
 
 	void introduce_KruhobotConflict(const Traversal                  &kruhobot_traversal,
@@ -782,11 +931,14 @@ namespace boOX
 	sDouble calc_KruhobotCollisionImportance(const Traversal            &traversal_A,
 						 const Traversal            &traversal_B,
 						 LocationCooccupations_umap &location_Cooccupations,
-						 LinearCooccupations_map    &linear_Cooccupations) const;
+						 UlinearCooccupations_map    &linear_Cooccupations) const;
 
 	sDouble calc_KruhobotCollisionImportance(const Traversal            &traversal,
 						 LocationCooccupations_umap &location_Cooccupations,
-						 LinearCooccupations_map    &linear_Cooccupations) const;
+						 UlinearCooccupations_map    &linear_Cooccupations) const;
+        /*----------------------------------------------------------------------------*/
+	// TODO
+
         /*----------------------------------------------------------------------------*/	
 
 	static void smooth_Schedule(const Schedule_vector &Schedule, Schedule_vector &smooth_Schedule);
