@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,13 +9,12 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 1-144_leibniz                                                    */
+/* graph.h / 1-157_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
 //
 /*----------------------------------------------------------------------------*/
-
 
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
@@ -27,10 +26,9 @@
 
 #include "result.h"
 
-#include "core/types.h"
+#include "common/types.h"
 
 
-using namespace std;
 using namespace boOX;
 
 
@@ -389,4 +387,4 @@ namespace boOX
 
 } // namespace boOX
 
-#endif /* __RELOC_H__ */
+#endif /* __GRAPH_H__ */

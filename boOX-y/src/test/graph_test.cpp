@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.cpp / 1-144_leibniz                                             */
+/* graph_test.cpp / 1-157_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
@@ -24,9 +24,9 @@
 #include "defs.h"
 #include "version.h"
 
+#include "common/types.h"
 #include "core/graph.h"
 #include "core/agent.h"
-
 #include "util/statistics.h"
 
 #include "test/graph_test.h"

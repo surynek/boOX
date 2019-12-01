@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 1-144_leibniz                                                 */
+/* kruhoR.cpp / 1-157_leibniz                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -26,10 +26,11 @@
 #include "compile.h"
 #include "version.h"
 #include "defs.h"
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/kruhoR.h"
+#include "util/io.h"
 #include "util/statistics.h"
 
 
@@ -259,6 +260,273 @@ namespace boOX
     }
 
 
+    sResult sRealConjunction::from_File_xml_init(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sREAL_CONJUNCTION_XML_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_xml_init(fr)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;		
+    }
+
+    
+    sResult sRealConjunction::from_Stream_xml_init(FILE *fr)
+    {
+	sString root_keyword;
+	
+	sConsumeUntilChar(fr, '<');
+	sConsumeUntilChar(fr, '>');	
+	
+	sConsumeUntilChar(fr, '<');
+	sConsumeAlphaString(fr, root_keyword);
+	sConsumeUntilChar(fr, '>');
+
+//	printf("keyword:%s\n", root_keyword.c_str());
+	if (root_keyword != "root")
+	{
+	    return sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	}
+	if (m_kruhobot_Locations.empty())
+	{
+	    m_kruhobot_Locations.push_back(0);
+	}
+	sInt_32 kruhobot_id = 1;
+	
+	while(true)
+	{
+	    sString next_keyword;
+	
+	    sConsumeUntilChar(fr, '<');	    
+	    sConsumeAlphaString(fr, next_keyword);    
+//	    printf("nxt:%s\n", next_keyword.c_str());
+
+	    if (next_keyword == "agent")
+	    {
+		sString start_keyword;
+		sConsumeWhiteSpaces(fr);
+		sConsumeAlphaString(fr, start_keyword);
+
+//		printf("start:%s\n", start_keyword.c_str());
+		
+		if (start_keyword == "start_id")
+		{
+		    sString init_id_keyword;
+		    sInt_32 init_id;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_id_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("ID:%s\n", init_id_keyword.c_str());
+
+		    init_id = sInt_32_from_String(init_id_keyword);
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }
+		    sConsumeUntilChar(fr, '>');
+		}
+		else if (start_keyword == "start_i")
+		{
+		    sString init_y_keyword;
+		    sInt_32 init_y;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_y_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDy:%s\n", init_y_keyword.c_str());
+		    init_y = sInt_32_from_String(init_y_keyword);		    
+
+		    sString init_x_keyword;
+		    sInt_32 init_x;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_x_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDx:%s\n", init_x_keyword.c_str());
+		    init_x = sInt_32_from_String(init_x_keyword);
+		    
+		    sConsumeUntilChar(fr, '>');
+
+		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }
+//		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
+//		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
+		}
+		else
+		{
+		    return sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR;		    
+		}
+		++kruhobot_id;
+	    }
+	    else
+	    {
+		break;
+	    }
+	}
+	return sRESULT_SUCCESS;
+    }
+
+    
+    sResult sRealConjunction::from_File_xml_goal(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sREAL_CONJUNCTION_XML_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_xml_goal(fr)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;		
+    }
+
+    
+    sResult sRealConjunction::from_Stream_xml_goal(FILE *fr)
+    {
+	sString root_keyword;
+	
+	sConsumeUntilChar(fr, '<');
+	sConsumeUntilChar(fr, '>');	
+	
+	sConsumeUntilChar(fr, '<');
+	sConsumeAlphaString(fr, root_keyword);
+	sConsumeUntilChar(fr, '>');
+
+//	printf("keyword:%s\n", root_keyword.c_str());
+	if (root_keyword != "root")
+	{
+	    return sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	}
+	if (m_kruhobot_Locations.empty())
+	{
+	    m_kruhobot_Locations.push_back(0);
+	}
+	sInt_32 kruhobot_id = 1;
+	
+	while(true)
+	{
+	    sString next_keyword;
+	
+	    sConsumeUntilChar(fr, '<');	    
+	    sConsumeAlphaString(fr, next_keyword);    
+//	    printf("nxt:%s\n", next_keyword.c_str());
+
+	    if (next_keyword == "agent")
+	    {
+		sString start_keyword;
+		sConsumeWhiteSpaces(fr);
+		sConsumeAlphaString(fr, start_keyword);
+
+//		printf("start:%s\n", start_keyword.c_str());
+		
+		if (start_keyword == "start_id")
+		{
+		    sString init_id_keyword;
+		    sInt_32 init_id;
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_id_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("ID:%s\n", init_id_keyword.c_str());
+
+		    init_id = sInt_32_from_String(init_id_keyword);
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }
+		    sConsumeUntilChar(fr, '>');
+		}
+		else if (start_keyword == "start_i")
+		{
+		    sString init_y_keyword;
+		    sInt_32 init_y;
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_y_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDy:%s\n", init_y_keyword.c_str());
+		    init_y = sInt_32_from_String(init_y_keyword);		    
+
+		    sString init_x_keyword;
+		    sInt_32 init_x;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_x_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDx:%s\n", init_x_keyword.c_str());
+		    init_x = sInt_32_from_String(init_x_keyword);
+		    
+		    sConsumeUntilChar(fr, '>');
+
+		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }
+//		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
+//		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
+		}
+		else
+		{
+		    return sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR;		    
+		}
+		++kruhobot_id;
+	    }
+	    else
+	    {
+		break;
+	    }
+	}
+	return sRESULT_SUCCESS;
+    }
 
     
 /*----------------------------------------------------------------------------*/

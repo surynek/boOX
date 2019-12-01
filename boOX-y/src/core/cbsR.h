@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 1-144_leibniz                                                     */
+/* cbsR.h / 1-157_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -27,9 +27,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/mapR.h"
 #include "core/kruhoR.h"
 

@@ -9,18 +9,19 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent_test.h / 1-157_leibniz                                               */
+/* io.h / 1-157_leibniz                                                       */
 /*----------------------------------------------------------------------------*/
 //
-// Agent and multi-agent problem related structures - testing program.
+// Input/output functions and utilities.
 //
 /*----------------------------------------------------------------------------*/
 
 
-#ifndef __AGENT_TEST_H__
-#define __AGENT_TEST_H__
+#ifndef __IO_H__
+#define __IO_H__
 
-#include "core/agent.h"
+#include "result.h"
+
 
 using namespace boOX;
 
@@ -31,15 +32,24 @@ namespace boOX
 {
 
 
+
+
 /*----------------------------------------------------------------------------*/
+// Global functions
 
-    void print_Introduction(void);
-    void test_agent_1(const sString &filename);
-
+    sInt_32 sConsumeUntilChar(FILE *fr, sChar c);
+    sInt_32 sConsumeUntilString(FILE *fr, const sString &string);
     
+    sInt_32 sConsumeAlphaString(FILE *fr, sString &alpha_string);
+    sInt_32 sConsumeAlnumString(FILE *fr, sString &alnum_string);    
+    sInt_32 sConsumeNumericString(FILE *fr, sString &numeric_string);
+    sInt_32 sConsumeFloatalString(FILE *fr, sString &floatal_string);    
+
+    sInt_32 sConsumeWhiteSpaces(FILE *fr);
+    
+
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
 
-
-#endif /* __AGENT_TEST_H__ */
+#endif /* __IO_H__ */

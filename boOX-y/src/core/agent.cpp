@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 1-144_leibniz                                                  */
+/* agent.cpp / 1-157_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -26,12 +26,11 @@
 #include "compile.h"
 #include "version.h"
 #include "defs.h"
-#include "types.h"
 #include "result.h"
 
-#include "core/agent.h"
+#include "common/types.h"
 #include "util/statistics.h"
-
+#include "core/agent.h"
 
 using namespace std;
 using namespace boOX;

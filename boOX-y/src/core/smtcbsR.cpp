@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.cpp / 1-144_leibniz                                                */
+/* smtcbsR.cpp / 1-157_leibniz                                                */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -28,9 +28,9 @@
 #include "compile.h"
 #include "version.h"
 #include "defs.h"
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/smtcbsR.h"
 #include "util/statistics.h"
 

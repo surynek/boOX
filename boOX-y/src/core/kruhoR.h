@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 1-144_leibniz                                                   */
+/* kruhoR.h / 1-157_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -26,9 +26,9 @@
 #include <map>
 #include <unordered_map>
 
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/mapR.h"
 
 
@@ -149,7 +149,13 @@ namespace boOX
 	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
 
 	virtual void to_Stream_mpfR(FILE *fw, const sString &indent = "") const;
-	virtual sResult from_Stream_mpfR(FILE *fr);	
+	virtual sResult from_Stream_mpfR(FILE *fr);
+
+	virtual sResult from_File_xml_init(const sString &filename);	
+	virtual sResult from_Stream_xml_init(FILE *fr);
+
+	virtual sResult from_File_xml_goal(const sString &filename);
+	virtual sResult from_Stream_xml_goal(FILE *fr);	
 
     public:
 	s2DMap *m_Map;

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 1-144_leibniz                                                   */
+/* result.h / 1-157_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -125,24 +125,35 @@ enum sAgentInstance_Result
 
 enum s2DMap_Result
 {
-    s2D_MAP_INFO       =  15000,
-    s2D_MAP_ERROR      = -15000,
-    s2D_MAP_OPEN_ERROR = (s2D_MAP_ERROR - 1),
+    s2D_MAP_INFO                              =  15000,
+    s2D_MAP_ERROR                             = -15000,
+    s2D_MAP_OPEN_ERROR                        = (s2D_MAP_ERROR - 1),
+    s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR = (s2D_MAP_ERROR - 2)    
+};
+
+
+enum sRealConjunction_Result
+{
+    sREAL_CONJUNCTION_INFO                              =  16000,
+    sREAL_CONJUNCTION_ERROR                             = -16000,
+    sREAL_CONJUNCTION_OPEN_ERROR                        = (sREAL_CONJUNCTION_ERROR - 1),
+    sREAL_CONJUNCTION_XML_OPEN_ERROR                    = (sREAL_CONJUNCTION_ERROR - 2),    
+    sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR = (sREAL_CONJUNCTION_ERROR - 3)
 };
 
 
 enum sRealInstance_Result
 {
-    sREAL_INSTANCE_INFO       =  16000,
-    sREAL_INSTANCE_ERROR      = -16000,
+    sREAL_INSTANCE_INFO       =  17000,
+    sREAL_INSTANCE_ERROR      = -17000,
     sREAL_INSTANCE_OPEN_ERROR = (sREAL_INSTANCE_ERROR - 1),
 };
 
 
 enum sRealCBS_Result
 {
-    sREAL_CBS_INFO       =  17000,
-    sREAL_CBS_ERROR      = -17000,
+    sREAL_CBS_INFO       =  18000,
+    sREAL_CBS_ERROR      = -18000,
     sREAL_CBS_OPEN_ERROR = (sREAL_CBS_ERROR - 1),
 };
 
@@ -228,7 +239,8 @@ enum sRealMapConvertorProgram_Result
 {
     sMAP_R_CONVERT_PROGRAM_INFO                         =  190000,
     sMAP_R_CONVERT_PROGRAM_ERROR                        = -190000,
-    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 1)
+    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
+    sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR  = (sMAP_R_CONVERT_PROGRAM_ERROR - 2)
 };
 
 

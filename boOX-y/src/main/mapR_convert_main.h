@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.h / 1-144_leibniz                                        */
+/* mapR_convert_main.h / 1-157_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -50,7 +50,8 @@ namespace boOX
 	sCommandParameters();
         /*--------------------------------*/
 
-	sString m_input_map_filename;		
+	sString m_input_map_filename;
+	sString m_input_xml_filename;
 	sString m_output_mapR_filename;
 
 	Neighborhood m_neighbor_type;
@@ -65,7 +66,9 @@ namespace boOX
     void print_Help(void);
     
     sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &parameters);
+    
     sResult convert_GridMap2RealMap(const sCommandParameters &parameters);
+    sResult convert_XmlMap2RealMap(const sCommandParameters &parameters);    
 
 
 /*----------------------------------------------------------------------------*/

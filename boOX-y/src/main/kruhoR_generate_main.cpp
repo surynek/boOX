@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_generate_main.cpp / 1-144_leibniz                                   */
+/* kruhoR_generate_main.cpp / 1-157_leibniz                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) instance (real kruhobot
@@ -88,6 +88,8 @@ namespace boOX
     {
 	printf("Usage:\n");
 	printf("kruhoR_generate_boOX  --input-mapR-file=<string>\n");
+	printf("                      --input-xml-map-file=<string>\n");
+	printf("                      --input-xml-agent-file=<string>\n");		
 	printf("                      --output-kruhoR-file=<string>\n");
 	printf("                      --N-kruhobots=<int>\n");
 	printf("                     [--walk]\n");		
@@ -113,6 +115,7 @@ namespace boOX
     {
 	sResult result;
 	s2DMap real_Map;
+	sRealInstance real_Instance(NULL);
 
 	srand(parameters.m_seed);	
 
@@ -121,7 +124,7 @@ namespace boOX
 	    s_GlobalStatistics.enter_Phase("GENERATION");
 	}
   	#endif
-	
+
 	if (!parameters.m_input_mapR_filename.empty())
 	{
 	    result = real_Map.from_File_mapR(parameters.m_input_mapR_filename);
@@ -132,35 +135,79 @@ namespace boOX
 		return result;
 	    }
 	}
-
-	sInt_32 N_locations = real_Map.m_Locations.size();	
 	
-	sRealConjunction start_conjunction(&real_Map, parameters.m_N_kruhobots);
-	generate_RandomKruhobotConjunction(parameters, N_locations, start_conjunction);
-
-	sRealConjunction goal_conjunction(&real_Map, parameters.m_N_kruhobots);	
-	if (parameters.m_walk)
+	if (!parameters.m_input_xml_map_filename.empty() && !parameters.m_input_xml_agent_filename.empty())
 	{
-	    generate_WalkKruhobotConjunction(parameters, start_conjunction, goal_conjunction);
+	    s2DMap real_Map;
+
+	    result = real_Map.from_File_xml(parameters.m_input_xml_map_filename);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Failed to open xml map file %s (code = %d).\n", parameters.m_input_xml_map_filename.c_str(), result);
+		return result;
+	    }	    		
+	    sRealConjunction start_conjunction(&real_Map, 0);    
+	    sRealConjunction goal_conjunction(&real_Map, 0);	
+	    
+	    result = start_conjunction.from_File_xml_init(parameters.m_input_xml_agent_filename);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Failed to open xml initial configuration file %s (code = %d).\n", parameters.m_input_xml_agent_filename.c_str(), result);
+		return result;
+	    }
+	    result = goal_conjunction.from_File_xml_goal(parameters.m_input_xml_agent_filename);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Failed to open xml goal configuration file %s (code = %d).\n", parameters.m_input_xml_agent_filename.c_str(), result);
+		return result;
+	    }	    
+	    real_Instance = sRealInstance(start_conjunction, goal_conjunction);
+
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= start_conjunction.get_KruhobotCount(); ++kruhobot_id)
+	    {
+		sKruhobot kruhobot(kruhobot_id, sKruhobot::Properties(parameters.m_kruhobot_radius,
+								      parameters.m_kruhobot_linear_velocity,
+								      parameters.m_kruhobot_linear_acceleration,
+								      parameters.m_kruhobot_angular_velocity,
+								      parameters.m_kruhobot_angular_acceleration,
+								      parameters.m_kruhobot_wait_factor),
+				   sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+		real_Instance.add_Kruhobot(kruhobot_id, kruhobot);
+	    }	    
 	}
 	else
 	{
-	    generate_RandomKruhobotConjunction(parameters, N_locations, goal_conjunction);
+	    sInt_32 N_locations = real_Map.m_Locations.size();	
+	
+	    sRealConjunction start_conjunction(&real_Map, parameters.m_N_kruhobots);
+	    generate_RandomKruhobotConjunction(parameters, N_locations, start_conjunction);
+	    
+	    sRealConjunction goal_conjunction(&real_Map, parameters.m_N_kruhobots);	
+	    if (parameters.m_walk)
+	    {
+		generate_WalkKruhobotConjunction(parameters, start_conjunction, goal_conjunction);
+	    }
+	    else
+	    {
+		generate_RandomKruhobotConjunction(parameters, N_locations, goal_conjunction);
+	    }
+	    real_Instance = sRealInstance(start_conjunction, goal_conjunction);
+
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id <= parameters.m_N_kruhobots; ++kruhobot_id)
+	    {
+		sKruhobot kruhobot(kruhobot_id, sKruhobot::Properties(parameters.m_kruhobot_radius,
+								      parameters.m_kruhobot_linear_velocity,
+								      parameters.m_kruhobot_linear_acceleration,
+								      parameters.m_kruhobot_angular_velocity,
+								      parameters.m_kruhobot_angular_acceleration,
+								      parameters.m_kruhobot_wait_factor),
+				   sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+		real_Instance.add_Kruhobot(kruhobot_id, kruhobot);
+	    }
 	}
-
-	sRealInstance real_Instance(start_conjunction, goal_conjunction);
-
-	for (sInt_32 kruhobot_id = 1; kruhobot_id <= parameters.m_N_kruhobots; ++kruhobot_id)
-	{
-	    sKruhobot kruhobot(kruhobot_id, sKruhobot::Properties(parameters.m_kruhobot_radius,
-								  parameters.m_kruhobot_linear_velocity,
-								  parameters.m_kruhobot_linear_acceleration,
-								  parameters.m_kruhobot_angular_velocity,
-								  parameters.m_kruhobot_angular_acceleration,
-								  parameters.m_kruhobot_wait_factor),
-			       sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
-	    real_Instance.add_Kruhobot(kruhobot_id, kruhobot);
-	}	
 
 	if (!parameters.m_output_kruhoR_filename.empty())
 	{
@@ -171,7 +218,7 @@ namespace boOX
 		printf("Error: Failed to write real kruhobot instance (kruR) file %s (code = %d).\n", parameters.m_output_kruhoR_filename.c_str(), result);
 		return result;
 	    }
-	}	
+	}
 
         #ifdef sSTATISTICS
 	{
@@ -224,6 +271,14 @@ namespace boOX
 	{
 	    command_parameters.m_input_mapR_filename = parameter.substr(18, parameter.size());
 	}
+	else if (parameter.find("--input-xml-map-file=") == 0)
+	{
+	    command_parameters.m_input_xml_map_filename = parameter.substr(21, parameter.size());
+	}
+	else if (parameter.find("--input-xml-agent-file=") == 0)
+	{
+	    command_parameters.m_input_xml_agent_filename = parameter.substr(23, parameter.size());
+	}		
 	else if (parameter.find("--output-kruhoR-file=") == 0)
 	{
 	    command_parameters.m_output_kruhoR_filename = parameter.substr(21, parameter.size());

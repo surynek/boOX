@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.h / 1-144_leibniz                                                     */
+/* mapR.h / 1-157_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous maps for semi-continuous version of MAPF (MAPF-R).
@@ -26,9 +26,9 @@
 #include <map>
 #include <unordered_map>
 
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/graph.h"
 
 
@@ -158,7 +158,10 @@ namespace boOX
 	virtual sResult from_Stream_mapR(FILE *fr);
 
 	virtual sResult from_File_map(const sString &filename);
-	virtual sResult from_Stream_map(FILE *fr);	
+	virtual sResult from_Stream_map(FILE *fr);
+
+	virtual sResult from_File_xml(const sString &filename);
+	virtual sResult from_Stream_xml(FILE *fr);
 	/*----------------------------------------------------------------------------*/	
 	
     public:

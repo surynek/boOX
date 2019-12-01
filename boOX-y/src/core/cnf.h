@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 1-144_leibniz                                                      */
+/* cnf.h / 1-157_leibniz                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -28,9 +28,10 @@
 #include <zlib.h>
 #include <sys/resource.h>
 
-#include "types.h"
 #include "defs.h"
 #include "result.h"
+
+#include "common/types.h"
 
 #include "glucose/System.h"
 #include "glucose/ParseUtils.h"

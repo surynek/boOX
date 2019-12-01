@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.cpp / 1-144_leibniz                                      */
+/* mapR_convert_main.cpp / 1-157_leibniz                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -77,6 +77,7 @@ namespace boOX
     {
 	printf("Usage:\n");
 	printf("mapR_convert_boOX  --input-map-file=<string>\n");
+	printf("                   --input-xml-file=<string>\n");
 	printf("                   --output-mapR-file=<string>\n");
 	printf("                  [--neighbor-type={circular|radiant}]\n");		
 	printf("                  [--neighbor-radius=<double>]\n");	
@@ -160,12 +161,87 @@ namespace boOX
     }
 
 
+    sResult convert_XmlMap2RealMap(const sCommandParameters &parameters)
+    {
+	sResult result;
+	s2DMap real_Map;
+
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.enter_Phase("CONVERSION");
+	}
+  	#endif
+	
+	if (!parameters.m_input_xml_filename.empty())
+	{
+	    result = real_Map.from_File_xml(parameters.m_input_xml_filename);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Failed to open xml map file %s (code = %d).\n", parameters.m_input_xml_filename.c_str(), result);
+		return result;
+	    }
+	}
+	
+	if (real_Map.m_Network.m_Edges.empty())
+	{
+	    switch (parameters.m_neighbor_type)
+	    {
+	    case sCommandParameters::NEIGHBORHOOD_CIRCULAR:
+	    {
+		real_Map.populate_NetworkCircular(parameters.m_neighbor_radius);
+		break;
+	    }
+	    case sCommandParameters::NEIGHBORHOOD_RADIANT:
+	    {
+		real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		break;
+	    }
+	    default:
+	    {
+		sASSERT(false);
+		break;
+	    }
+	    }
+	}
+
+	if (!parameters.m_output_mapR_filename.empty())
+	{
+	    result = real_Map.to_File_mapR(parameters.m_output_mapR_filename);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Failed to write continuous map (mapR) file %s (code = %d).\n", parameters.m_output_mapR_filename.c_str(), result);
+		return result;
+	    }
+	}
+
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.leave_Phase();
+	}
+	#endif
+	
+	#ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.to_Screen();
+	}
+	#endif
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &command_parameters)
     {
 	if (parameter.find("--input-map-file=") == 0)
 	{
 	    command_parameters.m_input_map_filename = parameter.substr(17, parameter.size());
 	}
+	else if (parameter.find("--input-xml-file=") == 0)
+	{
+	    command_parameters.m_input_xml_filename = parameter.substr(17, parameter.size());
+	}	
 	else if (parameter.find("--output-mapR-file=") == 0)
 	{
 	    command_parameters.m_output_mapR_filename = parameter.substr(19, parameter.size());
@@ -227,7 +303,21 @@ int main(int argc, char **argv)
 		return result;
 	    }
 	}
-	result = convert_GridMap2RealMap(command_parameters);
+	if (!command_parameters.m_input_map_filename.empty())
+	{
+	    result = convert_GridMap2RealMap(command_parameters);
+	}
+	else if (!command_parameters.m_input_xml_filename.empty())
+	{
+	    result = convert_XmlMap2RealMap(command_parameters);
+	}
+	else
+	{
+	    printf("Error: No input map file specified (code = %d).\n", sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR);
+	    print_Help();
+
+	    return sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR;
+	}
 	if (sFAILED(result))
 	{
 	    return result;

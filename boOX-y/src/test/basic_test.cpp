@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* basic_test.cpp / 1-144_leibniz                                             */
+/* basic_test.cpp / 1-157_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Basic initial test.
@@ -30,7 +30,7 @@
 #include "result.h"
 #include "version.h"
 
-#include "core/types.h"
+#include "common/types.h"
 
 #include "test/basic_test.h"
 

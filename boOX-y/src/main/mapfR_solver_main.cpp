@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapfR_solver_main.cpp / 1-144_leibniz                                      */
+/* mapfR_solver_main.cpp / 1-157_leibniz                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.
@@ -81,7 +81,7 @@ namespace boOX
 	printf("                   --input-kruhoR-file=<sting>\n");
 	printf("                   --output-file=<sting>\n");
 	printf("                  [--makespan-limit=<double>]\n");
-	printf("                  [--algorithm={cbsR|cbsR+|cbsR++|smtcbsR|smtcbsR+|smtcbsR++|smtcbsR+++|smtcbsR4+}]\n");
+	printf("                  [--algorithm={cbsR|cbsR+|cbsR++|smtcbsR|smtcbsR+|smtcbsR++|smtcbsR+++|smtcbsR4+|smtcbsR*}]\n");
         printf("	 	  [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");

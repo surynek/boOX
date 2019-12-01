@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 1-144_leibniz                                                   */
+/* mapR.cpp / 1-157_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -27,11 +27,11 @@
 #include "compile.h"
 #include "version.h"
 #include "defs.h"
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/mapR.h"
-
+#include "util/io.h"
 #include "util/statistics.h"
 
 
@@ -1132,6 +1132,366 @@ namespace boOX
 
 	return sRESULT_SUCCESS;
     }
+
+
+    sResult s2DMap::from_File_xml(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return s2D_MAP_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_xml(fr)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    sResult s2DMap::from_Stream_xml(FILE *fr)
+    {
+	sString root_keyword;
+
+	sConsumeUntilChar(fr, '<');
+	sConsumeUntilChar(fr, '>');	
+	
+	sConsumeUntilChar(fr, '<');
+	sConsumeAlphaString(fr, root_keyword);
+	sConsumeUntilChar(fr, '>');
+
+//	printf("keyword:%s\n", root_keyword.c_str());
+	if (root_keyword == "root")
+	{
+	    sString map_keyword;
+	    
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeAlphaString(fr, map_keyword);
+	    sConsumeUntilChar(fr, '>');
+    
+//	    printf("map:%s\n", map_keyword.c_str());
+
+	    if (map_keyword != "map")
+	    {
+		return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	    }
+
+	    sString width_keyword;
+	    
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeAlphaString(fr, width_keyword);
+	    sConsumeUntilChar(fr, '>');
+
+//	    printf("width:%s\n", width_keyword.c_str());
+
+	    if (width_keyword != "width")
+	    {
+		return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	    }	    
+
+	    sString width_number;
+	    sInt_32 width;
+
+	    sConsumeNumericString(fr, width_number);
+	    width = sInt_32_from_String(width_number);
+//	    printf("width:%d\n", width);
+	    
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeUntilChar(fr, '>');
+
+	    sString height_keyword;
+	    
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeAlphaString(fr, height_keyword);
+	    sConsumeUntilChar(fr, '>');
+
+//	    printf("height:%s\n", height_keyword.c_str());
+
+	    if (height_keyword != "height")
+	    {
+		return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	    }	    
+
+	    sString height_number;
+	    sInt_32 height;
+
+	    sConsumeNumericString(fr, height_number);
+	    height = sInt_32_from_String(height_number);
+//	    printf("height:%d\n", height);
+	    
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeUntilChar(fr, '>');
+
+	    sString grid_keyword;
+	    
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeAlphaString(fr, grid_keyword);
+	    sConsumeUntilChar(fr, '>');
+
+	    if (grid_keyword != "grid")
+	    {
+		return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	    }
+
+	    m_Network.m_x_size = width;
+	    m_Network.m_y_size = height;
+
+	    m_Network.m_Matrix = new int[m_Network.m_x_size * m_Network.m_y_size];
+	    sInt_32 cnt = 0;	    
+	    
+	    for (sInt_32 r = 0; r < width; ++r)
+	    {
+		sString row_keyword;
+			    
+		sConsumeUntilChar(fr, '<');
+		sConsumeAlphaString(fr, row_keyword);
+		sConsumeUntilChar(fr, '>');
+
+//		printf("row:%s\n", row_keyword.c_str());
+
+		if (row_keyword != "row")
+		{
+		    return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+		}		
+
+		for (sInt_32 c = 0; c < height; ++c)
+		{
+		    sString number;
+		    sInt_32 position;
+		    
+		    sConsumeNumericString(fr, number);
+//		    printf("numo: %s\n", number.c_str());
+		    position = sInt_32_from_String(number);
+		    
+		    sConsumeWhiteSpaces(fr);
+
+		    if (position == 0)
+		    {
+			m_Network.m_Matrix[r * width + c] = cnt++;
+		    }
+		    else
+		    {
+			m_Network.m_Matrix[r * width + c] = -1;
+		    }
+		}
+
+		sConsumeUntilChar(fr, '<');
+		sConsumeUntilChar(fr, '>');
+	    }
+	    m_Network.add_Vertices(cnt);	    
+
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeUntilChar(fr, '>');
+
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeUntilChar(fr, '>');
+
+	    sConsumeUntilChar(fr, '<');
+	    sConsumeUntilChar(fr, '>');
+
+	    m_Locations.resize(m_Network.m_Vertices.size());
+	    
+	    for (sInt_32 y = 0; y < m_Network.m_y_size; ++y)
+	    {
+		for (sInt_32 x = 0; x < m_Network.m_x_size; ++x)
+		{
+		    sInt_32 location_id = m_Network.m_Matrix[y * m_Network.m_x_size + x];
+		    
+		    if (location_id >= 0)
+		    {
+			m_Locations[location_id] = Location(location_id, x, y);
+		    }
+		}
+	    }	    
+	}
+	else
+	{
+	    if (root_keyword == "graphml")
+	    {
+		std::map<sString, sInt_32, std::less<sString> > node_Mapping;
+		    
+		sInt_32 location_id = 0;
+		
+//		printf("beta\n");
+
+		sString key1_keyword;
+		
+		sConsumeUntilChar(fr, '<');
+		sConsumeAlphaString(fr, key1_keyword);
+		sConsumeUntilChar(fr, '>');
+    
+//		printf("key1:%s\n", key1_keyword.c_str());
+		
+		if (key1_keyword != "key")
+		{
+		    return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+		}
+
+		sString key2_keyword;
+		
+		sConsumeUntilChar(fr, '<');
+		sConsumeAlphaString(fr, key2_keyword);
+		sConsumeUntilChar(fr, '>');
+    
+//		printf("key2:%s\n", key2_keyword.c_str());
+		
+		if (key2_keyword != "key")
+		{
+		    return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+		}
+
+		sString graph_keyword;
+		
+		sConsumeUntilChar(fr, '<');
+		sConsumeAlphaString(fr, graph_keyword);
+		sConsumeUntilChar(fr, '>');
+    
+//		printf("graph:%s\n", graph_keyword.c_str());
+		
+		if (graph_keyword != "graph")
+		{
+		    return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+		}
+
+		sString next_keyword;
+				    
+		while(true)
+		{			
+		    sConsumeUntilChar(fr, '<');
+		    sConsumeAlphaString(fr, next_keyword);
+
+//		    printf("nxt:%s\n", next_keyword.c_str());
+
+		    if (next_keyword == "node")
+		    {
+			sString node_key;
+			
+			sConsumeUntilChar(fr, '"');
+			sConsumeAlnumString(fr, node_key);
+			sConsumeUntilChar(fr, '"');
+			sConsumeUntilChar(fr, '>');			
+
+//			printf("nd_key:%s\n", node_key.c_str());
+
+			sConsumeUntilChar(fr, '<');
+			sConsumeUntilChar(fr, '>');			
+			
+			sString x_coord_number, y_coord_number;
+			sDouble x_coord, y_coord;
+
+			sConsumeFloatalString(fr, x_coord_number);
+//			printf("x_coord:%s\n", x_coord_number.c_str());			
+			sConsumeUntilChar(fr, ',');
+			sConsumeFloatalString(fr, y_coord_number);
+//			printf("y_coord:%s\n", y_coord_number.c_str());						
+			sConsumeUntilChar(fr, '>');
+
+			x_coord = sDouble_from_String(x_coord_number);
+			y_coord = sDouble_from_String(y_coord_number);
+
+//			printf("XY: %.3f, %.3f\n", x_coord, y_coord);
+
+			sConsumeUntilChar(fr, '<');
+			sConsumeUntilChar(fr, '>');
+			
+			m_Locations.push_back(Location(location_id, x_coord, y_coord));
+			node_Mapping[node_key] = location_id;
+			
+			++location_id;
+			next_keyword.clear();
+		    }
+		    else
+		    {
+			break;
+		    }
+		}
+		
+		m_Network.add_Vertices(m_Locations.size());
+
+		do
+		{
+//		    printf("nxt:%s\n", next_keyword.c_str());
+				
+		    if (next_keyword == "edge")
+		    {
+			sConsumeUntilChar(fr, '"');
+			sConsumeUntilChar(fr, '"');
+									
+			sString source_key;			
+			
+			sConsumeUntilChar(fr, '"');
+			sConsumeAlnumString(fr, source_key);
+			sConsumeUntilChar(fr, '"');
+//			printf("source: %s\n", source_key.c_str());
+
+			sString target_key;
+			
+			sConsumeUntilChar(fr, '"');
+			sConsumeAlnumString(fr, target_key);
+			sConsumeUntilChar(fr, '"');
+//			printf("target: %s\n", target_key.c_str());
+//			printf("Net size: %d\n", m_Network.m_Vertices.size());
+//			printf("%d <--> %d\n", node_Mapping[source_key], node_Mapping[target_key]);
+			
+			m_Network.add_Edge(node_Mapping[source_key], node_Mapping[target_key]);
+
+			sConsumeUntilChar(fr, '<');
+			sConsumeUntilChar(fr, '>');
+
+			sConsumeUntilChar(fr, '<');
+			sConsumeUntilChar(fr, '>');
+			
+			sConsumeUntilChar(fr, '<');
+			sConsumeUntilChar(fr, '>');
+
+			next_keyword.clear();			
+		    }
+		    else
+		    {
+//			printf("nexto:%s\n", next_keyword.c_str());
+			break;
+		    }		    
+		    sConsumeUntilChar(fr, '<');
+		    sConsumeAlphaString(fr, next_keyword);
+
+//		    printf("nxt:%s\n", next_keyword.c_str());		    
+		} while(true);
+	    }
+	    else
+	    {
+		return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
+	    }
+	}
+	
+	/*
+	if (sFAILED(result = m_Network.from_Stream_map(fr)))
+	{
+	    return result;
+	}
+	
+	m_Locations.resize(m_Network.m_Vertices.size());
+
+	for (sInt_32 y = 0; y < m_Network.m_y_size; ++y)
+	{
+	    for (sInt_32 x = 0; x < m_Network.m_x_size; ++x)
+	    {
+		sInt_32 location_id = m_Network.m_Matrix[y * m_Network.m_x_size + x];
+		
+		if (location_id >= 0)
+		{
+		    m_Locations[location_id] = Location(location_id, x, y);
+		}
+	    }
+	}
+	*/
+	return sRESULT_SUCCESS;
+    }    
         
 
 /*----------------------------------------------------------------------------*/

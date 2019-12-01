@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-144_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_generate_main.h / 1-144_leibniz                                     */
+/* kruhoR_generate_main.h / 1-157_leibniz                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) instance (real kruhobot
@@ -61,7 +61,9 @@ namespace boOX
 	sDouble m_kruhobot_angular_acceleration;
 	sDouble m_kruhobot_wait_factor;
 	
-	sString m_input_mapR_filename;		
+	sString m_input_mapR_filename;
+	sString m_input_xml_map_filename;	
+	sString m_input_xml_agent_filename;
 	sString m_output_kruhoR_filename;
     };
 

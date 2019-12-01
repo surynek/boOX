@@ -1,4 +1,4 @@
-SUBDIRS = src/core src/util src/glucose src/test src/main src
+SUBDIRS = src/common src/core src/util src/glucose src/test src/main src
 
 all: debug
 
