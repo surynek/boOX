@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* randgen_main.h / 0_iskra-156                                               */
+/* randgen_main.h / 1-158_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Random Graph Instance Generator - main program.
@@ -43,10 +44,10 @@ namespace boOX
         /*--------------------------------*/
 
 	bool m_walk;
-	int m_N_vertices;	
-	int m_N_agents;
-	int m_seed;
-	double m_edge_probability;	
+	sInt_32 m_N_vertices;	
+	sInt_32 m_N_agents;
+	sInt_32 m_seed;
+	sDouble m_edge_probability;	
 
 	sString m_map_filename;
 	sString m_cpf_filename;

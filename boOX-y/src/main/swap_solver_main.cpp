@@ -1,19 +1,20 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.cpp / 0_iskra-156                                         */
+/* swap_solver_main.cpp / 1-158_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
 //
-// A CBS-based solver for token swapping problem.
+// CBS-based and SMT-based solver for token swapping problem.
 //
 /*----------------------------------------------------------------------------*/
 
@@ -80,7 +81,7 @@ namespace boOX
 	printf("swap_solver_boOX  --input-file=<string>\n");
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
-	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+}]\n");		
+	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+|smtcbs++}]\n");
         printf("	         [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
@@ -176,7 +177,20 @@ namespace boOX
 	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingSwappingInverse(solution, parameters.m_cost_limit);
 	    break;
-	}	
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-PLUS-PLUS");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    cost = smtcbs_Solver.find_ShortestNonconflictingSwappingInverseDepleted(solution, parameters.m_cost_limit);
+	    break;
+	}		
 	default:
 	{
 	    sASSERT(false);
@@ -267,10 +281,14 @@ namespace boOX
 	    else if (algorithm_str == "smtcbs+")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS;
-	    }	    
+	    }
+	    else if (algorithm_str == "smtcbs++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
+	    }	    	    
 	    else
 	    {
-		return sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
+		return sSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
 	    }
 	}	
 	else if (parameter.find("--timeout=") == 0)
@@ -279,7 +297,7 @@ namespace boOX
 	}		
 	else
 	{
-	    return sTSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
+	    return sSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
 	}
 	return sRESULT_SUCCESS;
     }
@@ -313,6 +331,11 @@ int main(int argc, char **argv)
 		return result;
 	    }
 	}
+	if (command_parameters.m_input_filename.empty())
+	{
+	    printf("Error: Input file name missing (code = %d).\n", sSWAP_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR);
+	    return sSWAP_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR;
+	}		
 	result = solve_TokenSwappingInstance(command_parameters);
 	if (sFAILED(result))
 	{

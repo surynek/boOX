@@ -1,19 +1,20 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.h / 0_iskra-156                                           */
+/* mapf_solver_main.h / 1-158_leibniz                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.
 //
-// A CBS-based solver for multi-agent path finding problem.
+// CBS-based and SMT-based solvers for multi-agent path finding problem.
 //
 /*----------------------------------------------------------------------------*/
 
@@ -45,7 +46,8 @@ namespace boOX
 	    ALGORITHM_CBS_PLUS,
 	    ALGORITHM_CBS_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS,
-	    ALGORITHM_SMTCBS_PLUS
+	    ALGORITHM_SMTCBS_PLUS,
+	    ALGORITHM_SMTCBS_PLUS_PLUS	    
 	};
 	
 	sCommandParameters();

@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* basic_test.cpp / 0_iskra-156                                               */
+/* basic_test.cpp / 1-158_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Basic initial test.
@@ -29,7 +30,7 @@
 #include "result.h"
 #include "version.h"
 
-#include "core/types.h"
+#include "common/types.h"
 
 #include "test/basic_test.h"
 

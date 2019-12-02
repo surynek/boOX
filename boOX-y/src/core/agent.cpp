@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 0_iskra-156                                                    */
+/* agent.cpp / 1-158_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -25,12 +26,11 @@
 #include "compile.h"
 #include "version.h"
 #include "defs.h"
-#include "types.h"
 #include "result.h"
 
-#include "core/agent.h"
+#include "common/types.h"
 #include "util/statistics.h"
-
+#include "core/agent.h"
 
 using namespace std;
 using namespace boOX;
@@ -181,7 +181,9 @@ namespace boOX
 	}
     }
 
-
+    
+/*----------------------------------------------------------------------------*/
+    
     bool sConfiguration::operator==(const sConfiguration &agent_configuration) const
     {
 	sASSERT(m_agent_Locs.size() == agent_configuration.m_agent_Locs.size());
@@ -227,7 +229,9 @@ namespace boOX
 	return false;
     }
 
-
+    
+/*----------------------------------------------------------------------------*/
+    
     sInt_32 sConfiguration::get_AgentCount(void) const
     {
 	return (m_agent_Locs.size() - 1);
@@ -756,7 +760,7 @@ namespace boOX
     void sConfiguration::to_Stream(FILE *fw, const sString &indent) const
     {
 	fprintf(fw, "%sAgent configuration: (|R| = %ld, |V| = %ld) [\n", indent.c_str(), m_agent_Locs.size() - 1, m_vertex_Occups.size());
-	fprintf(fw, "%s%s agent locations: {", indent.c_str(), s_INDENT.c_str());
+	fprintf(fw, "%s%sagent locations: {", indent.c_str(), s_INDENT.c_str());
 	
 	sInt_32 N_Agents_1 = m_agent_Locs.size();
 	for (sInt_32 i = 1; i < N_Agents_1; ++i)
@@ -765,7 +769,7 @@ namespace boOX
 	}
 	fprintf(fw, "}\n");
 
-	fprintf(fw, "%s%s vertex occupancy: {", indent.c_str(), s_INDENT.c_str());
+	fprintf(fw, "%s%svertex occupancy: {", indent.c_str(), s_INDENT.c_str());
 	
 	sInt_32 N_Vertices = m_vertex_Occups.size();
 	for (sInt_32 i = 0; i < N_Vertices; ++i)
@@ -826,6 +830,22 @@ namespace boOX
     }
 
 
+    sResult sConfiguration::to_File_ccpf(const sString &filename, const sUndirectedGraph &environment, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_CONFIGURATION_OPEN_ERROR;
+	}
+	
+	to_Stream_ccpf(fw, environment, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sConfiguration::to_File_mpf(const sString &filename, const sString &indent) const
     {
 	FILE *fw;
@@ -839,7 +859,23 @@ namespace boOX
 	fclose(fw);
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sConfiguration::to_File_cmpf(const sString &filename, const sUndirectedGraph &environment, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_CONFIGURATION_OPEN_ERROR;
+	}
+	
+	to_Stream_cmpf(fw, environment, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }        
 
 
     void sConfiguration::to_Stream_cpf(FILE *fw, const sString &indent) const
@@ -852,6 +888,18 @@ namespace boOX
 	    fprintf(fw, "(%d:-1)[%d:-1:-1]\n", i, m_vertex_Occups[i]);
 	}
     }
+
+
+    void sConfiguration::to_Stream_ccpf(FILE *fw, const sUndirectedGraph &environment, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_vertex_Occups.size();
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d:-1:%d)[%d:-1:-1]\n", i, environment.m_Vertices[i].m_capacity, m_vertex_Occups[i]);
+	}
+    }    
     
     
     void sConfiguration::to_Stream_mpf(FILE *fw, const sString &indent) const
@@ -864,6 +912,18 @@ namespace boOX
 	    fprintf(fw, "(%d,%d,-1)\n", i, m_vertex_Occups[i]);
 	}
     }
+
+
+    void sConfiguration::to_Stream_cmpf(FILE *fw, const sUndirectedGraph &environment, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_vertex_Occups.size();
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d,%d,%d,-1)\n", i, environment.m_Vertices[i].m_capacity, m_vertex_Occups[i]);
+	}
+    }    
 
 
     sResult sConfiguration::from_File_cpf(const sString &filename, sInt_32 component)
@@ -888,6 +948,28 @@ namespace boOX
     }
 
 
+    sResult sConfiguration::from_File_ccpf(const sString &filename, sUndirectedGraph &environment, sInt_32 component)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_CONFIGURATION_OPEN_ERROR;
+	}
+	
+	result = from_Stream_ccpf(fr, environment, component);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sConfiguration::from_File_mpf(const sString &filename, sInt_32 component)
     {
 	sResult result;
@@ -907,7 +989,29 @@ namespace boOX
 	fclose(fr);
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sConfiguration::from_File_cmpf(const sString &filename, sUndirectedGraph &environment, sInt_32 component)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_CONFIGURATION_OPEN_ERROR;
+	}
+	
+	result = from_Stream_cmpf(fr, environment, component);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }        
 
     
     sResult sConfiguration::from_Stream_cpf(FILE *fr, sInt_32 component)
@@ -1026,6 +1130,123 @@ namespace boOX
     }
 
 
+    sResult sConfiguration::from_Stream_ccpf(FILE *fr, sUndirectedGraph &environment, sInt_32 component)
+    {
+	
+	m_agent_Locs.clear();
+	m_vertex_Occups.clear();
+
+	sInt_32 N_Agents = 0;
+	sInt_32 N_Vertices = 0;
+
+	sInt_32 c = fgetc(fr);
+
+	while (c != 'V')
+	{
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, " =\n");
+
+	long position = ftell(fr);
+	c = fgetc(fr);
+
+	while (c == '(')
+	{
+	    sInt_32 vertex_id, cycle_id, agent_id, capacity;
+
+	    switch (component)
+	    {
+	    case 0:
+	    {
+		fscanf(fr, "%d:%d:%d)[%d", &vertex_id, &cycle_id, &capacity, &agent_id);
+		break;
+	    }
+	    case 1:
+	    {
+		sInt_32 dummy_agent_1_id;
+		fscanf(fr, "%d:%d:%d)[%d:%d", &vertex_id, &cycle_id, &capacity, &dummy_agent_1_id, &agent_id);
+		break;
+	    }
+	    default:
+	    {
+		sASSERT(false);
+		break;
+	    }
+	    }
+
+	    if (agent_id > 0)
+	    {
+		++N_Agents;
+	    }
+	    ++N_Vertices;
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	if (fseek(fr, position, SEEK_SET) != 0)
+	{
+	    return sAGENT_CONFIGURATION_SEEK_ERROR;
+	}
+	c = fgetc(fr);
+
+	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
+	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+
+	while (c == '(')
+	{
+	    sInt_32 vertex_id, cycle_id, agent_id, capacity;
+
+	    switch (component)
+	    {
+	    case 0:
+	    {
+		fscanf(fr, "%d:%d:%d)[%d", &vertex_id, &cycle_id, &capacity, &agent_id);
+		break;
+	    }
+	    case 1:
+	    {
+		sInt_32 dummy_agent_1_id;
+		fscanf(fr, "%d:%d:%d)[%d:%d", &vertex_id, &cycle_id, &capacity, &dummy_agent_1_id, &agent_id);
+		break;
+	    }
+	    case 2:
+	    {
+		sInt_32 dummy_agent_1_id, dummy_agent_2_id;
+		fscanf(fr, "%d:%d:%d)[%d:%d:%d", &vertex_id, &cycle_id, &capacity, &dummy_agent_1_id, &dummy_agent_2_id, &agent_id);
+		break;
+	    }
+	    default:
+	    {
+		sASSERT(false);
+		break;
+	    }
+	    }
+
+	    if (agent_id > 0)
+	    {
+		m_agent_Locs[agent_id] = vertex_id;
+		m_vertex_Occups[vertex_id] = agent_id;
+	    }
+	    environment.m_Vertices[vertex_id].m_capacity = capacity;
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	return sRESULT_SUCCESS;	
+    }    
+
+
     sResult sConfiguration::from_Stream_mpf(FILE *fr, sInt_32 component)
     {
 	m_agent_Locs.clear();
@@ -1132,7 +1353,118 @@ namespace boOX
 	}
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sConfiguration::from_Stream_cmpf(FILE *fr, sUndirectedGraph &environment, sInt_32 component)
+    {
+	m_agent_Locs.clear();
+	m_vertex_Occups.clear();
+
+	sInt_32 N_Agents = 0;
+	sInt_32 N_Vertices = 0;
+
+	sInt_32 c = fgetc(fr);
+
+	while (c != 'V')
+	{
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, " =\n");
+
+	long position = ftell(fr);
+	c = fgetc(fr);
+
+	while (c == '(')
+	{
+	    sInt_32 vertex_id, agent_id, capacity;
+
+	    switch (component)
+	    {
+	    case 0:
+	    {
+		fscanf(fr, "%d,%d,%d", &vertex_id, &capacity, &agent_id);
+		break;
+	    }
+	    case 1:
+	    {
+		sInt_32 dummy_agent_1_id;
+		fscanf(fr, "%d,%d,%d,%d", &vertex_id, &capacity, &dummy_agent_1_id, &agent_id);
+		break;
+	    }
+	    default:
+	    {
+		sASSERT(false);
+		break;
+	    }
+	    }
+
+	    if (agent_id > 0)
+	    {
+		++N_Agents;
+	    }
+	    ++N_Vertices;
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	if (fseek(fr, position, SEEK_SET) != 0)
+	{
+	    return sAGENT_CONFIGURATION_SEEK_ERROR;
+	}
+	c = fgetc(fr);
+
+	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
+	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+
+	while (c == '(')
+	{
+	    sInt_32 vertex_id, agent_id, capacity;
+
+	    switch (component)
+	    {
+	    case 0:
+	    {
+		fscanf(fr, "%d,%d,%d", &vertex_id, &capacity, &agent_id);
+		break;
+	    }
+	    case 1:
+	    {
+		sInt_32 dummy_agent_1_id;
+		fscanf(fr, "%d,%d,%d,%d", &vertex_id, &capacity, &dummy_agent_1_id, &agent_id);
+		break;
+	    }
+	    default:
+	    {
+		sASSERT(false);
+		break;
+	    }
+	    }
+
+	    if (agent_id > 0)
+	    {
+		m_agent_Locs[agent_id] = vertex_id;
+		m_vertex_Occups[vertex_id] = agent_id;
+	    }
+	    environment.m_Vertices[vertex_id].m_capacity = capacity;
+	    
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	return sRESULT_SUCCESS;
+    }        
 
     
 /*----------------------------------------------------------------------------*/
@@ -1408,6 +1740,7 @@ namespace boOX
 
         #ifdef sDEBUG
 	{
+	    /*
 	    printf("<----\n");	
 	    printf("MDD printout\n");
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
@@ -1424,6 +1757,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    printf("<----\n");
+	    */
 	}
 	#endif
 	
@@ -1813,10 +2147,22 @@ namespace boOX
     }
 
 
+    void sInstance::to_Screen_ccpf(const sString &indent) const
+    {
+	to_Stream_ccpf(stdout, indent);
+    }    
+
+
     void sInstance::to_Screen_mpf(const sString &indent) const
     {
 	to_Stream_mpf(stdout, indent);
-    }    
+    }
+
+    
+    void sInstance::to_Screen_cmpf(const sString &indent) const
+    {
+	to_Stream_cmpf(stdout, indent);
+    }        
 
 
     void sInstance::to_Screen_domainPDDL(const sString &indent) const
@@ -1867,6 +2213,21 @@ namespace boOX
     }
 
 
+    sResult sInstance::to_File_ccpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_OPEN_ERROR;
+	}
+	to_Stream_ccpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sInstance::to_File_mpf(const sString &filename, const sString &indent) const
     {
 	FILE *fw;
@@ -1879,7 +2240,22 @@ namespace boOX
 	fclose(fw);
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sInstance::to_File_cmpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_OPEN_ERROR;
+	}
+	to_Stream_cmpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }        
 
 
     sResult sInstance::to_File_domainPDDL(const sString &filename, const sString &indent) const
@@ -1970,6 +2346,38 @@ namespace boOX
     }
 
 
+    void sInstance::to_Stream_ccpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_start_configuration.m_vertex_Occups.size();
+	
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d:-1:%d)[%d:%d:%d]", i,
+		    m_environment.m_Vertices[i].m_capacity,
+		    m_start_configuration.m_vertex_Occups[i],
+		    m_goal_configuration.m_vertex_Occups[i],
+		    m_goal_configuration.m_vertex_Occups[i]);
+	    
+	    if (m_environment.m_Vertices[i].m_Conflicts.empty())
+	    {
+		fprintf(fw, "\n");
+	    }
+	    else
+	    {
+		fprintf(fw, "< ");
+		for (sInt_32 c = 0; c < m_environment.m_Vertices[i].m_Conflicts.size(); ++c)
+		{
+		    fprintf(fw, "%d ", m_environment.m_Vertices[i].m_Conflicts[c]);
+		}			 
+		fprintf(fw, ">\n");
+	    }
+	}
+	m_environment.to_Stream_ccpf(fw, indent);
+    }    
+
+
     void sInstance::to_Stream_mpf(FILE *fw, const sString &indent) const
     {
 	fprintf(fw, "%sV =\n", indent.c_str());
@@ -1997,7 +2405,38 @@ namespace boOX
 	    }
 	}
 	m_environment.to_Stream_mpf(fw, indent);
-    }    
+    }
+
+
+    void sInstance::to_Stream_cmpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_start_configuration.m_vertex_Occups.size();
+	
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d,%d,%d,%d)", i,
+		    m_environment.m_Vertices[i].m_capacity,
+		    m_start_configuration.m_vertex_Occups[i],
+		    m_goal_configuration.m_vertex_Occups[i]);
+	    
+	    if (m_environment.m_Vertices[i].m_Conflicts.empty())
+	    {
+		fprintf(fw, "\n");
+	    }
+	    else
+	    {
+		fprintf(fw, "< ");
+		for (sInt_32 c = 0; c < m_environment.m_Vertices[i].m_Conflicts.size(); ++c)
+		{
+		    fprintf(fw, "%d ", m_environment.m_Vertices[i].m_Conflicts[c]);
+		}			 
+		fprintf(fw, ">\n");
+	    }
+	}
+	m_environment.to_Stream_mpf(fw, indent);
+    }        
 
 
     void sInstance::to_Stream_domainPDDL(FILE *fw, const sString &indent) const
@@ -2148,6 +2587,28 @@ namespace boOX
     }
 
 
+    sResult sInstance::from_File_ccpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_INSTANCE_CCPF_OPEN_ERROR;
+	}
+	
+	result = from_Stream_ccpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }    
+
+
     sResult sInstance::from_File_mpf(const sString &filename)
     {
 	sResult result;
@@ -2155,7 +2616,7 @@ namespace boOX
 
 	if ((fr = fopen(filename.c_str(), "r")) == NULL)
 	{
-	    return sAGENT_INSTANCE_CPF_OPEN_ERROR;
+	    return sAGENT_INSTANCE_MPF_OPEN_ERROR;
 	}
 	
 	result = from_Stream_mpf(fr);
@@ -2167,7 +2628,29 @@ namespace boOX
 	fclose(fr);
 
 	return sRESULT_SUCCESS;	
-    }    
+    }
+
+
+    sResult sInstance::from_File_cmpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_INSTANCE_MPF_OPEN_ERROR;
+	}
+	
+	result = from_Stream_cmpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }        
 
     
     sResult sInstance::from_Stream_cpf(FILE *fr)
@@ -2201,6 +2684,37 @@ namespace boOX
     }
 
 
+    sResult sInstance::from_Stream_ccpf(FILE *fr)
+    {
+	sResult result;
+
+	if (sFAILED(result = m_environment.from_Stream_ccpf(fr)))
+	{
+	    return result;
+	}
+
+	if (fseek(fr, 0, SEEK_SET) < 0)
+	{
+	    return sAGENT_INSTANCE_SEEK_ERROR;
+	}
+	if (sFAILED(result = m_start_configuration.from_Stream_ccpf(fr, m_environment, 0)))
+	{
+	    return result;
+	}
+
+	if (fseek(fr, 0, SEEK_SET) < 0)
+	{
+	    return sAGENT_INSTANCE_SEEK_ERROR;
+	}
+	if (sFAILED(result = m_goal_configuration.from_Stream_ccpf(fr, m_environment, 2)))
+	{
+	    return result;
+	}
+	
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sInstance::from_Stream_mpf(FILE *fr)
     {
 	sResult result;
@@ -2229,7 +2743,38 @@ namespace boOX
 	}
 	
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sInstance::from_Stream_cmpf(FILE *fr)
+    {
+	sResult result;
+
+	if (sFAILED(result = m_environment.from_Stream_cmpf(fr)))
+	{
+	    return result;
+	}
+
+	if (fseek(fr, 0, SEEK_SET) < 0)
+	{
+	    return sAGENT_INSTANCE_SEEK_ERROR;
+	}
+	if (sFAILED(result = m_start_configuration.from_Stream_cmpf(fr, m_environment, 0)))
+	{
+	    return result;
+	}
+
+	if (fseek(fr, 0, SEEK_SET) < 0)
+	{
+	    return sAGENT_INSTANCE_SEEK_ERROR;
+	}
+	if (sFAILED(result = m_goal_configuration.from_Stream_cmpf(fr, m_environment, 1)))
+	{
+	    return result;
+	}
+	
+	return sRESULT_SUCCESS;
+    }        
 
 
     sResult sInstance::from_File_bgu(const sString &filename)
@@ -2290,6 +2835,58 @@ namespace boOX
 
 	return sRESULT_SUCCESS;
     }
+
+
+    sResult sInstance::to_File_usc(const sString &map_filename, const sString &agents_filename) const
+    {
+	FILE *fw_map, *fw_agents;
+
+	if ((fw_map = fopen(map_filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_USC_MAP_OPEN_ERROR;
+	}
+	if ((fw_agents = fopen(agents_filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR;
+	}
+	
+	to_Stream_usc(fw_map, fw_agents);
+	
+	fclose(fw_map);
+	fclose(fw_agents);	
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sInstance::to_Stream_usc(FILE *fw_map, FILE *fw_agents, const sString &indent) const
+    {
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	sASSERT(N_Agents == m_goal_configuration.get_AgentCount());
+
+	m_environment.to_Stream_usc(fw_map);
+        fprintf(fw_agents, "%s%d\n", indent.c_str(), N_Agents);
+
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    fprintf(fw_agents, "%s", indent.c_str());
+	    
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
+	    
+	    sInt_32 goal_row = m_environment.calc_GridRow(goal_vertex_id);
+	    sInt_32 goal_column = m_environment.calc_GridColumn(goal_vertex_id);
+	    
+	    fprintf(fw_agents, "%d,%d,", goal_row, goal_column);
+
+	    sInt_32 start_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+
+	    sInt_32 start_row = m_environment.calc_GridRow(start_vertex_id);
+	    sInt_32 start_column = m_environment.calc_GridColumn(start_vertex_id);	    
+
+	    fprintf(fw_agents, "%d,%d,", start_row, start_column);
+	    fprintf(fw_agents, "\n");
+	}	
+    }    
 
 
     sResult sInstance::from_File_usc(const sString &map_filename, const sString &agents_filename)
@@ -2356,7 +2953,7 @@ namespace boOX
 	return sRESULT_SUCCESS;
     }
 
-
+    
     sResult sInstance::from_File_lusc(const sString &map_filename, const sString &agents_filename)
     {
 	sResult result;
@@ -2424,7 +3021,7 @@ namespace boOX
     }        
 
 
-    sResult sInstance::to_File_dibox(const sString &filename)
+    sResult sInstance::to_File_dibox(const sString &filename) const
     {
 	sResult result;
 	FILE *fw;
@@ -2446,7 +3043,7 @@ namespace boOX
     }
 
 
-    sResult sInstance::to_Stream_dibox(FILE *fw)
+    sResult sInstance::to_Stream_dibox(FILE *fw) const
     {
 	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
 
@@ -3014,6 +3611,39 @@ namespace boOX
     }
 
 
+
+    sResult sSolution::to_File_ccpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_SOLUTION_OPEN_ERROR;
+	}
+	
+	to_Stream_ccpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sSolution::to_Stream_ccpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sFine solution\n", indent.c_str());
+	fprintf(fw, "%sLength:%d\n", indent.c_str(), get_MoveCount());
+	sInt_32 N_Steps = m_Steps.size();
+	for (sInt_32 i = 0; i < N_Steps; ++i)
+	{
+	    const Step &step = m_Steps[i];
+	    for (Moves_list::const_iterator move = step.m_Moves.begin(); move != step.m_Moves.end(); ++move)
+	    {
+		fprintf(fw, "%s%d # %d ---> %d (%d)\n", indent.c_str(), move->m_agent_id, move->m_src_vrtx_id, move->m_dest_vrtx_id, i);
+	    }
+	}
+    }    
+
+
     sResult sSolution::to_File_mpf(const sString &filename, const sString &indent) const
     {
 	FILE *fw;
@@ -3043,7 +3673,39 @@ namespace boOX
 		fprintf(fw, "%s%d # %d ---> %d (%d)\n", indent.c_str(), move->m_agent_id, move->m_src_vrtx_id, move->m_dest_vrtx_id, i);
 	    }
 	}
-    }    
+    }
+
+
+    sResult sSolution::to_File_cmpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_SOLUTION_OPEN_ERROR;
+	}
+	
+	to_Stream_cmpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sSolution::to_Stream_cmpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sFine solution\n", indent.c_str());
+	fprintf(fw, "%sLength:%d\n", indent.c_str(), get_MoveCount());
+	sInt_32 N_Steps = m_Steps.size();
+	for (sInt_32 i = 0; i < N_Steps; ++i)
+	{
+	    const Step &step = m_Steps[i];
+	    for (Moves_list::const_iterator move = step.m_Moves.begin(); move != step.m_Moves.end(); ++move)
+	    {
+		fprintf(fw, "%s%d # %d ---> %d (%d)\n", indent.c_str(), move->m_agent_id, move->m_src_vrtx_id, move->m_dest_vrtx_id, i);
+	    }
+	}
+    }        
 
 
     sResult sSolution::to_File_graphrec(const sString &filename, const sInstance &instance, const sString &indent) const
@@ -3100,7 +3762,7 @@ namespace boOX
 	fclose(fr);
 
 	return sRESULT_SUCCESS;
-    }
+    }    
 
 
     sResult sSolution::from_Stream_cpf(FILE *fr)
@@ -3134,6 +3796,61 @@ namespace boOX
 
 	return sRESULT_SUCCESS;
     }
+
+
+    sResult sSolution::from_File_ccpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_SOLUTION_OPEN_ERROR;
+	}
+	
+	result = from_Stream_ccpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
+    sResult sSolution::from_Stream_ccpf(FILE *fr)
+    {
+	sInt_32 N_Moves;
+	sInt_32 c = fgetc(fr);
+
+	while (c != 'F')
+	{
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, "Fine solution\nLength:%d\n", &N_Moves);
+        #ifdef sDEBUG
+	printf("Length:%d\n", N_Moves);
+	#endif
+
+	for (sInt_32 i = 0; i < N_Moves; ++i)
+	{
+	    sInt_32 agent_id, src_vertex_id, dest_vertex_id, step;
+	    fscanf(fr, "%d # %d ---> %d (%d)\n", &agent_id, &src_vertex_id, &dest_vertex_id, &step);
+	    #ifdef sDEBUG
+	    printf("%d # %d ---> %d (%d)\n", agent_id, src_vertex_id, dest_vertex_id, step);
+	    #endif
+	    add_Move(step, Move(agent_id, src_vertex_id, dest_vertex_id));
+	}
+
+	return sRESULT_SUCCESS;
+    }    
 
 
     sResult sSolution::from_File_mpf(const sString &filename)
@@ -3188,7 +3905,62 @@ namespace boOX
 	}
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sSolution::from_File_cmpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_SOLUTION_OPEN_ERROR;
+	}
+	
+	result = from_Stream_cmpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sSolution::from_Stream_cmpf(FILE *fr)
+    {
+	sInt_32 N_Moves;
+	sInt_32 c = fgetc(fr);
+
+	while (c != 'F')
+	{
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, "Fine solution\nLength:%d\n", &N_Moves);
+        #ifdef sDEBUG
+	printf("Length:%d\n", N_Moves);
+	#endif
+
+	for (sInt_32 i = 0; i < N_Moves; ++i)
+	{
+	    sInt_32 agent_id, src_vertex_id, dest_vertex_id, step;
+	    fscanf(fr, "%d # %d ---> %d (%d)\n", &agent_id, &src_vertex_id, &dest_vertex_id, &step);
+	    #ifdef sDEBUG
+	    printf("%d # %d ---> %d (%d)\n", agent_id, src_vertex_id, dest_vertex_id, step);
+	    #endif
+	    add_Move(step, Move(agent_id, src_vertex_id, dest_vertex_id));
+	}
+
+	return sRESULT_SUCCESS;
+    }        
 
 
 /*----------------------------------------------------------------------------*/

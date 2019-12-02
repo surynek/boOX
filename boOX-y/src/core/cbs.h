@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 0_iskra-156                                                        */
+/* cbs.h / 1-158_leibniz                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -27,9 +28,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/graph.h"
 #include "core/agent.h"
 
@@ -64,6 +65,49 @@ namespace boOX
 	typedef std::vector<Conflicts_vector> AgentConflicts_vector;
 	typedef std::vector<EdgeConflicts_vector> AgentEdgeConflicts_vector;		
 
+	struct MonoCollision
+	{
+	    MonoCollision() { /* nothing */ }
+	    
+	    MonoCollision(sInt_32 cooccupation,
+			  sInt_32 agent_id,
+			  sInt_32 level,
+			  sInt_32 vertex_id)
+	    : m_cooccupation(cooccupation)
+	    , m_agent_id(agent_id)
+	    , m_level(level)
+	    , m_vertex_id(vertex_id)
+	    { /* nothing */ }
+	    
+	    sInt_32 m_cooccupation;
+	    
+	    sInt_32 m_agent_id;
+	    sInt_32 m_level;
+	    sInt_32 m_vertex_id;
+	    
+	    bool operator<(const MonoCollision &collision) const
+	    {
+		return (m_cooccupation < collision.m_cooccupation);
+	    }	    
+	};
+
+	typedef std::vector<MonoCollision> MonoCollisions_vector;	
+
+	struct CapacitatedCollision
+	{
+	    CapacitatedCollision() { /* nothing */ }
+
+	    bool operator<(const CapacitatedCollision &sUNUSED(capacitated_collision)) const
+	    {
+		// TODO
+		return true;
+	    }	    	    
+
+	    MonoCollisions_vector m_mono_Collisions;
+	};
+
+	typedef std::vector<CapacitatedCollision> CapacitatedCollisions_vector;	
+	
 	struct Collision
 	{
 	    Collision() { /* nothing */ }

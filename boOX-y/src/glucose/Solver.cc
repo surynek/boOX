@@ -1276,7 +1276,7 @@ printf("c ==================================[ Search Statistics (every %6d confl
 	    {
 		return l_Undef;
 	    }
-	}	    	
+	}
     }
 
     if (!incremental && verbosity >= 1)

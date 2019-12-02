@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* icts.cpp / 0_iskra-156                                                     */
+/* icts.cpp / 1-158_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Increasing cost tree search for multi-agent path finding MAPF
@@ -26,9 +27,9 @@
 #include "compile.h"
 #include "version.h"
 #include "defs.h"
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/icts.h"
 #include "util/statistics.h"
 

@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* icts.h / 0_iskra-156                                                       */
+/* icts.h / 1-158_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Increasing cost tree search for multi-agent path finding MAPF
@@ -27,9 +28,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "types.h"
 #include "result.h"
 
+#include "common/types.h"
 #include "core/graph.h"
 #include "core/agent.h"
 

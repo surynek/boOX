@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.h / 0_iskra-156                                               */
+/* gridgen_main.h / 1-158_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -43,13 +44,14 @@ namespace boOX
 	sCommandParameters();
         /*--------------------------------*/
 
-	bool m_walk;
-	int m_x_size;
-	int m_y_size;
-	int m_N_agents;
-	int m_seed;
-	double m_obstacle_probability;	
-	int m_N_obstacles;
+	bool m_walk;	
+	sInt_32 m_x_size;
+	sInt_32 m_y_size;
+	sInt_32 m_N_agents;
+	sInt_32 m_seed;
+	sDouble m_obstacle_probability;	
+	sInt_32 m_N_obstacles;
+	sInt_32 m_capacity;
 
 	sString m_map_filename;
 	sString m_cpf_filename;
@@ -59,7 +61,17 @@ namespace boOX
 	sString m_bgu_filename;
 
 	sString m_usc_map_filename;
-	sString m_usc_agents_filename;	
+	sString m_usc_agents_filename;
+
+	bool is_Input_usc(void) const
+	{
+	    return ((!m_cpf_filename.empty() || !m_mpf_filename.empty() || !m_bgu_filename.empty()) && !m_usc_map_filename.empty());
+	}
+
+	bool is_Output_usc(void) const
+	{
+	    return (m_cpf_filename.empty() && m_mpf_filename.empty() && m_bgu_filename.empty() && !m_usc_map_filename.empty());
+	}
     };
 
 

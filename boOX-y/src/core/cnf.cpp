@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 0_iskra-156                                                      */
+/* cnf.cpp / 1-158_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -161,7 +162,12 @@ namespace boOX
 
     void sBoolEncoder::cast_AdaptiveAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight)
     {
-	if (variable_IDs.size() <= 32)
+//	if (variable_IDs.size() <= 0)		
+//	if (variable_IDs.size() <= 4)
+//	if (variable_IDs.size() <= 6)
+	if (variable_IDs.size() <= 16)	    
+//	if (variable_IDs.size() <= 32)
+//	if (variable_IDs.size() <= 64)	
 //	if (variable_IDs.size() <= 512)
 	{
 	    cast_AllMutexConstraint(solver, variable_IDs, weight);
@@ -201,6 +207,66 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
 	}
 	#endif	
+    }
+
+
+    void sBoolEncoder::cast_3Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 sUNUSED(weight))
+    {
+	cast_Clause(solver, -variable_ID_A, -variable_ID_B, -variable_ID_C);
+	
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif	
+    }
+
+
+    void sBoolEncoder::cast_4Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 variable_ID_D, sInt_32 sUNUSED(weight))
+    {
+	cast_Clause(solver, -variable_ID_A, -variable_ID_B, -variable_ID_C, -variable_ID_D);
+	
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif	
+    }        
+
+
+    void  sBoolEncoder::cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 sUNUSED(weight))	
+    {
+	for (VariableIDs_vector::const_iterator variable_A = variable_IDs_A.begin(); variable_A != variable_IDs_A.end(); ++variable_A)
+	{
+	    for (VariableIDs_vector::const_iterator variable_B = variable_IDs_B.begin(); variable_B != variable_IDs_B.end(); ++variable_B)
+	    {
+		cast_Clause(solver, -*variable_A, -*variable_B);	
+	
+                #ifdef sSTATISTICS
+		{
+		    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+		}
+      	        #endif
+	    }
+	}
+    }
+
+
+    void sBoolEncoder::cast_CapacityMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 sUNUSED(weight))
+    {
+	std::vector<int> Literals;
+			    
+	for (VariableIDs_vector::const_iterator variable_id = variable_IDs.begin(); variable_id != variable_IDs.end(); ++variable_id)
+	{
+	    Literals.push_back(-(*variable_id));
+	}		
+	cast_Clause(solver, Literals);
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+      	#endif	
     }
 
 
@@ -380,8 +446,7 @@ namespace boOX
 	Literals.push_back(-variable_ID_PREC);
 
 	for (VariableIDs_vector::const_iterator variable_ID_POST = variable_IDs_POST.begin(); variable_ID_POST != variable_IDs_POST.end(); ++variable_ID_POST)
-	{
-	    
+	{	    
 	    Literals.push_back(*variable_ID_POST);
 	}
 	cast_Clause(solver, Literals);
@@ -646,6 +711,18 @@ namespace boOX
 		
 	cast_Clause(solver, Lits);
     }
+
+
+    void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3,sInt_32 lit_4)
+    {
+	std::vector<int> Lits;
+	Lits.push_back(lit_1);
+	Lits.push_back(lit_2);
+	Lits.push_back(lit_3);
+	Lits.push_back(lit_4);	
+		
+	cast_Clause(solver, Lits);
+    }    
 
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, std::vector<int> &Lits)

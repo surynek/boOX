@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.cpp / 0_iskra-156                                               */
+/* graph_test.cpp / 1-158_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
@@ -23,9 +24,9 @@
 #include "defs.h"
 #include "version.h"
 
+#include "common/types.h"
 #include "core/graph.h"
 #include "core/agent.h"
-
 #include "util/statistics.h"
 
 #include "test/graph_test.h"

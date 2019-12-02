@@ -7,6 +7,7 @@ do
   for SEED in $SEED_LIST;	
   do
     echo $ROBOTS,$SEED
-    grep "machine TIME" 'swap-cbs_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "machine TIME" 'swap-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
+    grep "clauses" 'swap-smt_path_'$SIZE'_a'$ROBOTS'_'$SEED'.txt'
   done
 done

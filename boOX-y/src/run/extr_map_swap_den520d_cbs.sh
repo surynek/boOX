@@ -8,5 +8,6 @@ do
   do            
     echo $ROBOTS,$SEED
      grep "machine TIME" 'swap-cbs_den520d_a'$ROBOTS'_'$SEED'.txt'
+     grep "steps" 'swap-cbs_den520d_a'$ROBOTS'_'$SEED'.txt'
   done
 done

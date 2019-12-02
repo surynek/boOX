@@ -1,19 +1,20 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.cpp / 0_iskra-156                                         */
+/* mapf_solver_main.cpp / 1-158_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.
 //
-// A CBS-based solver for multi-agent path finding problem.
+// CBS-based and SMT-based solvers for multi-agent path finding problem.
 //
 /*----------------------------------------------------------------------------*/
 
@@ -50,6 +51,7 @@ namespace boOX
 
   sCommandParameters::sCommandParameters()
       : m_cost_limit(65536)
+      , m_algorithm(ALGORITHM_CBS)
       , m_timeout(-1.0)
   {
       // nothing
@@ -61,7 +63,7 @@ namespace boOX
     void print_IntroductoryMessage(void)
     {
 	printf("----------------------------------------------------------------\n");
-	printf("%s : Multi-Agent Path Finding Solver\n", sPRODUCT);
+	printf("%s : Multi-Agent Path Finding (MAPF) Solver\n", sPRODUCT);
 	printf("%s\n", sCOPYRIGHT);
 	printf("================================================================\n");	
     }
@@ -79,11 +81,11 @@ namespace boOX
 	printf("mapf_solver_boOX  --input-file=<string>\n");
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
-	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+}]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+|smtcbs++}]\n");
         printf("		 [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
-	printf("mapf_solver_boOX --input-file=grid_02x02_t04.tkn\n");
+	printf("mapf_solver_boOX --input-file=grid_02x02_t04.mpf\n");
 	printf("                 --output-file=output.txt\n");
 	printf("\n");
 	printf("Defaults: --cost-limit=65536\n");
@@ -175,7 +177,20 @@ namespace boOX
 	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingPathsInverse(solution, parameters.m_cost_limit);
 	    break;
-	}		
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-PLUS-PLUS");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    cost = smtcbs_Solver.find_ShortestNonconflictingPathsInverseDepleted(solution, parameters.m_cost_limit);
+	    break;
+	}			
 	default:
 	{
 	    sASSERT(false);
@@ -267,7 +282,11 @@ namespace boOX
 	    else if (algorithm_str == "smtcbs+")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS;
-	    }	    
+	    }
+	    else if (algorithm_str == "smtcbs++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
+	    }
 	    else
 	    {
 		return sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
@@ -313,6 +332,11 @@ int main(int argc, char **argv)
 		return result;
 	    }
 	}
+	if (command_parameters.m_input_filename.empty())
+	{
+	    printf("Error: Input file name missing (code = %d).\n", sMAPF_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR);
+	    return sMAPF_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR;
+	}	
 	result = solve_MultiAgentPathFindingInstance(command_parameters);
 	if (sFAILED(result))
 	{

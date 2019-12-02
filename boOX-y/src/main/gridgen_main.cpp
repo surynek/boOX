@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.cpp / 0_iskra-156                                             */
+/* gridgen_main.cpp / 1-158_leibniz                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -54,6 +55,7 @@ namespace boOX
       , m_seed(0)
       , m_obstacle_probability(0.0)
       , m_N_obstacles(-1)
+      , m_capacity(1)
   {
       // nothing
   }
@@ -85,6 +87,7 @@ namespace boOX
 	printf("             [--obstacle-probability=<double>]\n");
 	printf("             [--walk]\n");		
 	printf("             [--N-obstacles=<int>]\n");
+	printf("             [--capacity=<int>]\n");	
 	printf("             [--seed=<int>\n");
 	printf("             [--cpf-file=<string>]\n");
 	printf("             [--mpf-file=<string>]\n");		
@@ -106,6 +109,7 @@ namespace boOX
 	printf("Defaults: --x-size=4\n");
 	printf("          --y-size=4\n");
 	printf("          --N-agents=5\n");
+	printf("          --capacity=1\n");
 	printf("          --seed=0\n");
 	printf("          --obstacle-probability=0.0\n");
 	printf("\n");
@@ -121,38 +125,41 @@ namespace boOX
 	sInstance instance;
 	sUndirectedGraph environment;
 
-	if (!parameters.m_usc_map_filename.empty())
+	if (parameters.is_Input_usc())
 	{
-	    if (!parameters.m_usc_agents_filename.empty())
+	    if (!parameters.m_usc_map_filename.empty())
 	    {
-		result = instance.from_File_usc(parameters.m_usc_map_filename, parameters.m_usc_agents_filename);
+		if (!parameters.m_usc_agents_filename.empty())
+		{
+		    result = instance.from_File_usc(parameters.m_usc_map_filename, parameters.m_usc_agents_filename);
 
-		if (sFAILED(result))
-		{
-		    printf("Error: Failed to read usc map and agents files %s,%s (code = %d).\n", parameters.m_usc_map_filename.c_str(), parameters.m_usc_agents_filename.c_str(), result);
-		    return result;
+		    if (sFAILED(result))
+		    {
+			printf("Error: Failed to read usc map and agents files %s,%s (code = %d).\n", parameters.m_usc_map_filename.c_str(), parameters.m_usc_agents_filename.c_str(), result);
+			return result;
+		    }
+		    instance.to_Screen();
 		}
-		instance.to_Screen();
-	    }
-	    else		
-	    {
-		result = environment.from_File_usc(parameters.m_usc_map_filename);
-				
-		sConfiguration initial_configuration;		
-		if (sFAILED(result = initial_configuration.generate_Nonconflicting(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), environment)))
+		else		
 		{
-		    printf("Error: Failed to generate initial configuration because of too many conflicts.\n");
-		    return result;
+		    result = environment.from_File_usc(parameters.m_usc_map_filename);
+		    
+		    sConfiguration initial_configuration;		
+		    if (sFAILED(result = initial_configuration.generate_Nonconflicting(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), environment)))
+		    {
+			printf("Error: Failed to generate initial configuration because of too many conflicts.\n");
+			return result;
+		    }
+		    sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);		
+		    goal_configuration.generate_NovelNonconflictingWalk(initial_configuration, environment);
+		    instance = sInstance(environment, initial_configuration, goal_configuration);
 		}
-		sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);		
-		goal_configuration.generate_NovelNonconflictingWalk(initial_configuration, environment);
-		instance = sInstance(environment, initial_configuration, goal_configuration);
 	    }
 	}
 	else
-	{       
+	{
 	    if (!parameters.m_map_filename.empty())
-	    {	    
+	    {
 		result = environment.from_File_map(parameters.m_map_filename);
 		
 		if (sFAILED(result))
@@ -171,9 +178,13 @@ namespace boOX
 		{
 		    environment = sUndirectedGraph(parameters.m_x_size, parameters.m_y_size, parameters.m_obstacle_probability);
 		}
+		if (parameters.m_capacity > 1)
+		{
+		    environment.set_Capacities(parameters.m_capacity);
+		}
 	    }
 	    sConfiguration initial_configuration(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), true);
-	    
+	
 	    if (parameters.m_walk)
 	    {
 		sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);
@@ -186,11 +197,11 @@ namespace boOX
 		instance = sInstance(environment, initial_configuration, goal_configuration);
 	    }
 	}
-	
+        
 	if (!parameters.m_pddl_problem_filename.empty())
 	{
 	    result = instance.to_File_problemPDDL(parameters.m_pddl_problem_filename);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write PDDL problem file %s (code = %d).\n", parameters.m_pddl_problem_filename.c_str(), result);
@@ -200,7 +211,7 @@ namespace boOX
 	if (!parameters.m_pddl_domain_filename.empty())
 	{
 	    result = instance.to_File_domainPDDL(parameters.m_pddl_domain_filename);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write PDDL domain file %s (code = %d).\n", parameters.m_pddl_domain_filename.c_str(), result);
@@ -209,8 +220,15 @@ namespace boOX
 	}
 	if (!parameters.m_cpf_filename.empty())
 	{
-	    result = instance.to_File_cpf(parameters.m_cpf_filename);
-
+	    if (parameters.m_capacity > 1)
+	    {
+		result = instance.to_File_ccpf(parameters.m_cpf_filename);
+	    }
+	    else
+	    {
+		result = instance.to_File_cpf(parameters.m_cpf_filename);
+	    }
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write multirobot file %s (code = %d).\n", parameters.m_cpf_filename.c_str(), result);
@@ -219,8 +237,15 @@ namespace boOX
 	}
 	if (!parameters.m_mpf_filename.empty())
 	{
-	    result = instance.to_File_mpf(parameters.m_mpf_filename);
-
+	    if (parameters.m_capacity > 1)
+	    {	    
+		result = instance.to_File_cmpf(parameters.m_mpf_filename);
+	    }
+	    else
+	    {
+		result = instance.to_File_mpf(parameters.m_mpf_filename);		
+	    }
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write multirobot file %s (code = %d).\n", parameters.m_mpf_filename.c_str(), result);
@@ -230,16 +255,44 @@ namespace boOX
 	if (!parameters.m_bgu_filename.empty())
 	{
 	    result = instance.to_File_bgu(parameters.m_bgu_filename, "", 1);
-
+	    
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to write multirobot file %s (code = %d).\n", parameters.m_bgu_filename.c_str(), result);
 		return result;
 	    }
 	}
-	#ifdef sSTATISTICS
+	
+	if (parameters.is_Output_usc())
 	{
-	  s_GlobalStatistics.to_Screen();
+	    if (!parameters.m_usc_map_filename.empty())
+	    {
+		if (!parameters.m_usc_agents_filename.empty())
+		{
+		    result = instance.to_File_usc(parameters.m_usc_map_filename, parameters.m_usc_agents_filename);
+
+		    if (sFAILED(result))
+		    {
+			printf("Error: Failed to write usc map and agents files %s,%s (code = %d).\n", parameters.m_usc_map_filename.c_str(), parameters.m_usc_agents_filename.c_str(), result);
+			return result;
+		    }
+		}
+		else		
+		{		    
+		    result = environment.from_File_usc(parameters.m_usc_map_filename);
+
+		    if (sFAILED(result))
+		    {
+			printf("Error: Failed to write usc map files %s (code = %d).\n", parameters.m_usc_map_filename.c_str(), result);
+			return result;
+		    }		    
+		}
+	    }
+	}
+	   
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.to_Screen();
 	}
 	#endif
 
@@ -273,6 +326,10 @@ namespace boOX
 	{
 	    command_parameters.m_N_obstacles = sInt_32_from_String(parameter.substr(14, parameter.size()));
 	}
+	else if (parameter.find("--capacity=") == 0)
+	{
+	    command_parameters.m_capacity = sInt_32_from_String(parameter.substr(11, parameter.size()));
+	}	
 	else if (parameter.find("--walk") == 0)
 	{
 	    command_parameters.m_walk = true;

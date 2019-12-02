@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 0_iskra-156                                                    */
+/* version.h / 1-158_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -26,11 +27,11 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "0_iskra-156"
-#define sPRODUCT "boOX 0_iskra-156"
+#define sVERSION "1-158_leibniz"
+#define sPRODUCT "boOX 1-158_leibniz"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.com>"
-#define sCOPYRIGHT "(C) Copyright 2018 Pavel Surynek"
+#define sCOPYRIGHT "(C) Copyright 2018 - 2019 Pavel Surynek"
 #define sURL "http://www.surynek.com"
 
 

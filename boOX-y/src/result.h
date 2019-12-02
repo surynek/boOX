@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 0_iskra-156                                                     */
+/* result.h / 1-158_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -108,15 +109,52 @@ enum sAgentInstance_Result
 {
     sAGENT_INSTANCE_INFO                =  14000,
     sAGENT_INSTANCE_ERROR               = -14000,
-    sAGENT_INSTANCE_OPEN_ERROR          = (sAGENT_INSTANCE_ERROR - 1),
-    sAGENT_INSTANCE_PDDL_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR - 2),
-    sAGENT_INSTANCE_CPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 3),
-    sAGENT_INSTANCE_BGU_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 4),
-    sAGENT_INSTANCE_USC_MAP_OPEN_ERROR  = (sAGENT_INSTANCE_ERROR - 5),
-    sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR - 6),    
-    sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR - 7),    
-    sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 8),
-    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 9)
+    sAGENT_INSTANCE_OPEN_ERROR          = (sAGENT_INSTANCE_ERROR -  1),
+    sAGENT_INSTANCE_PDDL_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  2),
+    sAGENT_INSTANCE_CPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  3),
+    sAGENT_INSTANCE_CCPF_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  4),
+    sAGENT_INSTANCE_MPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  5),
+    sAGENT_INSTANCE_BGU_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  6),
+    sAGENT_INSTANCE_USC_MAP_OPEN_ERROR  = (sAGENT_INSTANCE_ERROR -  7),
+    sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR -  8),    
+    sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR -  9),    
+    sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 10),
+    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 11)
+};
+
+
+enum s2DMap_Result
+{
+    s2D_MAP_INFO                              =  15000,
+    s2D_MAP_ERROR                             = -15000,
+    s2D_MAP_OPEN_ERROR                        = (s2D_MAP_ERROR - 1),
+    s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR = (s2D_MAP_ERROR - 2)    
+};
+
+
+enum sRealConjunction_Result
+{
+    sREAL_CONJUNCTION_INFO                              =  16000,
+    sREAL_CONJUNCTION_ERROR                             = -16000,
+    sREAL_CONJUNCTION_OPEN_ERROR                        = (sREAL_CONJUNCTION_ERROR - 1),
+    sREAL_CONJUNCTION_XML_OPEN_ERROR                    = (sREAL_CONJUNCTION_ERROR - 2),    
+    sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR = (sREAL_CONJUNCTION_ERROR - 3)
+};
+
+
+enum sRealInstance_Result
+{
+    sREAL_INSTANCE_INFO       =  17000,
+    sREAL_INSTANCE_ERROR      = -17000,
+    sREAL_INSTANCE_OPEN_ERROR = (sREAL_INSTANCE_ERROR - 1),
+};
+
+
+enum sRealCBS_Result
+{
+    sREAL_CBS_INFO       =  18000,
+    sREAL_CBS_ERROR      = -18000,
+    sREAL_CBS_OPEN_ERROR = (sREAL_CBS_ERROR - 1),
 };
 
 
@@ -162,9 +200,10 @@ enum sPathgenProgram_Result
 
 enum sTokenSwappingSolverProgram_Result
 {
-    sTSWAP_SOLVER_PROGRAM_INFO                         =  150000,
-    sTSWAP_SOLVER_PROGRAM_ERROR                        = -150000,
-    sTSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sTSWAP_SOLVER_PROGRAM_ERROR - 1)
+    sSWAP_SOLVER_PROGRAM_INFO                         =  150000,
+    sSWAP_SOLVER_PROGRAM_ERROR                        = -150000,
+    sSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sSWAP_SOLVER_PROGRAM_ERROR - 1),
+    sSWAP_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sSWAP_SOLVER_PROGRAM_ERROR - 2)    
 };
 
 
@@ -172,8 +211,57 @@ enum sMultiAgentPathfindingSolverProgram_Result
 {
     sMAPF_SOLVER_PROGRAM_INFO                         =  160000,
     sMAPF_SOLVER_PROGRAM_ERROR                        = -160000,
-    sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_SOLVER_PROGRAM_ERROR - 1)
+    sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_SOLVER_PROGRAM_ERROR - 1),
+    sMAPF_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sMAPF_SOLVER_PROGRAM_ERROR - 2)        
 };
+
+
+enum sTokenRotationSolverProgram_Result
+{
+    sROTA_SOLVER_PROGRAM_INFO                         =  170000,
+    sROTA_SOLVER_PROGRAM_ERROR                        = -170000,
+    sROTA_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sROTA_SOLVER_PROGRAM_ERROR - 1),
+    sROTA_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sROTA_SOLVER_PROGRAM_ERROR - 2),
+    sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR       = (sROTA_SOLVER_PROGRAM_ERROR - 3)
+};
+
+
+enum sTokenPermutationSolverProgram_Result
+{
+    sPERM_SOLVER_PROGRAM_INFO                         =  180000,
+    sPERM_SOLVER_PROGRAM_ERROR                        = -180000,
+    sPERM_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sPERM_SOLVER_PROGRAM_ERROR - 1),
+    sPERM_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sPERM_SOLVER_PROGRAM_ERROR - 2)        
+};
+
+
+enum sRealMapConvertorProgram_Result
+{
+    sMAP_R_CONVERT_PROGRAM_INFO                          =  190000,
+    sMAP_R_CONVERT_PROGRAM_ERROR                         = -190000,
+    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR  = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
+    sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR   = (sMAP_R_CONVERT_PROGRAM_ERROR - 2),
+    sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 3)    
+};
+
+
+enum sRealInstanceGeneratorProgram_Result
+{
+    sKRUHOBOT_R_GENERATE_PROGRAM_INFO                         =  200000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_ERROR                        = -200000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sKRUHOBOT_R_GENERATE_PROGRAM_ERROR - 1)
+};
+
+
+enum sRealMutliAgentPathfindingSolverProgram_Result
+{
+    sMAPF_R_SOLVER_PROGRAM_INFO                         =  210000,
+    sMAPF_R_SOLVER_PROGRAM_ERROR                        = -210000,
+    sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_R_SOLVER_PROGRAM_ERROR - 1),
+    sMAPF_R_SOLVER_PROGRAM_MISSING_MAP_FILE_ERROR       = (sMAPF_R_SOLVER_PROGRAM_ERROR - 2),
+    sMAPF_R_SOLVER_PROGRAM_MISSING_KRUHOBOT_FILE_ERROR  = (sMAPF_R_SOLVER_PROGRAM_ERROR - 3)    
+};
+
 
 
 

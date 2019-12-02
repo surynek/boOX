@@ -1,14 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 0_iskra-156                              */
+/*                             boOX 1-158_leibniz                             */
 /*                                                                            */
-/*                      (C) Copyright 2018 Pavel Surynek                      */
+/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
-/*                                                                            */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0_iskra-156                                                    */
+/* graph.cpp / 1-158_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -24,7 +25,7 @@
 #include "defs.h"
 #include "result.h"
 
-#include "core/types.h"
+#include "common/types.h"
 #include "core/graph.h"
 
 using namespace boOX;
@@ -43,6 +44,7 @@ namespace boOX
 	: m_id(0)
 	, m_distance(0)
 	, m_prev_id(-1)
+	, m_capacity(1)
     {
 	// nothing
     }
@@ -52,15 +54,27 @@ namespace boOX
 	: m_id(id)
 	, m_distance(0)
 	, m_prev_id(-1)
+	, m_capacity(1)
     {
 	// nothing
     }
+
+    
+    sVertex::sVertex(sInt_32 id, sInt_32 capacity)
+	: m_id(id)
+	, m_distance(0)
+	, m_prev_id(-1)
+	, m_capacity(capacity)
+    {
+	// nothing
+    }    
 
 
     sVertex::sVertex(const sVertex &vertex)
 	: m_id(vertex.m_id)
 	, m_distance(vertex.m_distance)
 	, m_prev_id(vertex.m_prev_id)
+	, m_capacity(vertex.m_capacity)
 	, m_Conflicts(vertex.m_Conflicts)
     {	
 	sASSERT(m_Neighbors.empty() && vertex.m_Neighbors.empty());
@@ -70,6 +84,7 @@ namespace boOX
     const sVertex& sVertex::operator=(const sVertex &vertex)
     {
 	m_id = vertex.m_id;
+	m_capacity = vertex.m_capacity;	
 	m_Conflicts = vertex.m_Conflicts;
 	sASSERT(m_Neighbors.empty() && vertex.m_Neighbors.empty());
 
@@ -114,6 +129,8 @@ namespace boOX
     }
 
 
+/*----------------------------------------------------------------------------*/
+    
     void sVertex::to_Screen(const sString &indent) const
     {
 	to_Stream(stdout, indent);
@@ -122,7 +139,7 @@ namespace boOX
 
     void sVertex::to_Stream(FILE *fw, const sString &indent) const
     {
-	fprintf(fw, "%sVertex: (id = %d, distance = %d, prev_id = %d)", indent.c_str(), m_id, m_distance, m_prev_id);
+	fprintf(fw, "%sVertex: (id = %d, distance = %d, prev_id = %d, capacity = %d)", indent.c_str(), m_id, m_distance, m_prev_id, m_capacity);
 	
 	if (!m_Neighbors.empty())
 	{
@@ -398,7 +415,6 @@ namespace boOX
 		}
 	    }
 	}
-
 	add_Vertices(cnt);
 
 	for (sInt_32 j = 0; j < y_size - 1; ++j)
@@ -951,6 +967,7 @@ namespace boOX
 	for (sInt_32 i = 0; i < undirected_graph.m_Vertices.size(); ++i)
 	{
 	    m_Vertices[i].m_Conflicts = undirected_graph.m_Vertices[i].m_Conflicts;
+	    m_Vertices[i].m_capacity = undirected_graph.m_Vertices[i].m_capacity;	    
 	}
 
 	for (Edges_list::const_iterator edge = undirected_graph.m_Edges.begin(); edge != undirected_graph.m_Edges.end(); ++edge)	
@@ -997,6 +1014,11 @@ namespace boOX
 	m_inverse_Matrix = undirected_graph.m_inverse_Matrix;
 		
 	add_Vertices(undirected_graph.m_Vertices.size());
+	for (sInt_32 i = 0; i < undirected_graph.m_Vertices.size(); ++i)
+	{
+	    m_Vertices[i].m_Conflicts = undirected_graph.m_Vertices[i].m_Conflicts;
+	    m_Vertices[i].m_capacity = undirected_graph.m_Vertices[i].m_capacity;	    
+	}	
 
 	for (Edges_list::const_iterator edge = undirected_graph.m_Edges.begin(); edge != undirected_graph.m_Edges.end(); ++edge)	
 	{
@@ -1054,6 +1076,11 @@ namespace boOX
 	m_Edges.clear();
 
 	add_Vertices(undirected_graph.m_Vertices.size());
+	for (sInt_32 i = 0; i < undirected_graph.m_Vertices.size(); ++i)
+	{
+	    m_Vertices[i].m_Conflicts = undirected_graph.m_Vertices[i].m_Conflicts;
+	    m_Vertices[i].m_capacity = undirected_graph.m_Vertices[i].m_capacity;	    
+	}	
 
 	for (Edges_list::const_iterator edge = undirected_graph.m_Edges.begin(); edge != undirected_graph.m_Edges.end(); ++edge)
 	{
@@ -1150,9 +1177,27 @@ namespace boOX
     }
 
 
+    void sUndirectedGraph::set_Capacities(sInt_32 capacity)
+    {
+	for (sInt_32 u_id = 1; u_id < m_Vertices.size(); ++u_id)
+	{
+	    m_Vertices[u_id].m_capacity = capacity;
+	}	
+    }
+
+
+/*----------------------------------------------------------------------------*/
+    
     void sUndirectedGraph::add_Vertex(void)
     {
 	m_Vertices.push_back(sVertex(m_Vertices.size()));
+    }
+
+
+    void sUndirectedGraph::add_Vertex(sInt_32 id, sInt_32 capacity)
+    {
+	sASSERT(m_Vertices.size() == id);
+	m_Vertices.push_back(sVertex(m_Vertices.size(), capacity));
     }
 
 
@@ -1421,6 +1466,8 @@ namespace boOX
     }
 
 
+/*----------------------------------------------------------------------------*/
+    
     sInt_32 sUndirectedGraph::calc_ShortestPath(sInt_32 u_id, sInt_32 v_id) const
     {
 	Distances_vector Distances;
@@ -1557,7 +1604,9 @@ namespace boOX
 	}
     }    
 
-
+    
+/*----------------------------------------------------------------------------*/
+    
     void sUndirectedGraph::find_ShortestPathBreadth(sInt_32 source_id, sInt_32 dest_id, VertexIDs_vector &shortest_Path)
     {
 	Distances_vector Distances;
@@ -1926,15 +1975,24 @@ namespace boOX
     {
 	fprintf(fw, "%sUndirected graph: (|V|=%ld |E|=%ld) [\n", indent.c_str(), m_Vertices.size(), m_Edges.size());
 
-	for (Vertices_vector::const_iterator vertex = m_Vertices.begin(); vertex != m_Vertices.end(); ++vertex)
-	{
-	    vertex->to_Stream(fw, indent + s_INDENT);
+	fprintf(fw, "%s%sV = {\n", indent.c_str(), s_INDENT.c_str());
+	{	   
+	    for (Vertices_vector::const_iterator vertex = m_Vertices.begin(); vertex != m_Vertices.end(); ++vertex)
+	    {
+		vertex->to_Stream(fw, indent + s2_INDENT);
+	    }
 	}
+	fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());
 
-	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
-	{
-	    edge->to_Stream(fw, indent + s_INDENT);
+	fprintf(fw, "%s%sE = {\n", indent.c_str(), s_INDENT.c_str());
+	{	   
+	    for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	    {
+		edge->to_Stream(fw, indent + s2_INDENT);
+	    }
+	    fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());
 	}
+	
 	fprintf(fw, "%s]\n", indent.c_str());
     }
 
@@ -2068,6 +2126,121 @@ namespace boOX
     }
 
 
+    sResult sUndirectedGraph::from_File_ccpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	result = from_Stream_ccpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sUndirectedGraph::from_Stream_ccpf(FILE *fr)
+    {
+	m_Vertices.clear();
+	m_Edges.clear();
+
+	sInt_32 c = fgetc(fr);
+
+	while (c != 'V')
+	{
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, " =\n");
+	c = fgetc(fr);
+
+	while (c == '(')
+	{
+	    add_Vertex();
+	    if (c != '\n' && c != '<')
+	    {
+		while((c = fgetc(fr)) != '\n' && c != '<');
+		if (c == '<')
+		{
+		    sInt_32 x_id;
+
+		    while (c != '>')
+		    {
+			fscanf(fr, "%d", &x_id);
+			m_Vertices.back().m_Conflicts.push_back(x_id);
+			
+			while((c = fgetc(fr)) == ' ');
+			ungetc(c, fr);
+		    }
+		    if (c == '>')
+		    {
+			fgetc(fr);
+		    }
+		    fscanf(fr, "\n");
+		}
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, " =\n");
+	c = fgetc(fr);
+
+	while (c == (int)'{')
+	{
+	    sInt_32 u_id, v_id;
+	    fscanf(fr, "%d,%d", &u_id, &v_id);
+
+	    if (m_directed)
+	    {
+		add_Arrow(u_id, v_id);
+	    }
+	    else
+	    {
+		add_Edge(u_id, v_id);
+	    }
+	    if (c != '\n' && c != '<')
+	    {
+		while((c = fgetc(fr)) != '\n' && c != '<');
+		if (c == '<')
+		{
+		    sInt_32 x_id, y_id;
+
+		    while (c != '>')
+		    {
+			fscanf(fr, "{%d,%d}", &x_id, &y_id);
+//			m_Edges.back().m_Conflicts.push_back(sEdge::Conflict(x_id, y_id));
+			
+			while((c = fgetc(fr)) == ' ');
+			ungetc(c, fr);
+		    }
+		    if (c == '>')
+		    {
+			fgetc(fr);
+		    }
+		    fscanf(fr, "\n");
+		}		
+	    }
+	    c = fgetc(fr);
+	}
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sUndirectedGraph::from_File_mpf(const sString &filename)
     {
 	sResult result;
@@ -2180,7 +2353,125 @@ namespace boOX
 	}
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sUndirectedGraph::from_File_cmpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	result = from_Stream_cmpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sUndirectedGraph::from_Stream_cmpf(FILE *fr)
+    {
+	m_Vertices.clear();
+	m_Edges.clear();
+
+	sInt_32 c = fgetc(fr);
+
+	while (c != 'V')
+	{
+	    if (c != '\n')
+	    {
+		while(fgetc(fr) != '\n');
+	    }
+	    c = fgetc(fr);
+	}
+
+	fscanf(fr, " =\n");
+	c = fgetc(fr);
+
+	while (c == '(')
+	{
+	    sInt_32 id, capacity;
+	    fscanf(fr, "%d,%d", &id, &capacity);
+	    
+	    add_Vertex(id, capacity);    
+
+	    if (c != '\n' && c != '<')
+	    {
+		while((c = fgetc(fr)) != '\n' && c != '<');
+		if (c == '<')
+		{
+		    sInt_32 x_id;
+
+		    while (c != '>')
+		    {
+			fscanf(fr, "%d", &x_id);
+			m_Vertices.back().m_Conflicts.push_back(x_id);
+			
+			while((c = fgetc(fr)) == ' ');
+			ungetc(c, fr);
+		    }
+		    if (c == '>')
+		    {
+			fgetc(fr);
+		    }
+		    fscanf(fr, "\n");
+		}
+	    }
+	    c = fgetc(fr);
+	}
+	fscanf(fr, " =\n");
+	c = fgetc(fr);
+
+	while (c == (int)'{')
+	{
+	    sInt_32 u_id, v_id;
+	    fscanf(fr, "%d,%d", &u_id, &v_id);
+
+	    if (m_directed)
+	    {
+		add_Arrow(u_id, v_id);
+	    }
+	    else
+	    {
+		add_Edge(u_id, v_id);
+	    }
+	    if (c != '\n' && c != '<')
+	    {
+		while((c = fgetc(fr)) != '\n' && c != '<');
+		if (c == '<')
+		{
+		    sInt_32 x_id, y_id;
+
+		    while (c != '>')
+		    {
+			fscanf(fr, "{%d,%d}", &x_id, &y_id);
+//			m_Edges.back().m_Conflicts.push_back(sEdge::Conflict(x_id, y_id));
+			
+			while((c = fgetc(fr)) == ' ');
+			ungetc(c, fr);
+		    }
+		    if (c == '>')
+		    {
+			fgetc(fr);
+		    }
+		    fscanf(fr, "\n");
+		}		
+	    }
+	    c = fgetc(fr);
+	}
+
+	return sRESULT_SUCCESS;
+    }        
 
 
     sResult sUndirectedGraph::to_File_cpf(const sString &filename, const sString &indent) const
@@ -2210,6 +2501,33 @@ namespace boOX
     }
 
 
+    sResult sUndirectedGraph::to_File_ccpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_ccpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sUndirectedGraph::to_Stream_ccpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sE =\n", indent.c_str());
+
+	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	{
+	    fprintf(fw, "%s{%d,%d} (-1)\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
+	}
+    }    
+
+
     sResult sUndirectedGraph::to_File_mpf(const sString &filename, const sString &indent) const
     {
 	FILE *fw;
@@ -2234,7 +2552,34 @@ namespace boOX
 	{
 	    fprintf(fw, "%s{%d,%d}\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
 	}
-    }    
+    }
+
+
+    sResult sUndirectedGraph::to_File_cmpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_cmpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sUndirectedGraph::to_Stream_cmpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sE =\n", indent.c_str());
+
+	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	{
+	    fprintf(fw, "%s{%d,%d}\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
+	}
+    }        
 
 
     sResult sUndirectedGraph::from_File_map(const sString &filename)
@@ -2445,6 +2790,45 @@ namespace boOX
     }
 
 
+    sResult sUndirectedGraph::to_File_usc(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_usc(fw, indent);	
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sUndirectedGraph::to_Stream_usc(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_y_size, m_x_size);
+
+	for (sInt_32 j = 0; j < m_y_size; ++j)
+	{
+	    fprintf(fw, "%s", indent.c_str());
+	    for (sInt_32 i = 0; i < m_x_size; ++i)
+	    {
+		if (m_Matrix[j * m_x_size + i] >= 0)
+		{
+		    fprintf(fw, ".");
+		}
+		else
+		{
+		    fprintf(fw, "#");
+		}
+	    }
+	    fprintf(fw, "\n");
+	}	
+    }
+    
+    
     sResult sUndirectedGraph::from_File_usc(const sString &filename)
     {
 	sResult result;
@@ -2737,6 +3121,85 @@ namespace boOX
     }    
 
 
+/*----------------------------------------------------------------------------*/
+
+    sResult sUndirectedGraph::to_File_mapR(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_mapR(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sUndirectedGraph::to_Stream_mapR(FILE *fw, const sString &indent) const
+    {
+	sInt_32 N_vertices = m_Vertices.size();
+	sInt_32 N_edges = m_Edges.size();
+	
+	fprintf(fw, "%sVertices: %d\n", indent.c_str(), N_vertices);	
+	fprintf(fw, "%sEdges: %d\n", indent.c_str(), N_edges);
+
+	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	{
+	    fprintf(fw, "%s{%d,%d}\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
+	}
+    }    
+
+    
+    sResult sUndirectedGraph::from_File_mapR(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	result = from_Stream_mapR(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sUndirectedGraph::from_Stream_mapR(FILE *fr)
+    {
+	sInt_32 N_vertices;
+	sInt_32 N_edges;	
+
+	fscanf(fr, "Vertices: %d\n", &N_vertices);
+	fscanf(fr, "Edges: %d\n", &N_edges);
+
+	add_Vertices(N_vertices);
+
+	for (sInt_32 edge_id = 0; edge_id < N_edges; ++edge_id)
+	{
+	    sInt_32 u_id, v_id;
+	    
+	    fscanf(fr, "{%d,%d}\n", &u_id, &v_id);
+	    add_Edge(u_id, v_id);	    
+	}
+	return sRESULT_SUCCESS;
+    }    
+
+
+
+    
 /*----------------------------------------------------------------------------*/
 // sVectorGraph
 
