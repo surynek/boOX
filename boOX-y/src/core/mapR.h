@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-158_leibniz                             */
+/*                             boOX 1-157_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.h / 1-158_leibniz                                                     */
+/* mapR.h / 1-157_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous maps for semi-continuous version of MAPF (MAPF-R).
