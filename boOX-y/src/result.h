@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 1-163_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 1-157_leibniz                                                   */
+/* result.h / 1-163_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -237,10 +237,11 @@ enum sTokenPermutationSolverProgram_Result
 
 enum sRealMapConvertorProgram_Result
 {
-    sMAP_R_CONVERT_PROGRAM_INFO                         =  190000,
-    sMAP_R_CONVERT_PROGRAM_ERROR                        = -190000,
-    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
-    sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR  = (sMAP_R_CONVERT_PROGRAM_ERROR - 2)
+    sMAP_R_CONVERT_PROGRAM_INFO                          =  190000,
+    sMAP_R_CONVERT_PROGRAM_ERROR                         = -190000,
+    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR  = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
+    sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR   = (sMAP_R_CONVERT_PROGRAM_ERROR - 2),
+    sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 3)    
 };
 
 

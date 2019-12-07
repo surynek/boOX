@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 1-163_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.h / 1-157_leibniz                                        */
+/* mapR_convert_main.h / 1-163_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -56,6 +56,7 @@ namespace boOX
 
 	Neighborhood m_neighbor_type;
 	sDouble m_neighbor_radius;
+	sInt_32 m_neighbor_k;
     };
 
 

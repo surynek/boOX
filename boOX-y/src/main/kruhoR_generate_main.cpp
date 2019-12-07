@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 1-163_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_generate_main.cpp / 1-157_leibniz                                   */
+/* kruhoR_generate_main.cpp / 1-163_leibniz                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) instance (real kruhobot
@@ -149,15 +149,30 @@ namespace boOX
 	    }	    		
 	    sRealConjunction start_conjunction(&real_Map, 0);    
 	    sRealConjunction goal_conjunction(&real_Map, 0);	
-	    
-	    result = start_conjunction.from_File_xml_init(parameters.m_input_xml_agent_filename);
+
+	    if (parameters.m_N_kruhobots >= 0)
+	    {
+		result = start_conjunction.from_File_xml_init(parameters.m_input_xml_agent_filename, parameters.m_N_kruhobots);
+	    }
+	    else
+	    {
+		result = start_conjunction.from_File_xml_init(parameters.m_input_xml_agent_filename);
+	    }
 
 	    if (sFAILED(result))
 	    {
 		printf("Error: Failed to open xml initial configuration file %s (code = %d).\n", parameters.m_input_xml_agent_filename.c_str(), result);
 		return result;
 	    }
-	    result = goal_conjunction.from_File_xml_goal(parameters.m_input_xml_agent_filename);
+
+	    if (parameters.m_N_kruhobots >= 0)
+	    {
+		result = goal_conjunction.from_File_xml_goal(parameters.m_input_xml_agent_filename, parameters.m_N_kruhobots);
+	    }
+	    else
+	    {		
+		result = goal_conjunction.from_File_xml_goal(parameters.m_input_xml_agent_filename);
+	    }
 
 	    if (sFAILED(result))
 	    {

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 1-163_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 1-157_leibniz                                                 */
+/* kruhoR.cpp / 1-163_leibniz                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -260,7 +260,7 @@ namespace boOX
     }
 
 
-    sResult sRealConjunction::from_File_xml_init(const sString &filename)
+    sResult sRealConjunction::from_File_xml_init(const sString &filename, sInt_32 N_kruhobots)
     {
 	sResult result;
 	FILE *fr;
@@ -270,7 +270,7 @@ namespace boOX
 	    return sREAL_CONJUNCTION_XML_OPEN_ERROR;
 	}
 	
-	if (sFAILED(result = from_Stream_xml_init(fr)))
+	if (sFAILED(result = from_Stream_xml_init(fr, N_kruhobots)))
 	{
 	    fclose(fr);
 	    return result;
@@ -281,7 +281,7 @@ namespace boOX
     }
 
     
-    sResult sRealConjunction::from_Stream_xml_init(FILE *fr)
+    sResult sRealConjunction::from_Stream_xml_init(FILE *fr, sInt_32 N_kruhobots)
     {
 	sString root_keyword;
 	
@@ -304,9 +304,16 @@ namespace boOX
 	sInt_32 kruhobot_id = 1;
 	
 	while(true)
-	{
+	{	    
 	    sString next_keyword;
-	
+
+	    if (N_kruhobots >= 0)
+	    {
+		if (kruhobot_id > N_kruhobots)
+		{
+		    break;
+		}
+	    }	    
 	    sConsumeUntilChar(fr, '<');	    
 	    sConsumeAlphaString(fr, next_keyword);    
 //	    printf("nxt:%s\n", next_keyword.c_str());
@@ -375,6 +382,45 @@ namespace boOX
 //		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
 //		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
 		}
+		else if (start_keyword == "id")
+		{
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+	    
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+				    
+		    sString init_y_keyword;
+		    sInt_32 init_y;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_y_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDy:%s\n", init_y_keyword.c_str());
+		    init_y = sInt_32_from_String(init_y_keyword);		    
+
+		    sString init_x_keyword;
+		    sInt_32 init_x;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_x_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDx:%s\n", init_x_keyword.c_str());
+		    init_x = sInt_32_from_String(init_x_keyword);
+		    
+		    sConsumeUntilChar(fr, '>');
+
+		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }		    
+		}
 		else
 		{
 		    return sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR;		    
@@ -390,7 +436,7 @@ namespace boOX
     }
 
     
-    sResult sRealConjunction::from_File_xml_goal(const sString &filename)
+    sResult sRealConjunction::from_File_xml_goal(const sString &filename, sInt_32 N_kruhobots)
     {
 	sResult result;
 	FILE *fr;
@@ -400,7 +446,7 @@ namespace boOX
 	    return sREAL_CONJUNCTION_XML_OPEN_ERROR;
 	}
 	
-	if (sFAILED(result = from_Stream_xml_goal(fr)))
+	if (sFAILED(result = from_Stream_xml_goal(fr, N_kruhobots)))
 	{
 	    fclose(fr);
 	    return result;
@@ -411,7 +457,7 @@ namespace boOX
     }
 
     
-    sResult sRealConjunction::from_Stream_xml_goal(FILE *fr)
+    sResult sRealConjunction::from_Stream_xml_goal(FILE *fr, sInt_32 N_kruhobots)
     {
 	sString root_keyword;
 	
@@ -436,8 +482,15 @@ namespace boOX
 	while(true)
 	{
 	    sString next_keyword;
-	
-	    sConsumeUntilChar(fr, '<');	    
+
+	    if (N_kruhobots >= 0)
+	    {
+		if (kruhobot_id > N_kruhobots)
+		{
+		    break;
+		}
+	    }
+	    sConsumeUntilChar(fr, '<');
 	    sConsumeAlphaString(fr, next_keyword);    
 //	    printf("nxt:%s\n", next_keyword.c_str());
 
@@ -513,6 +566,53 @@ namespace boOX
 		    }
 //		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
 //		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
+		}
+		else if (start_keyword == "id")
+		{
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+	    
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+
+		    sString init_y_keyword;
+		    sInt_32 init_y;
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_y_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDy:%s\n", init_y_keyword.c_str());
+		    init_y = sInt_32_from_String(init_y_keyword);		    
+
+		    sString init_x_keyword;
+		    sInt_32 init_x;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_x_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDx:%s\n", init_x_keyword.c_str());
+		    init_x = sInt_32_from_String(init_x_keyword);
+		    
+		    sConsumeUntilChar(fr, '>');
+
+		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }
+//		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
+//		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());		    
 		}
 		else
 		{

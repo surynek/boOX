@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 1-163_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.cpp / 1-157_leibniz                                      */
+/* mapR_convert_main.cpp / 1-163_leibniz                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -51,6 +51,7 @@ namespace boOX
   sCommandParameters::sCommandParameters()
       : m_neighbor_type(NEIGHBORHOOD_CIRCULAR)
       , m_neighbor_radius(1.0)
+      , m_neighbor_k(-1)
   {
      // nothing
   }
@@ -80,7 +81,8 @@ namespace boOX
 	printf("                   --input-xml-file=<string>\n");
 	printf("                   --output-mapR-file=<string>\n");
 	printf("                  [--neighbor-type={circular|radiant}]\n");		
-	printf("                  [--neighbor-radius=<double>]\n");	
+	printf("                  [--neighbor-radius=<double>]\n");
+	printf("                  [--neighbor-k=<int>]\n");	
 	printf("\n");
 	printf("Examples:\n");
 	printf("mapR_convert_boOX --input-map-file=ost003d.map\n");
@@ -124,7 +126,23 @@ namespace boOX
 	}
 	case sCommandParameters::NEIGHBORHOOD_RADIANT:
 	{
-	    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+	    if (parameters.m_neighbor_k >= 0)
+	    {		
+		if (parameters.m_neighbor_k >= 2 && parameters.m_neighbor_k < sizeof(s_RADIANT_RADIUS_2K_NEIHBORHOOD) / sizeof(sDouble))
+		{
+		    sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
+		    real_Map.populate_NetworkRadiant(corresponding_radius);		    
+		}
+		else
+		{
+		    printf("Error: Specified k in 2^k neighborhood is out of range <2,6> (code = %d).\n", sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR);
+		    return sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR;
+		}
+	    }
+	    else
+	    {
+		real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+	    }
 	    break;
 	}
 	default:
@@ -194,7 +212,23 @@ namespace boOX
 	    }
 	    case sCommandParameters::NEIGHBORHOOD_RADIANT:
 	    {
-		real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		if (parameters.m_neighbor_k >= 0)
+		{		
+		    if (parameters.m_neighbor_k >= 2 && parameters.m_neighbor_k < sizeof(s_RADIANT_RADIUS_2K_NEIHBORHOOD) / sizeof(sDouble))
+		    {
+			sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
+			real_Map.populate_NetworkRadiant(corresponding_radius);		    
+		    }
+		    else
+		    {
+			printf("Error: Specified k in 2^k neighborhood is out of range <2,6> (code = %d).\n", sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR);
+			return sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR;
+		    }
+		}
+		else
+		{
+		    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		}
 		break;
 	    }
 	    default:
@@ -250,6 +284,10 @@ namespace boOX
 	{
 	    command_parameters.m_neighbor_radius = sDouble_from_String(parameter.substr(18, parameter.size()));
 	}
+	else if (parameter.find("--neighbor-k=") == 0)
+	{
+	    command_parameters.m_neighbor_k = sInt_32_from_String(parameter.substr(13, parameter.size()));	    
+	}	
 	else if (parameter.find("--neighbor-type=") == 0)
 	{
 	    sString neighbor_type_str = parameter.substr(16, parameter.size());
