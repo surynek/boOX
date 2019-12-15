@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-163_leibniz                             */
+/*                             boOX 1-173_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR_test.cpp / 1-163_leibniz                                              */
+/* cbsR_test.cpp / 1-173_leibniz                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search.

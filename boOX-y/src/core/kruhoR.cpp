@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-163_leibniz                             */
+/*                             boOX 1-173_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 1-163_leibniz                                                 */
+/* kruhoR.cpp / 1-173_leibniz                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -370,6 +370,8 @@ namespace boOX
 		    sConsumeUntilChar(fr, '>');
 
 		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("init_idi 1 (%d,%d):%d\n", m_Map->m_Network.m_x_size, m_Map->m_Network.m_y_size, init_id);		    
 
 		    if (m_kruhobot_Locations.size() <= kruhobot_id)
 		    {
@@ -386,10 +388,7 @@ namespace boOX
 		{
 		    sConsumeUntilChar(fr, '"');
 		    sConsumeUntilChar(fr, '"');		    
-	    
-		    sConsumeUntilChar(fr, '"');
-		    sConsumeUntilChar(fr, '"');		    
-				    
+	    			    
 		    sString init_y_keyword;
 		    sInt_32 init_y;
 				
@@ -411,6 +410,8 @@ namespace boOX
 		    sConsumeUntilChar(fr, '>');
 
 		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("init_idi 2 (%d,%d):%d\n", m_Map->m_Network.m_x_size, m_Map->m_Network.m_y_size, init_id);
 
 		    if (m_kruhobot_Locations.size() <= kruhobot_id)
 		    {
@@ -555,6 +556,8 @@ namespace boOX
 		    sConsumeUntilChar(fr, '>');
 
 		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("init_id 1:%d\n", init_id);		    
 
 		    if (m_kruhobot_Locations.size() <= kruhobot_id)
 		    {
@@ -568,10 +571,7 @@ namespace boOX
 //		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
 		}
 		else if (start_keyword == "id")
-		{
-		    sConsumeUntilChar(fr, '"');
-		    sConsumeUntilChar(fr, '"');		    
-	    
+		{    
 		    sConsumeUntilChar(fr, '"');
 		    sConsumeUntilChar(fr, '"');		    
 
@@ -602,6 +602,9 @@ namespace boOX
 		    sConsumeUntilChar(fr, '>');
 
 		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("textu:%d,%d\n", init_x, init_y);
+//		    printf("init_id 2 (%d,%d):%d\n", m_Map->m_Network.m_x_size, m_Map->m_Network.m_y_size, init_id);
 
 		    if (m_kruhobot_Locations.size() <= kruhobot_id)
 		    {

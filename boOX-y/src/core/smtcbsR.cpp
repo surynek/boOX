@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-163_leibniz                             */
+/*                             boOX 1-173_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.cpp / 1-163_leibniz                                                */
+/* smtcbsR.cpp / 1-173_leibniz                                                */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -3107,7 +3107,7 @@ namespace boOX
 	#ifdef sVERBOSE
 	sDouble start_time = sStatistics::get_CPU_Seconds();
 	#endif
-
+	
 	std::vector<sDouble> kruhobot_makespan_lower_Bounds;
 	kruhobot_makespan_lower_Bounds.resize(N_kruhobots + 1);
 
@@ -3754,7 +3754,7 @@ namespace boOX
 	#ifdef sVERBOSE
 	sDouble start_time = sStatistics::get_CPU_Seconds();
 	#endif
-
+    
 	std::vector<sDouble> kruhobot_makespan_lower_Bounds;
 	kruhobot_makespan_lower_Bounds.resize(N_kruhobots + 1);
 
@@ -3775,7 +3775,7 @@ namespace boOX
 
 	Glucose::Solver *solver;
 	solver = new Glucose::Solver;
-	solver->s_Glucose_timeout = m_timeout;	
+	solver->s_Glucose_timeout = m_timeout;
 	
 	{    	    
 	    sDouble next_makespan_bound = -1.0;
@@ -7973,7 +7973,7 @@ namespace boOX
 
 	UnifiedVisits_umap unified_Visits;
 	SinkReachabilities_mmap sink_Reachabilities;
-	
+
 	bucketed_respectful_transition_Queues[initial_transition.m_conflict_fingerprint].insert(RespectfulTransitions_mmap::value_type(0.0, initial_transition));    
 	{
 	    RespectfulVisits_umap empty_conflict_Visits;
@@ -8031,8 +8031,8 @@ namespace boOX
 		    ++processed_nodes;
 		}
 		#endif
-		const RespectfulTransition &front_respectful_transition = front_respectful_transition_Queue.begin()->second;
 
+		const RespectfulTransition &front_respectful_transition = front_respectful_transition_Queue.begin()->second;
 		sDouble effective_makespan_bound = sMIN(individual_makespan_bound + front_respectful_transition.m_waited, makespan_bound);
 		
 		if (front_respectful_transition.m_time + (map.m_shortest_Distances[sink_loc_id][front_respectful_transition.m_location_id] / kruhobot.m_properties.m_linear_velo) <= effective_makespan_bound + s_EPSILON)
