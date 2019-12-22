@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-173_leibniz                             */
+/*                             boOX 1-180_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 1-173_leibniz                                                   */
+/* kruhoR.h / 1-180_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).

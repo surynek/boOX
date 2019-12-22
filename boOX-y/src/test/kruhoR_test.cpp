@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-173_leibniz                             */
+/*                             boOX 1-180_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_test.cpp / 1-173_leibniz                                            */
+/* kruhoR_test.cpp / 1-180_leibniz                                            */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous MAPF (MAPR-R), Kurhobots and related structures.

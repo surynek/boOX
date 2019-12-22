@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-173_leibniz                             */
+/*                             boOX 1-180_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 1-173_leibniz                                                   */
+/* mapR.cpp / 1-180_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1245,7 +1245,7 @@ namespace boOX
 	    m_Network.m_Matrix = new int[m_Network.m_x_size * m_Network.m_y_size];
 	    sInt_32 cnt = 0;	    
 	    
-	    for (sInt_32 r = 0; r < width; ++r)
+	    for (sInt_32 r = 0; r < height; ++r)
 	    {
 		sString row_keyword;
 			    
@@ -1260,7 +1260,7 @@ namespace boOX
 		    return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
 		}		
 
-		for (sInt_32 c = 0; c < height; ++c)
+		for (sInt_32 c = 0; c < width; ++c)
 		{
 		    sString number;
 		    sInt_32 position;
