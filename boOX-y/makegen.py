@@ -627,7 +627,7 @@ def generate_rules(clean_pattern):
                    header_dirs.add(hdr_dir)
                src = construct_source_name(md.directory, sr)
                makefile.write(src + "\n")
-               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -std=c++0x -g -c ")
+               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -std=c++0x -g -c ")
                for hdr_dir in header_dirs:
                  makefile.write("-I" + hdr_dir + " ")
                makefile.write("-o" + obj + " " + src + "\n")
@@ -664,7 +664,7 @@ def generate_rules(clean_pattern):
                src = construct_source_name(md.directory, sr)
                makefile.write(src + "\n")
 
-               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c ")
+               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c ")
                for hdr_dir in header_dirs:
                  makefile.write("-I" + hdr_dir + " ")
                makefile.write("-o" + obj + " " + src + "\n")
@@ -694,7 +694,7 @@ def generate_rules(clean_pattern):
                src = construct_source_name(md.directory, sr)
                makefile.write(src + "\n")
 
-               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c ")
+               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c ")
                for hdr_dir in head_dirs:
                  makefile.write("-I" + hdr_dir + " ")
                makefile.write("-o" + obj + " " + src + "\n")

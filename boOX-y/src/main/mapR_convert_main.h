@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-186_leibniz                             */
+/*                             boOX 1-187_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.h / 1-186_leibniz                                        */
+/* mapR_convert_main.h / 1-187_leibniz                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
