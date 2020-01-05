@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-188_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* safe_intervals.cpp / 1-187_leibniz                                         */
+/* safe_intervals.cpp / 1-188_leibniz                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Exact safe time interval calculation for circular robots
