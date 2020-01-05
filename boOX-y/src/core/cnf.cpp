@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-186_leibniz                             */
+/*                             boOX 1-187_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 1-186_leibniz                                                    */
+/* cnf.cpp / 1-187_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -736,7 +736,7 @@ namespace boOX
 	    {
 		solver->newVar();
 	    }
-	    glu_Lits.push((*lit > 0) ? Glucose::mkLit(glu_var) : ~Glucose::mkLit(glu_var));
+	    glu_Lits.push((*lit > 0) ? Glucose::mkLit(glu_var, false) : ~Glucose::mkLit(glu_var, false));
 	}
 	solver->addClause(glu_Lits);
     }

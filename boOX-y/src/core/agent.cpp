@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-186_leibniz                             */
+/*                             boOX 1-187_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 1-186_leibniz                                                  */
+/* agent.cpp / 1-187_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1081,8 +1081,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);	
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -1197,8 +1199,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -1313,8 +1317,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -1422,8 +1428,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
