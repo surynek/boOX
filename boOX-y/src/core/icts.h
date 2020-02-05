@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-210_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* icts.h / 1-210_leibniz                                                     */
+/* icts.h / 1-211_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Increasing cost tree search for multi-agent path finding MAPF

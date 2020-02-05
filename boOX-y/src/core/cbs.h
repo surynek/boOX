@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-210_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 1-210_leibniz                                                      */
+/* cbs.h / 1-211_leibniz                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
