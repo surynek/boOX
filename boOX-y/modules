@@ -159,6 +159,22 @@ mapR_convert_main.cpp
 pthread
 /src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
+movimap_convert_boOX
+application
+/src/main
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h movimap_convert_main.h
+movimap_convert_main.cpp
+pthread
+/src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
+moviscen_convert_boOX
+application
+/src/main
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h moviscen_convert_main.h
+moviscen_convert_main.cpp
+pthread
+/src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
 kruhoR_generate_boOX
 application
 /src/main

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 1-187_leibniz                                                    */
+/* agent.h / 1-211_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -241,6 +241,7 @@ namespace boOX
 	virtual void to_Stream_cpf(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_ccpf(FILE *fw, const sString &indent = "") const;	
 	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_mpf(FILE *fw, sInt_32 N_agents, const sString &indent = "") const;	
 	virtual void to_Stream_cmpf(FILE *fw, const sString &indent = "") const;
 	
 	virtual void to_Stream_domainPDDL(FILE *fw, const sString &indent = "") const;
@@ -251,6 +252,7 @@ namespace boOX
 	virtual sResult to_File_cpf(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_ccpf(const sString &filename, const sString &indent = "") const;	
 	virtual sResult to_File_mpf(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_mpf(const sString &filename, sInt_32 N_agents, const sString &indent = "") const;	
 	virtual sResult to_File_cmpf(const sString &filename, const sString &indent = "") const;
 	
 	virtual sResult to_File_domainPDDL(const sString &filename, const sString &indent = "") const;
@@ -286,6 +288,9 @@ namespace boOX
 	
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
+
+	virtual sResult from_File_movi(const sString &filename, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
+	virtual sResult from_Stream_movi(FILE *fr, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
 
     public:
 	sUndirectedGraph m_environment;

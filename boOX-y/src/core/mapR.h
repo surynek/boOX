@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.h / 1-187_leibniz                                                     */
+/* mapR.h / 1-211_leibniz                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous maps for semi-continuous version of MAPF (MAPF-R).
@@ -166,6 +166,12 @@ namespace boOX
 
 	virtual sResult from_File_map(const sString &filename);
 	virtual sResult from_Stream_map(FILE *fr);
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);	
+
+	virtual sResult to_File_xml(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, const sString &indent = "") const;	
 
 	virtual sResult from_File_xml(const sString &filename);
 	virtual sResult from_Stream_xml(FILE *fr);

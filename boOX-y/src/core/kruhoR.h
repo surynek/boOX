@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 1-187_leibniz                                                   */
+/* kruhoR.h / 1-211_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -194,6 +194,14 @@ namespace boOX
 
 	virtual sResult from_File_mpfR(const sString &filename);
 	virtual sResult from_Stream_mpfR(FILE *fr);
+        /*----------------------------------------------------------------------------*/
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);	
+
+	virtual sResult to_File_xml(const sString &filename, sInt_32 N_kruhobots = -1, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, sInt_32 N_kruhobots = -1, const sString &indent = "") const;	
+        /*----------------------------------------------------------------------------*/	
 	
     public:
 	Kruhobots_vector m_Kruhobots;

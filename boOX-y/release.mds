@@ -19,5 +19,7 @@ mapf_solver_boOX
 perm_solver_boOX
 rota_solver_boOX
 mapR_convert_boOX
+movimap_convert_boOX
+moviscen_convert_boOX
 kruhoR_generate_boOX
 mapfR_solver_boOX

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 1-187_leibniz                                                   */
+/* cbsR.cpp / 1-211_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -1475,7 +1475,6 @@ namespace boOX
 		    sDouble delta_tau_B = kruhobot_traversal_A_location.m_interval.m_upper - tau_1;
 
 		    Interval avoid_interval_A(kruhobot_traversal_A_location.m_interval.m_lower, kruhobot_traversal_A_location.m_interval.m_lower + delta_tau_A);
-
 		    if (avoid_interval_A.size() > s_DELTION)
 		    {
 			Interval intersection_A = kruhobot_traversal_A_location.m_interval.intersect(avoid_interval_A);
@@ -1492,7 +1491,7 @@ namespace boOX
 
 		    if (avoid_interval_B.size() > s_DELTION)
 		    {
-			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);
+			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);		       
 			
 			if (intersection_B.size() > s_DELTION)
 			{

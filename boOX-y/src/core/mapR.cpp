@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 1-187_leibniz                                                   */
+/* mapR.cpp / 1-211_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1133,6 +1133,88 @@ namespace boOX
 	return sRESULT_SUCCESS;
     }
 
+
+    sResult s2DMap::from_File_movi(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return s2D_MAP_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_movi(fr)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    sResult s2DMap::from_Stream_movi(FILE *fr)
+    {
+	sResult result;
+
+	if (sFAILED(result = m_Network.from_Stream_movi(fr)))
+	{
+	    return result;
+	}
+	
+	m_Locations.resize(m_Network.m_Vertices.size());
+
+	for (sInt_32 y = 0; y < m_Network.m_y_size; ++y)
+	{
+	    for (sInt_32 x = 0; x < m_Network.m_x_size; ++x)
+	    {
+		sInt_32 location_id = m_Network.m_Matrix[y * m_Network.m_x_size + x];
+		
+		if (location_id >= 0)
+		{
+		    m_Locations[location_id] = Location(location_id, x, y);
+		}
+	    }
+	}
+
+	return sRESULT_SUCCESS;
+    }    
+
+    
+    sResult s2DMap::to_File_xml(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return s2D_MAP_OPEN_ERROR;
+	}
+	
+	to_Stream_xml(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+    
+    void s2DMap::to_Stream_xml(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%s<?xml version=\"1.0\" ?>\n", indent.c_str());
+	fprintf(fw, "%s<root>\n", indent.c_str());
+	fprintf(fw, "%s%s<map>\n", indent.c_str(), s_INDENT.c_str());
+
+	sASSERT(m_Network.m_Matrix != NULL);
+	fprintf(fw, "%s%s<width>%d</width>\n", indent.c_str(), s2_INDENT.c_str(), m_Network.m_x_size);
+	fprintf(fw, "%s%s<height>%d</height>\n", indent.c_str(), s2_INDENT.c_str(), m_Network.m_y_size);
+
+	m_Network.to_Stream_xml(fw, indent + s2_INDENT);
+
+	fprintf(fw, "%s%s</map>\n", indent.c_str(), s_INDENT.c_str());
+	fprintf(fw, "%s</root>\n", indent.c_str());
+    }
+    
 
     sResult s2DMap::from_File_xml(const sString &filename)
     {

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 1-211_leibniz                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.com | <pavel@surynek.com>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 1-187_leibniz                                                    */
+/* graph.h / 1-211_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -326,6 +326,12 @@ namespace boOX
 
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
+
+	virtual sResult to_File_xml(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, const sString &indent = "") const;
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);		
 	/*----------------------------------------------------------------------------*/
 	
 	virtual sResult to_File_mapR(const sString &filename, const sString &indent = "") const;
