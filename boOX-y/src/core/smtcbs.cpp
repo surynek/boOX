@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 1-211_leibniz                                                 */
+/* smtcbs.cpp / 1-220_leibniz                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -133,6 +133,7 @@ namespace boOX
     sSMTCBS::sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance)
 	: sCBSBase(instance)
 	, sSMTCBSBase(solver_Encoder)
+	, m_subopt_weight(-1)	  
 	, m_cbs(instance)
 
     {
@@ -143,11 +144,34 @@ namespace boOX
     sSMTCBS::sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance, sDouble timeout)
 	: sCBSBase(instance, timeout)
 	, sSMTCBSBase(solver_Encoder)
+	, m_subopt_weight(-1)
 	, m_cbs(instance)
 
     {
 	// nothing
     }
+
+
+    sSMTCBS::sSMTCBS(sBoolEncoder *solver_Encoder, sDouble subopt_weight, sInstance *instance)
+	: sCBSBase(instance)
+	, sSMTCBSBase(solver_Encoder)
+	, m_subopt_weight(subopt_weight)
+	, m_cbs(instance)
+
+    {
+	// nothing
+    }
+
+    
+    sSMTCBS::sSMTCBS(sBoolEncoder *solver_Encoder, sDouble subopt_weight, sInstance *instance, sDouble timeout)
+	: sCBSBase(instance, timeout)
+	, sSMTCBSBase(solver_Encoder)
+	, m_subopt_weight(subopt_weight)
+	, m_cbs(instance)
+
+    {
+	// nothing
+    }    
 
 
 /*----------------------------------------------------------------------------*/
@@ -4324,7 +4348,7 @@ namespace boOX
 						  sInstance::MDD_vector &MDD,
 						  sInstance::MDD_vector &extra_MDD,
 						  sInt_32                extra_cost,
-						  sInt_32                sUNUSED(cost_limit),
+						  sInt_32                cost_limit,
 						  AgentPaths_vector     &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -4341,10 +4365,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_PathModelVariables(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	variable_ID = build_PathModelVariables(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PathModelConstraints(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	build_PathModelConstraints(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -4413,7 +4437,7 @@ namespace boOX
 							 sInstance::MDD_vector        &extra_MDD,
 							 sInstance::InverseMDD_vector &inverse_MDD,
 							 sInt_32                       extra_cost,
-							 sInt_32                       sUNUSED(cost_limit),
+							 sInt_32                       cost_limit,
 							 AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -4430,10 +4454,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_PathModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_PathModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PathModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_PathModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -4856,16 +4880,16 @@ namespace boOX
 							      sInstance::MDD_vector        &extra_MDD,
 							      sInstance::InverseMDD_vector &inverse_MDD,
 							      sInt_32                       extra_cost,
-							      sInt_32                       sUNUSED(cost_limit),
+							      sInt_32                       cost_limit,
 							      AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
 
-	variable_ID = build_PathModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_PathModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PathModelConstraintsInverse_validity(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
-	build_PathModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);	
+	build_PathModelConstraintsInverse_validity(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
+	build_PathModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);	
 
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
@@ -5026,7 +5050,7 @@ namespace boOX
 							   sInstance::MDD_vector        &extra_MDD,
 							   sInstance::InverseMDD_vector &inverse_MDD,
 							   sInt_32                       extra_cost,
-							   sInt_32                       sUNUSED(cost_limit),
+							   sInt_32                       cost_limit,
 							   AgentPaths_vector            &agent_Paths) const
     {
 	/*
@@ -5036,7 +5060,7 @@ namespace boOX
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 	*/
 
-	build_PathModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_PathModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
@@ -5121,15 +5145,15 @@ namespace boOX
 								 sInstance::MDD_vector        &extra_MDD,
 								 sInstance::InverseMDD_vector &inverse_MDD,
 								 sInt_32                       extra_cost,
-								 sInt_32                       sUNUSED(cost_limit),
+								 sInt_32                       cost_limit,
 								 AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
 
-	variable_ID = build_PathSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_PathSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PathSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_PathSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -5220,7 +5244,7 @@ namespace boOX
 							      sInstance::MDD_vector        &extra_MDD,
 							      sInstance::InverseMDD_vector &inverse_MDD,
 							      sInt_32                       extra_cost,
-							      sInt_32                       sUNUSED(cost_limit),
+							      sInt_32                       cost_limit,
 							      AgentPaths_vector            &agent_Paths) const
     {
 	/*
@@ -5243,6 +5267,7 @@ namespace boOX
 					       MDD,
 					       extra_MDD,
 					       inverse_MDD,
+					       cost_limit,
 					       extra_cost,
 					       sat_Model);
 	
@@ -5298,16 +5323,16 @@ namespace boOX
 								      sInstance::MDD_vector        &extra_MDD,
 								      sInstance::InverseMDD_vector &inverse_MDD,
 								      sInt_32                       extra_cost,
-								      sInt_32                       sUNUSED(cost_limit),
+								      sInt_32                       cost_limit,
 								      AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
 
-	variable_ID = build_PathSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_PathSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PathSmallModelConstraintsInverse_validity(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
-	build_PathSmallModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);	
+	build_PathSmallModelConstraintsInverse_validity(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
+	build_PathSmallModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);	
 
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
@@ -5319,6 +5344,7 @@ namespace boOX
 					       MDD,
 					       extra_MDD,
 					       inverse_MDD,
+					       cost_limit, 
 					       extra_cost,
 					       sat_Model);	
 
@@ -5374,7 +5400,7 @@ namespace boOX
 								       sInstance::MDD_vector        &extra_MDD,
 								       sInstance::InverseMDD_vector &inverse_MDD,
 								       sInt_32                       extra_cost,
-								       sInt_32                       sUNUSED(cost_limit),
+								       sInt_32                       cost_limit,
 								       AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -5388,6 +5414,7 @@ namespace boOX
 					       MDD,
 					       extra_MDD,
 					       inverse_MDD,
+					       cost_limit,
 					       extra_cost,
 					       sat_Model);
 	
@@ -5443,7 +5470,7 @@ namespace boOX
 								   sInstance::MDD_vector        &extra_MDD,
 								   sInstance::InverseMDD_vector &inverse_MDD,
 								   sInt_32                       extra_cost,
-								   sInt_32                       sUNUSED(cost_limit),
+								   sInt_32                       cost_limit,
 								   AgentPaths_vector            &agent_Paths) const
     {
 	/*
@@ -5453,7 +5480,7 @@ namespace boOX
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 	*/
 
-	build_PathSmallModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_PathSmallModelConstraintsInverse_cost(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
@@ -5466,6 +5493,7 @@ namespace boOX
 					       MDD,
 					       extra_MDD,
 					       inverse_MDD,
+					       cost_limit,
 					       extra_cost,
 					       sat_Model);
 	
@@ -5641,12 +5669,14 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    if (cummulative < 0)
 	    {
 		printf("Collision: %d,%d,%d %d,%d,%d\n",
 		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
 		       principal_collision.m_agent_B_id, principal_collision.m_level_B, principal_collision.m_vertex_B_id);
 	    }
+	    */
 	}
 	#endif
 	
@@ -5752,6 +5782,7 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("Number of collisions: %ld\n", Collisions.size());
 	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	    {       	
@@ -5761,6 +5792,7 @@ namespace boOX
 		
 		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
 	    }
+	    */
 	}
 	#endif
 	
@@ -5777,7 +5809,7 @@ namespace boOX
 						     sInstance::MDD_vector &MDD,
 						     sInstance::MDD_vector &extra_MDD,
 						     sInt_32                extra_cost,
-						     sInt_32                sUNUSED(cost_limit),
+						     sInt_32                cost_limit,
 						     AgentPaths_vector     &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -5794,10 +5826,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_SwappingModelVariables(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	variable_ID = build_SwappingModelVariables(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_SwappingModelConstraints(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	build_SwappingModelConstraints(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -5866,7 +5898,7 @@ namespace boOX
 							    sInstance::MDD_vector        &extra_MDD,
 							    sInstance::InverseMDD_vector &inverse_MDD,
 							    sInt_32                       extra_cost,
-							    sInt_32                       sUNUSED(cost_limit),
+							    sInt_32                       cost_limit,
 							    AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -5883,10 +5915,10 @@ namespace boOX
 	}
 */
 	
-	variable_ID = build_SwappingModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_SwappingModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_SwappingModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_SwappingModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -5955,7 +5987,7 @@ namespace boOX
 						  sInstance::MDD_vector &MDD,
 						  sInstance::MDD_vector &extra_MDD,
 						  sInt_32                extra_cost,
-						  sInt_32                sUNUSED(cost_limit),
+						  sInt_32                cost_limit,
 						  AgentPaths_vector     &agent_Paths) const
     {
 	context.m_trans_Collisions.push_back(principal_collision);
@@ -5965,6 +5997,7 @@ namespace boOX
 				      instance,
 				      MDD,
 				      extra_MDD,
+				      cost_limit,
 				      extra_cost,
 				      sat_Model);
 
@@ -6036,7 +6069,7 @@ namespace boOX
 						  sInstance::MDD_vector       &MDD,
 						  sInstance::MDD_vector       &extra_MDD,
 						  sInt_32                      extra_cost,
-						  sInt_32                      sUNUSED(cost_limit),
+						  sInt_32                      cost_limit,
 						  AgentPaths_vector           &agent_Paths) const
     {
 	
@@ -6055,6 +6088,7 @@ namespace boOX
 				       instance,
 				       MDD,
 				       extra_MDD,
+				       cost_limit,
 				       extra_cost,
 				       sat_Model);
 
@@ -6127,7 +6161,7 @@ namespace boOX
 							 sInstance::MDD_vector        &extra_MDD,
 							 sInstance::InverseMDD_vector &inverse_MDD,
 							 sInt_32                      extra_cost,
-							 sInt_32                      sUNUSED(cost_limit),
+							 sInt_32                      cost_limit,
 							 AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -6146,6 +6180,7 @@ namespace boOX
 					      MDD,
 					      extra_MDD,
 					      inverse_MDD,
+					      cost_limit,
 					      extra_cost,
 					      sat_Model);
 
@@ -6218,7 +6253,7 @@ namespace boOX
 								    sInstance::MDD_vector        &extra_MDD,
 								    sInstance::InverseMDD_vector &inverse_MDD,
 								    sInt_32                       extra_cost,
-								    sInt_32                       sUNUSED(cost_limit),
+								    sInt_32                       cost_limit,
 								    AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -6235,10 +6270,10 @@ namespace boOX
 	}
 */
 	
-	variable_ID = build_SwappingSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_SwappingSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_SwappingSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_SwappingSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -6293,7 +6328,7 @@ namespace boOX
 								 sInstance::MDD_vector        &extra_MDD,
 								 sInstance::InverseMDD_vector &inverse_MDD,
 								 sInt_32                      extra_cost,
-								 sInt_32                      sUNUSED(cost_limit),
+								 sInt_32                      cost_limit,
 								 AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -6312,6 +6347,7 @@ namespace boOX
 						   MDD,
 						   extra_MDD,
 						   inverse_MDD,
+						   cost_limit,
 						   extra_cost,
 						   sat_Model);
 
@@ -6473,12 +6509,14 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    if (cummulative < 0)
 	    {
 		printf("Collision: %d,%d,%d %d,%d,%d\n",
 		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
 		       principal_collision.m_agent_B_id, principal_collision.m_level_B, principal_collision.m_vertex_B_id);
 	    }
+	    */
 	}
 	#endif
 	
@@ -6598,6 +6636,7 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("Number of collisions: %ld\n", Collisions.size());
 	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	    {       	
@@ -6607,6 +6646,7 @@ namespace boOX
 		
 		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
 	    }
+	    */
 	}
 	#endif
 	
@@ -6623,7 +6663,7 @@ namespace boOX
 							sInstance::MDD_vector &MDD,
 							sInstance::MDD_vector &extra_MDD,
 							sInt_32                extra_cost,
-							sInt_32                sUNUSED(cost_limit),
+							sInt_32                cost_limit,
 							AgentPaths_vector     &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -6640,10 +6680,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_PermutationModelVariables(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	variable_ID = build_PermutationModelVariables(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PermutationModelConstraints(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	build_PermutationModelConstraints(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -6712,7 +6752,7 @@ namespace boOX
 							       sInstance::MDD_vector        &extra_MDD,
 							       sInstance::InverseMDD_vector &inverse_MDD,
 							       sInt_32                       extra_cost,
-							       sInt_32                       sUNUSED(cost_limit),
+							       sInt_32                       cost_limit,
 							       AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -6729,10 +6769,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_PermutationModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_PermutationModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PermutationModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_PermutationModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -6801,7 +6841,7 @@ namespace boOX
 						     sInstance::MDD_vector &MDD,
 						     sInstance::MDD_vector &extra_MDD,
 						     sInt_32                extra_cost,
-						     sInt_32                sUNUSED(cost_limit),
+						     sInt_32                cost_limit,
 						     AgentPaths_vector     &agent_Paths) const
     {
 	context.m_trans_Collisions.push_back(principal_collision);
@@ -6811,6 +6851,7 @@ namespace boOX
 					 instance,
 					 MDD,
 					 extra_MDD,
+					 cost_limit,
 					 extra_cost,
 					 sat_Model);
 	
@@ -6882,7 +6923,7 @@ namespace boOX
 						     sInstance::MDD_vector   &MDD,
 						     sInstance::MDD_vector   &extra_MDD,
 						     sInt_32                  extra_cost,
-						     sInt_32                  sUNUSED(cost_limit),
+						     sInt_32                  cost_limit,
 						     AgentPaths_vector       &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -6895,6 +6936,7 @@ namespace boOX
 					  instance,
 					  MDD,
 					  extra_MDD,
+					  cost_limit,
 					  extra_cost,
 					  sat_Model);
 	
@@ -6967,7 +7009,7 @@ namespace boOX
 							    sInstance::MDD_vector        &extra_MDD,
 							    sInstance::InverseMDD_vector &inverse_MDD,
 							    sInt_32                       extra_cost,
-							    sInt_32                       sUNUSED(cost_limit),
+							    sInt_32                       cost_limit,
 							    AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -6981,6 +7023,7 @@ namespace boOX
 						 MDD,
 						 extra_MDD,
 						 inverse_MDD,
+						 cost_limit,
 						 extra_cost,
 						 sat_Model);
 	
@@ -7053,15 +7096,15 @@ namespace boOX
 								       sInstance::MDD_vector        &extra_MDD,
 								       sInstance::InverseMDD_vector &inverse_MDD,
 								       sInt_32                       extra_cost,
-								       sInt_32                       sUNUSED(cost_limit),
+								       sInt_32                       cost_limit,
 								       AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
 
-	variable_ID = build_PermutationSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_PermutationSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_PermutationSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_PermutationSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -7115,7 +7158,7 @@ namespace boOX
 								    sInstance::MDD_vector        &extra_MDD,
 								    sInstance::InverseMDD_vector &inverse_MDD,
 								    sInt_32                       extra_cost,
-								    sInt_32                       sUNUSED(cost_limit),
+								    sInt_32                       cost_limit,
 								    AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -7129,6 +7172,7 @@ namespace boOX
 						      MDD,
 						      extra_MDD,
 						      inverse_MDD,
+						      cost_limit,
 						      extra_cost,
 						      sat_Model);
 	
@@ -7294,12 +7338,14 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    if (cummulative < 0)
 	    {
 		printf("Collision: %d,%d,%d %d,%d,%d\n",
 		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
 		       principal_collision.m_agent_B_id, principal_collision.m_level_B, principal_collision.m_vertex_B_id);
 	    }
+	    */
 	}
 	#endif
 	
@@ -7413,6 +7459,7 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("Number of collisions: %ld\n", Collisions.size());
 	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	    {       	
@@ -7422,6 +7469,7 @@ namespace boOX
 		
 		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
 	    }
+	    */
 	}
 	#endif
 	
@@ -7438,7 +7486,7 @@ namespace boOX
 						     sInstance::MDD_vector &MDD,
 						     sInstance::MDD_vector &extra_MDD,
 						     sInt_32                extra_cost,
-						     sInt_32                sUNUSED(cost_limit),
+						     sInt_32                cost_limit,
 						     AgentPaths_vector     &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -7455,10 +7503,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_RotationModelVariables(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	variable_ID = build_RotationModelVariables(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_RotationModelConstraints(solver, context, instance, MDD, extra_MDD, extra_cost, sat_Model);
+	build_RotationModelConstraints(solver, context, instance, MDD, extra_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -7527,7 +7575,7 @@ namespace boOX
 							    sInstance::MDD_vector        &extra_MDD,
 							    sInstance::InverseMDD_vector &inverse_MDD,
 							    sInt_32                       extra_cost,
-							    sInt_32                       sUNUSED(cost_limit),
+							    sInt_32                       cost_limit,
 							    AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
@@ -7544,10 +7592,10 @@ namespace boOX
 	}
 */
 
-	variable_ID = build_RotationModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_RotationModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_RotationModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_RotationModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -7616,18 +7664,19 @@ namespace boOX
 						  sInstance::MDD_vector &MDD,
 						  sInstance::MDD_vector &extra_MDD,
 						  sInt_32                extra_cost,
-						  sInt_32                sUNUSED(cost_limit),
+						  sInt_32                cost_limit,
 						  AgentPaths_vector     &agent_Paths) const
     {
 	context.m_trans_Collisions.push_back(principal_collision);
 	
 	refine_RotationModelCollision(solver,
-				  principal_collision,
-				  instance,
-				  MDD,
-				  extra_MDD,
-				  extra_cost,
-				  sat_Model);
+				      principal_collision,
+				      instance,
+				      MDD,
+				      extra_MDD,
+				      cost_limit,
+				      extra_cost,
+				      sat_Model);
 	
 	if (!solver->simplify())
 	{
@@ -7697,7 +7746,7 @@ namespace boOX
 						  sInstance::MDD_vector       &MDD,
 						  sInstance::MDD_vector       &extra_MDD,
 						  sInt_32                      extra_cost,
-						  sInt_32                      sUNUSED(cost_limit),
+						  sInt_32                      cost_limit,
 						  AgentPaths_vector           &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -7715,6 +7764,7 @@ namespace boOX
 				       instance,
 				       MDD,
 				       extra_MDD,
+				       cost_limit,
 				       extra_cost,
 				       sat_Model);
 	
@@ -7787,7 +7837,7 @@ namespace boOX
 							 sInstance::MDD_vector        &extra_MDD,
 							 sInstance::InverseMDD_vector &inverse_MDD,
 							 sInt_32                       extra_cost,
-							 sInt_32                       sUNUSED(cost_limit),
+							 sInt_32                       cost_limit,
 							 AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -7806,6 +7856,7 @@ namespace boOX
 					      MDD,
 					      extra_MDD,
 					      inverse_MDD,
+					      cost_limit,
 					      extra_cost,
 					      sat_Model);
 	
@@ -7878,15 +7929,15 @@ namespace boOX
 								    sInstance::MDD_vector        &extra_MDD,
 								    sInstance::InverseMDD_vector &inverse_MDD,
 								    sInt_32                       extra_cost,
-								    sInt_32                       sUNUSED(cost_limit),
+								    sInt_32                       cost_limit,
 								    AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
 
-	variable_ID = build_RotationSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_RotationSmallModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_RotationSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_RotationSmallModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -7941,7 +7992,7 @@ namespace boOX
 								 sInstance::MDD_vector        &extra_MDD,
 								 sInstance::InverseMDD_vector &inverse_MDD,
 								 sInt_32                       extra_cost,
-								 sInt_32                       sUNUSED(cost_limit),
+								 sInt_32                       cost_limit,
 								 AgentPaths_vector            &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -7960,6 +8011,7 @@ namespace boOX
 						   MDD,
 						   extra_MDD,
 						   inverse_MDD,
+						   cost_limit,
 						   extra_cost,
 						   sat_Model);
 	
@@ -8014,15 +8066,15 @@ namespace boOX
 									       sInstance::MDD_vector        &extra_MDD,
 									       sInstance::InverseMDD_vector &inverse_MDD,
 									       sInt_32                       extra_cost,
-									       sInt_32                       sUNUSED(cost_limit),
+									       sInt_32                       cost_limit,
 									       AgentPaths_vector            &agent_Paths) const
     {
 	sInt_32 variable_ID;
 
-	variable_ID = build_RotationSmallCapacitatedModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	variable_ID = build_RotationSmallCapacitatedModelVariablesInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 	m_solver_Encoder->set_LastVariableID(variable_ID);
 
-	build_RotationSmallCapacitatedModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, extra_cost, sat_Model);
+	build_RotationSmallCapacitatedModelConstraintsInverse(solver, context, instance, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -8078,7 +8130,7 @@ namespace boOX
 									    sInstance::MDD_vector              &extra_MDD,
 									    sInstance::InverseMDD_vector       &inverse_MDD,
 									    sInt_32                             extra_cost,
-									    sInt_32                             sUNUSED(cost_limit),
+									    sInt_32                             cost_limit,
 									    AgentPaths_vector                  &agent_Paths) const
     {
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
@@ -8102,6 +8154,7 @@ namespace boOX
 							      MDD,
 							      extra_MDD,
 							      inverse_MDD,
+							      cost_limit,
 							      extra_cost,
 							      sat_Model);
 	
@@ -8265,12 +8318,14 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    if (cummulative < 0)
 	    {
 		printf("Collision: %d,%d,%d %d,%d,%d\n",
 		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
 		       principal_collision.m_agent_B_id, principal_collision.m_level_B, principal_collision.m_vertex_B_id);
 	    }
+	    */
 	}
 	#endif
 	
@@ -8388,6 +8443,7 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("Number of collisions: %ld\n", Collisions.size());
 	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	    {       	
@@ -8397,6 +8453,7 @@ namespace boOX
 		
 		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
 	    }
+	    */
 	}
 	#endif
 	
@@ -8523,12 +8580,14 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    if (cummulative < 0)
 	    {
 		printf("Collision: %d,%d,%d %d,%d,%d\n",
 		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
 		       principal_collision.m_agent_B_id, principal_collision.m_level_B, principal_collision.m_vertex_B_id);
 	    }
+	    */
 	}
 	#endif
 	
@@ -8649,6 +8708,7 @@ namespace boOX
 	
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("Number of collisions: %ld\n", Collisions.size());
 	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	    {       	
@@ -8658,6 +8718,7 @@ namespace boOX
 		
 		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
 	    }
+	    */
 	}
 	#endif
 	
@@ -8672,6 +8733,7 @@ namespace boOX
 					      const sInstance             &instance,
 					      const sInstance::MDD_vector &MDD,
 					      const sInstance::MDD_vector &sUNUSED(extra_MDD),
+					      sInt_32                      sUNUSED(cost_limit),
 					      sInt_32                      sUNUSED(extra_cost),
 					      Model                       &sat_Model) const
     {
@@ -8750,6 +8812,7 @@ namespace boOX
 						     const sInstance::MDD_vector        &MDD,
 						     const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 						     const sInstance::InverseMDD_vector &inverse_MDD,
+						     sInt_32                             sUNUSED(cost_limit),						     
 						     sInt_32                             sUNUSED(extra_cost),
 						     Model                              &sat_Model) const
     {
@@ -8846,6 +8909,7 @@ namespace boOX
 					     const sInstance             &instance,
 					     const sInstance::MDD_vector &MDD,
 					     const sInstance::MDD_vector &extra_MDD,
+					     sInt_32                      cost_limit,
 					     sInt_32                      extra_cost,
 					     Model                       &sat_Model) const
     {
@@ -8904,7 +8968,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -9057,6 +9132,7 @@ namespace boOX
 						    const sInstance::MDD_vector        &MDD,
 						    const sInstance::MDD_vector        &extra_MDD,
 						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             cost_limit,
 						    sInt_32                             extra_cost,
 						    Model                              &sat_Model) const
     {
@@ -9115,7 +9191,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	/*
@@ -9354,6 +9441,7 @@ namespace boOX
 							     const sInstance::MDD_vector        &MDD,
 							     const sInstance::MDD_vector        &extra_MDD,
 							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             sUNUSED(cost_limit),
 							     sInt_32                             extra_cost,
 							     Model                              &sat_Model) const
     {
@@ -9446,6 +9534,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &MDD,
 							 const sInstance::MDD_vector        &extra_MDD,
 							 const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+							 sInt_32                             cost_limit,
 							 sInt_32                             extra_cost,
 							 Model                              &sat_Model) const
     {
@@ -9503,7 +9592,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}	
     }        
     
@@ -9688,6 +9788,7 @@ namespace boOX
 							  const sInstance::MDD_vector        &MDD,
 							  const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							  const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+							  sInt_32                             sUNUSED(cost_limit),
 							  sInt_32                             sUNUSED(extra_cost),
 							  Model                              &sat_Model) const
     {
@@ -9777,6 +9878,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &MDD,
 							 const sInstance::MDD_vector        &extra_MDD,
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             cost_limit,
 							 sInt_32                             extra_cost,
 							 Model                              &sat_Model) const
     {
@@ -9886,7 +9988,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}	
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -9916,6 +10029,7 @@ namespace boOX
 					       MDD,
 					       extra_MDD,
 					       inverse_MDD,
+					       cost_limit,
 					       extra_cost,
 					       sat_Model);
     }
@@ -9927,6 +10041,7 @@ namespace boOX
 								  const sInstance::MDD_vector        &MDD,
 								  const sInstance::MDD_vector        &extra_MDD,
 								  const sInstance::InverseMDD_vector &inverse_MDD,
+								  sInt_32                             cost_limit,
 								  sInt_32                             extra_cost,
 								  Model                              &sat_Model) const
     {
@@ -10014,6 +10129,7 @@ namespace boOX
 					       MDD,
 					       extra_MDD,
 					       inverse_MDD,
+					       cost_limit,
 					       extra_cost,
 					       sat_Model);
     }   
@@ -10025,6 +10141,7 @@ namespace boOX
 							      const sInstance::MDD_vector        &MDD,
 							      const sInstance::MDD_vector        &extra_MDD,
 							      const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+							      sInt_32                             cost_limit,
 							      sInt_32                             extra_cost,
 							      Model                              &sat_Model) const
     {
@@ -10082,7 +10199,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}	
     }        
     
@@ -10093,6 +10221,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &sUNUSED(MDD),
 							 const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             sUNUSED(cost_limit),
 							 sInt_32                             sUNUSED(extra_cost),
 							 Model                              &sat_Model) const
     {	
@@ -10197,6 +10326,7 @@ namespace boOX
 						  const sInstance             &instance,
 						  const sInstance::MDD_vector &MDD,
 						  const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						  sInt_32                      sUNUSED(cost_limit),
 						  sInt_32                      sUNUSED(extra_cost),
 						  Model                       &sat_Model) const
     {
@@ -10275,6 +10405,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &MDD,
 							 const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             sUNUSED(cost_limit),
 							 sInt_32                             sUNUSED(extra_cost),
 							 Model                              &sat_Model) const
     {
@@ -10371,6 +10502,7 @@ namespace boOX
 						 const sInstance             &instance,
 						 const sInstance::MDD_vector &MDD,
 						 const sInstance::MDD_vector &extra_MDD,
+						 sInt_32                      cost_limit,
 						 sInt_32                      extra_cost,
 						 Model                       &sat_Model) const
     {
@@ -10429,7 +10561,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10616,6 +10759,7 @@ namespace boOX
 				       instance,
 				       MDD,
 				       extra_MDD,
+				       cost_limit,
 				       extra_cost,
 				       sat_Model);
     }
@@ -10627,6 +10771,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const
     {
@@ -10685,7 +10830,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	std::vector<VariableIDs_vector> mutex_source_Identifiers;		
@@ -10913,6 +11069,7 @@ namespace boOX
 					      MDD,
 					      extra_MDD,
 					      inverse_MDD,
+					      cost_limit,
 					      extra_cost,
 					      sat_Model);
     }    
@@ -10923,6 +11080,7 @@ namespace boOX
 						const sInstance             &sUNUSED(instance),
 						const sInstance::MDD_vector &MDD,
 						const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						sInt_32                      sUNUSED(cost_limit),
 						sInt_32                      sUNUSED(extra_cost),
 						Model                       &sat_Model) const
     {
@@ -10957,6 +11115,7 @@ namespace boOX
 						 const sInstance             &instance,
 						 const sInstance::MDD_vector &MDD,
 						 const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						 sInt_32                      sUNUSED(cost_limit),
 						 sInt_32                      sUNUSED(extra_cost),
 						 Model                       &sat_Model) const
     {
@@ -11046,6 +11205,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             sUNUSED(cost_limit),
 							sInt_32                             sUNUSED(extra_cost),
 							Model                              &sat_Model) const
     {	
@@ -11200,6 +11360,7 @@ namespace boOX
 							      const sInstance::MDD_vector        &MDD,
 							      const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							      const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+							      sInt_32                             sUNUSED(cost_limit),
 							      sInt_32                             sUNUSED(extra_cost),
 							      Model                              &sat_Model) const
     {
@@ -11248,6 +11409,7 @@ namespace boOX
 							     const sInstance::MDD_vector        &MDD,
 							     const sInstance::MDD_vector        &extra_MDD,
 							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             cost_limit,
 							     sInt_32                             extra_cost,
 							     Model                              &sat_Model) const
     {
@@ -11306,7 +11468,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 
@@ -11389,6 +11562,7 @@ namespace boOX
 						   MDD,
 						   extra_MDD,
 						   inverse_MDD,
+						   cost_limit,
 						   extra_cost,
 						   sat_Model);
     }    
@@ -11401,6 +11575,7 @@ namespace boOX
 							     const sInstance::MDD_vector        &sUNUSED(MDD),
 							     const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             sUNUSED(cost_limit),
 							     sInt_32                             sUNUSED(extra_cost),
 							     Model                              &sat_Model) const
     {	
@@ -11579,6 +11754,7 @@ namespace boOX
 						     const sInstance             &instance,
 						     const sInstance::MDD_vector &MDD,
 						     const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						     sInt_32                      sUNUSED(cost_limit),
 						     sInt_32                      sUNUSED(extra_cost),
 						     Model                       &sat_Model) const
     {
@@ -11657,6 +11833,7 @@ namespace boOX
 							    const sInstance::MDD_vector        &MDD,
 							    const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							    const sInstance::InverseMDD_vector &inverse_MDD,
+							    sInt_32                             sUNUSED(cost_limit),
 							    sInt_32                             sUNUSED(extra_cost),
 							    Model                              &sat_Model) const
     {
@@ -11753,6 +11930,7 @@ namespace boOX
 						    const sInstance             &instance,
 						    const sInstance::MDD_vector &MDD,
 						    const sInstance::MDD_vector &extra_MDD,
+						    sInt_32                      cost_limit,
 						    sInt_32                      extra_cost,
 						    Model                       &sat_Model) const
     {
@@ -11811,7 +11989,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -11994,6 +12183,7 @@ namespace boOX
 					  instance,
 					  MDD,
 					  extra_MDD,
+					  cost_limit,
 					  extra_cost,
 					  sat_Model);
     }
@@ -12005,6 +12195,7 @@ namespace boOX
 							   const sInstance::MDD_vector        &MDD,
 							   const sInstance::MDD_vector        &extra_MDD,
 							   const sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                             cost_limit,
 							   sInt_32                             extra_cost,
 							   Model                              &sat_Model) const
     {
@@ -12063,7 +12254,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	std::vector<VariableIDs_vector> mutex_source_Identifiers;		
@@ -12289,6 +12491,7 @@ namespace boOX
 						 MDD,
 						 extra_MDD,
 						 inverse_MDD,
+						 cost_limit,
 						 extra_cost,
 						 sat_Model);
     }        
@@ -12299,6 +12502,7 @@ namespace boOX
 						   const sInstance             &sUNUSED(instance),
 						   const sInstance::MDD_vector &MDD,
 						   const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						   sInt_32                      sUNUSED(cost_limit),
 						   sInt_32                      sUNUSED(extra_cost),
 						   Model                       &sat_Model) const
     {
@@ -12332,6 +12536,7 @@ namespace boOX
 						    const sInstance             &sUNUSED(instance),
 						    const sInstance::MDD_vector &MDD,
 						    const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						    sInt_32                      sUNUSED(cost_limit),
 						    sInt_32                      sUNUSED(extra_cost),
 						    Model                       &sat_Model) const
     {
@@ -12369,6 +12574,7 @@ namespace boOX
 							   const sInstance::MDD_vector        &sUNUSED(MDD),
 							   const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							   const sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                             sUNUSED(cost_limit),
 							   sInt_32                             sUNUSED(extra_cost),
 							   Model                              &sat_Model) const
     {	
@@ -12448,6 +12654,7 @@ namespace boOX
 								 const sInstance::MDD_vector        &MDD,
 								 const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 								 const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+								 sInt_32                             sUNUSED(cost_limit),
 								 sInt_32                             sUNUSED(extra_cost),
 								 Model                              &sat_Model) const
     {
@@ -12496,6 +12703,7 @@ namespace boOX
 								const sInstance::MDD_vector        &MDD,
 								const sInstance::MDD_vector        &extra_MDD,
 								const sInstance::InverseMDD_vector &inverse_MDD,
+								sInt_32                             cost_limit,
 								sInt_32                             extra_cost,
 								Model                              &sat_Model) const
     {
@@ -12554,7 +12762,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -12635,6 +12854,7 @@ namespace boOX
 						 MDD,
 						 extra_MDD,
 						 inverse_MDD,
+						 cost_limit,
 						 extra_cost,
 						 sat_Model);
     }        
@@ -12646,6 +12866,7 @@ namespace boOX
 								const sInstance::MDD_vector        &sUNUSED(MDD),
 								const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 								const sInstance::InverseMDD_vector &inverse_MDD,
+								sInt_32                             sUNUSED(cost_limit),
 								sInt_32                             sUNUSED(extra_cost),
 								Model                              &sat_Model) const
     {	
@@ -12724,6 +12945,7 @@ namespace boOX
 						  const sInstance             &instance,
 						  const sInstance::MDD_vector &MDD,
 						  const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						  sInt_32                      sUNUSED(cost_limit),
 						  sInt_32                      sUNUSED(extra_cost),
 						  Model                       &sat_Model) const
     {
@@ -12802,6 +13024,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &MDD,
 							 const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             sUNUSED(cost_limit),
 							 sInt_32                             sUNUSED(extra_cost),
 							 Model                              &sat_Model) const
     {
@@ -12898,6 +13121,7 @@ namespace boOX
 						 const sInstance             &instance,
 						 const sInstance::MDD_vector &MDD,
 						 const sInstance::MDD_vector &extra_MDD,
+						 sInt_32                      cost_limit,
 						 sInt_32                      extra_cost,
 						 Model                       &sat_Model) const
     {
@@ -12956,7 +13180,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13128,6 +13363,7 @@ namespace boOX
 				       instance,
 				       MDD,
 				       extra_MDD,
+				       cost_limit,
 				       extra_cost,
 				       sat_Model);
     }
@@ -13139,6 +13375,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const
     {
@@ -13197,7 +13434,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	std::vector<VariableIDs_vector> mutex_source_Identifiers;		
@@ -13424,6 +13672,7 @@ namespace boOX
 					      MDD,
 					      extra_MDD,
 					      inverse_MDD,
+					      cost_limit,
 					      extra_cost,
 					      sat_Model);
     }    
@@ -13434,6 +13683,7 @@ namespace boOX
 						const sInstance             &sUNUSED(instance),
 						const sInstance::MDD_vector &MDD,
 						const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						sInt_32                      sUNUSED(cost_limit),
 						sInt_32                      sUNUSED(extra_cost),
 						Model                       &sat_Model) const
     {
@@ -13468,6 +13718,7 @@ namespace boOX
 						 const sInstance             &instance,
 						 const sInstance::MDD_vector &MDD,
 						 const sInstance::MDD_vector &sUNUSED(extra_MDD),
+						 sInt_32                      sUNUSED(cost_limit),
 						 sInt_32                      sUNUSED(extra_cost),
 						 Model                       &sat_Model) const
     {
@@ -13557,6 +13808,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             sUNUSED(cost_limit),
 							sInt_32                             sUNUSED(extra_cost),
 							Model                              &sat_Model) const
     {	
@@ -13711,6 +13963,7 @@ namespace boOX
 							      const sInstance::MDD_vector        &MDD,
 							      const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							      const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+							      sInt_32                             sUNUSED(cost_limit),
 							      sInt_32                             sUNUSED(extra_cost),
 							      Model                              &sat_Model) const
     {
@@ -13759,6 +14012,7 @@ namespace boOX
 							     const sInstance::MDD_vector        &MDD,
 							     const sInstance::MDD_vector        &extra_MDD,
 							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             cost_limit,
 							     sInt_32                             extra_cost,
 							     Model                              &sat_Model) const
     {
@@ -13817,7 +14071,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13899,6 +14164,7 @@ namespace boOX
 						   MDD,
 						   extra_MDD,
 						   inverse_MDD,
+						   cost_limit,
 						   extra_cost,
 						   sat_Model);
     }    
@@ -13911,6 +14177,7 @@ namespace boOX
 							     const sInstance::MDD_vector        &sUNUSED(MDD),
 							     const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             sUNUSED(cost_limit),
 							     sInt_32                             sUNUSED(extra_cost),
 							     Model                              &sat_Model) const
     {	
@@ -14091,6 +14358,7 @@ namespace boOX
 									 const sInstance::MDD_vector        &MDD,
 									 const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 									 const sInstance::InverseMDD_vector &sUNUSED(inverse_MDD),
+									 sInt_32                             sUNUSED(cost_limit),
 									 sInt_32                             sUNUSED(extra_cost),
 									 Model                              &sat_Model) const
     {
@@ -14139,6 +14407,7 @@ namespace boOX
 									const sInstance::MDD_vector        &MDD,
 									const sInstance::MDD_vector        &extra_MDD,
 									const sInstance::InverseMDD_vector &inverse_MDD,
+									sInt_32                             cost_limit,
 									sInt_32                             extra_cost,
 									Model                              &sat_Model) const
     {
@@ -14197,7 +14466,18 @@ namespace boOX
 	}
 	if (!cardinality_Identifiers.empty())
 	{
-	    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14280,6 +14560,7 @@ namespace boOX
 							      MDD,
 							      extra_MDD,
 							      inverse_MDD,
+							      cost_limit,
 							      extra_cost,
 							      sat_Model);
     }    
@@ -14293,6 +14574,7 @@ namespace boOX
 									const sInstance::MDD_vector        &sUNUSED(MDD),
 									const sInstance::MDD_vector        &sUNUSED(extra_MDD),
 									const sInstance::InverseMDD_vector &inverse_MDD,
+									sInt_32                             sUNUSED(cost_limit),
 									sInt_32                             sUNUSED(extra_cost),
 									Model                              &sat_Model) const
     {	

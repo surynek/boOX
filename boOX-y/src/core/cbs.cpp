@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 1-211_leibniz                                                    */
+/* cbs.cpp / 1-220_leibniz                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -459,7 +459,105 @@ namespace boOX
 	    ++extra;
 	}
 	return -1;
-    }    
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingSwapping_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingSwapping_DeltaSuperStar(*m_Instance, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingSwapping_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingSwapping_DeltaSuperStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingSwapping_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingSwapping_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingSwapping_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
+	
+	#ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = instance.estimate_TotalSwappingCost(max_individual_cost) + N_agents;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving TSWAP cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingSwapping_DeltaSuperStar(instance, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }        
    
 
     sInt_32 sCBS::find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const
@@ -728,6 +826,104 @@ namespace boOX
 	    }
 	    #endif
 	    if ((solution_cost = find_NonconflictingPaths_DeltaStar(instance, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingPaths_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingPaths_DeltaSuperStar(*m_Instance, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingPaths_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingPaths_DeltaSuperStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingPaths_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingPaths_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingPaths_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
+	
+	#ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = instance.estimate_TotalPathCost(max_individual_cost) + N_agents;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingPaths_DeltaSuperStar(instance, agent_Paths, cost, extra)) >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1025,7 +1221,105 @@ namespace boOX
 	    ++extra;
 	}
 	return -1;
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingPermutation_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingPermutation_DeltaSuperStar(*m_Instance, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingPermutation_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingPermutation_DeltaSuperStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
     }    
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingPermutation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingPermutation_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingPermutation_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
+	
+        #ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = instance.estimate_TotalPermutationCost(max_individual_cost) + N_agents;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+	    }
+	    #endif	    
+	    if ((solution_cost = find_NonconflictingPermutation_DeltaSuperStar(instance, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }        
 
     
     sInt_32 sCBS::find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const
@@ -1308,7 +1602,105 @@ namespace boOX
 	    ++extra;
 	}
 	return -1;
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingRotation_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingRotation_DeltaSuperStar(*m_Instance, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingRotation_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingRotation_DeltaSuperStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
     }    
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingRotation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingRotation_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingRotation_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
+	
+        #ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = instance.estimate_TotalRotationCost(max_individual_cost) + N_agents;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+	    }
+	    #endif	    
+	    if ((solution_cost = find_NonconflictingRotation_DeltaSuperStar(instance, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }        
 
 
 /*----------------------------------------------------------------------------*/
@@ -1391,6 +1783,38 @@ namespace boOX
     }
 
     
+    sInt_32 sCBS::find_NonconflictingSwapping_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingSwapping_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit, extra_cost);
+    }
+    
+   
+    sInt_32 sCBS::find_NonconflictingSwapping_DeltaSuperStar(sInstance  &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;	
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	instance.collect_Endpoints(source_IDs, goal_IDs);
+	instance.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);
+	
+	return find_NonconflictingSwapping_principalCollision_DeltaSuperStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }    
+
+    
     sInt_32 sCBS::find_NonconflictingPaths(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPaths(*m_Instance, agent_Paths, cost_limit);
@@ -1467,6 +1891,38 @@ namespace boOX
 	return find_NonconflictingPaths_principalCollision_DeltaStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
     }        
 
+
+    sInt_32 sCBS::find_NonconflictingPaths_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingPaths_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit, extra_cost);
+    }
+    
+   
+    sInt_32 sCBS::find_NonconflictingPaths_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;	
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	instance.collect_Endpoints(source_IDs, goal_IDs);
+	instance.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);
+	
+	return find_NonconflictingPaths_principalCollision_DeltaSuperStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }
+    
     
     sInt_32 sCBS::find_NonconflictingPermutation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
@@ -1544,7 +2000,40 @@ namespace boOX
 	
 //	return find_NonconflictingPermutation_prioritizedCooccupation(instance, agent_Conflicts, agent_Paths, cost_limit);
 	return find_NonconflictingPermutation_principalCollision_DeltaStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
-    }        
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingPermutation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingPermutation_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit, extra_cost);
+    }
+
+    
+    sInt_32 sCBS::find_NonconflictingPermutation_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;	
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	instance.collect_Endpoints(source_IDs, goal_IDs);
+	instance.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);
+	
+//	return find_NonconflictingPermutation_prioritizedCooccupation(instance, agent_Conflicts, agent_Paths, cost_limit);
+	return find_NonconflictingPermutation_principalCollision_DeltaSuperStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }            
 
 
     sInt_32 sCBS::find_NonconflictingRotation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
@@ -1623,7 +2112,40 @@ namespace boOX
 	
 //	return find_NonconflictingRotation_prioritizedCooccupation(instance, agent_Conflicts, agent_Paths, cost_limit);
 	return find_NonconflictingRotation_principalCollision_DeltaStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
-    }    
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingRotation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingRotation_DeltaSuperStar(*m_Instance, agent_Paths, cost_limit, extra_cost);
+    }
+
+    
+    sInt_32 sCBS::find_NonconflictingRotation_DeltaSuperStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	instance.collect_Endpoints(source_IDs, goal_IDs);
+	instance.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);	
+	
+//	return find_NonconflictingRotation_prioritizedCooccupation(instance, agent_Conflicts, agent_Paths, cost_limit);
+	return find_NonconflictingRotation_principalCollision_DeltaSuperStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }        
 
     
 /*----------------------------------------------------------------------------*/
@@ -3051,7 +3573,200 @@ namespace boOX
 	    }
 	}	
 	return -1;
-    }            
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingSwapping_principalCollision_DeltaSuperStar(const sInstance           &instance,
+										AgentConflicts_vector     &agent_Conflicts,
+										AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										AgentPaths_vector         &agent_Paths,
+										sInt_32                    cost_limit,
+										sInt_32                    extra_cost)
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();	
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findSuperStar_NonconflictingSequence(instance.m_environment,
+						     instance.m_start_configuration.get_AgentLocation(agent_id),
+						     instance.m_goal_configuration.get_AgentLocation(agent_id),
+						     cost_limit,
+						     extra_cost,
+						     initial_node.m_agent_Conflicts[agent_id],
+						     initial_node.m_agent_edge_Conflicts[agent_id],
+						     m_first_agent_Paths[agent_id]) < 0)
+	    {
+		return -1;
+	    }	    
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    {
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+	
+		if (findSuperStar_NonconflictingSequence(instance.m_environment,
+							 instance.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 instance.m_goal_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 cost_limit,
+							 extra_cost,
+//						    search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//						    search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							 m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingSwappingDelta(instance,
+								   best_node.m_node_id,
+								   space_Cooccupations,
+								   cost_limit,
+								   search_Store,
+								   search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }                
 
     
 /*----------------------------------------------------------------------------*/
@@ -4238,7 +4953,223 @@ namespace boOX
 	    }
 	}	
 	return -1;
-    }    
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingPaths_principalCollision_DeltaSuperStar(const sInstance           &instance,
+									     AgentConflicts_vector     &agent_Conflicts,
+									     AgentEdgeConflicts_vector &agent_edge_Conflicts,
+									     AgentPaths_vector         &agent_Paths,
+									     sInt_32                    cost_limit,
+									     sInt_32                    extra_cost)
+    {
+	sDouble relaxation = 1.0;
+	
+	sInt_32 cummulative;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();	
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findSuperStar_NonconflictingSequence(instance.m_environment,
+						     instance.m_start_configuration.get_AgentLocation(agent_id),
+						     instance.m_goal_configuration.get_AgentLocation(agent_id),
+						     cost_limit,
+						     extra_cost,
+						     initial_node.m_agent_Conflicts[agent_id],
+						     initial_node.m_agent_edge_Conflicts[agent_id],
+						     m_first_agent_Paths[agent_id]) < 0)
+	    {
+		return -1;
+	    }
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > relaxation * cost_limit)
+	    {
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif	    
+
+	    /*
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+	    */
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		/*
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+		*/
+		
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+		/*
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+		*/
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+
+		/*
+		printf("Node STACK:\n");
+		sInt_32 nd_id = best_node.m_node_id;
+		std::vector<sInt_32> print_buff;
+		while (nd_id > 0)
+		{
+		    print_buff.push_back(nd_id);
+		    nd_id = search_Store[nd_id].m_upper_node_id;
+		}
+		for (std::vector<sInt_32>::const_reverse_iterator nd = print_buff.rbegin(); nd != print_buff.rend(); ++nd)
+		{
+		    printf("%d ", *nd);
+		}
+		printf("\n--------\n");
+		*/
+	
+		if (findSuperStar_NonconflictingSequence(instance.m_environment,
+							 instance.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 instance.m_goal_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 cost_limit,
+							 extra_cost,
+//						search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//						search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							 m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingPathsDelta(instance,
+								best_node.m_node_id,
+								space_Cooccupations,
+								relaxation * cost_limit,
+								search_Store,
+								search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }        
 
 
 /*----------------------------------------------------------------------------*/
@@ -5406,6 +6337,199 @@ namespace boOX
 	}	
 	return -1;
     }
+
+
+    sInt_32 sCBS::find_NonconflictingPermutation_principalCollision_DeltaSuperStar(const sInstance           &instance,
+										   AgentConflicts_vector     &agent_Conflicts,
+										   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										   AgentPaths_vector         &agent_Paths,
+										   sInt_32                    cost_limit,
+										   sInt_32                    extra_cost)
+    {    
+	sInt_32 cummulative;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();	
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findSuperStar_NonconflictingSequence(instance.m_environment,
+						     instance.m_start_configuration.get_AgentLocation(agent_id),
+						     instance.m_goal_configuration.get_AgentLocation(agent_id),
+						     cost_limit,
+						     extra_cost,
+						     initial_node.m_agent_Conflicts[agent_id],
+						     initial_node.m_agent_edge_Conflicts[agent_id],
+						     m_first_agent_Paths[agent_id]) < 0)
+	    {
+		return -1;
+	    }	    
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    {
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+	
+		if (findSuperStar_NonconflictingSequence(instance.m_environment,
+							 instance.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 instance.m_goal_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 cost_limit,
+							 extra_cost,
+//						search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//						search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							 m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingPermutationDelta(instance,
+								      best_node.m_node_id,
+								      space_Cooccupations,
+								      cost_limit,
+								      search_Store,
+								      search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }    
 
     
 /*----------------------------------------------------------------------------*/
@@ -6582,8 +7706,201 @@ namespace boOX
 	    }
 	}	
 	return -1;
-    }    
+    }
 
+
+    sInt_32 sCBS::find_NonconflictingRotation_principalCollision_DeltaSuperStar(const sInstance           &instance,
+										AgentConflicts_vector     &agent_Conflicts,
+										AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										AgentPaths_vector         &agent_Paths,
+										sInt_32                    cost_limit,
+										sInt_32                    extra_cost)
+    {    
+	sInt_32 cummulative;
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();	
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findSuperStar_NonconflictingSequence(instance.m_environment,
+						     instance.m_start_configuration.get_AgentLocation(agent_id),
+						     instance.m_goal_configuration.get_AgentLocation(agent_id),
+						     cost_limit,
+						     extra_cost,
+						     initial_node.m_agent_Conflicts[agent_id],
+						     initial_node.m_agent_edge_Conflicts[agent_id],
+						     m_first_agent_Paths[agent_id]) < 0)
+	    {
+		return -1;
+	    }	    
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    {
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+	
+		if (findSuperStar_NonconflictingSequence(instance.m_environment,
+							 instance.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 instance.m_goal_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							 cost_limit,
+							 extra_cost,
+//						    search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//				  		    search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							 m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							 m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingRotationDelta(instance,
+								   best_node.m_node_id,
+								   space_Cooccupations,
+								   cost_limit,
+								   search_Store,
+								   search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }    
+    
     
 /*----------------------------------------------------------------------------*/
     
@@ -11893,7 +13210,9 @@ namespace boOX
     {
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("seq:%d -> %d\n", source_id, sink_id);
+	    */
 	}
 	#endif
 		
@@ -11902,6 +13221,7 @@ namespace boOX
        
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("conflicts:\n");
 	    
 	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
@@ -11930,6 +13250,7 @@ namespace boOX
 		}
 		printf("\n");
 	    }	    
+	    */
 	}
 	#endif
 
@@ -12185,7 +13506,320 @@ namespace boOX
 	    visit_Queue.pop_front();
 	}
 	return -1;
-    }    
+    }
+
+
+    sInt_32 sCBS::findSuperStar_NonconflictingSequence(const sUndirectedGraph     &graph,
+						       sInt_32                     source_id,
+						       sInt_32                     sink_id,
+						       sInt_32                     sUNUSED(cost_limit),
+						       sInt_32                     extra_cost,
+						       const Conflicts_vector     &Conflicts,
+						       const EdgeConflicts_vector &edge_Conflicts,
+						       VertexIDs_vector           &Path) const
+    {
+	sDouble relaxation = 1.0;
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("seq:%d -> %d\n", source_id, sink_id);
+	    */
+	}
+	#endif
+		
+	Visits_mmap visit_Queue;
+	Visits_vector visited_Vertices;
+       
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (VertexIDs_uset::const_iterator conf = Conflicts[level].begin(); conf != Conflicts[level].end(); ++conf)
+		{
+		    printf("%d ", *conf);
+		}
+		printf("\n");
+	    }
+
+	    printf("edge conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < edge_Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (NeighborIDs_umap::const_iterator neigh = edge_Conflicts[level].begin(); neigh != edge_Conflicts[level].end(); ++neigh)
+		{
+		    printf("%d [", neigh->first);
+		    for (VertexIDs_uset::const_iterator vertex = neigh->second.begin(); vertex != neigh->second.end(); ++vertex)
+		    {
+			printf("%d ", *vertex);
+		    }
+		    printf("] ");
+		}
+		printf("\n");
+	    }	    
+	    */
+	}
+	#endif
+
+	if (source_id == sink_id)
+	{
+	    bool non_conflicting_sink = true;
+
+	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
+	    {
+		if (Conflicts[level].find(sink_id) != Conflicts[level].end())
+		{
+		    non_conflicting_sink = false;
+		    break;
+		}
+	    }
+
+	    if (non_conflicting_sink)
+	    {
+		Path.push_back(sink_id);
+		return 1;
+	    }
+	}
+  
+	if (Conflicts.empty() || Conflicts[0].find(source_id) == Conflicts[0].end())
+	{
+	    visit_Queue.insert(Visits_mmap::value_type(0 + relaxation * m_goal_Distances[sink_id][source_id], Visit(0, source_id, -1)));
+	    visited_Vertices.push_back(Visits_umap());
+	    
+	    Visit source_visit(0, source_id, -1);
+	    visited_Vertices[0][source_id] = source_visit;
+	}
+	else
+	{
+	    return -1;
+	}
+	
+	while (!visit_Queue.empty())
+	{
+	    const Visit &front_visit = visit_Queue.begin()->second;    
+	    Visits_mmap::iterator visit_erase = visit_Queue.begin();
+	        
+            /*
+	    #ifdef sDEBUG
+	    {
+		printf("  v:%d,%d,%d\n", front_visit.m_level, front_visit.m_vertex_id, front_visit.m_previous_id);
+	    }
+	    #endif
+	    */
+
+	    if (visited_Vertices.size() <= front_visit.m_level + 1)
+	    {
+		visited_Vertices.push_back(Visits_umap());
+	    }
+    
+	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= relaxation * (m_goal_Distances[sink_id][source_id] + extra_cost))
+	    {
+		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
+		{
+		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+
+		    if (visited_Vertices.size() <= front_visit.m_level + 1)
+		    {
+			sASSERT(visited_Vertices.size() == front_visit.m_level + 1);
+			visited_Vertices.push_back(Visits_umap());
+		    }
+		    Visits_umap &next_visited_Vertices = visited_Vertices[front_visit.m_level + 1];
+		    
+		    if (next_visited_Vertices.find(neighbor_id) == next_visited_Vertices.end())
+		    {
+		    /*
+		    #ifdef sDEBUG
+		    {
+			printf("    n:%d\n", neighbor_id);
+		    }
+		    #endif
+		    */		    
+			if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(neighbor_id) == Conflicts[front_visit.m_level + 1].end())
+			{
+			    NeighborIDs_umap::const_iterator edge_vertex;
+			    
+			    if (   edge_Conflicts.size() <= front_visit.m_level
+				|| (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
+				|| edge_vertex->second.find(neighbor_id) == edge_vertex->second.end())
+			    {
+			    /*
+                            #ifdef sDEBUG
+			    {
+			        printf("      *\n");
+			    }
+                            #endif
+			    */			
+				Visit neighbor_visit(front_visit.m_level + 1, neighbor_id, front_visit.m_vertex_id);
+				next_visited_Vertices[neighbor_id] = neighbor_visit;
+
+				if (neighbor_id == sink_id)
+				{
+				    bool non_conflicting_sink = true;
+				    
+				    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
+				    {
+					if (Conflicts[level].find(sink_id) != Conflicts[level].end())
+					{
+					    non_conflicting_sink = false;
+					    break;
+					}
+				    }
+				    
+				    if (non_conflicting_sink)
+				    {
+					sInt_32 prev_vertex_id = sink_id;
+					Path.resize(front_visit.m_level + 2, -1);
+
+					/* Lambda
+                                        #ifdef sDEBUG
+					{
+					    printf("Path:\n");
+					    for (sInt_32 i = 0; i <= front_visit.m_level + 1; ++i)
+					    {
+						for (Visits_umap::const_iterator visit_vertex = visited_Vertices[i].begin(); visit_vertex != visited_Vertices[i].end(); ++visit_vertex)
+						{
+						    printf("(%d,%d,%d) ", visit_vertex->second.m_level, visit_vertex->second.m_vertex_id, visit_vertex->second.m_previous_id);
+						}
+						printf("\n");
+					    }
+					}
+				        #endif
+
+                                        #ifdef sDEBUG
+					{
+					    printf("P:");
+					}
+				        #endif
+					*/
+					for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+					{
+					    Path[i] = prev_vertex_id;
+					    /*
+                                            #ifdef sDEBUG
+					    {
+						printf("%d ", Path[i]);
+					    }
+				            #endif
+					    */
+					    Visits_umap::const_iterator prev_visit = visited_Vertices[i].find(prev_vertex_id);
+					    
+					    sASSERT(prev_visit != visited_Vertices[i].end());
+					    
+					    prev_vertex_id = prev_visit->second.m_previous_id;
+					}
+					/*
+				        #ifdef sDEBUG
+					{
+					    printf("\n");
+					}
+				        #endif
+					*/
+					return front_visit.m_level + 2;
+				    }	 		
+				}			    
+				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] + neighbor_visit.m_level, neighbor_visit));
+			    }
+			}
+		    }
+		}
+	        { /* wait action */
+
+		/*
+                #ifdef sDEBUG
+		{
+		    printf("    -:%d\n", front_visit.m_vertex_id);
+		}
+                #endif		
+		*/
+		    
+		    if (visited_Vertices.size() <= front_visit.m_level + 1)
+		    {
+			sASSERT(visited_Vertices.size() == front_visit.m_level + 1);
+			visited_Vertices.push_back(Visits_umap());
+		    }		
+		    Visits_umap &next_visited_Vertices = visited_Vertices[front_visit.m_level + 1];
+		    
+		    if (next_visited_Vertices.find(front_visit.m_vertex_id) == next_visited_Vertices.end())
+		    {
+			if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(front_visit.m_vertex_id) == Conflicts[front_visit.m_level + 1].end())
+			{
+			    NeighborIDs_umap::const_iterator edge_vertex;
+			    
+			    if (   edge_Conflicts.size() <= front_visit.m_level
+				|| (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
+				|| edge_vertex->second.find(front_visit.m_vertex_id) == edge_vertex->second.end())
+			    {
+			
+			    /*
+                            #ifdef sDEBUG
+			    {
+			        printf("      *\n");
+			    }
+                            #endif
+			    */		
+				if (front_visit.m_vertex_id == sink_id)
+				{
+				    bool non_conflicting_sink = true;
+				    
+				    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
+				    {
+					if (Conflicts[level].find(sink_id) != Conflicts[level].end())
+					{
+					    non_conflicting_sink = false;
+					    break;
+					}
+				    }
+				    
+				    if (non_conflicting_sink)
+				    {
+					sInt_32 prev_vertex_id = sink_id;
+					Path.resize(front_visit.m_level + 1, -1);
+				
+                                        #ifdef sDEBUG
+					{
+					    printf("Path:\n");
+					    for (sInt_32 i = 0; i <= front_visit.m_level; ++i)
+					    {
+						for (Visits_umap::const_iterator visit_vertex = visited_Vertices[i].begin(); visit_vertex != visited_Vertices[i].end(); ++visit_vertex)
+						{
+						    printf("(%d,%d,%d) ", visit_vertex->second.m_level, visit_vertex->second.m_vertex_id, visit_vertex->second.m_previous_id);
+						}
+						printf("\n");
+					    }
+					}
+				        #endif
+					
+					for (sInt_32 i = front_visit.m_level; i >= 0; --i)
+					{
+					    Path[i] = prev_vertex_id;
+					    Visits_umap::const_iterator prev_visit = visited_Vertices[i].find(prev_vertex_id);
+					    
+					    sASSERT(prev_visit != visited_Vertices[i].end());
+					    
+					    prev_vertex_id = prev_visit->second.m_previous_id;
+					}
+					return front_visit.m_level + 1;
+				    }
+				}
+				
+				Visit identity_visit(front_visit.m_level + 1, front_visit.m_vertex_id, front_visit.m_vertex_id);
+				next_visited_Vertices[front_visit.m_vertex_id] = identity_visit;
+				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][identity_visit.m_vertex_id] + identity_visit.m_level, identity_visit));
+			    }
+			}
+		    }
+		}
+	    }
+//	    visit_Queue.erase(visit_Queue.begin());
+	    visit_Queue.erase(visit_erase);	    
+	}
+	return -1;
+    }        
 
 
     void sCBS::equalize_NonconflictingSequences(AgentPaths_vector &agent_Paths) const

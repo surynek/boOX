@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.h / 1-211_leibniz                                    */
+/* moviscen_convert_main.h / 1-220_leibniz                                    */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -51,7 +51,9 @@ namespace boOX
 	sString m_input_movi_scen_filename;	
 	sString m_output_xml_scen_filename;
 	
-	sString m_output_mpf_filename;	
+	sString m_output_mpf_filename;
+	sString m_output_cpf_filename;
+	sString m_output_bgu_filename;
     };
 
 

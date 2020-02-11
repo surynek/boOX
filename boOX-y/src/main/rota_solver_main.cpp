@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.cpp / 1-211_leibniz                                       */
+/* rota_solver_main.cpp / 1-220_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.
@@ -82,7 +82,7 @@ namespace boOX
 	printf("swap_solver_boOX  --input-file=<string>\n");
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
-	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+|smtcbs++}]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++}]\n");
         printf("		 [--timeout=<double>]\n");
 	printf("		 [--capacitated]\n");
 	printf("\n");
@@ -186,7 +186,28 @@ namespace boOX
 		cost = cbs_Solver.find_ShortestNonconflictingRotation_DeltaStar(solution, parameters.m_cost_limit);
 	    }
 	    break;
-	}			
+	}
+	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("CBS-PLUS-PLUS-PLUS");
+	    }
+  	    #endif
+	    
+	    sCBS cbs_Solver(&instance, parameters.m_timeout);
+
+	    if (parameters.m_capacitated)
+	    {
+		printf("Wrong combination of command line parameters.\n");
+		return sROTA_SOLVER_PROGRAM_WRONG_PARAMETERS_ERROR;
+	    }
+	    else
+	    {	    
+		cost = cbs_Solver.find_ShortestNonconflictingRotation_DeltaSuperStar(solution, parameters.m_cost_limit);
+	    }
+	    break;
+	}				
 	case sCommandParameters::ALGORITHM_SMTCBS:
 	{
             #ifdef sSTATISTICS
@@ -339,6 +360,10 @@ namespace boOX
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_PLUS_PLUS;
 	    }
+	    else if (algorithm_str == "cbs+++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS;
+	    }	    
 	    else if (algorithm_str == "smtcbs")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS;

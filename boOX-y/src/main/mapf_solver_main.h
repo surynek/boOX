@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.h / 1-211_leibniz                                         */
+/* mapf_solver_main.h / 1-220_leibniz                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.
@@ -44,7 +44,8 @@ namespace boOX
 	{
 	    ALGORITHM_CBS,
 	    ALGORITHM_CBS_PLUS,
-	    ALGORITHM_CBS_PLUS_PLUS,	    
+	    ALGORITHM_CBS_PLUS_PLUS,
+	    ALGORITHM_CBS_PLUS_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS,
 	    ALGORITHM_SMTCBS_PLUS,
 	    ALGORITHM_SMTCBS_PLUS_PLUS	    
@@ -59,6 +60,7 @@ namespace boOX
 	sString m_input_filename;		
 	sString m_output_filename;
 
+	sDouble m_subopt_ratio;	
 	sDouble m_timeout;
     };
 

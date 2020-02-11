@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.cpp / 1-211_leibniz                                  */
+/* moviscen_convert_main.cpp / 1-220_leibniz                                  */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -81,7 +81,9 @@ namespace boOX
 	printf("moviscen_convert_boOX  --input-movi-map-file=<string>\n");
 	printf("                       --input-movi-scen-file=<string>\n");	
 	printf("                       --output-xml-scen-file=<string>\n");
-	printf("                       --output-mpf-file=<string>\n");	
+	printf("                       --output-mpf-file=<string>\n");
+	printf("                       --output-cpf-file=<string>\n");
+	printf("                       --output-bgu-file=<string>\n");			
 	printf("                      [--N-kruhobots=<int>]\n");
 	printf("                      [--N-agents=<int>]\n");		
 	printf("\n");
@@ -170,7 +172,7 @@ namespace boOX
     }
 
 
-    sResult convert_MoviScen2MpfTask(const sCommandParameters &parameters)
+    sResult convert_MoviScen2MultirobotTask(const sCommandParameters &parameters)
     {
 	sResult result;
 	s2DMap real_Map;
@@ -181,7 +183,7 @@ namespace boOX
 	}
   	#endif
 
-	if (!parameters.m_output_mpf_filename.empty())
+	if (!parameters.m_output_mpf_filename.empty() || !parameters.m_output_cpf_filename.empty() || !parameters.m_output_bgu_filename.empty())
 	{
 	    sInstance mapf_Instance;
 
@@ -223,6 +225,40 @@ namespace boOX
 		    return result;
 		}
 	    }
+
+	    if (!parameters.m_output_cpf_filename.empty())
+	    {
+		if (parameters.m_N_agents >= 0)
+		{
+		    result = mapf_Instance.to_File_cpf(parameters.m_output_cpf_filename, parameters.m_N_agents);
+		}
+		else
+		{
+		    result = mapf_Instance.to_File_cpf(parameters.m_output_cpf_filename);
+		}
+		if (sFAILED(result))
+		{
+		    printf("Error: Failed to write cpf file %s (code = %d).\n", parameters.m_output_cpf_filename.c_str(), result);
+		    return result;
+		}
+	    }
+
+	    if (!parameters.m_output_bgu_filename.empty())
+	    {
+		if (parameters.m_N_agents >= 0)
+		{
+		    result = mapf_Instance.to_File_bgu(parameters.m_output_bgu_filename, parameters.m_N_agents);
+		}
+		else
+		{
+		    result = mapf_Instance.to_File_bgu(parameters.m_output_bgu_filename);
+		}
+		if (sFAILED(result))
+		{
+		    printf("Error: Failed to write bgu file %s (code = %d).\n", parameters.m_output_bgu_filename.c_str(), result);
+		    return result;
+		}
+	    }	    	    
 	}
 	
         #ifdef sSTATISTICS
@@ -258,7 +294,15 @@ namespace boOX
 	else if (parameter.find("--output-mpf-file=") == 0)
 	{
 	    command_parameters.m_output_mpf_filename = parameter.substr(18, parameter.size());
-	}	
+	}
+	else if (parameter.find("--output-cpf-file=") == 0)
+	{
+	    command_parameters.m_output_cpf_filename = parameter.substr(18, parameter.size());
+	}
+	else if (parameter.find("--output-bgu-file=") == 0)
+	{
+	    command_parameters.m_output_bgu_filename = parameter.substr(18, parameter.size());
+	}			
 	else if (parameter.find("--N-kruhobots=") == 0)
 	{
 	    command_parameters.m_N_kruhobots = sInt_32_from_String(parameter.substr(14, parameter.size()));
@@ -331,9 +375,9 @@ int main(int argc, char **argv)
 	    }
 	}
 	
-	if (!command_parameters.m_output_mpf_filename.empty())
+	if (!command_parameters.m_output_mpf_filename.empty() || !command_parameters.m_output_cpf_filename.empty() || !command_parameters.m_output_bgu_filename.empty())
 	{
-	    result = convert_MoviScen2MpfTask(command_parameters);
+	    result = convert_MoviScen2MultirobotTask(command_parameters);
 
 	    if (sFAILED(result))
 	    {
@@ -342,9 +386,12 @@ int main(int argc, char **argv)
 	    }
 	}
 
-	if (command_parameters.m_output_xml_scen_filename.empty() && command_parameters.m_output_mpf_filename.empty())
+	if (   command_parameters.m_output_xml_scen_filename.empty()
+	    && command_parameters.m_output_mpf_filename.empty()
+	    && command_parameters.m_output_cpf_filename.empty()
+	    && command_parameters.m_output_bgu_filename.empty())
 	{    
-	    printf("Error: Neither xml nor mpf output file specified (code = %d).\n", sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR);
+	    printf("Error: Neither .xml nor .mpf nor .cpf not .bgu output file specified (code = %d).\n", sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR);
 	    print_Help();
 	    
 	    return sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR;		

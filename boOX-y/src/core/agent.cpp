@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-211_leibniz                             */
+/*                             boOX 1-220_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 1-211_leibniz                                                  */
+/* agent.cpp / 1-220_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -2221,6 +2221,21 @@ namespace boOX
     }
 
 
+    sResult sInstance::to_File_cpf(const sString &filename, sInt_32 N_agents, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_OPEN_ERROR;
+	}
+	to_Stream_cpf(fw, N_agents, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sInstance::to_File_ccpf(const sString &filename, const sString &indent) const
     {
 	FILE *fw;
@@ -2323,6 +2338,20 @@ namespace boOX
     }
 
 
+    sResult sInstance::to_File_bgu(const sString &filename, sInt_32 N_agents, const sString &indent, sInt_32 instance_id) const
+    {
+	FILE *fw;
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_BGU_OPEN_ERROR;
+	}
+	to_Stream_bgu(fw, N_agents, indent, instance_id);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     void sInstance::to_Stream(FILE *fw, const sString &indent) const
     {       
 	fprintf(fw, "%sMultiagent instance: [\n", indent.c_str());
@@ -2367,6 +2396,37 @@ namespace boOX
 	}
 	m_environment.to_Stream_cpf(fw, indent);
     }
+
+
+    void sInstance::to_Stream_cpf(FILE *fw, sInt_32 N_agents, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_start_configuration.m_vertex_Occups.size();
+	
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d:-1)[%d:%d:%d]", i,
+		    m_start_configuration.m_vertex_Occups[i] <= N_agents ? m_start_configuration.m_vertex_Occups[i] : 0,
+		    m_goal_configuration.m_vertex_Occups[i] <= N_agents ? m_goal_configuration.m_vertex_Occups[i] : 0,
+		    m_goal_configuration.m_vertex_Occups[i] <= N_agents ? m_goal_configuration.m_vertex_Occups[i] : 0);
+	    
+	    if (m_environment.m_Vertices[i].m_Conflicts.empty())
+	    {
+		fprintf(fw, "\n");
+	    }
+	    else
+	    {
+		fprintf(fw, "< ");
+		for (sInt_32 c = 0; c < m_environment.m_Vertices[i].m_Conflicts.size(); ++c)
+		{
+		    fprintf(fw, "%d ", m_environment.m_Vertices[i].m_Conflicts[c]);
+		}			 
+		fprintf(fw, ">\n");
+	    }
+	}
+	m_environment.to_Stream_cpf(fw, indent);
+    }    
 
 
     void sInstance::to_Stream_ccpf(FILE *fw, const sString &indent) const
@@ -2616,6 +2676,46 @@ namespace boOX
 	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
 	}
     }
+
+
+    void sInstance::to_Stream_bgu(FILE *fw, sInt_32 N_agents, const sString &indent, sInt_32 instance_id) const
+    {
+	sASSERT(m_environment.m_Matrix != NULL);
+
+	fprintf(fw, "%s%d\n", indent.c_str(), instance_id);
+	fprintf(fw, "%sGrid:\n", indent.c_str());
+	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_environment.m_y_size, m_environment.m_x_size);
+
+	for (sInt_32 j = 0; j < m_environment.m_y_size; ++j)
+	{
+	    for (sInt_32 i = 0; i < m_environment.m_x_size; ++i)
+	    {
+		if (m_environment.m_Matrix[j * m_environment.m_x_size + i] >= 0)
+		{
+		    fprintf(fw, ".");
+		}
+		else
+		{
+		    fprintf(fw, "@");
+		}
+	    }
+	    fprintf(fw, "\n");
+	}
+	
+	fprintf(fw, "%sAgents:\n", indent.c_str());
+	fprintf(fw, "%s%d\n", indent.c_str(), N_agents);
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    fprintf(fw, "%s%d,", indent.c_str(), agent_id - 1);
+	    
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d,",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
+	    
+	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+	}
+    }    
 
 
     sResult sInstance::from_File_cpf(const sString &filename)
