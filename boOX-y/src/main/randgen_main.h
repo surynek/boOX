@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-220_leibniz                             */
+/*                             boOX 1-223_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* randgen_main.h / 1-220_leibniz                                             */
+/* randgen_main.h / 1-223_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Random Graph Instance Generator - main program.
