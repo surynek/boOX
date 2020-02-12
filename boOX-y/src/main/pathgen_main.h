@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-223_leibniz                             */
+/*                             boOX 1-224_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* pathgen_main.h / 1-223_leibniz                                             */
+/* pathgen_main.h / 1-224_leibniz                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Path Graph Instance Generator - main program.

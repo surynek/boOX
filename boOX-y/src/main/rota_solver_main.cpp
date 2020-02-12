@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-223_leibniz                             */
+/*                             boOX 1-224_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.cpp / 1-223_leibniz                                       */
+/* rota_solver_main.cpp / 1-224_leibniz                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.
@@ -53,6 +53,7 @@ namespace boOX
   sCommandParameters::sCommandParameters()
       : m_cost_limit(65536)
       , m_capacitated(false)
+      , m_subopt_ratio(-1.0)	
       , m_timeout(-1.0)	
   {
       // nothing
@@ -83,6 +84,7 @@ namespace boOX
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
 	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++}]\n");
+        printf("		 [--subopt-ratio=<double>]\n");		
         printf("		 [--timeout=<double>]\n");
 	printf("		 [--capacitated]\n");
 	printf("\n");
@@ -92,7 +94,8 @@ namespace boOX
 	printf("\n");
 	printf("Defaults: --cost-limit=65536\n");
 	printf("          --algorithm=cbs\n");	
-	printf("          --timeout=-1.0 (unlimited)\n");	
+	printf("          --timeout=-1.0 (unlimited)\n");
+	printf("          --subopt-ratio=-1.0 (unused = optimal)\n");				
 	printf("\n");
     }
 
@@ -217,7 +220,7 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
-	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);	    
 
 	    if (parameters.m_capacitated)
 	    {
@@ -239,7 +242,7 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
-	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);	    	    
 
 	    if (parameters.m_capacitated)
 	    {
@@ -261,7 +264,7 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
-	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);	    	    	    
 
 	    if (parameters.m_capacitated)
 	    {
@@ -380,7 +383,11 @@ namespace boOX
 	    {
 		return sROTA_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
 	    }
-	}	
+	}
+	else if (parameter.find("--subopt-ratio=") == 0)
+	{
+	    command_parameters.m_subopt_ratio = sDouble_from_String(parameter.substr(15, parameter.size()));
+	}			
 	else if (parameter.find("--timeout=") == 0)
 	{
 	    command_parameters.m_timeout = sDouble_from_String(parameter.substr(10, parameter.size()));

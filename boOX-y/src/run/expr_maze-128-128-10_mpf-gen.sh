@@ -11,7 +11,7 @@ for ROBOTS in $ROBOTS_LIST;
 do
     for SCENARIO in $SCENARIOS_LIST;
     do
-	echo 'Generating '$PREFIX' scenario '$SCENARIO' MAPF instance with '$ROBOTS' kruhobots ...'
-	../moviscen_convert_boOX '--input-movi-map-file='$PREFIX'.map' '--input-movi-scen-file='$SCENARIO_PREFIX'-'$SCENARIO'.scen' '--output-mpf-file='$PREFIX'-'$SCENARIO'_a'$ROBOTS'.mpf' '--output-bgu-file='$PREFIX'-'$SCENARIO'_a'$ROBOTS'.bgu' '--N-agents='$ROBOTS
+	echo 'Generating '$PREFIX' scenario '$SCENARIO' MAPF instance with '$ROBOTS' agents ...'
+	../main/moviscen_convert_boOX '--input-movi-map-file='$PREFIX'.map' '--input-movi-scen-file='$SCENARIO_PREFIX'-'$SCENARIO'.scen' '--output-mpf-file='$PREFIX'-'$SCENARIO'_a'$ROBOTS'.mpf' '--output-bgu-file='$PREFIX'-'$SCENARIO'_a'$ROBOTS'.bgu' '--N-agents='$ROBOTS
     done
 done
