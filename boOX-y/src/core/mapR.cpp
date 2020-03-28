@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-224_leibniz                             */
+/*                             boOX 1-238_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 1-224_leibniz                                                   */
+/* mapR.cpp / 1-238_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1520,9 +1520,11 @@ namespace boOX
 //			printf("target: %s\n", target_key.c_str());
 //			printf("Net size: %d\n", m_Network.m_Vertices.size());
 //			printf("%d <--> %d\n", node_Mapping[source_key], node_Mapping[target_key]);
-			
-			m_Network.add_Edge(node_Mapping[source_key], node_Mapping[target_key]);
 
+			if (!m_Network.is_Adjacent(node_Mapping[source_key], node_Mapping[target_key]))
+			{
+			    m_Network.add_Edge(node_Mapping[source_key], node_Mapping[target_key]);
+			}
 			sConsumeUntilChar(fr, '<');
 			sConsumeUntilChar(fr, '>');
 

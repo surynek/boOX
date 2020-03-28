@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-224_leibniz                             */
+/*                             boOX 1-238_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 1-224_leibniz                                                   */
+/* cbsR.cpp / 1-238_leibniz                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -801,6 +801,7 @@ namespace boOX
 
 	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
 	{
+	    
 	    const Schedule_vector &Schedule = kruhobot_Schedules[kruhobot_id];
 	    for (Schedule_vector::const_iterator event = Schedule.begin(); event != Schedule.end(); ++event)
 	    {
@@ -1151,7 +1152,8 @@ namespace boOX
 								  other_linear_Coop->first.m_upper_id);
 
 		    //if (linear_Coop->first.m_upper_id != other_linear_Coop->first.m_lower_id && other_linear_Coop->first.m_upper_id != linear_Coop->first.m_lower_id)
-		    {		    
+		    {
+
 			const Cooccupations__map &other_linear_cooccupations = other_linear_Coop->second;
 
 //		        for (Cooccupations_map::const_iterator other_coop = other_linear_cooccupations.begin(); other_coop != other_linear_cooccupations.end(); ++other_coop)
@@ -1161,7 +1163,7 @@ namespace boOX
 			    if (coop->first.overlaps(other_coop->first))
 			    {
 				for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
-				{				    
+				{
 				    for (KruhobotIDs_umap::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
 				    {
 					if (line_distance < real_Instance.m_Kruhobots[sABS(kruhobot->first)].m_properties.m_radius + real_Instance.m_Kruhobots[sABS(other_kruhobot->first)].m_properties.m_radius)
@@ -1475,6 +1477,7 @@ namespace boOX
 		    sDouble delta_tau_B = kruhobot_traversal_A_location.m_interval.m_upper - tau_1;
 
 		    Interval avoid_interval_A(kruhobot_traversal_A_location.m_interval.m_lower, kruhobot_traversal_A_location.m_interval.m_lower + delta_tau_A);
+
 		    if (avoid_interval_A.size() > s_DELTION)
 		    {
 			Interval intersection_A = kruhobot_traversal_A_location.m_interval.intersect(avoid_interval_A);
@@ -1491,7 +1494,7 @@ namespace boOX
 
 		    if (avoid_interval_B.size() > s_DELTION)
 		    {
-			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);		       
+			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);
 			
 			if (intersection_B.size() > s_DELTION)
 			{

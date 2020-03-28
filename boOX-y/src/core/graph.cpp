@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-224_leibniz                             */
+/*                             boOX 1-238_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 1-224_leibniz                                                  */
+/* graph.cpp / 1-238_leibniz                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -2444,7 +2444,10 @@ namespace boOX
 	    }
 	    else
 	    {
-		add_Edge(u_id, v_id);
+		if (!is_Adjacent(u_id, v_id))
+		{
+		    add_Edge(u_id, v_id);
+		}
 	    }
 	    if (c != '\n' && c != '<')
 	    {
@@ -3354,7 +3357,11 @@ namespace boOX
 	    sInt_32 u_id, v_id;
 	    
 	    fscanf(fr, "{%d,%d}\n", &u_id, &v_id);
-	    add_Edge(u_id, v_id);	    
+
+	    if (!is_Adjacent(u_id, v_id))
+	    {
+		add_Edge(u_id, v_id);
+	    }
 	}
 	return sRESULT_SUCCESS;
     }    
