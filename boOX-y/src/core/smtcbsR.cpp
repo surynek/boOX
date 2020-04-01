@@ -4714,14 +4714,14 @@ namespace boOX
 		
 		return front_transition.m_time;
 	    }
-	    /*
+
 	    Transitions_map::const_iterator explored_transition = explored_Transitions.find(front_transition.m_time);
 
 	    if (explored_transition == explored_Transitions.end())
 	    {
 		explored_Transitions.insert(Transitions_map::value_type(front_transition.m_time, LocationIDs_uset()));
 	    }
-	    */  
+
 	    if (front_transition.m_time + (map.m_shortest_Distances[sink_loc_id][front_transition.m_location_id] / kruhobot.m_properties.m_linear_velo) <= makespan_limit)
 	    {
 		const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_transition.m_location_id].m_Neighbors;
@@ -4740,14 +4740,14 @@ namespace boOX
 		    sDouble transition_finish_makespan = front_transition.m_makespan + transition_delta_time;		    
 			
 		    LocationIDs_uset *next_explored_Transitions = &explored_Transitions[0.0];
-		    /*
+
 		    Transitions_map::const_iterator explored_transition = explored_Transitions.find(transition_finish_time);
 		    if (explored_transition == explored_Transitions.end())
 		    {
 			explored_Transitions.insert(Transitions_map::value_type(transition_finish_time, LocationIDs_uset()));
 		    }
 		    next_explored_Transitions = &explored_Transitions[transition_finish_time];
-		    */
+
 		    if (next_explored_Transitions->find(neighbor_location_id) == next_explored_Transitions->end())
 		    {
 			Transition neighbor_transition(transition_Store.size(), transition_finish_time, transition_finish_cost, transition_finish_makespan, neighbor_location_id, front_transition.m_trans_id);
