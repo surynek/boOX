@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-238_leibniz                             */
+/*                             boOX 1-240_leibniz                             */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.cpp / 1-238_leibniz                                  */
+/* moviscen_convert_main.cpp / 1-240_leibniz                                  */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
