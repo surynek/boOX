@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-240_leibniz                             */
+/*                             boOX 2-019_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 1-240_leibniz                                                      */
+/* cnf.h / 2-019_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -85,7 +85,10 @@ namespace boOX
 	void cast_Disjunction(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);		
 	void cast_Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 weight = 0);
 	void cast_3Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 weight = 0);
-	void cast_4Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 variable_ID_D, sInt_32 weight = 0);	
+	void cast_4Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 variable_ID_D, sInt_32 weight = 0);
+	void cast_BigMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);
+	void cast_DomularMutex(Glucose::Solver *solver, VariableIDs_2vector &variable_IDs, sInt_32 weight = 0);	
+	
 	void cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 weight = 0);
 	void cast_CapacityMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);		
 	void cast_ConditionalAllMutexConstraint(Glucose::Solver *solver, sInt_32  &spec_condition, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);	

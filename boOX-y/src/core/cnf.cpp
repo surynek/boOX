@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-240_leibniz                             */
+/*                             boOX 2-019_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 1-240_leibniz                                                    */
+/* cnf.cpp / 2-019_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -231,7 +231,65 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
 	}
 	#endif	
-    }        
+    }
+
+
+    void sBoolEncoder::cast_BigMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 sUNUSED(weight))
+    {
+	sInt_32 N_Identifiers = variable_IDs.size();
+	std::vector<int> Literals;
+	
+	for (sInt_32 id = 0; id < N_Identifiers; ++id)
+	{
+	    Literals.push_back(-(variable_IDs[id]));
+	}
+	cast_Clause(solver, Literals);
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif
+    }
+
+
+    void sBoolEncoder::cast_DomularMutex(Glucose::Solver *solver, VariableIDs_2vector &variable_IDs, sInt_32 sUNUSED(weight))
+    {
+	std::vector<sInt_32> basement_Auxiliaries;
+	basement_Auxiliaries.resize(variable_IDs.size());
+
+	for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	{
+	    basement_Auxiliaries[i] = m_last_variable_ID++;
+	}
+
+	for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	{	
+	    for (sInt_32 j = 0; j < variable_IDs[i].size(); ++j)
+	    {
+		cast_Clause(solver, -variable_IDs[i][j], basement_Auxiliaries[i]);
+	    }
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	    }
+	    #endif	    
+	}
+
+	std::vector<int> Literals;
+
+	for (sInt_32 i = 0; i < variable_IDs.size(); ++i)	
+	{
+	    Literals.push_back(-(basement_Auxiliaries[i]));
+	}
+	cast_Clause(solver, Literals);
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif
+    }    
 
 
     void  sBoolEncoder::cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 sUNUSED(weight))	

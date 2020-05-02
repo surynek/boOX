@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-240_leibniz                             */
+/*                             boOX 2-019_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 1-240_leibniz                                                 */
+/* smtcbs.cpp / 2-019_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -9933,10 +9933,10 @@ namespace boOX
 		    m_solver_Encoder->cast_MultiImplication(solver,
 							    sat_Model.m_vertex_occupancy[agent_id][layer][u],
 							    mutex_target_Identifiers);
-//		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
+		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    //m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10096,10 +10096,10 @@ namespace boOX
 		    m_solver_Encoder->cast_MultiImplication(solver,
 							    sat_Model.m_vertex_occupancy[agent_id][layer][u],
 							    mutex_target_Identifiers);
-//		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
+		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    // m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10284,7 +10284,7 @@ namespace boOX
 		    #ifdef sDEBUG
 		    /*
 		    {
-			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
+			printf("Extratracted from satisfying a:%d, l:%d, v:%d\n", agent_id, level, vertex_id);
 		    }
 		    */
 		    #endif		    
@@ -11341,9 +11341,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
 			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -11736,9 +11738,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
 			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -12635,9 +12639,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
 			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -12927,9 +12933,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
 			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -13944,9 +13952,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
 			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -14131,7 +14141,7 @@ namespace boOX
 		    m_solver_Encoder->cast_MultiImplication(solver,
 							    sat_Model.m_vertex_occupancy[agent_id][layer][u],
 							    mutex_target_Identifiers);
-//		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
+		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
 	    }
 	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
@@ -14339,9 +14349,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
 			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -14526,7 +14538,7 @@ namespace boOX
 		    m_solver_Encoder->cast_MultiImplication(solver,
 							    sat_Model.m_vertex_occupancy[agent_id][layer][u],
 							    mutex_target_Identifiers);
-//		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
+		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
 	    }
 	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
@@ -14751,9 +14763,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
-			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
+		        printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
