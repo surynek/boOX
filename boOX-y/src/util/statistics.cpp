@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-019_planck                              */
+/*                             boOX 2-021_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* statistics.cpp / 2-019_planck                                              */
+/* statistics.cpp / 2-021_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Statistical data collection and analytical tools.

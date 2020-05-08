@@ -2,7 +2,7 @@
 
 boOX
 
-(C) Pavel Surynek, 2018
+(C) Pavel Surynek, 2018 - 2020
 pavel@surynek.net
 
 =======================================================
@@ -66,13 +66,36 @@ stargen_boOX   - instances on star graphs
 Simple command line help is provided by each tool
 when invoked with the --help option.
 
-The following example shows how to run the solver:
+The following example shows how to run the solver
+for the token swapping problem:
 
-./tosolver_boOX --output-file=solution.txt --input-file=clique_07_t07.tok --algorithm=smtcbs
+./swap_solver_boOX --output-file=solution.txt --input-file=clique_07_t07.tok --algorithm=smtcbs
 
 -------------------------------------------------------
 
-Please enjoy you problem solving...
+Please enjoy your problem solving...
 Pavel Surynek, 09/2018
+
+-------------------- **** -----------------------------
+
+-- Update 05/2020 -------------------------------------
+
+Since the above README the boOX package underwent a
+major update. The most significant is the addition of a
+solver for the continuous variant of multi-agent
+path finding (MAPF^R, sometimes also called MAPF with
+continuous time). The current version of the package
+(2-019) has the following command line tool for MAPF^R:
+
+mapfR_solver_boOX - an optimal makespan/SOC MAPF^R solver
+
+The MAPF^R solver is based on the combination of SMT and
+CBS (in the smart way). Samples for MAPF^R are available
+in the samples/R directory.
+
+-------------------------------------------------------
+
+Please enjoy your CONTINUOUS problem solving...
+Pavel Surynek, 09/2020
 
 -------------------- **** -----------------------------
