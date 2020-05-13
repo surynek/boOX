@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 1-157_leibniz                                                    */
+/* graph.h / 2-022_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -326,6 +326,12 @@ namespace boOX
 
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
+
+	virtual sResult to_File_xml(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, const sString &indent = "") const;
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);		
 	/*----------------------------------------------------------------------------*/
 	
 	virtual sResult to_File_mapR(const sString &filename, const sString &indent = "") const;

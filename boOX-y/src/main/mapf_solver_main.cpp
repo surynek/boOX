@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.cpp / 1-157_leibniz                                       */
+/* mapf_solver_main.cpp / 2-022_planck                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.
@@ -52,6 +52,7 @@ namespace boOX
   sCommandParameters::sCommandParameters()
       : m_cost_limit(65536)
       , m_algorithm(ALGORITHM_CBS)
+      , m_subopt_ratio(-1.0)
       , m_timeout(-1.0)
   {
       // nothing
@@ -81,7 +82,8 @@ namespace boOX
 	printf("mapf_solver_boOX  --input-file=<string>\n");
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
-	printf("                 [--algorithm={cbs|cbs+|cbs++|smtcbs|smtcbs+|smtcbs++}]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++}]\n");
+        printf("		 [--subopt-ratio=<double>]\n");	
         printf("		 [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
@@ -90,7 +92,8 @@ namespace boOX
 	printf("\n");
 	printf("Defaults: --cost-limit=65536\n");
 	printf("          --algorithm=cbs\n");
-	printf("          --timeout=-1.0 (unlimited)\n");		
+	printf("          --subopt-ratio=-1.0 (unused = optimal)\n");				
+	printf("          --timeout=-1.0 (unlimited)\n");
 	printf("\n");
     }
 
@@ -151,7 +154,19 @@ namespace boOX
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
 	    cost = cbs_Solver.find_ShortestNonconflictingPaths_DeltaStar(solution, parameters.m_cost_limit);
 	    break;
-	}		
+	}
+	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("CBS-PLUS-PLUS-PLUS");
+	    }
+  	    #endif
+	    
+	    sCBS cbs_Solver(&instance, parameters.m_timeout);
+	    cost = cbs_Solver.find_ShortestNonconflictingPaths_DeltaSuperStar(solution, parameters.m_cost_limit);
+	    break;
+	}			
 	case sCommandParameters::ALGORITHM_SMTCBS:
 	{
             #ifdef sSTATISTICS
@@ -161,7 +176,7 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
-	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingPaths(solution, parameters.m_cost_limit);
 	    break;
 	}
@@ -174,7 +189,7 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
-	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingPathsInverse(solution, parameters.m_cost_limit);
 	    break;
 	}
@@ -187,7 +202,7 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
-	    sSMTCBS smtcbs_Solver(&encoder, &instance, parameters.m_timeout);
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingPathsInverseDepleted(solution, parameters.m_cost_limit);
 	    break;
 	}			
@@ -274,7 +289,11 @@ namespace boOX
 	    else if (algorithm_str == "cbs++")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_PLUS_PLUS;
-	    }	    	    
+	    }
+	    else if (algorithm_str == "cbs+++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS;
+	    }	    	    	    
 	    else if (algorithm_str == "smtcbs")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS;
@@ -292,6 +311,10 @@ namespace boOX
 		return sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
 	    }
 	}
+	else if (parameter.find("--subopt-ratio=") == 0)
+	{
+	    command_parameters.m_subopt_ratio = sDouble_from_String(parameter.substr(15, parameter.size()));
+	}		
 	else if (parameter.find("--timeout=") == 0)
 	{
 	    command_parameters.m_timeout = sDouble_from_String(parameter.substr(10, parameter.size()));

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 1-157_leibniz                                                      */
+/* cbs.h / 2-022_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -403,6 +403,7 @@ namespace boOX
 	typedef std::unordered_map<sInt_32, Visit> Visits_umap;
 	typedef std::vector<Visits_umap> Visits_vector;
 	typedef std::list<Visit> Visits_list;
+	typedef std::multimap<sInt_32, Visit> Visits_mmap;
 	
 	typedef std::map<sInt_32, Node, std::less<sInt_32> > Nodes_map;
 	typedef std::multimap<sInt_32, Node, std::less<sInt_32>> Nodes_mmap;
@@ -442,7 +443,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingSwapping_DeltaStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
 	sInt_32 find_ShortestNonconflictingSwapping_DeltaStar(sInstance         &instance,
 							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit);	
+							      sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingSwapping_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingSwapping_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit);
+
+	sInt_32 find_ShortestNonconflictingSwapping_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingSwapping_DeltaSuperStar(sInstance         &instance,
+								   AgentPaths_vector &agent_Paths,
+								   sInt_32            cost_limit);		
 
 	sInt_32 find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const;
 	sInt_32 find_ShortestNonconflictingPaths(const sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
@@ -466,7 +475,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingPaths_DeltaStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
 	sInt_32 find_ShortestNonconflictingPaths_DeltaStar(sInstance         &instance,
 							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit);		
+							   sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingPaths_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingPaths_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingPaths_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingPaths_DeltaSuperStar(sInstance         &instance,
+								AgentPaths_vector &agent_Paths,
+								sInt_32            cost_limit);			
 	
 	sInt_32 find_ShortestNonconflictingPermutation(sSolution &solution, sInt_32 cost_limit) const;
 	sInt_32 find_ShortestNonconflictingPermutation(const sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
@@ -490,7 +507,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingPermutation_DeltaStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
 	sInt_32 find_ShortestNonconflictingPermutation_DeltaStar(sInstance         &instance,
 								 AgentPaths_vector &agent_Paths,
-								 sInt_32            cost_limit);	
+								 sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingPermutation_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingPermutation_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingPermutation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingPermutation_DeltaSuperStar(sInstance         &instance,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit);		
 
 	sInt_32 find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const;
 	sInt_32 find_ShortestNonconflictingRotation(const sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
@@ -514,7 +539,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingRotation_DeltaStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
 	sInt_32 find_ShortestNonconflictingRotation_DeltaStar(sInstance         &instance,
 							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit);	
+							      sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingRotation_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingRotation_DeltaSuperStar(const sInstance &instance, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingRotation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingRotation_DeltaSuperStar(sInstance         &instance,
+								   AgentPaths_vector &agent_Paths,
+								   sInt_32            cost_limit);		
 
 	sInt_32 find_NonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_NonconflictingSwapping(const sInstance   &instance,
@@ -530,7 +563,13 @@ namespace boOX
 	sInt_32 find_NonconflictingSwapping_DeltaStar(sInstance         &instance,
 						      AgentPaths_vector &agent_Paths,
 						      sInt_32            cost_limit,
-						      sInt_32            extra_cost);	
+						      sInt_32            extra_cost);
+
+	sInt_32 find_NonconflictingSwapping_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingSwapping_DeltaSuperStar(sInstance         &instance,
+							   AgentPaths_vector &agent_Paths,
+							   sInt_32            cost_limit,
+							   sInt_32            extra_cost);		
 
 	sInt_32 find_NonconflictingPaths(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_NonconflictingPaths(const sInstance   &instance,
@@ -548,6 +587,12 @@ namespace boOX
 						   sInt_32            cost_limit,
 						   sInt_32            extra_cost);
 
+	sInt_32 find_NonconflictingPaths_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingPaths_DeltaSuperStar(sInstance         &instance,
+							AgentPaths_vector &agent_Paths,
+							sInt_32            cost_limit,
+							sInt_32            extra_cost);	
+
 	sInt_32 find_NonconflictingPermutation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_NonconflictingPermutation(const sInstance   &instance,
 					       AgentPaths_vector &agent_Paths,
@@ -562,7 +607,13 @@ namespace boOX
 	sInt_32 find_NonconflictingPermutation_DeltaStar(sInstance         &instance,
 							 AgentPaths_vector &agent_Paths,
 							 sInt_32            cost_limit,
-							 sInt_32            extra_cost);	
+							 sInt_32            extra_cost);
+
+	sInt_32 find_NonconflictingPermutation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingPermutation_DeltaSuperStar(sInstance         &instance,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit,
+							      sInt_32            extra_cost);		
 
 	sInt_32 find_NonconflictingRotation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_NonconflictingRotation(const sInstance   &instance,
@@ -578,7 +629,13 @@ namespace boOX
 	sInt_32 find_NonconflictingRotation_DeltaStar(sInstance         &instance,
 						      AgentPaths_vector &agent_Paths,
 						      sInt_32            cost_limit,
-						      sInt_32            extra_cost);	
+						      sInt_32            extra_cost);
+
+	sInt_32 find_NonconflictingRotation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingRotation_DeltaSuperStar(sInstance         &instance,
+							   AgentPaths_vector &agent_Paths,
+							   sInt_32            cost_limit,
+							   sInt_32            extra_cost);		
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping_baseRecompute(const sInstance           &instance,
@@ -629,6 +686,13 @@ namespace boOX
 									 AgentPaths_vector         &agent_Paths,
 									 sInt_32                    cost_limit,
 									 sInt_32                    extra_cost);
+
+	sInt_32 find_NonconflictingSwapping_principalCollision_DeltaSuperStar(const sInstance           &instance,
+									      AgentConflicts_vector     &agent_Conflicts,
+									      AgentEdgeConflicts_vector &agent_edge_Conflicts,
+									      AgentPaths_vector         &agent_Paths,
+									      sInt_32                    cost_limit,
+									      sInt_32                    extra_cost);	
 	
 
 	sInt_32 update_NonconflictingSwapping(sInt_32                    upd_agent_id,
@@ -688,6 +752,13 @@ namespace boOX
 								      AgentPaths_vector         &agent_Paths,
 								      sInt_32                    cost_limit,
 								      sInt_32                    extra_cost);
+
+	sInt_32 find_NonconflictingPaths_principalCollision_DeltaSuperStar(const sInstance           &instance,
+									   AgentConflicts_vector     &agent_Conflicts,
+									   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+									   AgentPaths_vector         &agent_Paths,
+									   sInt_32                    cost_limit,
+									   sInt_32                    extra_cost);	
 	
 	sInt_32 update_NonconflictingPaths(sInt_32                    upd_agent_id,
 					   const sInstance           &instance,
@@ -745,7 +816,14 @@ namespace boOX
 									    AgentEdgeConflicts_vector &agent_edge_Conflicts,
 									    AgentPaths_vector         &agent_Paths,
 									    sInt_32                    cost_limit,
-									    sInt_32                    extra_cost);	
+									    sInt_32                    extra_cost);
+
+	sInt_32 find_NonconflictingPermutation_principalCollision_DeltaSuperStar(const sInstance           &instance,
+										 AgentConflicts_vector     &agent_Conflicts,
+										 AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										 AgentPaths_vector         &agent_Paths,
+										 sInt_32                    cost_limit,
+										 sInt_32                    extra_cost);		
 	
 	sInt_32 update_NonconflictingPermutation(sInt_32                    upd_agent_id,
 						 const sInstance           &instance,
@@ -804,6 +882,13 @@ namespace boOX
 									 AgentPaths_vector         &agent_Paths,
 									 sInt_32                    cost_limit,
 									 sInt_32                    extra_cost);
+
+	sInt_32 find_NonconflictingRotation_principalCollision_DeltaSuperStar(const sInstance           &instance,
+									      AgentConflicts_vector     &agent_Conflicts,
+									      AgentEdgeConflicts_vector &agent_edge_Conflicts,
+									      AgentPaths_vector         &agent_Paths,
+									      sInt_32                    cost_limit,
+									      sInt_32                    extra_cost);	
 	
 	sInt_32 update_NonconflictingRotation(sInt_32                    upd_agent_id,
 					      const sInstance           &instance,
@@ -1051,7 +1136,16 @@ namespace boOX
 						sInt_32                    extra_cost,
 						const Conflicts_vector     &Conflicts,
 						const EdgeConflicts_vector &edge_Conflicts,					    
-						VertexIDs_vector           &Path) const;	
+						VertexIDs_vector           &Path) const;
+
+	sInt_32 findSuperStar_NonconflictingSequence(const sUndirectedGraph     &graph,
+						     sInt_32                    source_id,
+						     sInt_32                    sink_id,
+						     sInt_32                    cost_limit,
+						     sInt_32                    extra_cost,
+						     const Conflicts_vector     &Conflicts,
+						     const EdgeConflicts_vector &edge_Conflicts,					    
+						     VertexIDs_vector           &Path) const;		
 
 	void equalize_NonconflictingSequences(AgentPaths_vector &agent_Paths) const;
 	void equalize_NonconflictingSequences(const AgentPaths_vector &agent_Paths, AgentPaths_vector &equal_agent_Paths) const;	

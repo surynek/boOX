@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.h / 1-157_leibniz                                                  */
+/* smtcbsR.h / 2-022_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -355,9 +355,38 @@ namespace boOX
 	    sInt_32 m_kruhobot_id;
 	    sInt_32 m_decision_id;
 	    sInt_32 m_sink_id;	    
-	};	
+	};
+
+	struct RealBicoordinate
+	{
+	    RealBicoordinate()
+	    {
+		// nothing
+	    }
+	    
+	    RealBicoordinate(sInt_32 kruhobot_id, sInt_32 decision_id)
+	    : m_kruhobot_id(kruhobot_id)
+	    , m_decision_id(decision_id)
+	    , m_next_id(-1)
+	    {
+		// nothing
+	    }
+
+	    RealBicoordinate(sInt_32 kruhobot_id, sInt_32 decision_id, sInt_32 next_id)
+	    : m_kruhobot_id(kruhobot_id)
+	    , m_decision_id(decision_id)
+	    , m_next_id(next_id)
+	    {
+		// nothing
+	    }
+    
+	    sInt_32 m_kruhobot_id;
+	    sInt_32 m_decision_id;
+	    sInt_32 m_next_id;
+	};		
 	
-	typedef std::vector<RealCoordinate> RealCoordinates_vector;	
+	typedef std::vector<RealCoordinate> RealCoordinates_vector;
+	typedef std::vector<RealBicoordinate> RealBicoordinates_vector;		
 
 	struct RealModel
 	{
@@ -372,6 +401,7 @@ namespace boOX
 //	    VariableIDs_2vector m_layer_cardinality;
 
 	    RealCoordinates_vector m_variable_mapping;
+	    RealBicoordinates_vector m_transition_mapping;	    	    
 	};	
 
 	struct RealContext
@@ -382,7 +412,15 @@ namespace boOX
 		// nothing
 	    }
 
+	RealContext(sDouble makespan_bound, sDouble cost_bound)
+	    : m_makespan_bound(makespan_bound)
+	    , m_cost_bound(cost_bound)
+	    {
+		// nothing
+	    }	    
+
 	    sDouble m_makespan_bound;
+	    sDouble m_cost_bound;
 	};
 
 	typedef std::vector<sDouble> Makespans_vector;
@@ -492,7 +530,48 @@ namespace boOX
 											   KruhobotSchedules_vector &kruhobot_Schedules,
 											   sDouble                   makespan_limit,
 											   sDouble                   extra_makespan);	
-	/*----------------------------------------------------------------------------*/		
+	/*----------------------------------------------------------------------------*/
+
+	sDouble find_CostExactShortestNonconflictingSchedules_individualizedConflictRespectful(sRealSolution &real_Solution, sDouble makespan_limit, sDouble cost_limit);
+	sDouble find_CostExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance  &real_Instance,
+											       sRealSolution        &real_Solution,
+											       sDouble               makespan_limit,
+											       sDouble               cost_limit);
+	
+	sDouble find_CostExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble cost_limit);
+	sDouble find_CostExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+											       KruhobotSchedules_vector &kruhobot_Schedules,
+											       sDouble                   makespan_limit,
+											       sDouble                   cost_limit);
+
+	sDouble find_CostExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble cost_limit, sDouble extra_cost);
+	sDouble find_CostExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+											       KruhobotSchedules_vector &kruhobot_Schedules,
+											       sDouble                   makespan_limit,
+											       sDouble                   cost_limit,
+											       sDouble                   extra_cost);	
+	/*----------------------------------------------------------------------------*/
+
+	sDouble find_DomularCostExactShortestNonconflictingSchedules_individualizedConflictRespectful(sRealSolution &real_Solution, sDouble makespan_limit, sDouble cost_limit);
+	sDouble find_DomularCostExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance  &real_Instance,
+												      sRealSolution        &real_Solution,
+												      sDouble               makespan_limit,
+												      sDouble               cost_limit);
+	
+	sDouble find_DomularCostExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble cost_limit);
+	sDouble find_DomularCostExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+												      KruhobotSchedules_vector &kruhobot_Schedules,
+												      sDouble                   makespan_limit,
+												      sDouble                   cost_limit);
+
+	sDouble find_DomularCostExactShortestNonconflictingSchedules_individualizedConflictRespectful(KruhobotSchedules_vector &kruhobot_Schedules, sDouble makespan_limit, sDouble cost_limit, sDouble extra_cost);
+	sDouble find_DomularCostExactShortestNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance      &real_Instance,
+												      KruhobotSchedules_vector &kruhobot_Schedules,
+												      sDouble                   makespan_limit,
+												      sDouble                   cost_limit,
+												      sDouble                   extra_cost);	
+	/*----------------------------------------------------------------------------*/			
+	
 
 	sDouble find_NonconflictingSchedules(const sRealInstance              &real_Instance,
 					     KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
@@ -516,6 +595,14 @@ namespace boOX
 						     sDouble          makespan_limit,
 						     sDouble          extra_makespan,
 						     Schedule_vector &Schedule) const;
+
+	sDouble find_KruhobotIgnoringSchedule_superStrong(const sKruhobot &kruhobot,
+							  const s2DMap    &map,
+							  sInt_32          source_loc_id,
+							  sInt_32          sink_loc_id,
+							  sDouble          makespan_limit,
+							  sDouble          extra_makespan,
+							  Schedule_vector &Schedule) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	void reflect_KruhobotCollision(const KruhobotCollision          &kruhobot_collision,
@@ -591,7 +678,23 @@ namespace boOX
 										   KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
 										   KruhobotSchedules_vector               &kruhobot_Schedules,
 										   sDouble                                 makespan_limit,
-										   sDouble                                 extra_makespan);		
+										   sDouble                                 extra_makespan);
+
+	sDouble find_CostExactNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance                    &real_Instance,
+										       KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+										       KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+										       KruhobotSchedules_vector               &kruhobot_Schedules,								
+										       sDouble                                 makespan_limit,
+										       sDouble                                 cost_limit,
+										       sDouble                                 extra_cost);
+
+	sDouble find_DomularCostExactNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance                    &real_Instance,
+											      KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
+											      KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
+											      KruhobotSchedules_vector               &kruhobot_Schedules,
+											      sDouble                                 makespan_limit,
+											      sDouble                                 cost_limit,
+											      sDouble                                 extra_cost);	
 	/*---------------------------------------------------------------------------*/			
 
 	void reflect_KruhobotCollisions(const KruhobotCollisions_mset          &kruhobot_Collisions,
@@ -635,6 +738,15 @@ namespace boOX
 						 RealModel                             &real_sat_Model,
 						 KruhobotSchedules_vector              &kruhobot_Schedules) const;
 
+	bool find_InitialNonconflictingSchedules(Glucose::Solver                       *solver,
+						 RealContext                           &context,					 
+						 const sRealInstance                   &real_Instance,
+						 KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+						 const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+						 sDouble                                cost_bound,					      
+						 const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,
+						 RealModel                             &real_sat_Model,
+						 KruhobotSchedules_vector              &kruhobot_Schedules) const;	
 	
 	bool find_NextNonconflictingSchedules(Glucose::Solver                       *solver,
 					      RealContext                           &context,
@@ -644,6 +756,19 @@ namespace boOX
 					      const KruhobotCollisions_mset         &kruhobot_Collisions,
 					      RealModel                             &real_sat_Model,
 					      KruhobotSchedules_vector              &kruhobot_Schedules) const;
+
+	bool find_NextNonconflictingSchedules(Glucose::Solver                       *solver,
+					      RealContext                           &context,
+					      const sRealInstance                   &real_Instance,
+					      KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+					      const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+					      const KruhobotCollisions_mset         &kruhobot_Collisions,
+					      sDouble                                cost_bound,					      
+					      const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,
+					      RealModel                             &real_sat_Model,
+					      KruhobotSchedules_vector              &kruhobot_Schedules,
+					      KruhobotExtraVariables_vector         &kruhobot_set_extra_Variables,
+					      KruhobotExtraVariables_vector         &kruhobot_all_extra_Variables) const;
 
 	bool find_NearNonconflictingSchedules(Glucose::Solver                       *solver,
 					      RealContext                           &context,
@@ -663,6 +788,51 @@ namespace boOX
 					      const KruhobotCollisions_mset         &next_kruhobot_Collisions,					      
 					      RealModel                             &real_sat_Model,
 					      KruhobotSchedules_vector              &kruhobot_Schedules) const;
+
+	bool find_NearNonconflictingSchedules(Glucose::Solver                       *solver,
+					      RealContext                           &context,
+					      const sRealInstance                   &real_Instance,
+					      KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+					      const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+					      const KruhobotCollisions_mset         &kruhobot_Collisions,
+					      const KruhobotCollisions_mset         &next_kruhobot_Collisions,
+					      sDouble                                cost_bound,					      
+					      const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,					     
+					      RealModel                             &real_sat_Model,
+					      KruhobotSchedules_vector              &kruhobot_Schedules,
+					      KruhobotExtraVariables_vector         &kruhobot_set_extra_Variables,
+					      KruhobotExtraVariables_vector         &kruhobot_all_extra_Variables) const;
+
+	bool find_BetterNonconflictingSchedules(Glucose::Solver                       *solver,
+						RealContext                           &context,
+						const sRealInstance                   &real_Instance,
+						KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+						const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+						const KruhobotCollisions_mset         &kruhobot_Collisions,
+						const KruhobotCollisions_mset         &next_kruhobot_Collisions,
+						sDouble                                cost_bound,					      
+						const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,					     
+						RealModel                             &real_sat_Model,
+						KruhobotSchedules_vector              &kruhobot_Schedules,
+						const KruhobotExtraVariables_vector   &kruhobot_envelope_Variables,
+						KruhobotExtraVariables_vector         &kruhobot_set_extra_Variables,
+						KruhobotExtraVariables_vector         &kruhobot_all_extra_Variables) const;
+
+	bool find_BetterNonconflictingSchedules(Glucose::Solver                       *solver,
+						RealContext                           &context,
+						const sRealInstance                   &real_Instance,
+						KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+						const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+						const KruhobotCollisions_mset         &kruhobot_Collisions,
+						const KruhobotCollisions_mset         &next_kruhobot_Collisions,
+						sDouble                                cost_bound,					      
+						const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,					     
+						RealModel                             &real_sat_Model,
+						KruhobotSchedules_vector              &kruhobot_Schedules,
+						const KruhobotExtraVariables_vector   &kruhobot_envelope_Variables,
+						const KruhobotExtraVariables_vector   &kruhobot_domus_Variables,						
+						KruhobotExtraVariables_vector         &kruhobot_set_extra_Variables,
+						KruhobotExtraVariables_vector         &kruhobot_all_extra_Variables) const;			
 	/*----------------------------------------------------------------------------*/		
 
 	sDouble build_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
@@ -743,9 +913,37 @@ namespace boOX
 											    const LinearConflicts_upper__map    &linear_Conflicts,
 											    sDouble                              makespan_bound,
 											    sDouble                             &individual_makespan_bound,
-											    sInt_32                              fingerprint_limit,											    
+											    sInt_32                              fingerprint_limit,
 											    KruhobotDecisionDiagram_vector      &kruhobot_RDD,
-											    KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;		
+											    KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;
+
+	sDouble build_KruhobotCostRealDecisionDiagram_individualizedConflictRespectfulBucketing(const sKruhobot                     &kruhobot,
+												const s2DMap                        &map,
+												sInt_32                              source_loc_id,
+												sInt_32                              sink_loc_id,
+												const LocationConflicts_upper__umap &location_Conflicts,
+												const LinearConflicts_upper__map    &linear_Conflicts,
+												sDouble                              makespan_limit,												
+												sDouble                              individual_cost_bound,
+												sInt_32                              fingerprint_limit,
+												KruhobotDecisionDiagram_vector      &kruhobot_RDD,
+												KruhobotDecisionMapping_map         &kruhobot_RDD_mapping) const;
+
+	typedef std::set<sDouble> SinkATTs_set;
+
+	sDouble build_KruhobotCostRealDecisionDiagram_individualizedConflictRespectfulBucketingLeaping(const sKruhobot                     &kruhobot,
+												       const s2DMap                        &map,
+												       sInt_32                              source_loc_id,
+												       sInt_32                              sink_loc_id,
+												       const LocationConflicts_upper__umap &location_Conflicts,
+												       const LinearConflicts_upper__map    &linear_Conflicts,
+												       sDouble                              makespan_limit,												
+												       sDouble                              individual_cost_bound,
+												       sInt_32                              fingerprint_limit,
+												       KruhobotDecisionDiagram_vector      &kruhobot_RDD,
+												       KruhobotDecisionMapping_map         &kruhobot_RDD_mapping,
+												       sDouble                              leap,
+												       SinkATTs_set                        &sink_ATTs) const;				
 	
 	Explorations_umap* obtain_ExploredTransitions(TransitionExplorations_map &explored_Transitions, sDouble time) const;
 	bool is_UnifiedlyVisited(sInt_32 location_id, sDouble time, const UnifiedVisits_umap &unified_Visits) const;
@@ -838,6 +1036,13 @@ namespace boOX
 					 const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
 					 RealModel                             &real_sat_Model) const;
 
+	sInt_32 build_CostRealModelVariables(Glucose::Solver                      *solver,
+					     RealContext                           &context,					 
+					     const sRealInstance                   &real_Instance,
+					     KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+					     const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+					     RealModel                             &real_sat_Model) const;
+	
 	void build_RealModelConstraints(Glucose::Solver                      *solver,
 					RealContext                           &context,					 
 					const sRealInstance                   &real_Instance,
@@ -852,6 +1057,27 @@ namespace boOX
 					 const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
 					 const KruhobotCollisions_mset         &kruhobot_Collisions,
 					 RealModel                             &real_sat_Model) const;
+
+	void introduce_RealModelCostCardinalities(Glucose::Solver                       *solver,
+						  RealContext                           &context,
+						  const sRealInstance                   &real_Instance,
+						  KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+						  const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+						  sDouble                                cost_bound,					      
+						  const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,
+						  RealModel                             &real_sat_Model,
+						  const KruhobotExtraVariables_vector   &kruhobot_envelope_Variables) const;
+
+	void introduce_RealModelCostCardinalities(Glucose::Solver                       *solver,
+						  RealContext                           &context,
+						  const sRealInstance                   &real_Instance,
+						  KruhobotDecisionDiagrams_vector       &kruhobot_RDDs,
+						  const KruhobotDecisionMappings_vector &kruhobot_RDD_Mappings,
+						  sDouble                                cost_bound,					      
+						  const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,
+						  RealModel                             &real_sat_Model,
+						  const KruhobotExtraVariables_vector   &kruhobot_envelope_Variables,
+						  const KruhobotExtraVariables_vector   &kruhobot_domus_Variables) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 match_CorrespondingDecision(const Traversal                      &traversal,
@@ -908,6 +1134,16 @@ namespace boOX
 			      const KruhobotDecisionDiagrams_vector &kruhobot_RDDs,
 			      const RealModel                       &real_sat_Model,
 			      KruhobotSchedules_vector              &kruhobot_Schedules) const;
+	
+	void decode_PathModel(Glucose::Solver                       *solver,
+			      const sRealInstance                   &real_Instance,
+			      const KruhobotDecisionDiagrams_vector &kruhobot_RDDs,
+			      const RealModel                       &real_sat_Model,
+			      sDouble                                cost_bound,					      
+			      const std::vector<sDouble>            &kruhobot_lower_cost_Bounds,
+			      KruhobotSchedules_vector              &kruhobot_Schedules,
+			      KruhobotExtraVariables_vector         &kruhobot_set_extra_Variables,
+			      KruhobotExtraVariables_vector         &kruhobot_all_extra_Variables) const;
 	
 	bool verify_KruhobotSchedules(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules) const;
 	bool verify_KruhobotCollisionDuplicities(const KruhobotCollision &next_kruhobot_collision, const KruhobotCollisions_mset &kruhobot_Collisions) const;	

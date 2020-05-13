@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 1-157_leibniz                                                   */
+/* cbsR.cpp / 2-022_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -801,6 +801,7 @@ namespace boOX
 
 	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
 	{
+	    
 	    const Schedule_vector &Schedule = kruhobot_Schedules[kruhobot_id];
 	    for (Schedule_vector::const_iterator event = Schedule.begin(); event != Schedule.end(); ++event)
 	    {
@@ -1151,7 +1152,8 @@ namespace boOX
 								  other_linear_Coop->first.m_upper_id);
 
 		    //if (linear_Coop->first.m_upper_id != other_linear_Coop->first.m_lower_id && other_linear_Coop->first.m_upper_id != linear_Coop->first.m_lower_id)
-		    {		    
+		    {
+
 			const Cooccupations__map &other_linear_cooccupations = other_linear_Coop->second;
 
 //		        for (Cooccupations_map::const_iterator other_coop = other_linear_cooccupations.begin(); other_coop != other_linear_cooccupations.end(); ++other_coop)
@@ -1161,7 +1163,7 @@ namespace boOX
 			    if (coop->first.overlaps(other_coop->first))
 			    {
 				for (KruhobotIDs_umap::const_iterator kruhobot = coop->second.begin(); kruhobot != coop->second.end(); ++kruhobot)
-				{				    
+				{
 				    for (KruhobotIDs_umap::const_iterator other_kruhobot = other_coop->second.begin(); other_kruhobot != other_coop->second.end(); ++other_kruhobot)
 				    {
 					if (line_distance < real_Instance.m_Kruhobots[sABS(kruhobot->first)].m_properties.m_radius + real_Instance.m_Kruhobots[sABS(other_kruhobot->first)].m_properties.m_radius)
@@ -1206,6 +1208,206 @@ namespace boOX
 	    }
 	}
 	return cummulative;
+    }
+
+
+    sDouble sRealCBSBase::analyze_NonconflictingSchedulesCosts(const sRealInstance                 &sUNUSED(real_Instance),
+							       const KruhobotSchedules_vector      &kruhobot_Schedules,
+							       sDouble                              cost_bound,					      
+							       const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
+							       const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
+							       const KruhobotExtraVariables_vector &sUNUSED(kruhobot_all_extra_Variables),
+							       KruhobotExtraVariables_vector       &envelope_extra_Variables) const
+    {
+	sDouble total_cost = 0.0;
+	sInt_32 N_kruhobots_1 = kruhobot_Schedules.size();
+
+	std::vector<ExtraVariables_mmap::const_reverse_iterator> extra_Envelope;
+	extra_Envelope.resize(N_kruhobots_1);
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    if (!kruhobot_set_extra_Variables[kruhobot_id].empty())
+	    {
+		total_cost += kruhobot_set_extra_Variables[kruhobot_id].rbegin()->first;
+		extra_Envelope[kruhobot_id] = kruhobot_set_extra_Variables[kruhobot_id].rbegin();
+	    }
+	    else
+	    {
+		total_cost += kruhobot_lower_cost_Bounds[kruhobot_id];
+	    }
+	}	
+	//printf("total cost: %.3f, bound: %.3f\n", total_cost, cost_bound);
+	sDouble envelope_cost = total_cost;	
+
+	/* go low */
+	while (true)
+	{
+	    sInt_32 best_to_low = -1;
+	    sDouble best_difference = -1.0;
+	
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	    {
+		if (!kruhobot_set_extra_Variables[kruhobot_id].empty())
+		{
+		    ExtraVariables_mmap::const_reverse_iterator next_lower = extra_Envelope[kruhobot_id];
+		    ++next_lower;
+		    if (next_lower != kruhobot_set_extra_Variables[kruhobot_id].rend())
+		    {
+			sDouble difference = extra_Envelope[kruhobot_id]->first - next_lower->first;
+			//printf("Defference is this: %.3f\n", difference);
+			
+			if (best_to_low < 0)
+			{
+			    best_to_low = kruhobot_id;
+			    best_difference = difference;
+			}
+			else
+			{
+			    if (difference < best_difference)
+			    {
+				best_to_low = kruhobot_id;
+				best_difference = difference;				
+			    }
+			}
+		    }
+		}
+	    }
+	    if (best_to_low > 0)
+	    {
+		if (envelope_cost - best_difference > cost_bound)
+		{
+		    ++extra_Envelope[best_to_low];
+		    envelope_cost -= best_difference;
+		}
+		else
+		{
+		    break;
+		}
+	    }
+	    else
+	    {
+		break;
+	    }
+	}
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    if (!kruhobot_set_extra_Variables[kruhobot_id].empty())
+	    {
+		envelope_extra_Variables[kruhobot_id].insert(*extra_Envelope[kruhobot_id]);
+	    }
+	}	
+		    
+	return total_cost;
+    }
+
+
+    sDouble sRealCBSBase::analyze_NonconflictingSchedulesCosts(const sRealInstance                 &sUNUSED(real_Instance),
+							       const KruhobotSchedules_vector      &kruhobot_Schedules,
+							       sDouble                              cost_bound,					      
+							       const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
+							       const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
+							       const KruhobotExtraVariables_vector &kruhobot_all_extra_Variables,
+							       KruhobotExtraVariables_vector       &envelope_extra_Variables,
+							       KruhobotExtraVariables_vector       &domus_extra_Variables) const
+    {
+	sDouble total_cost = 0.0;
+	sInt_32 N_kruhobots_1 = kruhobot_Schedules.size();
+
+	std::vector<ExtraVariables_mmap::const_reverse_iterator> extra_Envelope;
+	extra_Envelope.resize(N_kruhobots_1);
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    if (!kruhobot_set_extra_Variables[kruhobot_id].empty())
+	    {
+		total_cost += kruhobot_set_extra_Variables[kruhobot_id].rbegin()->first;
+		extra_Envelope[kruhobot_id] = kruhobot_set_extra_Variables[kruhobot_id].rbegin();
+	    }
+	    else
+	    {
+		total_cost += kruhobot_lower_cost_Bounds[kruhobot_id];
+	    }
+	}	
+	//printf("total cost: %.3f, bound: %.3f\n", total_cost, cost_bound);
+	sDouble envelope_cost = total_cost;	
+
+	/* go low */
+	while (true)
+	{
+	    sInt_32 best_to_low = -1;
+	    sDouble best_difference = -1.0;
+	
+	    for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	    {
+		if (!kruhobot_set_extra_Variables[kruhobot_id].empty())
+		{
+		    ExtraVariables_mmap::const_reverse_iterator next_lower = extra_Envelope[kruhobot_id];
+		    ++next_lower;
+		    if (next_lower != kruhobot_set_extra_Variables[kruhobot_id].rend())
+		    {
+			sDouble difference = extra_Envelope[kruhobot_id]->first - next_lower->first;
+			//printf("Defference is this: %.3f\n", difference);
+			
+			if (best_to_low < 0)
+			{
+			    best_to_low = kruhobot_id;
+			    best_difference = difference;
+			}
+			else
+			{
+			    if (difference < best_difference)
+			    {
+				best_to_low = kruhobot_id;
+				best_difference = difference;				
+			    }
+			}
+		    }
+		}
+	    }
+	    if (best_to_low > 0)
+	    {
+		if (envelope_cost - best_difference > cost_bound)
+		{
+		    ++extra_Envelope[best_to_low];
+		    envelope_cost -= best_difference;
+		}
+		else
+		{
+		    break;
+		}
+	    }
+	    else
+	    {
+		break;
+	    }
+	}
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    if (!kruhobot_set_extra_Variables[kruhobot_id].empty())
+	    {
+		envelope_extra_Variables[kruhobot_id].insert(*extra_Envelope[kruhobot_id]);
+	    }
+	}
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    if (!envelope_extra_Variables[kruhobot_id].empty())
+	    {
+		for (ExtraVariables_mmap::const_iterator extra_variable = kruhobot_all_extra_Variables[kruhobot_id].begin(); extra_variable != kruhobot_all_extra_Variables[kruhobot_id].end(); ++extra_variable)
+		{
+		    sASSERT(!envelope_extra_Variables[kruhobot_id].empty());
+		    if (extra_variable->first >= envelope_extra_Variables[kruhobot_id].begin()->first)
+		    {
+			domus_extra_Variables[kruhobot_id].insert(*extra_variable);
+		    }
+		}
+	    }
+	}		
+		    
+	return total_cost;
     }    
 
 
@@ -2241,6 +2443,160 @@ namespace boOX
 	
 	return final_time;
     }
+
+
+/*----------------------------------------------------------------------------*/
+    
+    sDouble sRealCBSBase::calc_Makespan(const sRealInstance &sUNUSED(real_Instance), const KruhobotSchedules_vector &kruhobot_Schedules)
+    {
+	sDouble makespan = 0.0;
+	sInt_32 N_kruhobots_1 = kruhobot_Schedules.size();
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    if (!kruhobot_Schedules[kruhobot_id].empty())
+	    {
+		Schedule_vector::const_reverse_iterator last_event = kruhobot_Schedules[kruhobot_id].rbegin();
+
+		while (last_event != kruhobot_Schedules[kruhobot_id].rend())
+		{
+		    if (last_event->m_from_loc_id != last_event->m_to_loc_id)
+		    {
+			makespan = sMAX(makespan, last_event->m_finish_time);
+			break;
+		    }
+		    ++last_event;
+		}
+	    }
+	}	
+	return makespan;	
+    }
+
+    
+    sDouble sRealCBSBase::calc_Cost(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules)
+    {
+	sDouble cost = 0.0;
+	sDouble alter_cost = 0.0;
+	sInt_32 N_kruhobots_1 = kruhobot_Schedules.size();	
+
+	sDouble kruho_cost;
+	
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    kruho_cost = 0.0;
+	    
+	    if (!kruhobot_Schedules[kruhobot_id].empty())
+	    {
+		Schedule_vector::const_reverse_iterator last_event = kruhobot_Schedules[kruhobot_id].rbegin();
+
+		while (last_event != kruhobot_Schedules[kruhobot_id].rend())
+		{
+		    if (last_event->m_from_loc_id != last_event->m_to_loc_id)
+		    { 
+			kruho_cost = sMAX(kruho_cost, last_event->m_finish_time);
+			break;
+		    }
+		    ++last_event;
+		}
+		alter_cost += kruho_cost;		
+
+		#ifdef sDEBUG
+		{
+		    bool wait_in_goal = true;
+		    last_event = kruhobot_Schedules[kruhobot_id].rbegin();
+		
+		    while (last_event != kruhobot_Schedules[kruhobot_id].rend())
+		    {
+			if (wait_in_goal)
+			{
+			    if (last_event->m_from_loc_id != last_event->m_to_loc_id)
+			    {
+				sASSERT(last_event->m_to_loc_id == real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id]);
+				cost += last_event->m_finish_time - last_event->m_start_time;
+				wait_in_goal = false;
+			    }
+			}
+			else
+			{
+			    cost += last_event->m_finish_time - last_event->m_start_time;
+			}
+			++last_event;
+		    }		
+		}
+		#endif
+	    }
+	}
+	sASSERT(sABS(cost - alter_cost) <= s_EPSILON);	
+	
+	return cost;		
+    }
+
+
+    sDouble sRealCBSBase::calc_Cost(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules, Costs_vector &individual_Costs)
+    {
+	sDouble cost = 0.0;
+	sDouble alter_cost = 0.0;
+	sInt_32 N_kruhobots_1 = kruhobot_Schedules.size();
+
+	individual_Costs.resize(N_kruhobots_1);
+
+	sDouble kruho_cost;
+	
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < N_kruhobots_1; ++kruhobot_id)
+	{
+	    kruho_cost = 0.0;
+	    
+	    if (!kruhobot_Schedules[kruhobot_id].empty())
+	    {
+		Schedule_vector::const_reverse_iterator last_event = kruhobot_Schedules[kruhobot_id].rbegin();
+
+		while (last_event != kruhobot_Schedules[kruhobot_id].rend())
+		{
+		    if (last_event->m_from_loc_id != last_event->m_to_loc_id)
+		    { 
+			kruho_cost = sMAX(kruho_cost, last_event->m_finish_time);
+			break;
+		    }
+		    ++last_event;
+		}
+		alter_cost += kruho_cost;		
+
+		#ifdef sDEBUG
+		{
+		    bool wait_in_goal = true;
+		    last_event = kruhobot_Schedules[kruhobot_id].rbegin();
+		
+		    while (last_event != kruhobot_Schedules[kruhobot_id].rend())
+		    {
+			if (wait_in_goal)
+			{
+			    if (last_event->m_from_loc_id != last_event->m_to_loc_id)
+			    {
+				sASSERT(last_event->m_to_loc_id == real_Instance.m_goal_conjunction.m_kruhobot_Locations[kruhobot_id]);
+				cost += last_event->m_finish_time - last_event->m_start_time;
+				wait_in_goal = false;
+			    }
+			}
+			else
+			{
+			    cost += last_event->m_finish_time - last_event->m_start_time;
+			}
+			++last_event;
+		    }		
+		}
+		#endif
+
+		individual_Costs[kruhobot_id] = kruho_cost;
+	    }
+	    else
+	    {
+		individual_Costs[kruhobot_id] = 0.0;
+	    }
+	}
+	sASSERT(sABS(cost - alter_cost) <= s_EPSILON);
+	
+	return cost;		
+    }    
 
     
 /*----------------------------------------------------------------------------*/

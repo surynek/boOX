@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 1-157_leibniz                                                    */
+/* agent.h / 2-022_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -239,23 +239,29 @@ namespace boOX
 	
 	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_cpf(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_cpf(FILE *fw, sInt_32 N_agents, const sString &indent = "") const;		
 	virtual void to_Stream_ccpf(FILE *fw, const sString &indent = "") const;	
 	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_mpf(FILE *fw, sInt_32 N_agents, const sString &indent = "") const;	
 	virtual void to_Stream_cmpf(FILE *fw, const sString &indent = "") const;
 	
 	virtual void to_Stream_domainPDDL(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_problemPDDL(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_bgu(FILE *fw, const sString &indent = "", sInt_32 instance_id = -1) const;
+	virtual void to_Stream_bgu(FILE *fw, sInt_32 N_agents, const sString &indent = "", sInt_32 instance_id = -1) const;	
 
 	virtual sResult to_File(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_cpf(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_cpf(const sString &filename, sInt_32 N_agents, const sString &indent = "") const;		
 	virtual sResult to_File_ccpf(const sString &filename, const sString &indent = "") const;	
 	virtual sResult to_File_mpf(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_mpf(const sString &filename, sInt_32 N_agents, const sString &indent = "") const;	
 	virtual sResult to_File_cmpf(const sString &filename, const sString &indent = "") const;
 	
 	virtual sResult to_File_domainPDDL(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_problemPDDL(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_bgu(const sString &filename, const sString &indent = "", sInt_32 instance_id = 0) const;
+	virtual sResult to_File_bgu(const sString &filename, sInt_32 N_agents, const sString &indent = "", sInt_32 instance_id = 0) const;	
 
 	virtual sResult from_File_cpf(const sString &filename);
 	virtual sResult from_Stream_cpf(FILE *fr);
@@ -269,7 +275,7 @@ namespace boOX
 	virtual sResult from_File_cmpf(const sString &filename);
 	virtual sResult from_Stream_cmpf(FILE *fr);			       
 
-	virtual sResult from_File_bgu(const sString &filename);
+	virtual sResult from_File_bgu(const sString &filename);	
 	virtual sResult from_Stream_bgu(FILE *fr);	
 
 	virtual sResult to_File_usc(const sString &map_filename, const sString &agents_filename) const;
@@ -286,6 +292,9 @@ namespace boOX
 	
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
+
+	virtual sResult from_File_movi(const sString &filename, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
+	virtual sResult from_Stream_movi(FILE *fr, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
 
     public:
 	sUndirectedGraph m_environment;

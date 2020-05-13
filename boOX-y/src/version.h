@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 1-157_leibniz                                                  */
+/* version.h / 2-022_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -27,12 +27,12 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "1-157_leibniz"
-#define sPRODUCT "boOX 1-157_leibniz"
+#define sVERSION "2-022_planck"
+#define sPRODUCT "boOX 2-022_planck"
 #define sAUTHOR "Pavel Surynek"
-#define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.com>"
-#define sCOPYRIGHT "(C) Copyright 2018 - 2019 Pavel Surynek"
-#define sURL "http://www.surynek.com"
+#define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.net>"
+#define sCOPYRIGHT "(C) Copyright 2018 - 2020 Pavel Surynek"
+#define sURL "http://www.surynek.net"
 
 
 /*----------------------------------------------------------------------------*/

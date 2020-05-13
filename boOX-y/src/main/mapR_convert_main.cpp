@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.cpp / 1-157_leibniz                                      */
+/* mapR_convert_main.cpp / 2-022_planck                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -131,7 +131,6 @@ namespace boOX
 		if (parameters.m_neighbor_k >= 2 && parameters.m_neighbor_k < sizeof(s_RADIANT_RADIUS_2K_NEIHBORHOOD) / sizeof(sDouble))
 		{
 		    sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
-		    printf("radi: %.3f\n", corresponding_radius);
 		    real_Map.populate_NetworkRadiant(corresponding_radius);		    
 		}
 		else
@@ -213,7 +212,23 @@ namespace boOX
 	    }
 	    case sCommandParameters::NEIGHBORHOOD_RADIANT:
 	    {
-		real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		if (parameters.m_neighbor_k >= 0)
+		{		
+		    if (parameters.m_neighbor_k >= 2 && parameters.m_neighbor_k < sizeof(s_RADIANT_RADIUS_2K_NEIHBORHOOD) / sizeof(sDouble))
+		    {
+			sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
+			real_Map.populate_NetworkRadiant(corresponding_radius);		    
+		    }
+		    else
+		    {
+			printf("Error: Specified k in 2^k neighborhood is out of range <2,6> (code = %d).\n", sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR);
+			return sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR;
+		    }
+		}
+		else
+		{
+		    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		}
 		break;
 	    }
 	    default:

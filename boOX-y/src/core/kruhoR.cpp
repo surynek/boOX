@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 1-157_leibniz                                                 */
+/* kruhoR.cpp / 2-022_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -132,7 +132,7 @@ namespace boOX
     {
 	fprintf(fw, "%s%d: ", indent.c_str(), m_id);
 	
-	fprintf(fw, "[r = %.3f, lv = %.3f, la = %.3f, av = %.3f, aa = %.3f, wf = %.3f]\n",
+	fprintf(fw, "[r = %f, lv = %.3f, la = %.3f, av = %.3f, aa = %.3f, wf = %.3f]\n",
 		m_properties.m_radius,
 		m_properties.m_linear_velo,
 		m_properties.m_linear_accel,
@@ -260,7 +260,7 @@ namespace boOX
     }
 
 
-    sResult sRealConjunction::from_File_xml_init(const sString &filename)
+    sResult sRealConjunction::from_File_xml_init(const sString &filename, sInt_32 N_kruhobots)
     {
 	sResult result;
 	FILE *fr;
@@ -270,7 +270,7 @@ namespace boOX
 	    return sREAL_CONJUNCTION_XML_OPEN_ERROR;
 	}
 	
-	if (sFAILED(result = from_Stream_xml_init(fr)))
+	if (sFAILED(result = from_Stream_xml_init(fr, N_kruhobots)))
 	{
 	    fclose(fr);
 	    return result;
@@ -281,7 +281,7 @@ namespace boOX
     }
 
     
-    sResult sRealConjunction::from_Stream_xml_init(FILE *fr)
+    sResult sRealConjunction::from_Stream_xml_init(FILE *fr, sInt_32 N_kruhobots)
     {
 	sString root_keyword;
 	
@@ -304,9 +304,16 @@ namespace boOX
 	sInt_32 kruhobot_id = 1;
 	
 	while(true)
-	{
+	{	    
 	    sString next_keyword;
-	
+
+	    if (N_kruhobots >= 0)
+	    {
+		if (kruhobot_id > N_kruhobots)
+		{
+		    break;
+		}
+	    }	    
 	    sConsumeUntilChar(fr, '<');	    
 	    sConsumeAlphaString(fr, next_keyword);    
 //	    printf("nxt:%s\n", next_keyword.c_str());
@@ -363,6 +370,8 @@ namespace boOX
 		    sConsumeUntilChar(fr, '>');
 
 		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("init_idi 1 (%d,%d):%d\n", m_Map->m_Network.m_x_size, m_Map->m_Network.m_y_size, init_id);		    
 
 		    if (m_kruhobot_Locations.size() <= kruhobot_id)
 		    {
@@ -374,6 +383,44 @@ namespace boOX
 		    }
 //		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
 //		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
+		}
+		else if (start_keyword == "id")
+		{
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+	    			    
+		    sString init_y_keyword;
+		    sInt_32 init_y;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_y_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDy:%s\n", init_y_keyword.c_str());
+		    init_y = sInt_32_from_String(init_y_keyword);		    
+
+		    sString init_x_keyword;
+		    sInt_32 init_x;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_x_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDx:%s\n", init_x_keyword.c_str());
+		    init_x = sInt_32_from_String(init_x_keyword);
+		    
+		    sConsumeUntilChar(fr, '>');
+
+		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("init_idi 2 (%d,%d):%d\n", m_Map->m_Network.m_x_size, m_Map->m_Network.m_y_size, init_id);
+
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }		    
 		}
 		else
 		{
@@ -390,7 +437,7 @@ namespace boOX
     }
 
     
-    sResult sRealConjunction::from_File_xml_goal(const sString &filename)
+    sResult sRealConjunction::from_File_xml_goal(const sString &filename, sInt_32 N_kruhobots)
     {
 	sResult result;
 	FILE *fr;
@@ -400,7 +447,7 @@ namespace boOX
 	    return sREAL_CONJUNCTION_XML_OPEN_ERROR;
 	}
 	
-	if (sFAILED(result = from_Stream_xml_goal(fr)))
+	if (sFAILED(result = from_Stream_xml_goal(fr, N_kruhobots)))
 	{
 	    fclose(fr);
 	    return result;
@@ -411,7 +458,7 @@ namespace boOX
     }
 
     
-    sResult sRealConjunction::from_Stream_xml_goal(FILE *fr)
+    sResult sRealConjunction::from_Stream_xml_goal(FILE *fr, sInt_32 N_kruhobots)
     {
 	sString root_keyword;
 	
@@ -436,8 +483,15 @@ namespace boOX
 	while(true)
 	{
 	    sString next_keyword;
-	
-	    sConsumeUntilChar(fr, '<');	    
+
+	    if (N_kruhobots >= 0)
+	    {
+		if (kruhobot_id > N_kruhobots)
+		{
+		    break;
+		}
+	    }
+	    sConsumeUntilChar(fr, '<');
 	    sConsumeAlphaString(fr, next_keyword);    
 //	    printf("nxt:%s\n", next_keyword.c_str());
 
@@ -502,6 +556,8 @@ namespace boOX
 		    sConsumeUntilChar(fr, '>');
 
 		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("init_id 1:%d\n", init_id);		    
 
 		    if (m_kruhobot_Locations.size() <= kruhobot_id)
 		    {
@@ -513,6 +569,53 @@ namespace boOX
 		    }
 //		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
 //		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());
+		}
+		else if (start_keyword == "id")
+		{    
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+
+		    sString init_y_keyword;
+		    sInt_32 init_y;
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');
+
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeUntilChar(fr, '"');		    
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_y_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDy:%s\n", init_y_keyword.c_str());
+		    init_y = sInt_32_from_String(init_y_keyword);		    
+
+		    sString init_x_keyword;
+		    sInt_32 init_x;
+				
+		    sConsumeUntilChar(fr, '"');
+		    sConsumeAlnumString(fr, init_x_keyword);
+		    sConsumeUntilChar(fr, '"');
+//		    printf("IDx:%s\n", init_x_keyword.c_str());
+		    init_x = sInt_32_from_String(init_x_keyword);
+		    
+		    sConsumeUntilChar(fr, '>');
+
+		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_y * m_Map->m_Network.m_x_size + init_x];
+//		    sInt_32 init_id = m_Map->m_Network.m_Matrix[init_x * m_Map->m_Network.m_y_size + init_y];
+//		    printf("textu:%d,%d\n", init_x, init_y);
+//		    printf("init_id 2 (%d,%d):%d\n", m_Map->m_Network.m_x_size, m_Map->m_Network.m_y_size, init_id);
+
+		    if (m_kruhobot_Locations.size() <= kruhobot_id)
+		    {
+			m_kruhobot_Locations.push_back(init_id);
+		    }
+		    else
+		    {
+			m_kruhobot_Locations[kruhobot_id] = init_id;
+		    }
+//		    printf("xy: %d, %d [%d]\n", init_x, init_y, init_id);
+//		    printf("SSSize:%ld\n", m_kruhobot_Locations.size());		    
 		}
 		else
 		{
@@ -758,7 +861,136 @@ namespace boOX
     }
 
 
+/*----------------------------------------------------------------------------*/
     
+    sResult sRealInstance::from_File_movi(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sREAL_INSTANCE_MOVISCEN_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_movi(fr)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    sResult sRealInstance::from_Stream_movi(FILE *fr)
+    {
+	sInt_32 version_unused;		
+	fscanf(fr, "version %d\n", &version_unused);
+
+	sInt_32 N_Kruhobots_1 = 1;
+
+	while (!feof(fr))
+	{
+	    sInt_32 number_ignore;
+	    sChar map_name_ignore[128];
+
+	    sInt_32 x_size, y_size;
+
+	    sInt_32 x_start, y_start;
+	    sInt_32 x_goal, y_goal;
+
+	    sDouble real_number_ignore;
+	    
+	    fscanf(fr, "%d %s %d %d %d %d %d %d %lf\n", &number_ignore, map_name_ignore, &x_size, &y_size, &x_start, &y_start, &x_goal, &y_goal, &real_number_ignore);
+//	    printf("%d %s %d %d %d %d %d %d %.3f\n", number_ignore, map_name_ignore, x_size, y_size, x_start, y_start, x_goal, y_goal, real_number_ignore);
+
+	    sInt_32 start_location_id = m_start_conjunction.m_Map->m_Network.m_Matrix[y_start * x_size + x_start];
+//	    printf("Map0 point: %d\n", start_location_id);
+	    m_start_conjunction.m_kruhobot_Locations.push_back(start_location_id);
+
+	    sInt_32 goal_location_id = m_goal_conjunction.m_Map->m_Network.m_Matrix[y_goal * x_size + x_goal];
+//	    printf("Map+ point: %d\n", goal_location_id);
+	    m_goal_conjunction.m_kruhobot_Locations.push_back(goal_location_id);	    
+	    	    
+	    ++N_Kruhobots_1;
+	}
+	m_Kruhobots.resize(N_Kruhobots_1);
+	
+	return sRESULT_SUCCESS;
+    }
+
+  
+    sResult sRealInstance::to_File_xml(const sString &filename, sInt_32 N_kruhobots, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sREAL_INSTANCE_OPEN_ERROR;
+	}
+	
+	to_Stream_xml(fw, N_kruhobots, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sRealInstance::to_Stream_xml(FILE *fw, sInt_32 N_kruhobots, const sString &indent) const
+    {
+	fprintf(fw, "%s<?xml version=\"1.0\" ?>\n", indent.c_str());
+	fprintf(fw, "%s<root>\n", indent.c_str());
+	sASSERT(m_start_conjunction.m_kruhobot_Locations.size() == m_goal_conjunction.m_kruhobot_Locations.size());	
+
+	LocationIDs_vector::const_iterator start_location = m_start_conjunction.m_kruhobot_Locations.begin();
+	LocationIDs_vector::const_iterator goal_location = m_goal_conjunction.m_kruhobot_Locations.begin();	
+
+
+	if (N_kruhobots > 0)
+	{
+	    while (   start_location != m_start_conjunction.m_kruhobot_Locations.end()
+		      && goal_location != m_goal_conjunction.m_kruhobot_Locations.end())
+	    {
+		if (N_kruhobots-- <= 0)
+		{
+		    break;
+		}
+		sInt_32 start_location_id = *start_location++;
+		sInt_32 goal_location_id = *goal_location++;
+		
+//	    printf("START: %.3f, %.3f\n", m_start_conjunction.m_Map->m_Locations[start_location_id].m_x, m_start_conjunction.m_Map->m_Locations[start_location_id].m_y);
+//	    printf("GOAL: %.3f, %.3f\n", m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_x, m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_y);
+		sInt_32 start_i = m_start_conjunction.m_Map->m_Locations[start_location_id].m_y;
+		sInt_32 start_j = m_start_conjunction.m_Map->m_Locations[start_location_id].m_x;
+		
+		sInt_32 goal_i = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_y;
+		sInt_32 goal_j = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_x;
+		
+		fprintf(fw, "%s%s<agent start_i=\"%d\" start_j=\"%d\" goal_i=\"%d\" goal_j=\"%d\"/>\n", indent.c_str(), s_INDENT.c_str(), start_i, start_j, goal_i, goal_j);	    
+	    }
+	}
+	else
+	{
+	    while (   start_location != m_start_conjunction.m_kruhobot_Locations.end()
+		      && goal_location != m_goal_conjunction.m_kruhobot_Locations.end())
+	    {
+		sInt_32 start_location_id = *start_location++;
+		sInt_32 goal_location_id = *goal_location++;
+		
+		sInt_32 start_i = m_start_conjunction.m_Map->m_Locations[start_location_id].m_y;
+		sInt_32 start_j = m_start_conjunction.m_Map->m_Locations[start_location_id].m_x;
+		
+		sInt_32 goal_i = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_y;
+		sInt_32 goal_j = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_x;
+
+		fprintf(fw, "%s%s<agent start_i=\"%d\" start_j=\"%d\" goal_i=\"%d\" goal_j=\"%d\"/>\n", indent.c_str(), s_INDENT.c_str(), start_i, start_j, goal_i, goal_j);
+	    }
+	}
+	fprintf(fw, "%s</root>\n", indent.c_str());	
+    }
+        
 
 /*----------------------------------------------------------------------------*/
 // sRealSolution

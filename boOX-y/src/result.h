@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 1-157_leibniz                                                   */
+/* result.h / 2-022_planck                                                    */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -119,7 +119,8 @@ enum sAgentInstance_Result
     sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR -  8),    
     sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR -  9),    
     sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 10),
-    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 11)
+    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 11),
+    sAGENT_INSTANCE_MOVISCEN_OPEN_ERROR = (sAGENT_INSTANCE_ERROR - 12)    
 };
 
 
@@ -144,9 +145,10 @@ enum sRealConjunction_Result
 
 enum sRealInstance_Result
 {
-    sREAL_INSTANCE_INFO       =  17000,
-    sREAL_INSTANCE_ERROR      = -17000,
-    sREAL_INSTANCE_OPEN_ERROR = (sREAL_INSTANCE_ERROR - 1),
+    sREAL_INSTANCE_INFO                =  17000,
+    sREAL_INSTANCE_ERROR               = -17000,
+    sREAL_INSTANCE_OPEN_ERROR          = (sREAL_INSTANCE_ERROR - 1),
+    sREAL_INSTANCE_MOVISCEN_OPEN_ERROR = (sREAL_INSTANCE_ERROR - 2)
 };
 
 
@@ -245,18 +247,39 @@ enum sRealMapConvertorProgram_Result
 };
 
 
+enum sMoviMapConvertorProgram_Result
+{
+    sMOVIMAP_CONVERT_PROGRAM_INFO                             =  200000,
+    sMOVIMAP_CONVERT_PROGRAM_ERROR                            = -200000,
+    sMOVIMAP_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR     = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 1),
+    sMOVIMAP_CONVERT_PROGRAM_NO_MOVI_MAP_FILE_SPECIFIED_ERROR = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 2),
+    sMOVIMAP_CONVERT_PROGRAM_NO_XML_MAP_FILE_SPECIFIED_ERROR  = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 3)
+};
+
+
+enum sMoviScenConvertorProgram_Result
+{
+    sMOVISCEN_CONVERT_PROGRAM_INFO                              =  210000,
+    sMOVISCEN_CONVERT_PROGRAM_ERROR                             = -210000,
+    sMOVISCEN_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR      = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 1),
+    sMOVISCEN_CONVERT_PROGRAM_NO_MOVI_MAP_FILE_SPECIFIED_ERROR  = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 2),
+    sMOVISCEN_CONVERT_PROGRAM_NO_MOVI_SCEN_FILE_SPECIFIED_ERROR = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 3),    
+    sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR    = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 4)
+};
+
+
 enum sRealInstanceGeneratorProgram_Result
 {
-    sKRUHOBOT_R_GENERATE_PROGRAM_INFO                         =  200000,
-    sKRUHOBOT_R_GENERATE_PROGRAM_ERROR                        = -200000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_INFO                         =  220000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_ERROR                        = -220000,
     sKRUHOBOT_R_GENERATE_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sKRUHOBOT_R_GENERATE_PROGRAM_ERROR - 1)
 };
 
 
 enum sRealMutliAgentPathfindingSolverProgram_Result
 {
-    sMAPF_R_SOLVER_PROGRAM_INFO                         =  210000,
-    sMAPF_R_SOLVER_PROGRAM_ERROR                        = -210000,
+    sMAPF_R_SOLVER_PROGRAM_INFO                         =  230000,
+    sMAPF_R_SOLVER_PROGRAM_ERROR                        = -230000,
     sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_R_SOLVER_PROGRAM_ERROR - 1),
     sMAPF_R_SOLVER_PROGRAM_MISSING_MAP_FILE_ERROR       = (sMAPF_R_SOLVER_PROGRAM_ERROR - 2),
     sMAPF_R_SOLVER_PROGRAM_MISSING_KRUHOBOT_FILE_ERROR  = (sMAPF_R_SOLVER_PROGRAM_ERROR - 3)    

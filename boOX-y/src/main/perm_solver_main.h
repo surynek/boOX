@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.h / 1-157_leibniz                                         */
+/* perm_solver_main.h / 2-022_planck                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.
@@ -45,6 +45,7 @@ namespace boOX
 	    ALGORITHM_CBS,
 	    ALGORITHM_CBS_PLUS,
 	    ALGORITHM_CBS_PLUS_PLUS,
+	    ALGORITHM_CBS_PLUS_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS,
 	    ALGORITHM_SMTCBS_PLUS,
 	    ALGORITHM_SMTCBS_PLUS_PLUS	    
@@ -59,6 +60,7 @@ namespace boOX
 	sString m_input_filename;		
 	sString m_output_filename;
 
+	sDouble m_subopt_ratio;		
 	sDouble m_timeout;
     };
 

@@ -8,34 +8,34 @@ libCore_boOX_dbg.a:	graph.o_dbg agent.o_dbg smtcbs.o_dbg cbs.o_dbg icts.o_dbg cn
 	ar r libCore_boOX_dbg.a graph.o_dbg agent.o_dbg smtcbs.o_dbg cbs.o_dbg icts.o_dbg cnf.o_dbg mapR.o_dbg kruhoR.o_dbg cbsR.o_dbg smtcbsR.o_dbg
 
 graph.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h graph.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ograph.o_dbg graph.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ograph.o_dbg graph.cpp
 
 agent.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h agent.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -oagent.o_dbg agent.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -oagent.o_dbg agent.cpp
 
 smtcbs.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h smtcbs.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -osmtcbs.o_dbg smtcbs.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -osmtcbs.o_dbg smtcbs.cpp
 
 cbs.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h cbs.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ocbs.o_dbg cbs.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ocbs.o_dbg cbs.cpp
 
 icts.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h icts.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -oicts.o_dbg icts.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -oicts.o_dbg icts.cpp
 
 cnf.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h cnf.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ocnf.o_dbg cnf.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ocnf.o_dbg cnf.cpp
 
 mapR.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h mapR.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -omapR.o_dbg mapR.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -omapR.o_dbg mapR.cpp
 
 kruhoR.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h kruhoR.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -okruhoR.o_dbg kruhoR.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -okruhoR.o_dbg kruhoR.cpp
 
 cbsR.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h cbsR.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ocbsR.o_dbg cbsR.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -ocbsR.o_dbg cbsR.cpp
 
 smtcbsR.o_dbg:	../../src/version.h ../../src/defs.h ../../src/config.h ../../src/compile.h ../../src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h smtcbsR.cpp
-	g++ -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -osmtcbsR.o_dbg smtcbsR.cpp
+	g++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c -I../../src -I../../src/core -osmtcbsR.o_dbg smtcbsR.cpp
 
 
 libCore_boOX_opt.a:	graph.o_opt agent.o_opt smtcbs.o_opt cbs.o_opt icts.o_opt cnf.o_opt mapR.o_opt kruhoR.o_opt cbsR.o_opt smtcbsR.o_opt 

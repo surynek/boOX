@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 1-157_leibniz                                                   */
+/* kruhoR.h / 2-022_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -151,11 +151,11 @@ namespace boOX
 	virtual void to_Stream_mpfR(FILE *fw, const sString &indent = "") const;
 	virtual sResult from_Stream_mpfR(FILE *fr);
 
-	virtual sResult from_File_xml_init(const sString &filename);	
-	virtual sResult from_Stream_xml_init(FILE *fr);
+	virtual sResult from_File_xml_init(const sString &filename, sInt_32 N_kruhobots = -1);
+	virtual sResult from_Stream_xml_init(FILE *fr, sInt_32 N_kruhobots = -1);
 
-	virtual sResult from_File_xml_goal(const sString &filename);
-	virtual sResult from_Stream_xml_goal(FILE *fr);	
+	virtual sResult from_File_xml_goal(const sString &filename, sInt_32 N_kruhobots = -1);
+	virtual sResult from_Stream_xml_goal(FILE *fr, sInt_32 N_kruhobots = -1);
 
     public:
 	s2DMap *m_Map;
@@ -194,6 +194,14 @@ namespace boOX
 
 	virtual sResult from_File_mpfR(const sString &filename);
 	virtual sResult from_Stream_mpfR(FILE *fr);
+        /*----------------------------------------------------------------------------*/
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);	
+
+	virtual sResult to_File_xml(const sString &filename, sInt_32 N_kruhobots = -1, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, sInt_32 N_kruhobots = -1, const sString &indent = "") const;	
+        /*----------------------------------------------------------------------------*/	
 	
     public:
 	Kruhobots_vector m_Kruhobots;

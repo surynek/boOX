@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 1-157_leibniz                                                  */
+/* graph.cpp / 2-022_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 
 #include "config.h"
@@ -2443,7 +2444,10 @@ namespace boOX
 	    }
 	    else
 	    {
-		add_Edge(u_id, v_id);
+		if (!is_Adjacent(u_id, v_id))
+		{
+		    add_Edge(u_id, v_id);
+		}
 	    }
 	    if (c != '\n' && c != '<')
 	    {
@@ -3120,7 +3124,168 @@ namespace boOX
 	return sRESULT_SUCCESS;
     }    
 
+    
+    sResult sUndirectedGraph::to_File_xml(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
 
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_xml(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sUndirectedGraph::to_Stream_xml(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%s<grid>\n", indent.c_str());
+
+	for (sInt_32 row = 0; row < m_y_size; ++row)
+	{
+
+	    fprintf(fw, "%s%s<row>", indent.c_str(), s_INDENT.c_str());
+	    
+	    sInt_32 column = 0;
+	    while (true)
+	    {
+		if (m_Matrix[row * m_x_size + column] >= 0)
+		{
+		    fprintf(fw, "0");
+		}
+		else
+		{
+		    fprintf(fw, "1");
+		}
+		if (++column < m_x_size)
+		{
+		    fprintf(fw, " ");
+		}
+		else
+		{
+		    break;
+		}
+	    }
+	    fprintf(fw, "</row>\n");
+	}	
+	fprintf(fw, "%s</grid>\n", indent.c_str());			
+    }
+    
+
+
+    sResult sUndirectedGraph::from_File_movi(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	result = from_Stream_movi(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sUndirectedGraph::from_Stream_movi(FILE *fr)
+    {
+	char map_type[128];
+	sInt_32 x_size, y_size;
+	fscanf(fr, "type %s\n", map_type);
+	fscanf(fr, "height %d\n", &y_size);
+	fscanf(fr, "width %d\n", &x_size);
+
+	fscanf(fr, "map\n");
+
+	m_x_size = x_size;
+	m_y_size = y_size;
+
+	m_Matrix = new int[x_size * y_size];
+	sInt_32 cnt = 0;
+
+	for (sInt_32 j = 0; j < y_size; ++j)
+	{
+	    for (sInt_32 i = 0; i < x_size; ++i)
+	    {
+		char ch;
+		
+		fscanf(fr, "%c", &ch);
+		if (ch == '.')
+		{
+		    m_Matrix[j * x_size + i] = cnt++;
+		}
+		else
+		{
+		    m_Matrix[j * x_size + i] = -1;
+		}
+		printf("%c", ch);
+	    }
+	    printf("\n");
+	    fscanf(fr, "\n");
+	}
+	add_Vertices(cnt);
+
+	if (strcmp(map_type, "octile") == 0)
+	{
+	    for (sInt_32 j = 0; j < y_size - 1; ++j)
+	    {
+		for (sInt_32 i = 0; i < x_size - 1; ++i)
+		{
+		    sInt_32 u_id = j * x_size + i;
+		    sInt_32 v_id = (j + 1) * x_size + i;
+		    sInt_32 w_id = j * x_size + i + 1;
+		    
+		    if (m_Matrix[u_id] != -1)
+		    {
+			if (m_Matrix[v_id] != -1)
+			{
+			    add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
+			}
+			if (m_Matrix[w_id] != -1)
+		    {
+			add_Edge(m_Matrix[u_id], m_Matrix[w_id]);
+		    }
+		    }
+		}
+	    }
+	    for (sInt_32 j = 0; j < y_size - 1; ++j)
+	    {
+		sInt_32 u_id = (j + 1) * x_size - 1;
+		sInt_32 v_id = (j + 2) * x_size - 1;
+		
+		if (m_Matrix[u_id] != -1 && m_Matrix[v_id] != -1)
+		{
+		    add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
+		}
+	    }
+	    for (sInt_32 i = 0; i < x_size - 1; ++i)
+	    {
+		sInt_32 u_id = (y_size - 1) * x_size + i;
+		sInt_32 v_id = (y_size - 1) * x_size + (i + 1);
+		
+		if (m_Matrix[u_id] != -1 && m_Matrix[v_id] != -1)
+		{
+		    add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
+		}
+	    }
+	}
+	    
+	return sRESULT_SUCCESS;
+    }
+
+    
 /*----------------------------------------------------------------------------*/
 
     sResult sUndirectedGraph::to_File_mapR(const sString &filename, const sString &indent) const
@@ -3192,7 +3357,11 @@ namespace boOX
 	    sInt_32 u_id, v_id;
 	    
 	    fscanf(fr, "{%d,%d}\n", &u_id, &v_id);
-	    add_Edge(u_id, v_id);	    
+
+	    if (!is_Adjacent(u_id, v_id))
+	    {
+		add_Edge(u_id, v_id);
+	    }
 	}
 	return sRESULT_SUCCESS;
     }    

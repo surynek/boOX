@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-157_leibniz                             */
+/*                             boOX 2-022_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 1-157_leibniz                                                  */
+/* agent.cpp / 2-022_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1081,8 +1081,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);	
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -1197,8 +1199,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -1313,8 +1317,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -1422,8 +1428,10 @@ namespace boOX
 	}
 	c = fgetc(fr);
 
-	m_agent_Locs.resize(N_Agents + 1, (const int)UNDEFINED_LOCATION);
-	m_vertex_Occups.resize(N_Vertices, (const int)VACANT_VERTEX);
+	sInt_32 undefined_location = UNDEFINED_LOCATION;
+	m_agent_Locs.resize(N_Agents + 1, undefined_location);
+	sInt_32 vacant_vertex = VACANT_VERTEX;
+	m_vertex_Occups.resize(N_Vertices, vacant_vertex);
 
 	while (c == '(')
 	{
@@ -2213,6 +2221,21 @@ namespace boOX
     }
 
 
+    sResult sInstance::to_File_cpf(const sString &filename, sInt_32 N_agents, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_OPEN_ERROR;
+	}
+	to_Stream_cpf(fw, N_agents, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sInstance::to_File_ccpf(const sString &filename, const sString &indent) const
     {
 	FILE *fw;
@@ -2241,6 +2264,21 @@ namespace boOX
 
 	return sRESULT_SUCCESS;
     }
+
+
+    sResult sInstance::to_File_mpf(const sString &filename, sInt_32 N_agents, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_OPEN_ERROR;
+	}
+	to_Stream_mpf(fw, N_agents, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
 
 
     sResult sInstance::to_File_cmpf(const sString &filename, const sString &indent) const
@@ -2300,6 +2338,20 @@ namespace boOX
     }
 
 
+    sResult sInstance::to_File_bgu(const sString &filename, sInt_32 N_agents, const sString &indent, sInt_32 instance_id) const
+    {
+	FILE *fw;
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_BGU_OPEN_ERROR;
+	}
+	to_Stream_bgu(fw, N_agents, indent, instance_id);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     void sInstance::to_Stream(FILE *fw, const sString &indent) const
     {       
 	fprintf(fw, "%sMultiagent instance: [\n", indent.c_str());
@@ -2344,6 +2396,37 @@ namespace boOX
 	}
 	m_environment.to_Stream_cpf(fw, indent);
     }
+
+
+    void sInstance::to_Stream_cpf(FILE *fw, sInt_32 N_agents, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_start_configuration.m_vertex_Occups.size();
+	
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d:-1)[%d:%d:%d]", i,
+		    m_start_configuration.m_vertex_Occups[i] <= N_agents ? m_start_configuration.m_vertex_Occups[i] : 0,
+		    m_goal_configuration.m_vertex_Occups[i] <= N_agents ? m_goal_configuration.m_vertex_Occups[i] : 0,
+		    m_goal_configuration.m_vertex_Occups[i] <= N_agents ? m_goal_configuration.m_vertex_Occups[i] : 0);
+	    
+	    if (m_environment.m_Vertices[i].m_Conflicts.empty())
+	    {
+		fprintf(fw, "\n");
+	    }
+	    else
+	    {
+		fprintf(fw, "< ");
+		for (sInt_32 c = 0; c < m_environment.m_Vertices[i].m_Conflicts.size(); ++c)
+		{
+		    fprintf(fw, "%d ", m_environment.m_Vertices[i].m_Conflicts[c]);
+		}			 
+		fprintf(fw, ">\n");
+	    }
+	}
+	m_environment.to_Stream_cpf(fw, indent);
+    }    
 
 
     void sInstance::to_Stream_ccpf(FILE *fw, const sString &indent) const
@@ -2406,6 +2489,36 @@ namespace boOX
 	}
 	m_environment.to_Stream_mpf(fw, indent);
     }
+
+
+    void sInstance::to_Stream_mpf(FILE *fw, sInt_32 N_agents, const sString &indent) const
+    {
+	fprintf(fw, "%sV =\n", indent.c_str());
+	
+	sInt_32 N_Vertices = m_start_configuration.m_vertex_Occups.size();
+	
+	for (sInt_32 i = 0; i < N_Vertices; ++i)
+	{
+	    fprintf(fw, "(%d,%d,%d)", i,
+		    m_start_configuration.m_vertex_Occups[i] <= N_agents ? m_start_configuration.m_vertex_Occups[i] : 0,
+		    m_goal_configuration.m_vertex_Occups[i] <= N_agents ? m_goal_configuration.m_vertex_Occups[i] : 0);
+	    
+	    if (m_environment.m_Vertices[i].m_Conflicts.empty())
+	    {
+		fprintf(fw, "\n");
+	    }
+	    else
+	    {
+		fprintf(fw, "< ");
+		for (sInt_32 c = 0; c < m_environment.m_Vertices[i].m_Conflicts.size(); ++c)
+		{
+		    fprintf(fw, "%d ", m_environment.m_Vertices[i].m_Conflicts[c]);
+		}			 
+		fprintf(fw, ">\n");
+	    }
+	}
+	m_environment.to_Stream_mpf(fw, indent);
+    }    
 
 
     void sInstance::to_Stream_cmpf(FILE *fw, const sString &indent) const
@@ -2563,6 +2676,46 @@ namespace boOX
 	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
 	}
     }
+
+
+    void sInstance::to_Stream_bgu(FILE *fw, sInt_32 N_agents, const sString &indent, sInt_32 instance_id) const
+    {
+	sASSERT(m_environment.m_Matrix != NULL);
+
+	fprintf(fw, "%s%d\n", indent.c_str(), instance_id);
+	fprintf(fw, "%sGrid:\n", indent.c_str());
+	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_environment.m_y_size, m_environment.m_x_size);
+
+	for (sInt_32 j = 0; j < m_environment.m_y_size; ++j)
+	{
+	    for (sInt_32 i = 0; i < m_environment.m_x_size; ++i)
+	    {
+		if (m_environment.m_Matrix[j * m_environment.m_x_size + i] >= 0)
+		{
+		    fprintf(fw, ".");
+		}
+		else
+		{
+		    fprintf(fw, "@");
+		}
+	    }
+	    fprintf(fw, "\n");
+	}
+	
+	fprintf(fw, "%sAgents:\n", indent.c_str());
+	fprintf(fw, "%s%d\n", indent.c_str(), N_agents);
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    fprintf(fw, "%s%d,", indent.c_str(), agent_id - 1);
+	    
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d,",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
+	    
+	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+	}
+    }    
 
 
     sResult sInstance::from_File_cpf(const sString &filename)
@@ -3111,6 +3264,90 @@ namespace boOX
 	    m_goal_configuration.place_Agent(agent_id, goal_vertex_id - 1);
 	}
 
+	return sRESULT_SUCCESS;
+    }
+    
+
+    sResult sInstance::from_File_movi(const sString &filename, const sUndirectedGraph &environment, sInt_32 N_agents)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_INSTANCE_MOVISCEN_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_movi(fr, environment, N_agents)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    sResult sInstance::from_Stream_movi(FILE *fr, const sUndirectedGraph &environment, sInt_32 N_agents)
+    {
+	sInt_32 version_unused;		
+	fscanf(fr, "version %d\n", &version_unused);
+
+	sInt_32 N_Agents_1 = 1;
+
+	if (N_agents < 0)
+	{
+	    N_agents = 0;
+	    
+	    while (!feof(fr))
+	    {
+		sInt_32 number_ignore;
+		sChar map_name_ignore[128];
+		
+		sInt_32 x_size, y_size;
+		
+		sInt_32 x_start, y_start;
+		sInt_32 x_goal, y_goal;
+		
+		sDouble real_number_ignore;
+		
+		fscanf(fr, "%d %s %d %d %d %d %d %d %lf\n", &number_ignore, map_name_ignore, &x_size, &y_size, &x_start, &y_start, &x_goal, &y_goal, &real_number_ignore);
+		++N_agents;
+	    }
+	    
+	    if (fseek(fr, 0, SEEK_SET) != 0)
+	    {
+		return sAGENT_INSTANCE_SEEK_ERROR;
+	    }
+	}
+
+	m_start_configuration = sConfiguration(environment.get_VertexCount(), N_agents);
+	m_goal_configuration = sConfiguration(environment.get_VertexCount(), N_agents);	    	
+	
+	while (!feof(fr) && N_agents > 0)
+	{
+	    sInt_32 number_ignore;
+	    sChar map_name_ignore[128];
+
+	    sInt_32 x_size, y_size;
+
+	    sInt_32 x_start, y_start;
+	    sInt_32 x_goal, y_goal;
+
+	    sDouble real_number_ignore;
+	    
+	    fscanf(fr, "%d %s %d %d %d %d %d %d %lf\n", &number_ignore, map_name_ignore, &x_size, &y_size, &x_start, &y_start, &x_goal, &y_goal, &real_number_ignore);
+
+	    sInt_32 start_location_id = environment.m_Matrix[y_start * x_size + x_start];
+	    m_start_configuration.place_Agent(N_Agents_1, start_location_id);
+
+	    sInt_32 goal_location_id = environment.m_Matrix[y_goal * x_size + x_goal];
+	    m_goal_configuration.place_Agent(N_Agents_1, goal_location_id);	    
+	    	    
+	    ++N_Agents_1;
+	    --N_agents;
+	}	
 	return sRESULT_SUCCESS;
     }    
 

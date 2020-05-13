@@ -5,5 +5,5 @@ for SIZE in $SIZE_LIST;
 do
   ROBOTS=$SIZE
   echo 'Generating grid '$SIZE'x'$SIZE' with '$ROBOTS' agents ...'
-  ./stargen_boOX '--N-vertices='$SIZE '--N-agents='$ROBOTS '--mpf-file=clique_'$SIZE'_a'$ROBOTS'.mpf' '--cpf-file=clique_'$SIZE'_a'$ROBOTS'.cpf'
+  ../main/stargen_boOX '--N-vertices='$SIZE '--N-agents='$ROBOTS '--mpf-file=clique_'$SIZE'_a'$ROBOTS'.mpf' '--cpf-file=clique_'$SIZE'_a'$ROBOTS'.cpf'
 done
