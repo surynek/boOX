@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* config.h / 2-021_planck                                                    */
+/* config.h / 2-026_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Configuration file for auRIx package - global settings.
@@ -35,6 +35,8 @@ namespace boOX
 
 #define s__DEFAULT_WRAP_LINE_LENGTH           80
 #define s__CONVERSION_BUFFER_SIZE            128
+
+#define s__VERIFICATION_SIMULATION_STEP    0.001
     
 
 

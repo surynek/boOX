@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-021_planck                                                  */
+/* smtcbs.cpp / 2-026_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -10234,11 +10234,13 @@ namespace boOX
 	    sInstance::InverseVertexIDs_umap::const_iterator inverse_v = inverse_MDD[collision->m_agent_B_id][collision->m_level_B].find(collision->m_vertex_B_id);
 	    sASSERT(inverse_v != inverse_MDD[collision->m_agent_B_id][collision->m_level_B].end());	    
 	    sInt_32 v = inverse_v->second;
+
+	    //printf("%d x %d\n", sat_Model.m_vertex_occupancy[collision->m_agent_A_id][collision->m_level_A][u], sat_Model.m_vertex_occupancy[collision->m_agent_B_id][collision->m_level_B][v]);
 	    
 	    m_solver_Encoder->cast_Mutex(solver,
 					 sat_Model.m_vertex_occupancy[collision->m_agent_A_id][collision->m_level_A][u],
 					 sat_Model.m_vertex_occupancy[collision->m_agent_B_id][collision->m_level_B][v]);
-	}	
+	}
     }        
 
 

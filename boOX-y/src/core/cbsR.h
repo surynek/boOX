@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 2-021_planck                                                      */
+/* cbsR.h / 2-026_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -51,33 +51,6 @@ namespace boOX
     class sRealCBSBase
     {
     public:
-	struct Event
-	{
-	    Event() { /* nothing */ }
-	    Event(sInt_32 from_loc_id,
-		  sInt_32 to_loc_id,
-		  sDouble start_time,
-		  sDouble finish_time)
-	    : m_from_loc_id(from_loc_id)
-	    , m_to_loc_id(to_loc_id)	    
-	    , m_start_time(start_time)
-	    , m_finish_time(finish_time)		
-	    { /* nothing */ }
-
-	    void to_Screen(const sString &indent = "") const
-	    {
-		to_Stream(stdout, indent);
-	    }
-	    
-	    void to_Stream(FILE *fw, const sString &indent = "") const
-	    {
-		fprintf(fw, "%s%d --> %d [%.3f, %.3f]\n", indent.c_str(), m_from_loc_id, m_to_loc_id, m_start_time, m_finish_time);
-	    }
-	    
-	    sInt_32 m_from_loc_id, m_to_loc_id;
-	    sDouble m_start_time, m_finish_time;
-	};
-
 	struct Interval
 	{
 	    Interval() { /* nothing */ }
@@ -254,9 +227,11 @@ namespace boOX
 	    }	    
 	};
 
-	typedef std::vector<Event> Schedule_vector;
-	typedef std::vector<Schedule_vector> KruhobotSchedules_vector;
-	typedef std::vector<sDouble> Costs_vector;
+	typedef sRealSolution::Event Event;
+
+	typedef sRealSolution::Schedule_vector Schedule_vector;
+	typedef sRealSolution::KruhobotSchedules_vector KruhobotSchedules_vector;
+	typedef sRealSolution::Costs_vector Costs_vector;
 
 	struct KruhobotCollision
 	{

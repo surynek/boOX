@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 2-021_planck                                                    */
+/* result.h / 2-026_planck                                                    */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -100,7 +100,7 @@ enum sAgentConfiguration_Result
 enum sAgentSolution_Result
 {
     sAGENT_SOLUTION_INFO       =  13000,
-    sAGENT_SOLUTION_ERROR      = -13000,
+    sAGENT_SOLUTION_ERROR      = -13000,    
     sAGENT_SOLUTION_OPEN_ERROR = (sAGENT_SOLUTION_ERROR - 1)
 };
 
@@ -152,10 +152,18 @@ enum sRealInstance_Result
 };
 
 
+enum sRealSolution_Result
+{
+    sREAL_SOLUTION_INFO           =  18000,
+    sREAL_SOLUTION_ERROR          = -18000,    
+    sREAL_SOLUTION_COLLISION_INFO = (sREAL_SOLUTION_INFO + 1)
+};
+
+
 enum sRealCBS_Result
 {
-    sREAL_CBS_INFO       =  18000,
-    sREAL_CBS_ERROR      = -18000,
+    sREAL_CBS_INFO       =  19000,
+    sREAL_CBS_ERROR      = -19000,
     sREAL_CBS_OPEN_ERROR = (sREAL_CBS_ERROR - 1),
 };
 

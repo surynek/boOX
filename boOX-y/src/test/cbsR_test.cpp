@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR_test.cpp / 2-021_planck                                               */
+/* cbsR_test.cpp / 2-026_planck                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search.

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.cpp / 2-021_planck                                                 */
+/* smtcbsR.cpp / 2-026_planck                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -76,8 +76,8 @@ namespace boOX
 
   
     sDouble sRealSMTCBS::find_ShortestNonconflictingSchedules(const sRealInstance &real_Instance,
-							   sRealSolution       &sUNUSED(real_Solution),
-							   sDouble              makespan_limit)
+							      sRealSolution       &sUNUSED(real_Solution),
+							      sDouble              makespan_limit)
     {
 	sInt_32 cost;
 	KruhobotSchedules_vector kruhobot_Schedules;
@@ -14005,7 +14005,6 @@ namespace boOX
 	{
 	    std::vector<sInt_32> variable_A_IDs, variable_B_IDs;	    
 	    sInt_32 kruhobot_A_id = sABS(kruhobot_collision->m_traversal_A.m_kruhobot_id);
-
 	    {
 		DecisionIDs_vector decision_A_IDs;
 		std::vector<sInt_32> Neighbors_A;
@@ -14020,8 +14019,8 @@ namespace boOX
 		    variable_A_IDs.push_back(real_sat_Model.m_edge_occupancy[kruhobot_A_id][decision_A_IDs[match]][Neighbors_A[match]]);
 		}
 	    }
+	    
 	    sInt_32 kruhobot_B_id = sABS(kruhobot_collision->m_traversal_B.m_kruhobot_id);
-
 	    {
 		DecisionIDs_vector decision_B_IDs;
 		std::vector<sInt_32> Neighbors_B;
@@ -14038,7 +14037,16 @@ namespace boOX
 		    variable_B_IDs.push_back(real_sat_Model.m_edge_occupancy[kruhobot_B_id][decision_B_IDs[match]][Neighbors_B[match]]);
 		}
 	    }
-	    m_solver_Encoder->cast_Mutexes(solver, variable_A_IDs, variable_B_IDs);	   
+	    /*
+	    printf("%ld,%ld\n", variable_A_IDs.size(), variable_B_IDs.size());
+	    if (variable_A_IDs.size() == 1 && variable_B_IDs.size() == 1)
+	    {
+		printf("  %d x %d\n", *variable_A_IDs.begin(), *variable_B_IDs.begin());
+	    }
+	    */
+	    m_solver_Encoder->cast_Mutexes(solver, variable_A_IDs, variable_B_IDs);
+	    //getchar();
+
 	}
     }
 

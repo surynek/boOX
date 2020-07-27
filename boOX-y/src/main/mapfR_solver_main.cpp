@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-021_planck                              */
+/*                             boOX 2-026_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapfR_solver_main.cpp / 2-021_planck                                       */
+/* mapfR_solver_main.cpp / 2-026_planck                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.
@@ -336,13 +336,13 @@ namespace boOX
 	    }	    
 	}
 	else
-	{
+	{	    
 	    sRealCBSBase::Costs_vector individual_Costs;
 	    
 	    makespan = sRealCBSBase::calc_Makespan(real_Instance, kruhobot_Schedules);
 	    cost = sRealCBSBase::calc_Cost(real_Instance, kruhobot_Schedules, individual_Costs);
 
-	    sRealCBSBase::to_Screen(kruhobot_Schedules);	    
+	    sRealCBSBase::to_Screen(kruhobot_Schedules);
 
 	    printf("\n");
 	    printf("The input instance is SOLVABLE with a solution of the following characteristics:\n");
@@ -366,6 +366,27 @@ namespace boOX
 		{
 		    printf("Error: Failed to write problem solution to %s (code = %d).\n", command_parameters.m_output_filename.c_str(), result);
 		    return result;
+		}
+	    }
+
+	    printf("Verifying solution ...\n");	    
+	    sRealSolution real_Solution(real_Instance, kruhobot_Schedules);
+	    
+	    if (sFAILED(result = real_Solution.verify_Simulate(real_Instance, s__VERIFICATION_SIMULATION_STEP)))
+	    {
+		printf("Error: Cannot verify solution (code = %d).\n", result);
+		return result;
+	    }
+	    else
+	    {
+		if (sINFORMED(result))
+		{
+		    printf("Solution verification test ... FAILED\n");
+		    printf("Info: There is something wrong with the solution (code = %d).\n", result);
+		}
+		else
+		{
+		    printf("Solution verification test ... OK\n");		    
 		}
 	    }
 	}
