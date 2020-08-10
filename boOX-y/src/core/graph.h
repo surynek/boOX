@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 1-187_leibniz                                                    */
+/* graph.h / 2-030_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -291,6 +291,9 @@ namespace boOX
 	virtual sResult to_File_mpf(const sString &filename, const sString &indent = "") const;
 	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;
 
+	virtual sResult to_File_mHpf(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_mHpf(FILE *fw, const sString &indent = "") const;	
+
 	virtual sResult to_File_cmpf(const sString &filename, const sString &indent = "") const;
 	virtual void to_Stream_cmpf(FILE *fw, const sString &indent = "") const;	
 
@@ -302,6 +305,9 @@ namespace boOX
 
 	virtual sResult from_File_mpf(const sString &filename);
 	virtual sResult from_Stream_mpf(FILE *fr);
+
+	virtual sResult from_File_mHpf(const sString &filename);
+	virtual sResult from_Stream_mHpf(FILE *fr);	
 
 	virtual sResult from_File_cmpf(const sString &filename);
 	virtual sResult from_Stream_cmpf(FILE *fr);		
@@ -326,6 +332,12 @@ namespace boOX
 
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
+
+	virtual sResult to_File_xml(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, const sString &indent = "") const;
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);		
 	/*----------------------------------------------------------------------------*/
 	
 	virtual sResult to_File_mapR(const sString &filename, const sString &indent = "") const;

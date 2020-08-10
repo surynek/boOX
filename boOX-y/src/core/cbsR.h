@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 1-187_leibniz                                                     */
+/* cbsR.h / 2-030_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -51,33 +51,6 @@ namespace boOX
     class sRealCBSBase
     {
     public:
-	struct Event
-	{
-	    Event() { /* nothing */ }
-	    Event(sInt_32 from_loc_id,
-		  sInt_32 to_loc_id,
-		  sDouble start_time,
-		  sDouble finish_time)
-	    : m_from_loc_id(from_loc_id)
-	    , m_to_loc_id(to_loc_id)	    
-	    , m_start_time(start_time)
-	    , m_finish_time(finish_time)		
-	    { /* nothing */ }
-
-	    void to_Screen(const sString &indent = "") const
-	    {
-		to_Stream(stdout, indent);
-	    }
-	    
-	    void to_Stream(FILE *fw, const sString &indent = "") const
-	    {
-		fprintf(fw, "%s%d --> %d [%.3f, %.3f]\n", indent.c_str(), m_from_loc_id, m_to_loc_id, m_start_time, m_finish_time);
-	    }
-	    
-	    sInt_32 m_from_loc_id, m_to_loc_id;
-	    sDouble m_start_time, m_finish_time;
-	};
-
 	struct Interval
 	{
 	    Interval() { /* nothing */ }
@@ -254,8 +227,11 @@ namespace boOX
 	    }	    
 	};
 
-	typedef std::vector<Event> Schedule_vector;
-	typedef std::vector<Schedule_vector> KruhobotSchedules_vector;
+	typedef sRealSolution::Event Event;
+
+	typedef sRealSolution::Schedule_vector Schedule_vector;
+	typedef sRealSolution::KruhobotSchedules_vector KruhobotSchedules_vector;
+	typedef sRealSolution::Costs_vector Costs_vector;
 
 	struct KruhobotCollision
 	{
@@ -785,6 +761,9 @@ namespace boOX
 
 	typedef std::vector<sInt_32> KruhobotAffections_vector;
 	typedef std::pair<sInt_32, sInt_32> KruhobotAffection_pair;
+
+	typedef std::multimap<sDouble, sInt_32, std::less<sDouble> > ExtraVariables_mmap;
+	typedef std::vector<ExtraVariables_mmap> KruhobotExtraVariables_vector;		
 	
     public:
 	sRealCBSBase(sRealInstance *real_Instance);
@@ -801,7 +780,24 @@ namespace boOX
 
 	sDouble analyze_NonconflictingSchedules_exactNonprioritized(const sRealInstance            &real_Instance,
 								    const KruhobotSchedules_vector &kruhobot_Schedules,
-								    KruhobotCollisions_mset        &kruhobot_Collisions) const;	
+								    KruhobotCollisions_mset        &kruhobot_Collisions) const;
+
+	sDouble analyze_NonconflictingSchedulesCosts(const sRealInstance                 &real_Instance,
+						     const KruhobotSchedules_vector      &kruhobot_Schedules,
+						     sDouble                              cost_bound,					      
+						     const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
+						     const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
+						     const KruhobotExtraVariables_vector &kruhobot_all_extra_Variables,
+						     KruhobotExtraVariables_vector       &envelope_extra_Variables) const;
+
+	sDouble analyze_NonconflictingSchedulesCosts(const sRealInstance                 &real_Instance,
+						     const KruhobotSchedules_vector      &kruhobot_Schedules,
+						     sDouble                              cost_bound,					      
+						     const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
+						     const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
+						     const KruhobotExtraVariables_vector &kruhobot_all_extra_Variables,
+						     KruhobotExtraVariables_vector       &envelope_extra_Variables,
+						     KruhobotExtraVariables_vector       &domus_extra_Variables) const;			
         /*----------------------------------------------------------------------------*/
 
 	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance              &real_Instance,
@@ -944,6 +940,11 @@ namespace boOX
 	static void smooth_Schedule(const Schedule_vector &Schedule, Schedule_vector &smooth_Schedule);
 	static sDouble augment_Schedules(const sRealInstance &real_Instance, KruhobotSchedules_vector &kruhobot_Schedules);	
         /*----------------------------------------------------------------------------*/
+
+	static sDouble calc_Makespan(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules);
+	static sDouble calc_Cost(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules);
+	static sDouble calc_Cost(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules, Costs_vector &individual_Costs);
+        /*----------------------------------------------------------------------------*/	
 
 	static void to_Screen(const KruhobotSchedules_vector &kruhobot_Schedules, const sString &indent = "");
 	static void to_Stream(FILE *fw, const KruhobotSchedules_vector &kruhobot_Schedules, const sString &indent = "");

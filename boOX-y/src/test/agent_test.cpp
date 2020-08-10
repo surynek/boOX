@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent_test.cpp / 1-187_leibniz                                             */
+/* agent_test.cpp / 2-030_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures - testing program.
@@ -128,6 +128,83 @@ namespace boOX
     }
 
 
+    void test_agent_2(void)
+    {
+	printf("Agent test 2 ...\n");
+	
+	sCommitment commitment_1(4);
+	commitment_1.add_Task(1, 4);
+	commitment_1.add_Task(1, 5);
+
+	commitment_1.add_Task(2, 2);
+	commitment_1.add_Task(2, 1);
+
+	commitment_1.add_Task(4, 1);
+	commitment_1.add_Task(4, 6);
+	commitment_1.add_Task(4, 7);
+
+	commitment_1.to_Screen();
+
+	printf("Agent test 2 ... finished\n");
+    }
+
+
+    void test_agent_3(const sString &filename)
+    {
+	printf("Agent test 3 ...\n");
+
+	sUndirectedGraph graph_1;
+
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+	graph_1.add_Vertex();
+
+	graph_1.add_Edge(0, 1);
+	graph_1.add_Edge(1, 2);
+	graph_1.add_Edge(2, 3);
+	graph_1.add_Edge(3, 0);
+
+	graph_1.to_Screen();
+	
+	sConfiguration start_configuration(4, 3);
+	start_configuration.place_Agent(1, 3);
+	start_configuration.place_Agent(2, 1);
+	start_configuration.place_Agent(3, 2);	
+
+	start_configuration.to_Screen();
+
+	sCommitment goal_commitment(3);
+	goal_commitment.add_Task(1, 0);
+	goal_commitment.add_Task(1, 1);
+
+	goal_commitment.add_Task(2, 2);
+	goal_commitment.add_Task(2, 3);
+	goal_commitment.add_Task(2, 1);
+
+	goal_commitment.add_Task(3, 3);
+	goal_commitment.add_Task(3, 2);
+	goal_commitment.add_Task(3, 1);		
+
+	goal_commitment.to_Screen();
+
+	sMission mission_1(graph_1, start_configuration, goal_commitment);	
+	mission_1.to_Screen();
+
+	mission_1.to_Screen_mHpf();
+	mission_1.to_File_mHpf(filename);
+
+	sMission mission_2;
+	mission_2.to_Screen();
+	mission_2.from_File_mHpf(filename);
+
+	mission_2.to_Screen();
+	mission_2.to_Screen_mHpf();
+	
+	printf("Agent test 3 ... finished\n");	
+    }
+
+
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
@@ -139,5 +216,7 @@ namespace boOX
 int main(int sUNUSED(argc), char **sUNUSED(argv))
 {
     print_Introduction();
-    test_agent_1("grid_04x04_r04.cpf");
+//    test_agent_1("grid_04x04_r04.cpf");
+    test_agent_2();
+    test_agent_3("hamiltonian_001.mHpf");        
 }

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent_test.h / 1-187_leibniz                                               */
+/* agent_test.h / 2-030_planck                                                */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures - testing program.
@@ -34,7 +34,10 @@ namespace boOX
 /*----------------------------------------------------------------------------*/
 
     void print_Introduction(void);
+    
     void test_agent_1(const sString &filename);
+    void test_agent_2(void);
+    void test_agent_3(const sString &filename);
 
     
 /*----------------------------------------------------------------------------*/

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 1-187_leibniz                                                    */
+/* agent.h / 2-030_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -138,6 +138,44 @@ namespace boOX
 
 
 /*----------------------------------------------------------------------------*/
+// sCommitment
+
+    class sCommitment
+    {
+    public:
+	static const sInt_32 VACANT_VERTEX = 0; /* Agents are numbered starting with 1 */
+	static const sInt_32 UNDEFINED_LOCATION = -1;
+
+	static const sInt_32 RANDOM_WALK_LENGTH = s__DEFAULT_RANDOM_WALK_LENGTH;
+
+    public:	
+	typedef std::vector<sInt_32> VertexIDs_vector;
+	typedef VertexIDs_vector AgentTask_vector;
+	    
+	typedef std::vector<AgentTask_vector> AgentTasks_vector;
+
+    public:
+	sCommitment();
+	sCommitment(sInt_32 N_Agents);
+	/*----------------------------------------------------------------------------*/ 	
+
+	sInt_32 get_AgentCount(void) const;
+	sInt_32 get_TaskCount(sInt_32 agent_id) const;
+
+	void add_Task(sInt_32 agent_id, sInt_32 vertex_id);
+	void clean_Tasks(sInt_32 agent_id);
+        /*----------------------------------------------------------------------------*/	
+
+    public:
+	virtual void to_Screen(const sString &indent = "") const;
+	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
+
+    public:
+	AgentTasks_vector m_agent_Tasks;	
+    };    
+
+
+/*----------------------------------------------------------------------------*/
 // sInstance
 
     class sInstance
@@ -224,7 +262,7 @@ namespace boOX
 					   MDD_vector       &extra_MDD);
         /*----------------------------------------------------------------------------*/	
 
-	void construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD) const;	
+	static void construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD);
         /*----------------------------------------------------------------------------*/
 
 	virtual void to_Screen(const sString &indent = "") const;
@@ -239,23 +277,29 @@ namespace boOX
 	
 	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_cpf(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_cpf(FILE *fw, sInt_32 N_agents, const sString &indent = "") const;		
 	virtual void to_Stream_ccpf(FILE *fw, const sString &indent = "") const;	
 	virtual void to_Stream_mpf(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_mpf(FILE *fw, sInt_32 N_agents, const sString &indent = "") const;	
 	virtual void to_Stream_cmpf(FILE *fw, const sString &indent = "") const;
 	
 	virtual void to_Stream_domainPDDL(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_problemPDDL(FILE *fw, const sString &indent = "") const;
 	virtual void to_Stream_bgu(FILE *fw, const sString &indent = "", sInt_32 instance_id = -1) const;
+	virtual void to_Stream_bgu(FILE *fw, sInt_32 N_agents, const sString &indent = "", sInt_32 instance_id = -1) const;	
 
 	virtual sResult to_File(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_cpf(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_cpf(const sString &filename, sInt_32 N_agents, const sString &indent = "") const;		
 	virtual sResult to_File_ccpf(const sString &filename, const sString &indent = "") const;	
 	virtual sResult to_File_mpf(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_mpf(const sString &filename, sInt_32 N_agents, const sString &indent = "") const;	
 	virtual sResult to_File_cmpf(const sString &filename, const sString &indent = "") const;
 	
 	virtual sResult to_File_domainPDDL(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_problemPDDL(const sString &filename, const sString &indent = "") const;
 	virtual sResult to_File_bgu(const sString &filename, const sString &indent = "", sInt_32 instance_id = 0) const;
+	virtual sResult to_File_bgu(const sString &filename, sInt_32 N_agents, const sString &indent = "", sInt_32 instance_id = 0) const;	
 
 	virtual sResult from_File_cpf(const sString &filename);
 	virtual sResult from_Stream_cpf(FILE *fr);
@@ -269,7 +313,7 @@ namespace boOX
 	virtual sResult from_File_cmpf(const sString &filename);
 	virtual sResult from_Stream_cmpf(FILE *fr);			       
 
-	virtual sResult from_File_bgu(const sString &filename);
+	virtual sResult from_File_bgu(const sString &filename);	
 	virtual sResult from_Stream_bgu(FILE *fr);	
 
 	virtual sResult to_File_usc(const sString &map_filename, const sString &agents_filename) const;
@@ -287,6 +331,9 @@ namespace boOX
 	virtual sResult from_File_dibox(const sString &filename);
 	virtual sResult from_Stream_dibox(FILE *fr);
 
+	virtual sResult from_File_movi(const sString &filename, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
+	virtual sResult from_Stream_movi(FILE *fr, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
+
     public:
 	sUndirectedGraph m_environment;
 	sConfiguration m_start_configuration;
@@ -294,6 +341,140 @@ namespace boOX
     };
 
 
+/*----------------------------------------------------------------------------*/
+// sMission
+
+    class sMission
+    {
+    public:
+	typedef std::vector<sUndirectedGraph> Environments_vector;
+	typedef std::vector<sConfiguration> Configurations_vector;
+
+	typedef std::vector<sInt_32> VertexIDs_vector;
+	typedef std::set<sInt_32> VertexIDs_set;
+
+	typedef std::vector<VertexIDs_vector> AgentMDD_vector;
+	typedef std::vector<AgentMDD_vector> MDD_vector;
+	typedef std::vector<VertexIDs_set> AgentMDD_set;
+
+/*
+	typedef std::unordered_map<int, int> Indices_map;
+	typedef std::vector<Indices_map> AgentMDDIndices_vector;
+	typedef std::vector<AgentMDDIndices_vector> MDDIndices_vector;
+*/
+	typedef std::multimap<sInt_32, sInt_32> AgentIndices_mmap;
+
+	typedef std::unordered_map<sInt_32, sInt_32> InverseVertexIDs_umap;
+	typedef std::vector<InverseVertexIDs_umap> InverseAgentMDD_vector;	
+	typedef std::vector<InverseAgentMDD_vector> InverseMDD_vector;
+
+    public:
+	sMission();
+
+	sMission(const sUndirectedGraph &environment,
+		 const sConfiguration   &start_configuration,
+		 const sCommitment      &goal_commitment);
+
+    public:
+	void collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const;
+
+	sInt_32 estimate_TotalRotationCost(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalRotationCost_rough(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalRotationCost_spanning(sInt_32 &max_individual_cost);
+	
+	/*
+	sInt_32 estimate_TotalPathCost(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalSwappingCost(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalPermutationCost(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalRotationCost(sInt_32 &max_individual_cost);	
+	*/
+
+	/*
+	sInt_32 construct_PathMDD(sInt_32     max_total_cost,
+				  MDD_vector &MDD,
+				  sInt_32    &extra_cost,
+				  MDD_vector &extra_MDD);
+	
+	sInt_32 construct_GraphPathMDD(sUndirectedGraph &graph,
+				       sInt_32           max_total_cost,
+				       MDD_vector       &MDD,
+				       sInt_32          &extra_cost,
+				       MDD_vector       &extra_MDD);
+
+	sInt_32 construct_SwappingMDD(sInt_32     max_total_cost,
+				      MDD_vector &MDD,
+				      sInt_32    &extra_cost,
+				      MDD_vector &extra_MDD);
+	
+	sInt_32 construct_GraphSwappingMDD(sUndirectedGraph &graph,
+					   sInt_32           max_total_cost,
+					   MDD_vector       &MDD,
+					   sInt_32          &extra_cost,
+					   MDD_vector       &extra_MDD);
+
+	sInt_32 construct_PermutationMDD(sInt_32     max_total_cost,
+					 MDD_vector &MDD,
+					 sInt_32    &extra_cost,
+					 MDD_vector &extra_MDD);
+	
+	sInt_32 construct_GraphPermutationMDD(sUndirectedGraph &graph,
+					      sInt_32           max_total_cost,
+					      MDD_vector       &MDD,
+					      sInt_32          &extra_cost,
+					      MDD_vector       &extra_MDD);
+	*/
+
+	sInt_32 construct_RotationMDD(sInt_32     max_total_cost,
+				      MDD_vector &MDD,
+				      sInt_32    &extra_cost,
+				      MDD_vector &extra_MDD);
+	
+	sInt_32 construct_GraphRotationMDD(sUndirectedGraph &graph,
+					   sInt_32           max_total_cost,
+					   MDD_vector       &MDD,
+					   sInt_32          &extra_cost,
+					   MDD_vector       &extra_MDD);
+        /*----------------------------------------------------------------------------*/	
+
+	static void construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD);
+        /*----------------------------------------------------------------------------*/
+
+	virtual void to_Screen(const sString &indent = "") const;
+	virtual void to_Screen_mHpf(const sString &indent = "") const;
+	/*
+	virtual void to_Screen_domainPDDL(const sString &indent = "") const;
+	virtual void to_Screen_problemPDDL(const sString &indent = "") const;
+	*/
+	
+	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_mHpf(FILE *fw, const sString &indent = "") const;
+	/*
+	virtual void to_Stream_domainPDDL(FILE *fw, const sString &indent = "") const;
+	virtual void to_Stream_problemPDDL(FILE *fw, const sString &indent = "") const;
+	*/
+
+	virtual sResult to_File(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_mHpf(const sString &filename, const sString &indent = "") const;
+	/*
+	virtual sResult to_File_domainPDDL(const sString &filename, const sString &indent = "") const;
+	virtual sResult to_File_problemPDDL(const sString &filename, const sString &indent = "") const;
+	*/
+
+	virtual sResult from_File_mHpf(const sString &filename);
+	virtual sResult from_Stream_mHpf(FILE *fr);
+
+	/*
+	virtual sResult from_File_movi(const sString &filename, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
+	virtual sResult from_Stream_movi(FILE *fr, const sUndirectedGraph &environment, sInt_32 N_agents = -1);
+	*/
+
+    public:
+	sUndirectedGraph m_environment;
+	sConfiguration m_start_configuration;
+	sCommitment m_goal_commitment;	
+    };
+
+    
 /*----------------------------------------------------------------------------*/
 // sSolution
 

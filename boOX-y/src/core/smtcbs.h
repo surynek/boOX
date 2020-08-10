@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 1-187_leibniz                                                   */
+/* smtcbs.h / 2-030_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -163,7 +163,10 @@ namespace boOX
 	
     public:
 	sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance);
-	sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance, sDouble timeout);	
+	sSMTCBS(sBoolEncoder *solver_Encoder, sInstance *instance, sDouble timeout);
+
+	sSMTCBS(sBoolEncoder *solver_Encoder, sDouble subopt_weight, sInstance *instance);
+	sSMTCBS(sBoolEncoder *solver_Encoder, sDouble subopt_weight, sInstance *instance, sDouble timeout);		
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 find_ShortestNonconflictingSwapping(sSolution &solution, sInt_32 cost_limit) const;
@@ -1060,6 +1063,7 @@ namespace boOX
 					     const sInstance             &instance,
 					     const sInstance::MDD_vector &MDD,
 					     const sInstance::MDD_vector &extra_MDD,
+					     sInt_32                      cost_limit,					     
 					     sInt_32                      extra_cost,
 					     Model                       &sat_Model) const;
 
@@ -1070,6 +1074,7 @@ namespace boOX
 						    const sInstance::MDD_vector        &MDD,
 						    const sInstance::MDD_vector        &extra_MDD,
 						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             cost_limit,						    
 						    sInt_32                             extra_cost,
 						    Model                              &sat_Model) const;	
 	
@@ -1078,6 +1083,7 @@ namespace boOX
 					    const sInstance             &instance,
 					    const sInstance::MDD_vector &MDD,
 					    const sInstance::MDD_vector &extra_MDD,
+					    sInt_32                      cost_limit,					    
 					    sInt_32                      extra_cost,
 					    Model                       &sat_Model) const;
 
@@ -1087,6 +1093,7 @@ namespace boOX
 						   const sInstance::MDD_vector        &MDD,
 						   const sInstance::MDD_vector        &extra_MDD,
 						   const sInstance::InverseMDD_vector &inverse_MDD,
+						   sInt_32                             cost_limit,						   
 						   sInt_32                             extra_cost,
 						   Model                              &sat_Model) const;
 	
@@ -1095,6 +1102,7 @@ namespace boOX
 					   const sInstance             &instance,
 					   const sInstance::MDD_vector &MDD,
 					   const sInstance::MDD_vector &extra_MDD,
+					   sInt_32                      cost_limit,
 					   sInt_32                      extra_cost,
 					   Model                       &sat_Model) const;
 	
@@ -1104,6 +1112,7 @@ namespace boOX
 					    const sInstance             &instance,
 					    const sInstance::MDD_vector &MDD,
 					    const sInstance::MDD_vector &extra_MDD,
+					    sInt_32                      cost_limit,					    
 					    sInt_32                      extra_cost,
 					    Model                       &sat_Model) const;
 
@@ -1114,6 +1123,7 @@ namespace boOX
 						   const sInstance::MDD_vector        &MDD,
 						   const sInstance::MDD_vector        &extra_MDD,
 						   const sInstance::InverseMDD_vector &inverse_MDD,
+						   sInt_32                             cost_limit,
 						   sInt_32                             extra_cost,
 						   Model                              &sat_Model) const;			
 
@@ -1130,6 +1140,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &MDD,
 							 const sInstance::MDD_vector        &extra_MDD,
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             cost_limit,
 							 sInt_32                             extra_cost,
 							 Model                              &sat_Model) const;
 	
@@ -1139,6 +1150,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const;
 	
@@ -1149,6 +1161,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const;			
 
@@ -1164,6 +1177,7 @@ namespace boOX
 					 const sInstance             &instance,
 					 const sInstance::MDD_vector &MDD,
 					 const sInstance::MDD_vector &extra_MDD,
+					 sInt_32                      cost_limit,
 					 sInt_32                      extra_cost,
 					 Model                       &sat_Model) const;
 
@@ -1173,6 +1187,7 @@ namespace boOX
 						const sInstance::MDD_vector        &MDD,
 						const sInstance::MDD_vector        &extra_MDD,
 						const sInstance::InverseMDD_vector &inverse_MDD,
+						sInt_32                             cost_limit,						
 						sInt_32                             extra_cost,
 						Model                              &sat_Model) const;
 	
@@ -1181,6 +1196,7 @@ namespace boOX
 					const sInstance             &instance,
 					const sInstance::MDD_vector &MDD,
 					const sInstance::MDD_vector &extra_MDD,
+					sInt_32                      cost_limit,					
 					sInt_32                      extra_cost,
 					Model                       &sat_Model) const;
 
@@ -1190,6 +1206,7 @@ namespace boOX
 					       const sInstance::MDD_vector        &MDD,
 					       const sInstance::MDD_vector        &extra_MDD,
 					       const sInstance::InverseMDD_vector &inverse_MDD,
+					       sInt_32                             cost_limit,					       
 					       sInt_32                             extra_cost,
 					       Model                              &sat_Model) const;
 
@@ -1199,6 +1216,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const;
 
@@ -1208,6 +1226,7 @@ namespace boOX
 						    const sInstance::MDD_vector        &MDD,
 						    const sInstance::MDD_vector        &extra_MDD,
 						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             cost_limit,
 						    sInt_32                             extra_cost,
 						    Model                              &sat_Model) const;
 
@@ -1249,6 +1268,7 @@ namespace boOX
 						     const sInstance::MDD_vector        &MDD,
 						     const sInstance::MDD_vector        &extra_MDD,
 						     const sInstance::InverseMDD_vector &inverse_MDD,
+						     sInt_32                             cost_limit,
 						     sInt_32                             extra_cost,
 						     Model                              &sat_Model) const;
 
@@ -1258,6 +1278,7 @@ namespace boOX
 						    const sInstance::MDD_vector        &MDD,
 						    const sInstance::MDD_vector        &extra_MDD,
 						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             cost_limit,
 						    sInt_32                             extra_cost,
 						    Model                              &sat_Model) const;	
 
@@ -1267,6 +1288,7 @@ namespace boOX
 							     const sInstance::MDD_vector        &MDD,
 							     const sInstance::MDD_vector        &extra_MDD,
 							     const sInstance::InverseMDD_vector &inverse_MDD,
+							     sInt_32                             cost_limit,
 							     sInt_32                             extra_cost,
 							     Model                              &sat_Model) const;
 
@@ -1276,6 +1298,7 @@ namespace boOX
 							 const sInstance::MDD_vector        &MDD,
 							 const sInstance::MDD_vector        &extra_MDD,
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                             cost_limit,
 							 sInt_32                             extra_cost,
 							 Model                              &sat_Model) const;
 
@@ -1285,6 +1308,7 @@ namespace boOX
 						    const sInstance::MDD_vector        &MDD,
 						    const sInstance::MDD_vector        &extra_MDD,
 						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                             cost_limit,
 						    sInt_32                             extra_cost,
 						    Model                              &sat_Model) const;	
 
@@ -1300,6 +1324,7 @@ namespace boOX
 						const sInstance             &instance,
 						const sInstance::MDD_vector &MDD,
 						const sInstance::MDD_vector &extra_MDD,
+						sInt_32                      cost_limit,
 						sInt_32                      extra_cost,
 						Model                       &sat_Model) const;
 
@@ -1309,6 +1334,7 @@ namespace boOX
 						       const sInstance::MDD_vector        &MDD,
 						       const sInstance::MDD_vector        &extra_MDD,
 						       const sInstance::InverseMDD_vector &inverse_MDD,
+						       sInt_32                             cost_limit,
 						       sInt_32                             extra_cost,
 						       Model                              &sat_Model) const;	
 	
@@ -1317,6 +1343,7 @@ namespace boOX
 					       const sInstance             &instance,
 					       const sInstance::MDD_vector &MDD,
 					       const sInstance::MDD_vector &extra_MDD,
+					       sInt_32                      cost_limit,
 					       sInt_32                      extra_cost,
 					       Model                       &sat_Model) const;
 
@@ -1326,6 +1353,7 @@ namespace boOX
 						      const sInstance::MDD_vector        &MDD,
 						      const sInstance::MDD_vector        &extra_MDD,
 						      const sInstance::InverseMDD_vector &inverse_MDD,
+						      sInt_32                             cost_limit,
 						      sInt_32                             extra_cost,
 						      Model                              &sat_Model) const;	
 	
@@ -1334,6 +1362,7 @@ namespace boOX
 					      const sInstance             &instance,
 					      const sInstance::MDD_vector &MDD,
 					      const sInstance::MDD_vector &extra_MDD,
+					      sInt_32                      cost_limit,
 					      sInt_32                      extra_cost,
 					      Model                       &sat_Model) const;
 	
@@ -1342,6 +1371,7 @@ namespace boOX
 					       const sInstance             &instance,
 					       const sInstance::MDD_vector &MDD,
 					       const sInstance::MDD_vector &extra_MDD,
+					       sInt_32                      cost_limit,
 					       sInt_32                      extra_cost,
 					       Model                       &sat_Model) const;
 
@@ -1351,6 +1381,7 @@ namespace boOX
 						      const sInstance::MDD_vector        &MDD,
 						      const sInstance::MDD_vector        &extra_MDD,
 						      const sInstance::InverseMDD_vector &inverse_MDD,
+						      sInt_32                             cost_limit,
 						      sInt_32                             extra_cost,
 						      Model                              &sat_Model) const;	
 	
@@ -1367,6 +1398,7 @@ namespace boOX
 							    const sInstance::MDD_vector        &MDD,
 							    const sInstance::MDD_vector        &extra_MDD,
 							    const sInstance::InverseMDD_vector &inverse_MDD,
+							    sInt_32                             cost_limit,
 							    sInt_32                             extra_cost,
 							    Model                              &sat_Model) const;	
 	
@@ -1376,6 +1408,7 @@ namespace boOX
 							   const sInstance::MDD_vector        &MDD,
 							   const sInstance::MDD_vector        &extra_MDD,
 							   const sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                             cost_limit,
 							   sInt_32                             extra_cost,
 							   Model                              &sat_Model) const;	
 	
@@ -1385,6 +1418,7 @@ namespace boOX
 							   const sInstance::MDD_vector        &MDD,
 							   const sInstance::MDD_vector        &extra_MDD,
 							   const sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                             cost_limit,
 							   sInt_32                             extra_cost,
 							   Model                              &sat_Model) const;	
 	
@@ -1400,6 +1434,7 @@ namespace boOX
 					     const sInstance                    &instance,
 					     const sInstance::MDD_vector        &MDD,
 					     const sInstance::MDD_vector        &extra_MDD,
+					     sInt_32                             cost_limit,
 					     sInt_32                             extra_cost,
 					     Model                              &sat_Model) const;
 
@@ -1409,6 +1444,7 @@ namespace boOX
 						    const sInstance::MDD_vector &MDD,
 						    const sInstance::MDD_vector &extra_MDD,
 						    const sInstance::InverseMDD_vector &inverse_MDD,
+						    sInt_32                      cost_limit,
 						    sInt_32                      extra_cost,
 						    Model                       &sat_Model) const;
 	
@@ -1417,6 +1453,7 @@ namespace boOX
 					    const sInstance             &instance,
 					    const sInstance::MDD_vector &MDD,
 					    const sInstance::MDD_vector &extra_MDD,
+					    sInt_32                      cost_limit,
 					    sInt_32                      extra_cost,
 					    Model                       &sat_Model) const;
 
@@ -1426,6 +1463,7 @@ namespace boOX
 						   const sInstance::MDD_vector        &MDD,
 						   const sInstance::MDD_vector        &extra_MDD,
 						   const sInstance::InverseMDD_vector &inverse_MDD,
+						   sInt_32                             cost_limit,
 						   sInt_32                             extra_cost,
 						   Model                              &sat_Model) const;	
 	
@@ -1434,6 +1472,7 @@ namespace boOX
 					   const sInstance             &instance,
 					   const sInstance::MDD_vector &MDD,
 					   const sInstance::MDD_vector &extra_MDD,
+					   sInt_32                      cost_limit,
 					   sInt_32                      extra_cost,
 					   Model                       &sat_Model) const;
 	
@@ -1443,6 +1482,7 @@ namespace boOX
 					    const sInstance             &instance,
 					    const sInstance::MDD_vector &MDD,
 					    const sInstance::MDD_vector &extra_MDD,
+					    sInt_32                      cost_limit,
 					    sInt_32                      extra_cost,
 					    Model                       &sat_Model) const;
 
@@ -1453,6 +1493,7 @@ namespace boOX
 						   const sInstance::MDD_vector        &MDD,
 						   const sInstance::MDD_vector        &extra_MDD,
 						   const sInstance::InverseMDD_vector &inverse_MDD,
+						   sInt_32                             cost_limit,
 						   sInt_32                             extra_cost,
 						   Model                              &sat_Model) const;			
 
@@ -1469,6 +1510,7 @@ namespace boOX
 							 const sInstance::MDD_vector &MDD,
 							 const sInstance::MDD_vector &extra_MDD,
 							 const sInstance::InverseMDD_vector &inverse_MDD,
+							 sInt_32                      cost_limit,
 							 sInt_32                      extra_cost,
 							 Model                       &sat_Model) const;
 
@@ -1478,6 +1520,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const;	
 	
@@ -1488,6 +1531,7 @@ namespace boOX
 							const sInstance::MDD_vector        &MDD,
 							const sInstance::MDD_vector        &extra_MDD,
 							const sInstance::InverseMDD_vector &inverse_MDD,
+							sInt_32                             cost_limit,
 							sInt_32                             extra_cost,
 							Model                              &sat_Model) const;			
 
@@ -1504,6 +1548,7 @@ namespace boOX
 								    const sInstance::MDD_vector &MDD,
 								    const sInstance::MDD_vector &extra_MDD,
 								    const sInstance::InverseMDD_vector &inverse_MDD,
+								    sInt_32                      cost_limit,
 								    sInt_32                      extra_cost,
 								    Model                       &sat_Model) const;
 
@@ -1513,6 +1558,7 @@ namespace boOX
 								   const sInstance::MDD_vector        &MDD,
 								   const sInstance::MDD_vector        &extra_MDD,
 								   const sInstance::InverseMDD_vector &inverse_MDD,
+								   sInt_32                             cost_limit,
 								   sInt_32                             extra_cost,
 								   Model                              &sat_Model) const;
 	
@@ -1524,6 +1570,7 @@ namespace boOX
 								   const sInstance::MDD_vector        &MDD,
 								   const sInstance::MDD_vector        &extra_MDD,
 								   const sInstance::InverseMDD_vector &inverse_MDD,
+								   sInt_32                             cost_limit,
 								   sInt_32                             extra_cost,
 								   Model                              &sat_Model) const;
 
@@ -1539,6 +1586,8 @@ namespace boOX
 	const sSMTCBS& operator=(const sSMTCBS &smt_cbs);
 
     public:
+	sDouble m_subopt_weight;
+	
 	sCBS m_cbs;
 	sInstance m_cbs_instance;
  };

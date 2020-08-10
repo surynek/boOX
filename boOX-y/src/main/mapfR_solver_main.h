@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapfR_solver_main.h / 1-187_leibniz                                        */
+/* mapfR_solver_main.h / 2-030_planck                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding Solver (MAPF-R) - main program.
@@ -50,13 +50,17 @@ namespace boOX
 	    ALGORITHM_SMTCBS_R_PLUS_PLUS,
 	    ALGORITHM_SMTCBS_R_PLUS_PLUS_PLUS,
 	    ALGORITHM_SMTCBS_R_4_PLUS,
-	    ALGORITHM_SMTCBS_R_STAR
+	    ALGORITHM_SMTCBS_R_STAR,
+	    ALGORITHM_SMTCBS_R_STAR_SOC,
+	    ALGORITHM_SMTCBS_R_STAR_SOC_PLUS	    
 	};
 	
 	sCommandParameters();
         /*--------------------------------*/
 
 	sDouble m_makespan_limit;
+	sDouble m_cost_limit;
+	
 	Algorithm m_algorithm;
 
 	sString m_mapR_input_filename;

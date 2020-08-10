@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_generate_main.cpp / 1-187_leibniz                                   */
+/* kruhoR_generate_main.cpp / 2-030_planck                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) instance (real kruhobot
@@ -254,6 +254,7 @@ namespace boOX
     void generate_RandomKruhobotConjunction(const sCommandParameters &parameters, sInt_32 N_locations, sRealConjunction &conjunction)
     {	
 	s2DMap::LocationIDs_vector location_IDs;
+	
 	for (sInt_32 location_id = 0; location_id < N_locations; ++location_id)
 	{
 	    location_IDs.push_back(location_id);
@@ -263,7 +264,8 @@ namespace boOX
 	{
 	    sInt_32 random_location = rand() % location_IDs.size();
 	    sInt_32 random_location_id = location_IDs[random_location];
-	    location_IDs[random_location_id] = location_IDs.back();
+	    
+	    location_IDs[random_location] = location_IDs.back();
 	    location_IDs.pop_back();
 
 	    conjunction.place_Kruhobot(kruhobot_id, random_location_id);	    

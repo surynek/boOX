@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 1-187_leibniz                                                 */
+/* kruhoR.cpp / 2-030_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -132,7 +132,7 @@ namespace boOX
     {
 	fprintf(fw, "%s%d: ", indent.c_str(), m_id);
 	
-	fprintf(fw, "[r = %.3f, lv = %.3f, la = %.3f, av = %.3f, aa = %.3f, wf = %.3f]\n",
+	fprintf(fw, "[r = %f, lv = %.3f, la = %.3f, av = %.3f, aa = %.3f, wf = %.3f]\n",
 		m_properties.m_radius,
 		m_properties.m_linear_velo,
 		m_properties.m_linear_accel,
@@ -861,7 +861,136 @@ namespace boOX
     }
 
 
+/*----------------------------------------------------------------------------*/
     
+    sResult sRealInstance::from_File_movi(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sREAL_INSTANCE_MOVISCEN_OPEN_ERROR;
+	}
+	
+	if (sFAILED(result = from_Stream_movi(fr)))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    sResult sRealInstance::from_Stream_movi(FILE *fr)
+    {
+	sInt_32 version_unused;		
+	fscanf(fr, "version %d\n", &version_unused);
+
+	sInt_32 N_Kruhobots_1 = 1;
+
+	while (!feof(fr))
+	{
+	    sInt_32 number_ignore;
+	    sChar map_name_ignore[128];
+
+	    sInt_32 x_size, y_size;
+
+	    sInt_32 x_start, y_start;
+	    sInt_32 x_goal, y_goal;
+
+	    sDouble real_number_ignore;
+	    
+	    fscanf(fr, "%d %s %d %d %d %d %d %d %lf\n", &number_ignore, map_name_ignore, &x_size, &y_size, &x_start, &y_start, &x_goal, &y_goal, &real_number_ignore);
+//	    printf("%d %s %d %d %d %d %d %d %.3f\n", number_ignore, map_name_ignore, x_size, y_size, x_start, y_start, x_goal, y_goal, real_number_ignore);
+
+	    sInt_32 start_location_id = m_start_conjunction.m_Map->m_Network.m_Matrix[y_start * x_size + x_start];
+//	    printf("Map0 point: %d\n", start_location_id);
+	    m_start_conjunction.m_kruhobot_Locations.push_back(start_location_id);
+
+	    sInt_32 goal_location_id = m_goal_conjunction.m_Map->m_Network.m_Matrix[y_goal * x_size + x_goal];
+//	    printf("Map+ point: %d\n", goal_location_id);
+	    m_goal_conjunction.m_kruhobot_Locations.push_back(goal_location_id);	    
+	    	    
+	    ++N_Kruhobots_1;
+	}
+	m_Kruhobots.resize(N_Kruhobots_1);
+	
+	return sRESULT_SUCCESS;
+    }
+
+  
+    sResult sRealInstance::to_File_xml(const sString &filename, sInt_32 N_kruhobots, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sREAL_INSTANCE_OPEN_ERROR;
+	}
+	
+	to_Stream_xml(fw, N_kruhobots, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void sRealInstance::to_Stream_xml(FILE *fw, sInt_32 N_kruhobots, const sString &indent) const
+    {
+	fprintf(fw, "%s<?xml version=\"1.0\" ?>\n", indent.c_str());
+	fprintf(fw, "%s<root>\n", indent.c_str());
+	sASSERT(m_start_conjunction.m_kruhobot_Locations.size() == m_goal_conjunction.m_kruhobot_Locations.size());	
+
+	LocationIDs_vector::const_iterator start_location = m_start_conjunction.m_kruhobot_Locations.begin();
+	LocationIDs_vector::const_iterator goal_location = m_goal_conjunction.m_kruhobot_Locations.begin();	
+
+
+	if (N_kruhobots > 0)
+	{
+	    while (   start_location != m_start_conjunction.m_kruhobot_Locations.end()
+		      && goal_location != m_goal_conjunction.m_kruhobot_Locations.end())
+	    {
+		if (N_kruhobots-- <= 0)
+		{
+		    break;
+		}
+		sInt_32 start_location_id = *start_location++;
+		sInt_32 goal_location_id = *goal_location++;
+		
+//	    printf("START: %.3f, %.3f\n", m_start_conjunction.m_Map->m_Locations[start_location_id].m_x, m_start_conjunction.m_Map->m_Locations[start_location_id].m_y);
+//	    printf("GOAL: %.3f, %.3f\n", m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_x, m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_y);
+		sInt_32 start_i = m_start_conjunction.m_Map->m_Locations[start_location_id].m_y;
+		sInt_32 start_j = m_start_conjunction.m_Map->m_Locations[start_location_id].m_x;
+		
+		sInt_32 goal_i = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_y;
+		sInt_32 goal_j = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_x;
+		
+		fprintf(fw, "%s%s<agent start_i=\"%d\" start_j=\"%d\" goal_i=\"%d\" goal_j=\"%d\"/>\n", indent.c_str(), s_INDENT.c_str(), start_i, start_j, goal_i, goal_j);	    
+	    }
+	}
+	else
+	{
+	    while (   start_location != m_start_conjunction.m_kruhobot_Locations.end()
+		      && goal_location != m_goal_conjunction.m_kruhobot_Locations.end())
+	    {
+		sInt_32 start_location_id = *start_location++;
+		sInt_32 goal_location_id = *goal_location++;
+		
+		sInt_32 start_i = m_start_conjunction.m_Map->m_Locations[start_location_id].m_y;
+		sInt_32 start_j = m_start_conjunction.m_Map->m_Locations[start_location_id].m_x;
+		
+		sInt_32 goal_i = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_y;
+		sInt_32 goal_j = m_goal_conjunction.m_Map->m_Locations[goal_location_id].m_x;
+
+		fprintf(fw, "%s%s<agent start_i=\"%d\" start_j=\"%d\" goal_i=\"%d\" goal_j=\"%d\"/>\n", indent.c_str(), s_INDENT.c_str(), start_i, start_j, goal_i, goal_j);
+	    }
+	}
+	fprintf(fw, "%s</root>\n", indent.c_str());	
+    }
+        
 
 /*----------------------------------------------------------------------------*/
 // sRealSolution
@@ -875,7 +1004,28 @@ namespace boOX
     {
 	// nothing
     }
+
+
+    sRealSolution::sRealSolution(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules)
+    {
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
+
+	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
+	{	    
+	    for (sInt_32 i = 1; i < kruhobot_Schedules[kruhobot_id].size(); ++i)
+	    {
+		add_Motion(Motion(kruhobot_id,
+				  kruhobot_Schedules[kruhobot_id][i].m_from_loc_id,
+				  kruhobot_Schedules[kruhobot_id][i].m_to_loc_id,
+				  kruhobot_Schedules[kruhobot_id][i].m_start_time,
+				  kruhobot_Schedules[kruhobot_id][i].m_finish_time));
+
+	    }
+	}	
+    }
+
     
+/*----------------------------------------------------------------------------*/
 	
     bool sRealSolution::is_Null(void) const
     {
@@ -886,6 +1036,147 @@ namespace boOX
     sInt_32 sRealSolution::get_MotionCount(void) const
     {
 	return (m_Motions.size());
+    }
+
+
+    void sRealSolution::add_Motion(const Motion &motion)
+    {
+	m_Motions.insert(motion);
+    }
+
+
+/*----------------------------------------------------------------------------*/
+
+    sResult sRealSolution::verify_Simulate(const sRealInstance &real_Instance, sDouble simulation_step)
+    {
+	sDouble current_time = 0.0;	
+	Motions_list active_Motions;
+	Motions_list future_Motions;
+
+	Positions_vector active_Positions;
+
+	s2DMap *Map = real_Instance.m_start_conjunction.m_Map;
+	sInt_32 N_kruhobots = real_Instance.m_start_conjunction.get_KruhobotCount();
+	active_Positions.resize(N_kruhobots + 1);
+
+	for (Motions_set::iterator motion = m_Motions.begin(); motion != m_Motions.end(); ++motion)
+	{
+	    future_Motions.push_back(&(*motion));
+	}
+
+	while (!active_Motions.empty() || !future_Motions.empty())
+	{
+//	    printf("%.3f: %ld,%ld\n", current_time, active_Motions.size(), future_Motions.size());
+	    
+	    for (Motions_list::iterator future_motion = future_Motions.begin(); future_motion != future_Motions.end();)
+	    {
+		if ((*future_motion)->m_duration.m_start_time <= current_time && current_time < (*future_motion)->m_duration.m_finish_time)
+		{
+		    active_Motions.push_back(*future_motion);
+		    
+		    Motions_list::iterator motion_erase = future_motion++;
+		    future_Motions.erase(motion_erase);
+		}
+		else
+		{
+		    ++future_motion;
+		}
+	    }
+
+	    for (Motions_list::iterator active_motion = active_Motions.begin(); active_motion != active_Motions.end();)
+	    {
+		if ((*active_motion)->m_duration.m_finish_time < current_time)
+		{
+		    Motions_list::iterator motion_erase = active_motion++;
+		    active_Motions.erase(motion_erase);
+		}
+		else
+		{
+		    ++active_motion;
+		}
+	    }
+
+	    for (Motions_list::iterator active_motion = active_Motions.begin(); active_motion != active_Motions.end(); ++active_motion)
+	    {
+		sDouble t = current_time - (*active_motion)->m_duration.m_start_time;
+
+		sDouble x1 = Map->m_Locations[(*active_motion)->m_src_loc_id].m_x;
+		sDouble y1 = Map->m_Locations[(*active_motion)->m_src_loc_id].m_y;
+		
+		sDouble x2 = Map->m_Locations[(*active_motion)->m_dest_loc_id].m_x;
+		sDouble y2 = Map->m_Locations[(*active_motion)->m_dest_loc_id].m_y;
+
+		sDouble dx = x2 - x1;
+		sDouble dy = y2 - y1;
+
+		sDouble dt = (*active_motion)->m_duration.m_finish_time - (*active_motion)->m_duration.m_start_time;
+		sDouble ddt = t / dt;
+
+		sDouble vx = dx * ddt;
+		sDouble vy = dy * ddt;
+
+		sDouble X = x1 + vx;
+		sDouble Y = y1 + vy;
+
+		sInt_32 kruhobot_id = (*active_motion)->m_kruhobot_id;
+		active_Positions[kruhobot_id] = Position(X, Y);
+	    }
+	    
+	    for (Motions_list::iterator active_motion_A = active_Motions.begin(); active_motion_A != active_Motions.end(); ++active_motion_A)
+	    {
+		Motions_list::iterator active_motion_B = active_motion_A;
+
+		for (++active_motion_B; active_motion_B != active_Motions.end(); ++active_motion_B)
+		{
+		    sInt_32 kruhobot_A_id = (*active_motion_A)->m_kruhobot_id;
+		    sInt_32 kruhobot_B_id = (*active_motion_B)->m_kruhobot_id;
+
+//		    printf("%d --> %d, %d --> %d\n", (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id, (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id);
+
+//		    if (kruhobot_A_id != kruhobot_B_id)
+		    {
+			sDouble xA = active_Positions[kruhobot_A_id].m_x;
+			sDouble yA = active_Positions[kruhobot_A_id].m_y;
+
+			sDouble xB = active_Positions[kruhobot_B_id].m_x;
+			sDouble yB = active_Positions[kruhobot_B_id].m_y;
+
+			sDouble dX = xB - xA;
+			sDouble dY = yB - yA;
+
+			sDouble DD = dX * dX + dY * dY;
+			sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
+			sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
+			
+			
+			sDouble R = rA + rB;
+			sDouble RR = R * R;
+
+			if (DD < RR)
+			{
+			    #ifdef sVERBOSE
+			    {
+				printf("Collision between kruhobots %d and %d at time %.3f [positions: %d --> %d (%.3f,%.3f) x %d --> %d (%.3f,%.3f)]\n",
+				       kruhobot_A_id,
+				       kruhobot_B_id,
+				       current_time,
+				       (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id,
+				       xA, yA,
+				       (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id,
+				       xB, yB);
+			    }
+                            #endif
+			    
+			    return sREAL_SOLUTION_COLLISION_INFO;
+			}
+		    }
+		}
+	    }
+	    
+	    current_time += simulation_step;
+	}
+
+	return sRESULT_SUCCESS;
     }
     
     

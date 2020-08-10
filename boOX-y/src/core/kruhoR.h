@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 1-187_leibniz                             */
+/*                             boOX 2-030_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2019 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
-/*                http://www.surynek.com | <pavel@surynek.com>                */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 1-187_leibniz                                                   */
+/* kruhoR.h / 2-030_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -194,6 +194,14 @@ namespace boOX
 
 	virtual sResult from_File_mpfR(const sString &filename);
 	virtual sResult from_Stream_mpfR(FILE *fr);
+        /*----------------------------------------------------------------------------*/
+
+	virtual sResult from_File_movi(const sString &filename);
+	virtual sResult from_Stream_movi(FILE *fr);	
+
+	virtual sResult to_File_xml(const sString &filename, sInt_32 N_kruhobots = -1, const sString &indent = "") const;
+	virtual void to_Stream_xml(FILE *fw, sInt_32 N_kruhobots = -1, const sString &indent = "") const;	
+        /*----------------------------------------------------------------------------*/	
 	
     public:
 	Kruhobots_vector m_Kruhobots;
@@ -212,6 +220,33 @@ namespace boOX
 	static const sInt_32 N_MOTION_UNDEFINED = -1;
 
     public:
+	struct Event
+	{
+	    Event() { /* nothing */ }
+	    Event(sInt_32 from_loc_id,
+		  sInt_32 to_loc_id,
+		  sDouble start_time,
+		  sDouble finish_time)
+	    : m_from_loc_id(from_loc_id)
+	    , m_to_loc_id(to_loc_id)	    
+	    , m_start_time(start_time)
+	    , m_finish_time(finish_time)		
+	    { /* nothing */ }
+
+	    void to_Screen(const sString &indent = "") const
+	    {
+		to_Stream(stdout, indent);
+	    }
+	    
+	    void to_Stream(FILE *fw, const sString &indent = "") const
+	    {
+		fprintf(fw, "%s%d --> %d [%.3f, %.3f]\n", indent.c_str(), m_from_loc_id, m_to_loc_id, m_start_time, m_finish_time);
+	    }
+	    
+	    sInt_32 m_from_loc_id, m_to_loc_id;
+	    sDouble m_start_time, m_finish_time;
+	};	
+	
 	struct Duration
 	{
 	    Duration() { /* nothing */ }
@@ -239,9 +274,9 @@ namespace boOX
 	    , m_duration(start_time, finish_time)
 	    { /* nothing */ }
 
-	    Motion(sInt_32 kruhobot_id,
-	           sInt_32 src_loc_id,
-		   sInt_32 dest_loc_id,
+	    Motion(sInt_32         kruhobot_id,
+	           sInt_32         src_loc_id,
+		   sInt_32         dest_loc_id,
 		   const Duration &duration)
 	    : m_kruhobot_id(kruhobot_id)
 	    , m_src_loc_id(src_loc_id)
@@ -256,12 +291,12 @@ namespace boOX
 	    
 	    bool operator<(const Motion &motion) const
 	    {
-		return (m_duration.m_start_time < motion.m_duration.m_start_time);
+		return (m_kruhobot_id < motion.m_kruhobot_id || (m_kruhobot_id == motion.m_kruhobot_id && m_duration.m_start_time < motion.m_duration.m_start_time));
 	    }
 	    
 	    bool operator==(const Motion &motion) const
 	    {
-		return (m_duration.m_start_time == motion.m_duration.m_start_time);
+		return (m_kruhobot_id == motion.m_kruhobot_id && m_duration.m_start_time == motion.m_duration.m_start_time);
 	    }
 
 	    sInt_32 m_kruhobot_id;	    
@@ -273,12 +308,31 @@ namespace boOX
 	static const Motion UNDEFINED_MOTION;	
 
 	typedef std::set<Motion> Motions_set;
+	typedef std::vector<Motions_set> KruhobotMotions_vector;
+	    
+	typedef std::list<const Motion*> Motions_list;
+	typedef std::vector<Motions_list> KruhobotMotions__vector;
+
+	typedef sKruhobot::Position Position;
+	typedef std::vector<Position> Positions_vector;
+
+	typedef std::vector<Event> Schedule_vector;
+	typedef std::vector<Schedule_vector> KruhobotSchedules_vector;
+	typedef std::vector<sDouble> Costs_vector;	
 	
     public:
 	sRealSolution();
+	sRealSolution(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules);
+        /*----------------------------------------------------------------------------*/	
 	
 	bool is_Null(void) const;
 	sInt_32 get_MotionCount(void) const;
+
+	void add_Motion(const Motion &motion);
+        /*----------------------------------------------------------------------------*/	
+
+	sResult verify_Simulate(const sRealInstance &real_Instance, sDouble simulation_step);
+        /*----------------------------------------------------------------------------*/		
 
     public:
 	virtual void to_Screen(const sString &indent = "") const;
