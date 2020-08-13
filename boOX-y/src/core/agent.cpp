@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-026_planck                              */
+/*                             boOX 2-033_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-026_planck                                                   */
+/* agent.cpp / 2-033_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -759,7 +759,7 @@ namespace boOX
 
     void sConfiguration::to_Stream(FILE *fw, const sString &indent) const
     {
-	fprintf(fw, "%sAgent configuration: (|R| = %ld, |V| = %ld) [\n", indent.c_str(), m_agent_Locs.size() - 1, m_vertex_Occups.size());
+	fprintf(fw, "%sAgent configuration: (|R| = %ld, |V| = %ld) [\n", indent.c_str(), m_agent_Locs.size() != 0 ? m_agent_Locs.size() - 1 : 0, m_vertex_Occups.size());
 	fprintf(fw, "%s%sagent locations: {", indent.c_str(), s_INDENT.c_str());
 	
 	sInt_32 N_Agents_1 = m_agent_Locs.size();
@@ -800,7 +800,7 @@ namespace boOX
 
     void sConfiguration::to_Stream_brief(FILE *fw, const sString &indent) const
     {
-	fprintf(fw, "%sAgent configuration (brief): (|R| = %ld, |V| = %ld) [\n", indent.c_str(), m_agent_Locs.size() - 1, m_vertex_Occups.size());
+	fprintf(fw, "%sAgent configuration (brief): (|R| = %ld, |V| = %ld) [\n", indent.c_str(), m_agent_Locs.size() != 0 ? m_agent_Locs.size() - 1 : 0, m_vertex_Occups.size());
 	fprintf(fw, "%s%s agent locations: {", indent.c_str(), s_INDENT.c_str());
 	
 	sInt_32 N_Agents_1 = m_agent_Locs.size();
@@ -1474,6 +1474,81 @@ namespace boOX
 	return sRESULT_SUCCESS;
     }        
 
+
+
+
+/*----------------------------------------------------------------------------*/
+// sCommitment
+
+    sCommitment::sCommitment()
+    {
+	// nothing
+    }
+
+    
+    sCommitment::sCommitment(sInt_32 N_Agents)
+    {
+	m_agent_Tasks.resize(N_Agents + 1);
+    }
+
+    
+/*----------------------------------------------------------------------------*/
+
+    sInt_32 sCommitment::get_AgentCount(void) const
+    {
+	return (sInt_32)(m_agent_Tasks.size() - 1);
+    }
+    
+	    
+    sInt_32 sCommitment::get_TaskCount(sInt_32 agent_id) const
+    {
+	return (sInt_32)m_agent_Tasks[agent_id].size();
+    }
+    
+
+    void sCommitment::add_Task(sInt_32 agent_id, sInt_32 vertex_id)
+    {
+	m_agent_Tasks[agent_id].push_back(vertex_id);
+    }
+
+    
+    void sCommitment::clean_Tasks(sInt_32 agent_id)
+    {
+	m_agent_Tasks[agent_id].clear();
+    }
+
+    
+/*----------------------------------------------------------------------------*/
+
+    void sCommitment::to_Screen(const sString &indent) const
+    {
+	to_Stream(stdout, indent);	
+    }
+
+    
+    void sCommitment::to_Stream(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sAgent commitment: (|R| = %ld) [\n", indent.c_str(), m_agent_Tasks.size() ? m_agent_Tasks.size() - 1 : 0);
+	fprintf(fw, "%s%sagent tasks: {\n", indent.c_str(), s_INDENT.c_str());
+	
+	sInt_32 N_Agents_1 = m_agent_Tasks.size();
+	
+	for (sInt_32 i = 1; i < N_Agents_1; ++i)
+	{
+	    fprintf(fw, "%s%s%d # { ", indent.c_str(), s2_INDENT.c_str(), i);
+
+	    for (AgentTask_vector::const_iterator task = m_agent_Tasks[i].begin(); task != m_agent_Tasks[i].end(); ++task)
+	    {
+		fprintf(fw, "%d ", *task);
+	    }
+	    fprintf(fw, "}\n");
+	}
+	fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());	
+	fprintf(fw, "%s]\n", indent.c_str());
+    }
+
+    
+    
     
 /*----------------------------------------------------------------------------*/
 // sInstance
@@ -2118,7 +2193,7 @@ namespace boOX
     }
 
 
-    void sInstance::construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD) const
+    void sInstance::construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD)
     {
 	sInt_32 N_agents = MDD.size() - 1;
 	inverse_MDD.resize(N_agents + 1);
@@ -3350,6 +3425,448 @@ namespace boOX
 	}	
 	return sRESULT_SUCCESS;
     }    
+
+
+    
+
+/*----------------------------------------------------------------------------*/
+// sMission
+
+    sMission::sMission()
+    {
+	// nothing
+    }
+
+    
+    sMission::sMission(const sUndirectedGraph &environment,
+		       const sConfiguration   &start_configuration,
+		       const sCommitment      &goal_commitment)
+	: m_environment(environment)
+	, m_start_configuration(start_configuration)
+	, m_goal_commitment(goal_commitment)
+    {
+	// nothing
+    }
+
+
+/*----------------------------------------------------------------------------*/
+    
+    void sMission::collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const
+    {
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{	    
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    source_IDs.push_back(agent_source_vertex_id);	    
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+	    {		
+		sInt_32 agent_sink_vertex_id = *task;
+		goal_IDs.push_back(agent_sink_vertex_id);
+	    }
+	}	
+    }
+
+
+    sInt_32 sMission::estimate_TotalHamiltonianCost(sInt_32 &max_individual_cost)
+    {
+	return estimate_TotalHamiltonianCost_rough(max_individual_cost);
+    }
+    
+    
+    sInt_32 sMission::estimate_TotalHamiltonianCost_rough(sInt_32 &max_individual_cost)
+    {	
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	collect_Endpoints(source_IDs, goal_IDs);
+	m_environment.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
+
+	const sUndirectedGraph::Distances_2d_vector &source_Distances = m_environment.get_SourceShortestPaths();
+//	const sUndirectedGraph::Distances_2d_vector &goal_Distances = m_environment.get_GoalShortestPaths();
+
+	sInt_32 min_total_cost = 0;
+	max_individual_cost = 0;
+
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+
+	    sInt_32 agent_max_cost = 0;
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+	    {		
+		sInt_32 agent_sink_vertex_id = *task;
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+		if (agent_cost > agent_max_cost)
+		{
+		    agent_max_cost = agent_cost;
+		}
+	    }	    
+	    min_total_cost += agent_max_cost;
+
+	    if (agent_max_cost > max_individual_cost)
+	    {
+		max_individual_cost = agent_max_cost;
+	    }
+	}
+	return min_total_cost;
+    }
+
+
+    sInt_32 sMission::estimate_TotalHamiltonianCost_spanning(sInt_32 &sUNUSED(max_individual_cost))
+    {
+	return 0;
+    }    
+
+    
+    sInt_32 sMission::construct_HamiltonianMDD(sInt_32     max_total_cost,
+					       MDD_vector &MDD,
+					       sInt_32    &extra_cost,
+					       MDD_vector &extra_MDD)
+    {
+	return construct_GraphHamiltonianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);	
+    }    
+
+    
+    sInt_32 sMission::construct_GraphHamiltonianMDD_rough(sUndirectedGraph &graph,
+							  sInt_32           max_total_cost,
+							  MDD_vector       &MDD,
+							  sInt_32          &extra_cost,
+							  MDD_vector       &extra_MDD)
+    {
+	sInt_32 max_individual_cost;
+	sInt_32 N_Vertices = graph.get_VertexCount();	
+
+	MDD.clear();
+	extra_MDD.clear();
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+	collect_Endpoints(source_IDs, goal_IDs);
+
+	graph.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
+	sInt_32 min_total_cost = estimate_TotalHamiltonianCost(max_individual_cost);
+	
+	const sUndirectedGraph::Distances_2d_vector &source_Distances = graph.get_SourceShortestPaths();
+	const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	
+
+	extra_cost = max_total_cost - min_total_cost;
+	sInt_32 mdd_depth = max_individual_cost + extra_cost;
+	
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+
+	MDD.resize(N_Agents + 1);
+	extra_MDD.resize(N_Agents + 1);
+
+	std::vector<sInt_32> agent_lower_cost_Bounds;
+	agent_lower_cost_Bounds.resize(N_Agents + 1);
+
+	AgentIndices_mmap sorted_mdd_Agents;
+
+	for (sInt_32 mdd_agent_id = 1; mdd_agent_id <= N_Agents; ++mdd_agent_id)
+	{
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
+	    
+	    sInt_32 agent_max_cost = 0;
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+	    {		
+		sInt_32 agent_sink_vertex_id = *task;
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+		if (agent_cost > agent_max_cost)
+		{
+		    agent_max_cost = agent_cost;
+		}
+	    }
+	    agent_lower_cost_Bounds[mdd_agent_id] = agent_max_cost;
+	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_max_cost, mdd_agent_id));
+	}
+
+	sInt_32 sort_index = 0;
+	for (AgentIndices_mmap::const_reverse_iterator sort_agent = sorted_mdd_Agents.rbegin(); sort_agent != sorted_mdd_Agents.rend(); ++sort_agent)
+	{
+	    sInt_32 mdd_agent_id = sort_agent->second;
+	    
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);	    
+//	    sInt_32 agent_sink_vertex_id  = m_goal_configuration.get_AgentLocation(mdd_agent_id);
+//   	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+	    {
+		sInt_32 commitment_distance = sINT_32_MAX;
+
+		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		{		
+		    sInt_32 agent_sink_vertex_id = *task;
+		    sInt_32 agent_cost = goal_Distances[agent_sink_vertex_id][vertex_id];
+		    
+		    if (agent_cost < commitment_distance)
+		    {
+			commitment_distance = agent_cost;
+		    }
+		}
+		    
+		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
+		     mdd_level <= sMIN(agent_lower_cost_Bounds[mdd_agent_id] + extra_cost - commitment_distance, mdd_depth);
+		     ++mdd_level)
+		{
+		    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		}
+	    }
+
+	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    {
+		if (MDD[mdd_agent_id][mdd_level].empty())
+		{
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}
+		/*
+		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		{
+		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		}
+		*/
+		if (   mdd_level >= agent_lower_cost_Bounds[mdd_agent_id]
+		    && mdd_level < agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
+		{
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    		    
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}		
+	    }
+	    ++sort_index;
+	}
+
+        #ifdef sDEBUG
+	{
+	    printf("<----\n");	
+	    printf("MDD printout\n");
+	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
+	    {	    
+		printf("agent:%d\n", mdd_agent);
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    for (sInt_32 i = 0; i < MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("\n");
+		}
+		printf("\n");
+	    }
+	    printf("<----\n");
+	}
+	#endif
+	
+	return mdd_depth;
+    }
+
+    
+/*----------------------------------------------------------------------------*/
+
+    void sMission::construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD)
+    {
+	sInstance::construct_InverseMDD(MDD, inverse_MDD);
+    }
+
+    
+/*----------------------------------------------------------------------------*/
+
+    void sMission::to_Screen(const sString &indent) const
+    {
+	to_Stream(stdout, indent);	
+    }
+
+    
+    void sMission::to_Screen_mHpf(const sString &indent) const
+    {
+	to_Stream_mHpf(stdout, indent);
+    }
+
+
+    /*
+    void sMission::to_Screen_domainPDDL(const sString &indent) const
+    {
+    }
+
+    
+    void sMission::to_Screen_problemPDDL(const sString &indent) const
+    {
+    }
+    */
+
+    
+    void sMission::to_Stream(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%sMultiagent mission: [\n", indent.c_str());
+	
+	fprintf(fw, "%s%sEnvironment:\n", indent.c_str(), s_INDENT.c_str());
+	m_environment.to_Stream_vertices(fw, indent + s_INDENT + s_INDENT);
+	
+	fprintf(fw, "%s%sStart configuration:\n", indent.c_str(), s_INDENT.c_str());
+	m_start_configuration.to_Stream(fw, indent + s_INDENT + s_INDENT);
+
+	fprintf(fw, "%s%sGoal commitment:\n", indent.c_str(), s_INDENT.c_str());
+	m_goal_commitment.to_Stream(fw, indent + s_INDENT + s_INDENT);
+	
+	fprintf(fw, "%s]\n", indent.c_str());	
+    }
+
+    
+    void sMission::to_Stream_mHpf(FILE *fw, const sString &indent) const
+    {
+	m_environment.to_Stream_mHpf(fw, indent);
+
+	fprintf(fw, "%s|A| = %ld\n", indent.c_str(), m_goal_commitment.m_agent_Tasks.size() - 1);
+	
+	sInt_32 N_Agents_1 = m_goal_commitment.m_agent_Tasks.size();
+	
+	for (sInt_32 i = 1; i < N_Agents_1; ++i)
+	{
+	    fprintf(fw, "%s%d # %d --> [%ld] { ", indent.c_str(), i, m_start_configuration.m_vertex_Occups[i], m_goal_commitment.m_agent_Tasks[i].size());
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[i].begin(); task != m_goal_commitment.m_agent_Tasks[i].end(); ++task)
+	    {
+		fprintf(fw, "%d ", *task);
+	    }
+	    fprintf(fw, "}\n");
+	}
+    }
+
+
+    /*
+    void sMission::to_Stream_domainPDDL(FILE *fw, const sString &indent) const
+    {
+    }
+
+    
+    void sMission::to_Stream_problemPDDL(FILE *fw, const sString &indent) const
+    {
+    }
+    */
+
+    
+    sResult sMission::to_File(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_MISSION_OPEN_ERROR;
+	}
+	to_Stream(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    sResult sMission::to_File_mHpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_MISSION_MHPF_OPEN_ERROR;
+	}
+	to_Stream_mHpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;		
+    }
+
+
+    /*
+    sResult sMission::to_File_domainPDDL(const sString &filename, const sString &indent) const
+    {
+    }
+
+    
+    sResult sMission::to_File_problemPDDL(const sString &filename, const sString &indent) const
+    {
+    }
+    */
+
+    
+    sResult sMission::from_File_mHpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sAGENT_MISSION_MHPF_OPEN_ERROR;
+	}
+	
+	result = from_Stream_mHpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+	fclose(fr);
+
+	return sRESULT_SUCCESS;		
+    }
+
+    
+    sResult sMission::from_Stream_mHpf(FILE *fr)
+    {
+	sResult result;
+
+	if (sFAILED(result = m_environment.from_Stream_mHpf(fr)))
+	{
+	    return result;
+	}
+	m_environment.to_Screen();
+
+	sInt_32 N_agents, N_vertices;
+	fscanf(fr, "|A| = %d\n", &N_agents);
+	N_vertices = m_environment.get_VertexCount();
+
+	m_start_configuration = sConfiguration(N_vertices, N_agents);	
+	m_goal_commitment = sCommitment(N_agents);
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    sInt_32 a, N_tasks;
+	    sInt_32 start_vertex_id;
+	    
+	    fscanf(fr, "%d # %d --> [%d] {", &a, &start_vertex_id, &N_tasks);
+
+	    m_start_configuration.place_Agent(a, start_vertex_id);
+
+	    for (sInt_32 t = 0; t < N_tasks; ++t)
+	    {
+		sInt_32 task_vertex_id;
+		
+		fscanf(fr, "%d ", &task_vertex_id);
+		m_goal_commitment.add_Task(agent_id, task_vertex_id);
+	    }
+	    fscanf(fr, "}\n");
+	}
+
+	return sRESULT_SUCCESS;
+    }
+
+    
 
     
 /*----------------------------------------------------------------------------*/

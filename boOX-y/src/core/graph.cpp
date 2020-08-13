@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-026_planck                              */
+/*                             boOX 2-033_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-026_planck                                                   */
+/* graph.cpp / 2-033_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -2357,6 +2357,81 @@ namespace boOX
     }
 
 
+    sResult sUndirectedGraph::from_File_mHpf(const sString &filename)
+    {
+	sResult result;
+	FILE *fr;
+
+	if ((fr = fopen(filename.c_str(), "r")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_MHPF_OPEN_ERROR;
+	}
+	
+	result = from_Stream_mHpf(fr);
+	if (sFAILED(result))
+	{
+	    fclose(fr);
+	    return result;
+	}
+
+	fclose(fr);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sUndirectedGraph::from_Stream_mHpf(FILE *fr)
+    {
+	sInt_32 N_vertices;
+	
+	fscanf(fr, "|V| = %d\n", &N_vertices);
+	add_Vertices(N_vertices);
+
+	fscanf(fr, "E =\n");	
+	sInt_32 c = fgetc(fr);
+
+	while (c == (int)'{')
+	{
+	    sInt_32 u_id, v_id;
+	    fscanf(fr, "%d,%d", &u_id, &v_id);
+
+	    if (m_directed)
+	    {
+		add_Arrow(u_id, v_id);
+	    }
+	    else
+	    {
+		add_Edge(u_id, v_id);
+	    }
+	    if (c != '\n' && c != '<')
+	    {
+		while((c = fgetc(fr)) != '\n' && c != '<');
+		if (c == '<')
+		{
+		    sInt_32 x_id, y_id;
+
+		    while (c != '>')
+		    {
+			fscanf(fr, "{%d,%d}", &x_id, &y_id);
+			
+			while((c = fgetc(fr)) == ' ');
+			ungetc(c, fr);
+		    }
+		    if (c == '>')
+		    {
+			fgetc(fr);
+		    }
+		    fscanf(fr, "\n");
+		}		
+	    }
+	    c = fgetc(fr);
+	}
+	ungetc(c, fr);
+
+	return sRESULT_SUCCESS;
+    }    
+
+
     sResult sUndirectedGraph::from_File_cmpf(const sString &filename)
     {
 	sResult result;
@@ -2557,6 +2632,34 @@ namespace boOX
 	    fprintf(fw, "%s{%d,%d}\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
 	}
     }
+
+    
+    sResult sUndirectedGraph::to_File_mHpf(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_MHPF_OPEN_ERROR;
+	}
+	
+	to_Stream_mHpf(fw, indent);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    void sUndirectedGraph::to_Stream_mHpf(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%s|V| = %ld\n", indent.c_str(), m_Vertices.size());	
+	fprintf(fw, "%sE =\n", indent.c_str());
+
+	for (Edges_list::const_iterator edge = m_Edges.begin(); edge != m_Edges.end(); ++edge)
+	{
+	    fprintf(fw, "%s{%d,%d}\n", indent.c_str(), edge->m_arc_uv.m_source->m_id, edge->m_arc_uv.m_target->m_id);
+	}
+    }    
 
 
     sResult sUndirectedGraph::to_File_cmpf(const sString &filename, const sString &indent) const

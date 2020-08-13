@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-026_planck                              */
+/*                             boOX 2-033_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 2-026_planck                                                    */
+/* result.h / 2-033_planck                                                    */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -82,9 +82,10 @@ enum sType_Result
 
 enum sUndirectedGraph_Result
 {
-    sUNDIRECTED_GRAPH_INFO       =  11000,
-    sUNDIRECTED_GRAPH_ERROR      = -11000,
-    sUNDIRECTED_GRAPH_OPEN_ERROR = (sUNDIRECTED_GRAPH_ERROR - 1)
+    sUNDIRECTED_GRAPH_INFO            =  11000,
+    sUNDIRECTED_GRAPH_ERROR           = -11000,
+    sUNDIRECTED_GRAPH_OPEN_ERROR      = (sUNDIRECTED_GRAPH_ERROR - 1),
+    sUNDIRECTED_GRAPH_MHPF_OPEN_ERROR = (sUNDIRECTED_GRAPH_ERROR - 2)    
 };
 
 
@@ -97,18 +98,26 @@ enum sAgentConfiguration_Result
 };
 
 
+enum sAgentCommitment_Result
+{
+    sAGENT_COMMITMENT_INFO       =  13000,
+    sAGENT_COMMITMENT_ERROR      = -13000,
+    sAGENT_COMMITMENT_OPEN_ERROR = (sAGENT_COMMITMENT_ERROR - 1)
+};
+
+
 enum sAgentSolution_Result
 {
-    sAGENT_SOLUTION_INFO       =  13000,
-    sAGENT_SOLUTION_ERROR      = -13000,    
+    sAGENT_SOLUTION_INFO       =  14000,
+    sAGENT_SOLUTION_ERROR      = -14000,    
     sAGENT_SOLUTION_OPEN_ERROR = (sAGENT_SOLUTION_ERROR - 1)
 };
 
 
 enum sAgentInstance_Result
 {
-    sAGENT_INSTANCE_INFO                =  14000,
-    sAGENT_INSTANCE_ERROR               = -14000,
+    sAGENT_INSTANCE_INFO                =  15000,
+    sAGENT_INSTANCE_ERROR               = -15000,
     sAGENT_INSTANCE_OPEN_ERROR          = (sAGENT_INSTANCE_ERROR -  1),
     sAGENT_INSTANCE_PDDL_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  2),
     sAGENT_INSTANCE_CPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  3),
@@ -124,10 +133,19 @@ enum sAgentInstance_Result
 };
 
 
+enum sAgentMission_Result
+{
+    sAGENT_MISSION_INFO                =  15000,
+    sAGENT_MISSION_ERROR               = -15000,
+    sAGENT_MISSION_OPEN_ERROR          = (sAGENT_MISSION_ERROR -  1),
+    sAGENT_MISSION_MHPF_OPEN_ERROR     = (sAGENT_MISSION_ERROR -  2)
+};
+
+
 enum s2DMap_Result
 {
-    s2D_MAP_INFO                              =  15000,
-    s2D_MAP_ERROR                             = -15000,
+    s2D_MAP_INFO                              =  16000,
+    s2D_MAP_ERROR                             = -16000,
     s2D_MAP_OPEN_ERROR                        = (s2D_MAP_ERROR - 1),
     s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR = (s2D_MAP_ERROR - 2)    
 };
@@ -135,8 +153,8 @@ enum s2DMap_Result
 
 enum sRealConjunction_Result
 {
-    sREAL_CONJUNCTION_INFO                              =  16000,
-    sREAL_CONJUNCTION_ERROR                             = -16000,
+    sREAL_CONJUNCTION_INFO                              =  17000,
+    sREAL_CONJUNCTION_ERROR                             = -17000,
     sREAL_CONJUNCTION_OPEN_ERROR                        = (sREAL_CONJUNCTION_ERROR - 1),
     sREAL_CONJUNCTION_XML_OPEN_ERROR                    = (sREAL_CONJUNCTION_ERROR - 2),    
     sREAL_CONJUNCTION_UNRECOGNIZED_XML_FORMATTING_ERROR = (sREAL_CONJUNCTION_ERROR - 3)
@@ -145,8 +163,8 @@ enum sRealConjunction_Result
 
 enum sRealInstance_Result
 {
-    sREAL_INSTANCE_INFO                =  17000,
-    sREAL_INSTANCE_ERROR               = -17000,
+    sREAL_INSTANCE_INFO                =  18000,
+    sREAL_INSTANCE_ERROR               = -18000,
     sREAL_INSTANCE_OPEN_ERROR          = (sREAL_INSTANCE_ERROR - 1),
     sREAL_INSTANCE_MOVISCEN_OPEN_ERROR = (sREAL_INSTANCE_ERROR - 2)
 };
@@ -154,16 +172,16 @@ enum sRealInstance_Result
 
 enum sRealSolution_Result
 {
-    sREAL_SOLUTION_INFO           =  18000,
-    sREAL_SOLUTION_ERROR          = -18000,    
+    sREAL_SOLUTION_INFO           =  19000,
+    sREAL_SOLUTION_ERROR          = -19000,    
     sREAL_SOLUTION_COLLISION_INFO = (sREAL_SOLUTION_INFO + 1)
 };
 
 
 enum sRealCBS_Result
 {
-    sREAL_CBS_INFO       =  19000,
-    sREAL_CBS_ERROR      = -19000,
+    sREAL_CBS_INFO       =  20000,
+    sREAL_CBS_ERROR      = -20000,
     sREAL_CBS_OPEN_ERROR = (sREAL_CBS_ERROR - 1),
 };
 
