@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-036_planck                              */
+/*                             boOX 2-035_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_test.h / 2-036_planck                                               */
+/* kruhoR_test.h / 2-035_planck                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous MAPF (MAPR-R), Kurhobots and related structures.
