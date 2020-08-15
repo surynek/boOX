@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-035_planck                              */
+/*                             boOX 2-037_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-035_planck                                                  */
+/* smtcbs.cpp / 2-037_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -15545,11 +15545,17 @@ namespace boOX
 	{
 	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
 	    {
+		printf("l:%d\n", layer);
 		if (!extra_MDD[agent_id][layer].empty())
 		{
+		    printf("  =\n");
 		    m_solver_Encoder->cast_NonImplication(solver,
 							  sat_Model.m_layer_fulfillment[agent_id][layer],
 							  sat_Model.m_layer_cardinality[agent_id][layer]);
+		}
+		else
+		{
+		    printf("  *\n");
 		}
 	    }
 	}
@@ -15561,6 +15567,7 @@ namespace boOX
 	    {
 		if (!extra_MDD[agent_id][layer].empty())
 		{
+		    printf("card: %d\n", sat_Model.m_layer_cardinality[agent_id][layer]);
 		    cardinality_Identifiers.push_back(sat_Model.m_layer_cardinality[agent_id][layer]);
 		}
 	    }
@@ -15577,6 +15584,7 @@ namespace boOX
 	    }
 	    else
 	    {
+		printf("cardinal: %d\n", extra_cost);
 		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
 	    }
 	}
@@ -15593,18 +15601,14 @@ namespace boOX
 		{
 		    VariableIDs_vector mutex_target_Identifiers;
 
-		    printf("V: %d (%d)\n", MDD[agent_id][layer][u], layer);
 		    for (sVertex::Neighbors_list::const_iterator neighbor = mission.m_environment.m_Vertices[MDD[agent_id][layer][u]].m_Neighbors.begin(); neighbor != mission.m_environment.m_Vertices[MDD[agent_id][layer][u]].m_Neighbors.end(); ++neighbor)
 		    {				    
-			sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
-			printf("  N: %d\n", neighbor_id);
-			
+			sInt_32 neighbor_id = (*neighbor)->m_target->m_id;			
 			sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[agent_id][layer + 1].find(neighbor_id);
 			
 			if (inverse_neighbor != inverse_MDD[agent_id][layer + 1].end())
 			{
 			    mutex_target_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
-			    printf("  ----\n");
 			    /*
 			    m_solver_Encoder->cast_Implication(solver,
 							       sat_Model.m_edge_occupancy[agent_id][layer][u][neighbor_index],
@@ -15660,9 +15664,11 @@ namespace boOX
 			agent_commitment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][inverse_commitment->second]);
 		    }			
 		}
+		printf("age commito: %d\n", agent_id);
 		m_solver_Encoder->cast_Disjunction(solver, agent_commitment_Identifiers);
 	    }
 	}
+
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
 	    for (VertexIDs_vector::const_iterator commitment = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); commitment != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++commitment)
@@ -15680,10 +15686,12 @@ namespace boOX
 			    agent_fulfillment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][prev_layer][inverse_commitment->second]);
 			}
 		    }
+		    printf("age fulfillo: %d\n", agent_id);
 		    m_solver_Encoder->cast_MultiImplication(solver, sat_Model.m_layer_fulfillment[agent_id][layer], agent_fulfillment_Identifiers);		    
 		}
 	    }
 	}
+
 	refine_HamiltonianSmallModelCollisionsInverse(solver,
 						   context.m_trans_Collisions,
 						   context.m_trans_edge_Collisions,
@@ -15857,6 +15865,7 @@ namespace boOX
 
 	    if (literal > 0)
 	    {
+		printf("%d\n", literal);
 		sInt_32 variable_ID = sABS(literal);
 		if (variable_ID < sat_Model.m_variable_mapping.size())
 		{
