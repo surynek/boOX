@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-029_planck                              */
+/*                             boOX 2-036_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-029_planck                                                   */
+/* agent.cpp / 2-036_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1515,6 +1515,19 @@ namespace boOX
     void sCommitment::clean_Tasks(sInt_32 agent_id)
     {
 	m_agent_Tasks[agent_id].clear();
+    }
+
+
+    bool sCommitment::is_Committed(sInt_32 agent_id, sInt_32 vertex_id) const
+    {
+	for (VertexIDs_vector::const_iterator vertex = m_agent_Tasks[agent_id].begin(); vertex != m_agent_Tasks[agent_id].end(); ++vertex)
+	{
+	    if (*vertex == vertex_id)
+	    {
+		return true;
+	    }
+	}
+	return false;
     }
 
     
@@ -3434,6 +3447,7 @@ namespace boOX
 
     sMission::sMission()
     {
+	// nothing
     }
 
     
@@ -3467,13 +3481,13 @@ namespace boOX
     }
 
 
-    sInt_32 sMission::estimate_TotalRotationCost(sInt_32 &max_individual_cost)
+    sInt_32 sMission::estimate_TotalHamiltonianCost(sInt_32 &max_individual_cost)
     {
-	return estimate_TotalRotationCost_rough(max_individual_cost);
+	return estimate_TotalHamiltonianCost_rough(max_individual_cost);
     }
     
     
-    sInt_32 sMission::estimate_TotalRotationCost_rough(sInt_32 &max_individual_cost)
+    sInt_32 sMission::estimate_TotalHamiltonianCost_rough(sInt_32 &max_individual_cost)
     {	
 	VertexIDs_vector source_IDs;
 	VertexIDs_vector goal_IDs;
@@ -3515,26 +3529,26 @@ namespace boOX
     }
 
 
-    sInt_32 sMission::estimate_TotalRotationCost_spanning(sInt_32 &sUNUSED(max_individual_cost))
+    sInt_32 sMission::estimate_TotalHamiltonianCost_spanning(sInt_32 &sUNUSED(max_individual_cost))
     {
 	return 0;
     }    
 
     
-    sInt_32 sMission::construct_RotationMDD(sInt_32     max_total_cost,
-					    MDD_vector &MDD,
-					    sInt_32    &extra_cost,
-					    MDD_vector &extra_MDD)
+    sInt_32 sMission::construct_HamiltonianMDD(sInt_32     max_total_cost,
+					       MDD_vector &MDD,
+					       sInt_32    &extra_cost,
+					       MDD_vector &extra_MDD)
     {
-	return construct_GraphRotationMDD(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);	
+	return construct_GraphHamiltonianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);	
     }    
 
     
-    sInt_32 sMission::construct_GraphRotationMDD(sUndirectedGraph &graph,
-						 sInt_32           max_total_cost,
-						 MDD_vector       &MDD,
-						 sInt_32          &extra_cost,
-						 MDD_vector       &extra_MDD)
+    sInt_32 sMission::construct_GraphHamiltonianMDD_rough(sUndirectedGraph &graph,
+							  sInt_32           max_total_cost,
+							  MDD_vector       &MDD,
+							  sInt_32          &extra_cost,
+							  MDD_vector       &extra_MDD)
     {
 	sInt_32 max_individual_cost;
 	sInt_32 N_Vertices = graph.get_VertexCount();	
@@ -3547,7 +3561,7 @@ namespace boOX
 	collect_Endpoints(source_IDs, goal_IDs);
 
 	graph.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
-	sInt_32 min_total_cost = estimate_TotalRotationCost(max_individual_cost);
+	sInt_32 min_total_cost = estimate_TotalHamiltonianCost(max_individual_cost);
 	
 	const sUndirectedGraph::Distances_2d_vector &source_Distances = graph.get_SourceShortestPaths();
 	const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	

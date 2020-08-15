@@ -1,0 +1,77 @@
+/*============================================================================*/
+/*                                                                            */
+/*                                                                            */
+/*                             boOX 2-036_planck                              */
+/*                                                                            */
+/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                                                                            */
+/*                http://www.surynek.net | <pavel@surynek.net>                */
+/*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
+/*                                                                            */
+/*============================================================================*/
+/* hamilton_solver_main.h / 2-036_planck                                      */
+/*----------------------------------------------------------------------------*/
+//
+// Multi-Agent Hamiltonian Path Finding Solver - main program.
+//
+// CBS-based and SMT-based solvers for multi-agent hamiltonian
+// path finding problem.
+//
+/*----------------------------------------------------------------------------*/
+
+
+#ifndef __HAMILTON_SOLVER_MAIN_H__
+#define __HAMILTON_SOLVER_MAIN_H__
+
+#include "config.h"
+#include "compile.h"
+#include "defs.h"
+#include "version.h"
+
+using namespace std;
+
+
+/*----------------------------------------------------------------------------*/
+
+namespace boOX
+{
+
+
+/*----------------------------------------------------------------------------*/
+
+    struct sCommandParameters
+    {
+	enum Algorithm
+	{
+	    ALGORITHM_SMTCBS_PLUS_PLUS	    
+	};
+	
+	sCommandParameters();
+        /*--------------------------------*/
+
+	sInt_32 m_cost_limit;
+	Algorithm m_algorithm;
+
+	sString m_input_filename;		
+	sString m_output_filename;
+
+	sDouble m_timeout;
+    };
+
+
+/*----------------------------------------------------------------------------*/
+
+    void print_IntroductoryMessage(void);
+    void print_ConcludingMessage(void);
+    void print_Help(void);
+    
+    sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &parameters);
+    sResult solve_MultiAgentHamiltonianPathFindingMission(const sCommandParameters &parameters);
+
+
+/*----------------------------------------------------------------------------*/
+
+} // namespace boOX
+
+
+#endif /* __HAMILTON_SOLVER_MAIN_H__ */

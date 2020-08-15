@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-029_planck                              */
+/*                             boOX 2-036_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 2-029_planck                                                       */
+/* cbs.h / 2-036_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -219,7 +219,14 @@ namespace boOX
 	sCBSBase(sInstance *instance, sDouble timeout);	
 	/*----------------------------------------------------------------------------*/
 
-	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;		
+	sCBSBase(sMission *mission);
+	sCBSBase(sMission *mission, sDouble timeout);		
+	/*----------------------------------------------------------------------------*/	
+
+	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;
+	sInt_32 fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;	
+	/*----------------------------------------------------------------------------*/		
+	
 	void cast_Occupations(sInt_32 agent_id, sInt_32 prefix_length, const VertexIDs_vector &path, Occupations_vector &space_Occupations) const;
 	void uncast_Occupations(sInt_32 prefix_length, const VertexIDs_vector &path, Occupations_vector &space_Occupations) const;
 	/*----------------------------------------------------------------------------*/	
@@ -230,6 +237,8 @@ namespace boOX
 
     public:
 	sInstance *m_Instance;
+	sMission *m_Mission;	
+	
 	sDouble m_timeout;
     };
     
@@ -420,6 +429,10 @@ namespace boOX
 	sCBS(sInstance *instance);
 	sCBS(sInstance *instance, sDouble timeout);
 	/*----------------------------------------------------------------------------*/
+
+	sCBS(sMission *mission);
+	sCBS(sMission *mission, sDouble timeout);	
+	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_ShortestNonconflictingSwapping(sSolution &solution, sInt_32 cost_limit) const;
 	sInt_32 find_ShortestNonconflictingSwapping(const sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;

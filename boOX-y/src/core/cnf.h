@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-029_planck                              */
+/*                             boOX 2-036_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 2-029_planck                                                       */
+/* cnf.h / 2-036_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -126,7 +126,12 @@ namespace boOX
 			      sInt_32          variable_ID_PREC,
 			      sInt_32          variable_ID_POST_A,
 			      sInt_32          variable_ID_POST_B,
-			      sInt_32          weight = 0);	
+			      sInt_32          weight = 0);
+
+	void cast_NonImplication(Glucose::Solver *solver,
+				 sInt_32          variable_ID_PREC,
+				 sInt_32          variable_ID_POST,
+				 sInt_32          weight = 0);		
 	
 	void cast_NonzeroImplication(Glucose::Solver *solver,
 				     sInt_32          variable_ID_PREC,

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-029_planck                              */
+/*                             boOX 2-036_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 2-029_planck                                                     */
+/* agent.h / 2-036_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -148,8 +148,11 @@ namespace boOX
 
 	static const sInt_32 RANDOM_WALK_LENGTH = s__DEFAULT_RANDOM_WALK_LENGTH;
 
-    public:	
+    public:
+	typedef std::set<sInt_32> VertexIDs_set;	
 	typedef std::vector<sInt_32> VertexIDs_vector;
+
+	typedef VertexIDs_set AgentTask_set;		
 	typedef VertexIDs_vector AgentTask_vector;
 	    
 	typedef std::vector<AgentTask_vector> AgentTasks_vector;
@@ -164,6 +167,8 @@ namespace boOX
 
 	void add_Task(sInt_32 agent_id, sInt_32 vertex_id);
 	void clean_Tasks(sInt_32 agent_id);
+	
+	bool is_Committed(sInt_32 agent_id, sInt_32 vertex_id) const;
         /*----------------------------------------------------------------------------*/	
 
     public:
@@ -378,9 +383,9 @@ namespace boOX
     public:
 	void collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const;
 
-	sInt_32 estimate_TotalRotationCost(sInt_32 &max_individual_cost);
-	sInt_32 estimate_TotalRotationCost_rough(sInt_32 &max_individual_cost);
-	sInt_32 estimate_TotalRotationCost_spanning(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalHamiltonianCost(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalHamiltonianCost_rough(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalHamiltonianCost_spanning(sInt_32 &max_individual_cost);
 	
 	/*
 	sInt_32 estimate_TotalPathCost(sInt_32 &max_individual_cost);
@@ -424,16 +429,16 @@ namespace boOX
 					      MDD_vector       &extra_MDD);
 	*/
 
-	sInt_32 construct_RotationMDD(sInt_32     max_total_cost,
-				      MDD_vector &MDD,
-				      sInt_32    &extra_cost,
-				      MDD_vector &extra_MDD);
+	sInt_32 construct_HamiltonianMDD(sInt_32     max_total_cost,
+					 MDD_vector &MDD,
+					 sInt_32    &extra_cost,
+					 MDD_vector &extra_MDD);
 	
-	sInt_32 construct_GraphRotationMDD(sUndirectedGraph &graph,
-					   sInt_32           max_total_cost,
-					   MDD_vector       &MDD,
-					   sInt_32          &extra_cost,
-					   MDD_vector       &extra_MDD);
+	sInt_32 construct_GraphHamiltonianMDD_rough(sUndirectedGraph &graph,
+						    sInt_32           max_total_cost,
+						    MDD_vector       &MDD,
+						    sInt_32          &extra_cost,
+						    MDD_vector       &extra_MDD);
         /*----------------------------------------------------------------------------*/	
 
 	static void construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD);
