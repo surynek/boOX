@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-038_planck                              */
+/*                             boOX 2-040_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-038_planck                                                   */
+/* graph.cpp / 2-040_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -2058,7 +2058,9 @@ namespace boOX
 	    sInt_32 color_B = component_Colors[connection->second.m_v_id];
 	    
 	    if (color_A != color_B)
-	    {		
+	    {
+		printf("connecting: %d -- %d\n", connection->second.m_u_id, connection->second.m_v_id);
+		
 		if (colored_Components[color_A].m_vertex_IDs.size() > colored_Components[color_B].m_vertex_IDs.size())
 		{
 		    for (VertexIDs_vector::const_iterator B_vertex = colored_Components[color_B].m_vertex_IDs.begin(); B_vertex != colored_Components[color_B].m_vertex_IDs.end(); ++B_vertex)

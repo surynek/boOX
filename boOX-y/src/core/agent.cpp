@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-038_planck                              */
+/*                             boOX 2-040_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-038_planck                                                   */
+/* agent.cpp / 2-040_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -3658,7 +3658,7 @@ namespace boOX
 	    {
 		if (MDD[mdd_agent_id][mdd_level].empty())
 		{
-		    printf("Empto: %d\n", mdd_level);
+//		    printf("Empto: %d\n", mdd_level);
 		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
 		    {		
 			sInt_32 agent_sink_vertex_id = *task;		    
@@ -3675,7 +3675,7 @@ namespace boOX
 		if (   mdd_level > agent_lower_cost_Bounds[mdd_agent_id]
 		    && mdd_level <= agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
 		{
-		    printf("extra Empto: %d\n", mdd_level);
+//		    printf("extra Empto: %d\n", mdd_level);
 		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
 		    {		
 			sInt_32 agent_sink_vertex_id = *task;		    		    

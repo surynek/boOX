@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-038_planck                              */
+/*                             boOX 2-040_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* randgen_main.h / 2-038_planck                                              */
+/* randgen_main.h / 2-040_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Random Graph Instance Generator - main program.

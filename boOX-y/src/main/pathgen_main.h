@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-038_planck                              */
+/*                             boOX 2-040_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* pathgen_main.h / 2-038_planck                                              */
+/* pathgen_main.h / 2-040_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Path Graph Instance Generator - main program.

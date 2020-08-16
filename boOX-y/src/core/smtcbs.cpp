@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-038_planck                              */
+/*                             boOX 2-040_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-038_planck                                                  */
+/* smtcbs.cpp / 2-040_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -9699,6 +9699,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -9971,8 +9978,15 @@ namespace boOX
 		    mutex_source_Identifiers[MDD[agent_id][layer + 1][v]].clear();
 		}		
 */
-//		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10573,9 +10587,7 @@ namespace boOX
 	sInt_32 N_layers = MDD[1].size() - 1;
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
-	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
+	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -10622,6 +10634,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10736,9 +10755,7 @@ namespace boOX
 	sInt_32 N_layers = MDD[1].size() - 1;	
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
-	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
+	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -10785,6 +10802,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -11305,6 +11329,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -11614,6 +11645,13 @@ namespace boOX
 */		
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -12174,8 +12212,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -12222,6 +12258,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 		
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -12734,6 +12777,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13041,6 +13091,13 @@ namespace boOX
 */		
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13471,8 +13528,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -13519,6 +13574,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}	
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13929,6 +13991,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14225,6 +14294,13 @@ namespace boOX
 */		
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14784,8 +14860,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -14832,6 +14906,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -15181,8 +15262,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -15229,6 +15308,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -15545,17 +15631,17 @@ namespace boOX
 	{
 	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
 	    {
-		printf("l:%d\n", layer);
+//		printf("l:%d\n", layer);
 		if (!extra_MDD[agent_id][layer].empty())
 		{
-		    printf("  =\n");
+//		    printf("  =\n");
 		    m_solver_Encoder->cast_NonImplication(solver,
 							  sat_Model.m_layer_fulfillment[agent_id][layer],
 							  sat_Model.m_layer_cardinality[agent_id][layer]);
 		}
 		else
 		{
-		    printf("  *\n");
+//		    printf("  *\n");
 		}
 	    }
 	}
@@ -15567,7 +15653,7 @@ namespace boOX
 	    {
 		if (!extra_MDD[agent_id][layer].empty())
 		{
-		    printf("card: %d\n", sat_Model.m_layer_cardinality[agent_id][layer]);
+//		    printf("card: %d\n", sat_Model.m_layer_cardinality[agent_id][layer]);
 		    cardinality_Identifiers.push_back(sat_Model.m_layer_cardinality[agent_id][layer]);
 		}
 	    }
@@ -15584,7 +15670,7 @@ namespace boOX
 	    }
 	    else
 	    {
-		printf("cardinal: %d\n", extra_cost);
+//		printf("cardinal: %d\n", extra_cost);
 		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
 	    }
 	}
@@ -15634,7 +15720,7 @@ namespace boOX
 		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
-	    }
+	    }	    
 	    
 	    VariableIDs_vector mutex_vertex_Identifiers;
 	    
@@ -15671,7 +15757,7 @@ namespace boOX
 			agent_commitment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][inverse_commitment->second]);
 		    }			
 		}
-		printf("age commito: %d\n", agent_id);
+//		printf("age commito: %d\n", agent_id);
 		m_solver_Encoder->cast_Disjunction(solver, agent_commitment_Identifiers);
 	    }
 	}
@@ -15693,7 +15779,7 @@ namespace boOX
 			    agent_fulfillment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][prev_layer][inverse_commitment->second]);
 			}
 		    }
-		    printf("age fulfillo: %d\n", agent_id);
+//		    printf("age fulfillo: %d\n", agent_id);
 		    m_solver_Encoder->cast_MultiImplication(solver, sat_Model.m_layer_fulfillment[agent_id][layer], agent_fulfillment_Identifiers);		    
 		}
 	    }
@@ -15872,7 +15958,11 @@ namespace boOX
 
 	    if (literal > 0)
 	    {
-		printf("%d\n", literal);
+		#ifdef sDEBUG
+		{
+		    // printf("Literal (true): %d\n", literal);
+		}
+		#endif
 		sInt_32 variable_ID = sABS(literal);
 		if (variable_ID < sat_Model.m_variable_mapping.size())
 		{
@@ -15883,7 +15973,7 @@ namespace boOX
 
 		    #ifdef sDEBUG
 		    {
-			printf("Extratracted from satisfying a:%d, v:%d, l:%d [%d]\n", agent_id, vertex_id, level, literal);
+			// printf("Extratracted from satisfying a:%d, v:%d, l:%d [%d]\n", agent_id, vertex_id, level, literal);
 		    }
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
