@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-037_planck                              */
+/*                             boOX 2-038_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-037_planck                                                  */
+/* smtcbs.cpp / 2-038_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -15590,9 +15590,7 @@ namespace boOX
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
-	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
+	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -15637,6 +15635,15 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
+	    
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
+	    
 	}
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)

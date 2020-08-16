@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-037_planck                              */
+/*                             boOX 2-038_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-037_planck                                                   */
+/* graph.cpp / 2-038_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -301,6 +301,7 @@ namespace boOX
 	, m_Matrix(NULL)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	// nothing
     }
@@ -312,6 +313,7 @@ namespace boOX
 	, m_Matrix(NULL)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  	  
     {
 	// nothing
     }
@@ -323,6 +325,7 @@ namespace boOX
 	, m_Matrix(NULL)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)
     {
        	add_Vertices(N_vertices);
 
@@ -347,6 +350,7 @@ namespace boOX
 	, m_y_size(y_size)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)
     {
 	sInt_32 grid_size = x_size * y_size;
 	m_Matrix = new int[grid_size];
@@ -394,6 +398,7 @@ namespace boOX
 	, m_y_size(y_size)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	m_Matrix = new int[x_size * y_size];
 	sInt_32 cnt = 0;
@@ -470,6 +475,7 @@ namespace boOX
 	, m_y_size(y_size)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	sInt_32 matrix_size = x_size * y_size;
 	m_Matrix = new int[matrix_size];
@@ -554,6 +560,7 @@ namespace boOX
 	, m_y_size(y_size)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	sInt_32 grid_size = x_size * y_size;
 	m_Matrix = new int[grid_size];
@@ -623,6 +630,7 @@ namespace boOX
 	, m_y_size(y_size)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	m_Matrix = new int[x_size * y_size];
 	sInt_32 cnt = 0;
@@ -728,6 +736,7 @@ namespace boOX
 	, m_y_size(y_size)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	sInt_32 matrix_size = x_size * y_size;
 	m_Matrix = new int[matrix_size];
@@ -839,6 +848,7 @@ namespace boOX
 	, m_Matrix(NULL)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	Edges_vector Edges;
 
@@ -893,6 +903,7 @@ namespace boOX
 	, m_Matrix(NULL)
 	, m_all_pairs_distances_calculated(false)
 	, m_source_goal_distances_calculated(false)
+	, m_endpoint_distances_calculated(false)	  
     {
 	Edges_vector Edges;
 
@@ -989,6 +1000,9 @@ namespace boOX
 	m_source_goal_distances_calculated = undirected_graph.m_source_goal_distances_calculated;
 	m_source_Distances = undirected_graph.m_source_Distances;
 	m_goal_Distances = undirected_graph.m_goal_Distances;
+
+	m_endpoint_distances_calculated = undirected_graph.m_endpoint_distances_calculated;
+	m_endpoint_Distances = undirected_graph.m_endpoint_Distances;
     }
 
 
@@ -1046,6 +1060,9 @@ namespace boOX
 	m_source_goal_distances_calculated = undirected_graph.m_source_goal_distances_calculated;
 	m_source_Distances = undirected_graph.m_source_Distances;
 	m_goal_Distances = undirected_graph.m_goal_Distances;
+
+	m_endpoint_distances_calculated = undirected_graph.m_endpoint_distances_calculated;
+	m_endpoint_Distances = undirected_graph.m_endpoint_Distances;	
     }    
 
 
@@ -1102,6 +1119,9 @@ namespace boOX
 	m_source_Distances = undirected_graph.m_source_Distances;
 	m_goal_Distances = undirected_graph.m_goal_Distances;
 
+	m_endpoint_distances_calculated = undirected_graph.m_endpoint_distances_calculated;
+	m_endpoint_Distances = undirected_graph.m_endpoint_Distances;
+	
 	return *this;
     }
 
@@ -1483,12 +1503,12 @@ namespace boOX
 	Distances.resize(m_Vertices.size(), sINT_32_MAX);
 
 	Distances[s_id] = 0;
-	VertexQueue_multimap vertex_Queue;
-	vertex_Queue.insert(VertexQueue_multimap::value_type(0, s_id));
+	VertexQueue_mmap vertex_Queue;
+	vertex_Queue.insert(VertexQueue_mmap::value_type(0, s_id));
 
 	while (!vertex_Queue.empty())
 	{
-	    VertexQueue_multimap::value_type front_record = *vertex_Queue.begin();
+	    VertexQueue_mmap::value_type front_record = *vertex_Queue.begin();
 
 	    for (sVertex::Neighbors_list::const_iterator neighbor = m_Vertices[front_record.second].m_Neighbors.begin(); neighbor != m_Vertices[front_record.second].m_Neighbors.end(); ++neighbor)
 	    {
@@ -1497,7 +1517,7 @@ namespace boOX
 		if (Distances[neighbor_id] == sINT_32_MAX || Distances[neighbor_id] > distance_update)
 		{
 		    Distances[neighbor_id] = distance_update;
-		    vertex_Queue.insert(VertexQueue_multimap::value_type(distance_update, neighbor_id));
+		    vertex_Queue.insert(VertexQueue_mmap::value_type(distance_update, neighbor_id));
 		}
 	    }
 	    vertex_Queue.erase(vertex_Queue.begin());
@@ -1904,7 +1924,7 @@ namespace boOX
 	return m_goal_Distances;
     }
 
-
+    
 /*----------------------------------------------------------------------------*/
 
     void sUndirectedGraph::find_ShortestPath(sInt_32 u_id, sInt_32 v_id, VertexIDs_list &path)
@@ -1956,8 +1976,114 @@ namespace boOX
 	    }	    
 	}
     }
+    
+
+/*----------------------------------------------------------------------------*/
+
+    void sUndirectedGraph::calc_EndpointShortestPaths(Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs)
+    {
+	endpoint_Distances.clear();
+	sInt_32 N_Vertices = m_Vertices.size();
+
+	endpoint_Distances.resize(N_Vertices);
+
+	for (VertexIDs_vector::const_iterator endpoint = endpoint_IDs.begin(); endpoint != endpoint_IDs.end(); ++endpoint)
+	{
+	    endpoint_Distances[*endpoint].resize(N_Vertices);
+	}
+
+	for (VertexIDs_vector::const_iterator endpoint = endpoint_IDs.begin(); endpoint != endpoint_IDs.end(); ++endpoint)
+	{
+	    calc_SingleSourceShortestPathsBreadth(*endpoint);
+
+	    sInt_32 vertex_id = 0;
+
+	    for (Distances_vector::const_iterator distance = m_Distances.begin(); distance != m_Distances.end(); ++distance)
+	    {
+		endpoint_Distances[*endpoint][vertex_id] = *distance;
+		++vertex_id;
+	    }
+	}
+    }
 
 
+    void sUndirectedGraph::calc_EndpointShortestPaths(const VertexIDs_vector &endpoint_IDs)
+    {
+	if (!m_endpoint_distances_calculated)
+	{
+	    calc_EndpointShortestPaths(m_endpoint_Distances, endpoint_IDs);
+	    m_endpoint_distances_calculated = true;
+	}
+    }
+
+
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs)
+    {
+	return calc_MinimumSpanningTree(m_endpoint_Distances, endpoint_IDs);
+    }
+
+    
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs)
+    {
+	sInt_32 tree_cost = 0;
+	
+	sInt_32 N_vertices = m_Vertices.size();	
+	Connections_mmap Connections;	
+
+	for (VertexIDs_vector::const_iterator endpoint_A = endpoint_IDs.begin(); endpoint_A != endpoint_IDs.end(); ++endpoint_A)
+	{
+	    VertexIDs_vector::const_iterator endpoint_B = endpoint_A;
+	    
+	    for (++endpoint_B; endpoint_B != endpoint_IDs.end(); ++endpoint_B)
+	    {
+		Connections.insert(Connections_mmap::value_type(endpoint_Distances[*endpoint_A][*endpoint_B], Connection(*endpoint_A, *endpoint_B)));
+	    }
+	}
+
+	Colors_vector component_Colors;
+	component_Colors.resize(N_vertices);
+
+	Components_vector colored_Components;
+
+	for (sInt_32 component = 0; component < N_vertices; ++component)
+	{
+	    component_Colors[component] = component;
+	    colored_Components.push_back(Component(component, component));
+	}
+		
+
+	for (Connections_mmap::const_iterator connection = Connections.begin(); connection != Connections.end(); ++connection)
+	{
+	    sInt_32 color_A = component_Colors[connection->second.m_u_id];
+	    sInt_32 color_B = component_Colors[connection->second.m_v_id];
+	    
+	    if (color_A != color_B)
+	    {		
+		if (colored_Components[color_A].m_vertex_IDs.size() > colored_Components[color_B].m_vertex_IDs.size())
+		{
+		    for (VertexIDs_vector::const_iterator B_vertex = colored_Components[color_B].m_vertex_IDs.begin(); B_vertex != colored_Components[color_B].m_vertex_IDs.end(); ++B_vertex)
+		    {
+			component_Colors[*B_vertex] = color_A;
+			colored_Components[color_A].m_vertex_IDs.push_back(*B_vertex);
+		    }
+		}
+		else
+		{
+		    for (VertexIDs_vector::const_iterator A_vertex = colored_Components[color_A].m_vertex_IDs.begin(); A_vertex != colored_Components[color_A].m_vertex_IDs.end(); ++A_vertex)
+		    {
+			component_Colors[*A_vertex] = color_B;
+			colored_Components[color_B].m_vertex_IDs.push_back(*A_vertex);
+		    }		    
+		}
+
+		tree_cost += connection->first;
+	    }
+	}
+
+	return tree_cost;
+    }
+    
+    
 /*----------------------------------------------------------------------------*/
 
     void sUndirectedGraph::to_Screen(const sString &indent) const

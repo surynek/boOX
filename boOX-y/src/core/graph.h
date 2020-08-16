@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-037_planck                              */
+/*                             boOX 2-038_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 2-037_planck                                                     */
+/* graph.h / 2-038_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -150,7 +150,7 @@ namespace boOX
 	    sInt_32 m_u_id;
 	    sInt_32 m_v_id;
 	};
-
+	
 	struct Coordinates
 	{
 	    Coordinates() { }
@@ -180,12 +180,50 @@ namespace boOX
 	typedef std::list<sVertex*> Vertices_list;	
 
 	typedef std::list<sEdge> Edges_list;
-	typedef std::multimap<sInt_32, sInt_32, std::less<sInt_32> > VertexQueue_multimap;
+	typedef std::multimap<sInt_32, sInt_32, std::less<sInt_32> > VertexQueue_mmap;
 
 	typedef std::pair<sInt_32, sInt_32> Vertex_pair;
 	typedef std::vector<Vertex_pair> VertexPairs_vector;
-	typedef std::multimap<sInt_32, Vertex_pair, std::less<sInt_32> > VertexPairQueue_multimap;
+	typedef std::multimap<sInt_32, Vertex_pair, std::less<sInt_32> > VertexPairQueue_mmap;
+	/*----------------------------------------------------------------------------*/
+	
+	struct Connection
+	{
+	    Connection(sInt_32 u_id, sInt_32 v_id)
+	    : m_u_id(u_id)
+	    , m_v_id(v_id)
+	    {
+		// nothing
+	    }
+	    
+	    sInt_32 m_u_id;
+	    sInt_32 m_v_id;
+	};
+
+	typedef std::multimap<sInt_32, Connection, std::less<sInt_32> > Connections_mmap;
+
+	struct Component
+	{
+	    Component(sInt_32 color)
+	    : m_color(color)
+	    {
+		// nothing
+	    }
+
+	    Component(sInt_32 color, sInt_32 vertex_id)
+	    : m_color(color)
+	    {
+		m_vertex_IDs.push_back(vertex_id);
+	    }	    
+
+	    sInt_32 m_color;
+	    VertexIDs_vector m_vertex_IDs;
+	};
+
+	typedef std::vector<Component> Components_vector;
+	typedef std::vector<sInt_32> Colors_vector;
 	/*----------------------------------------------------------------------------*/	
+	
 
     public:
 	sUndirectedGraph();
@@ -272,6 +310,13 @@ namespace boOX
 
 	void find_ShortestPath(sInt_32 u_id, sInt_32 v_id, VertexIDs_list &path);
 	void find_ShortestPathBFS(sInt_32 u_id, sInt_32 v_id);
+	/*----------------------------------------------------------------------------*/	
+
+	void calc_EndpointShortestPaths(Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs);
+	void calc_EndpointShortestPaths(const VertexIDs_vector &endpoint_IDs);
+
+	sInt_32 calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs);
+	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs);
 	/*----------------------------------------------------------------------------*/
 
     public:
@@ -366,6 +411,9 @@ namespace boOX
 	bool m_source_goal_distances_calculated;
 	Distances_2d_vector m_source_Distances;
 	Distances_2d_vector m_goal_Distances;
+
+	bool m_endpoint_distances_calculated;
+	Distances_2d_vector m_endpoint_Distances;
 
 	VertexIDs_vector m_Queue;
 	Distances_vector m_Distances;

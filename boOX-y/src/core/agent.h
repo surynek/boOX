@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-037_planck                              */
+/*                             boOX 2-038_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 2-037_planck                                                     */
+/* agent.h / 2-038_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -381,6 +381,7 @@ namespace boOX
 		 const sCommitment      &goal_commitment);
 
     public:
+	void collect_Endpoints(VertexIDs_vector &endpoint_IDs) const;		
 	void collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const;
 
 	sInt_32 estimate_TotalHamiltonianCost(sInt_32 &max_individual_cost);
@@ -439,6 +440,11 @@ namespace boOX
 						    MDD_vector       &MDD,
 						    sInt_32          &extra_cost,
 						    MDD_vector       &extra_MDD);
+	sInt_32 construct_GraphHamiltonianMDD_spanning(sUndirectedGraph &graph,
+						       sInt_32           max_total_cost,
+						       MDD_vector       &MDD,
+						       sInt_32          &extra_cost,
+						       MDD_vector       &extra_MDD);	
         /*----------------------------------------------------------------------------*/	
 
 	static void construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD);

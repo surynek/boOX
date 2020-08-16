@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-037_planck                              */
+/*                             boOX 2-038_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 2-037_planck                                                     */
+/* cnf.cpp / 2-038_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -804,7 +804,7 @@ namespace boOX
 	
 	for (std::vector<int>::const_iterator lit = Lits.begin(); lit != Lits.end(); ++lit)
 	{
-	    printf("%d ", *lit);
+//	    printf("%d ", *lit);
 	    sInt_32 glu_var = sABS(*lit) - 1;
 	    while (glu_var >= solver->nVars())
 	    {
@@ -812,7 +812,7 @@ namespace boOX
 	    }
 	    glu_Lits.push((*lit > 0) ? Glucose::mkLit(glu_var, false) : ~Glucose::mkLit(glu_var, false));
 	}
-	printf("0\n");
+//	printf("0\n");
 	solver->addClause(glu_Lits);
     }
 
