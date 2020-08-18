@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-041_planck                              */
+/*                             boOX 2-047_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* hamilton_solver_main.h / 2-041_planck                                      */
+/* hamilton_solver_main.h / 2-047_planck                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Hamiltonian Path Finding Solver - main program.
@@ -43,7 +43,8 @@ namespace boOX
     {
 	enum Algorithm
 	{
-	    ALGORITHM_SMTCBS_PLUS_PLUS	    
+	    ALGORITHM_SMTCBS_PLUS_PLUS,
+	    ALGORITHM_SMTCBS_PLUS_PLUS_PLUS
 	};
 	
 	sCommandParameters();

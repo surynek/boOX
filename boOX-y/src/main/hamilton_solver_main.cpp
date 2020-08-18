@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-041_planck                              */
+/*                             boOX 2-047_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* hamilton_solver_main.cpp / 2-041_planck                                    */
+/* hamilton_solver_main.cpp / 2-047_planck                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Hamiltonian Path Finding Solver - main program.
@@ -82,7 +82,7 @@ namespace boOX
 	printf("hamilton_solver_boOX  --input-file=<string>\n");
 	printf("                      --output-file=<sting>\n");
 	printf("                     [--cost-limit=<int>]\n");
-	printf("                     [--algorithm={smtcbs++}]\n");
+	printf("                     [--algorithm={smtcbs++|smtcbs+++}]\n");
         printf("		     [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
@@ -129,7 +129,20 @@ namespace boOX
 	    sSMTCBS smtcbs_Solver(&encoder, &mission, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingHamiltonianInverseDepleted(solution, parameters.m_cost_limit);
 	    break;
-	}			
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-PLUS-PLUS-PLUS");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, &mission, parameters.m_timeout);
+	    cost = smtcbs_Solver.find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(solution, parameters.m_cost_limit);
+	    break;
+	}				
 	default:
 	{
 	    sASSERT(false);
@@ -206,6 +219,10 @@ namespace boOX
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
 	    }
+	    else if (algorithm_str == "smtcbs+++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS;
+	    }	    
 	    else
 	    {
 		return sHAMILTON_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

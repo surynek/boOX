@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-041_planck                              */
+/*                             boOX 2-047_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 2-041_planck                                                     */
+/* graph.h / 2-047_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -316,7 +316,11 @@ namespace boOX
 	void calc_EndpointShortestPaths(const VertexIDs_vector &endpoint_IDs);
 
 	sInt_32 calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs);
+	sInt_32 calc_MinimumSpanningTree(sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs);	
 	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs);
+	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs);	
+
+	const Distances_2d_vector& get_EndpointShortestPaths(void) const;
 	/*----------------------------------------------------------------------------*/
 
     public:

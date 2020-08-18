@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-041_planck                              */
+/*                             boOX 2-047_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 2-041_planck                                                     */
+/* agent.h / 2-047_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -434,6 +434,16 @@ namespace boOX
 					 MDD_vector &MDD,
 					 sInt_32    &extra_cost,
 					 MDD_vector &extra_MDD);
+
+	sInt_32 construct_HamiltonianMDD_rough(sInt_32     max_total_cost,
+					       MDD_vector &MDD,
+					       sInt_32    &extra_cost,
+					       MDD_vector &extra_MDD);
+
+	sInt_32 construct_HamiltonianMDD_spanning(sInt_32     max_total_cost,
+						  MDD_vector &MDD,
+						  sInt_32    &extra_cost,
+						  MDD_vector &extra_MDD);
 	
 	sInt_32 construct_GraphHamiltonianMDD_rough(sUndirectedGraph &graph,
 						    sInt_32           max_total_cost,

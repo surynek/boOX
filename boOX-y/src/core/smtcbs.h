@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-041_planck                              */
+/*                             boOX 2-047_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 2-041_planck                                                    */
+/* smtcbs.h / 2-047_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -299,7 +299,15 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(sMission          &mission,
 								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit) const;	
+								      sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission          &mission,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping(Context           &context,
@@ -417,14 +425,22 @@ namespace boOX
 								      AgentPaths_vector &agent_Paths,
 								      sInt_32            cost_limit) const;
 	/*----------------------------------------------------------------------------*/
+	
 	sInt_32 find_NonconflictingHamiltonianInverseDepleted(Context           &context,
 							      AgentPaths_vector &agent_Paths,
 							      sInt_32            cost_limit) const;	
 	sInt_32 find_NonconflictingHamiltonianInverseDepleted(Context           &context,
 							      sMission          &mission,
 							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit) const;	
-	
+							      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedSpanning(Context           &context,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedSpanning(Context           &context,
+								      sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;			
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
@@ -602,7 +618,16 @@ namespace boOX
 										sInstance::InverseMDD_vector &inverse_MDD,
 										sInt_32                       extra_cost,
 										AgentPaths_vector            &agent_Paths,
-										sInt_32                       cost_limit) const;	
+										sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(const sMission              &mission,
+											Context                      &context,
+											sInstance::MDD_vector        &MDD,
+											sInstance::MDD_vector        &extra_MDD,
+											sInstance::InverseMDD_vector &inverse_MDD,
+											sInt_32                       extra_cost,
+											AgentPaths_vector            &agent_Paths,
+											sInt_32                       cost_limit) const;		
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingPaths(Glucose::Solver       *solver,
@@ -1116,7 +1141,7 @@ namespace boOX
 							       sMission::InverseMDD_vector &inverse_MDD,
 							       sInt_32                      extra_cost,
 							       sInt_32                      cost_limit,
-							       AgentPaths_vector           &agent_Paths) const;
+							       AgentPaths_vector           &agent_Paths) const;	
 
 	sInt_32 check_NonconflictingHamiltonian(const sMission          &mission,
 						const AgentPaths_vector &agent_Paths,
@@ -1125,7 +1150,9 @@ namespace boOX
 	sInt_32 check_NonconflictingHamiltonian(const sMission          &mission,
 						const AgentPaths_vector &agent_Paths,
 						Collisions_vector       &Collisions,
-						EdgeCollisions_vector   &edge_Collisions) const;	
+						EdgeCollisions_vector   &edge_Collisions) const;
+
+	sInt_32 calc_HamiltonianCost(const sMission &mission, const AgentPaths_vector &agent_Paths) const;	
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 build_SwappingModelVariables(Glucose::Solver             *solver,

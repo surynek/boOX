@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-041_planck                              */
+/*                             boOX 2-047_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-041_planck                                                   */
+/* graph.cpp / 2-047_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -2022,13 +2022,20 @@ namespace boOX
 	return calc_MinimumSpanningTree(m_endpoint_Distances, endpoint_IDs);
     }
 
+
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs)
+    {
+	return calc_MinimumSpanningTree(m_endpoint_Distances, exception_id, endpoint_IDs);
+    }    
+
     
     sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs)
     {
 	sInt_32 tree_cost = 0;
 	
 	sInt_32 N_vertices = m_Vertices.size();	
-	Connections_mmap Connections;	
+	Connections_mmap Connections;
+
 
 	for (VertexIDs_vector::const_iterator endpoint_A = endpoint_IDs.begin(); endpoint_A != endpoint_IDs.end(); ++endpoint_A)
 	{
@@ -2050,7 +2057,6 @@ namespace boOX
 	    component_Colors[component] = component;
 	    colored_Components.push_back(Component(component, component));
 	}
-		
 
 	for (Connections_mmap::const_iterator connection = Connections.begin(); connection != Connections.end(); ++connection)
 	{
@@ -2059,7 +2065,7 @@ namespace boOX
 	    
 	    if (color_A != color_B)
 	    {
-		printf("connecting: %d -- %d\n", connection->second.m_u_id, connection->second.m_v_id);
+//		printf("connecting: %d -- %d\n", connection->second.m_u_id, connection->second.m_v_id);
 		
 		if (colored_Components[color_A].m_vertex_IDs.size() > colored_Components[color_B].m_vertex_IDs.size())
 		{
@@ -2084,6 +2090,89 @@ namespace boOX
 
 	return tree_cost;
     }
+
+
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs)
+    {
+	sInt_32 tree_cost = 0;
+	
+	sInt_32 N_vertices = m_Vertices.size();	
+	Connections_mmap Connections;
+
+	for (VertexIDs_vector::const_iterator endpoint_A = endpoint_IDs.begin(); endpoint_A != endpoint_IDs.end(); ++endpoint_A)
+	{
+	    VertexIDs_vector::const_iterator endpoint_B = endpoint_A;
+	    
+	    for (++endpoint_B; endpoint_B != endpoint_IDs.end(); ++endpoint_B)
+	    {
+		if (*endpoint_A == exception_id)
+		{		    
+		    Connections.insert(Connections_mmap::value_type(endpoint_Distances[*endpoint_B][*endpoint_A], Connection(*endpoint_A, *endpoint_B)));
+		}
+		else
+		{
+		    if (*endpoint_B == exception_id)
+		    {
+			Connections.insert(Connections_mmap::value_type(endpoint_Distances[*endpoint_A][*endpoint_B], Connection(*endpoint_A, *endpoint_B)));			
+		    }
+		    else
+		    {
+			Connections.insert(Connections_mmap::value_type(endpoint_Distances[*endpoint_A][*endpoint_B], Connection(*endpoint_A, *endpoint_B)));
+		    }
+		}
+	    }
+	}
+
+	Colors_vector component_Colors;
+	component_Colors.resize(N_vertices);
+
+	Components_vector colored_Components;
+
+	for (sInt_32 component = 0; component < N_vertices; ++component)
+	{
+	    component_Colors[component] = component;
+	    colored_Components.push_back(Component(component, component));
+	}
+
+	for (Connections_mmap::const_iterator connection = Connections.begin(); connection != Connections.end(); ++connection)
+	{
+	    sInt_32 color_A = component_Colors[connection->second.m_u_id];
+	    sInt_32 color_B = component_Colors[connection->second.m_v_id];
+	    
+	    if (color_A != color_B)
+	    {
+//		printf("connecting: %d -- %d\n", connection->second.m_u_id, connection->second.m_v_id);
+		
+		if (colored_Components[color_A].m_vertex_IDs.size() > colored_Components[color_B].m_vertex_IDs.size())
+		{
+		    for (VertexIDs_vector::const_iterator B_vertex = colored_Components[color_B].m_vertex_IDs.begin(); B_vertex != colored_Components[color_B].m_vertex_IDs.end(); ++B_vertex)
+		    {
+			component_Colors[*B_vertex] = color_A;
+			colored_Components[color_A].m_vertex_IDs.push_back(*B_vertex);
+		    }
+		}
+		else
+		{
+		    for (VertexIDs_vector::const_iterator A_vertex = colored_Components[color_A].m_vertex_IDs.begin(); A_vertex != colored_Components[color_A].m_vertex_IDs.end(); ++A_vertex)
+		    {
+			component_Colors[*A_vertex] = color_B;
+			colored_Components[color_B].m_vertex_IDs.push_back(*A_vertex);
+		    }		    
+		}
+
+		tree_cost += connection->first;
+	    }
+	}
+
+	return tree_cost;
+    }    
+
+
+    const sUndirectedGraph::Distances_2d_vector& sUndirectedGraph::get_EndpointShortestPaths(void) const
+    {
+	sASSERT(m_endpoint_distances_calculated);
+	return m_endpoint_Distances;
+    }    
     
     
 /*----------------------------------------------------------------------------*/
