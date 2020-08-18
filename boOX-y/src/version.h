@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-047_planck                              */
+/*                             boOX 2-050_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 2-047_planck                                                   */
+/* version.h / 2-050_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -27,8 +27,8 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "2-047_planck"
-#define sPRODUCT "boOX 2-047_planck"
+#define sVERSION "2-050_planck"
+#define sPRODUCT "boOX 2-050_planck"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.net>"
 #define sCOPYRIGHT "(C) Copyright 2018 - 2020 Pavel Surynek"

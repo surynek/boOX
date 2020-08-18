@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-047_planck                              */
+/*                             boOX 2-050_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-047_planck                                                   */
+/* agent.cpp / 2-050_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -3629,7 +3629,7 @@ namespace boOX
 	sInt_32 min_total_cost = estimate_TotalHamiltonianCost_rough(max_individual_cost);
 	
 	const sUndirectedGraph::Distances_2d_vector &source_Distances = graph.get_SourceShortestPaths();
-	const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	
+	//const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	
 
 	extra_cost = max_total_cost - min_total_cost;
 	sInt_32 mdd_depth = max_individual_cost + extra_cost;
@@ -3683,6 +3683,7 @@ namespace boOX
 	    {
 		sInt_32 commitment_distance = sINT_32_MAX;
 
+		/*
 		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
 		{		
 		    sInt_32 agent_sink_vertex_id = *task;
@@ -3694,6 +3695,8 @@ namespace boOX
 		    }
 		}
 		sASSERT(commitment_distance < sINT_32_MAX);
+		*/
+		commitment_distance = 0;
 		    
 		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
 		     mdd_level <= sMIN(agent_lower_cost_Bounds[mdd_agent_id] + extra_cost - commitment_distance, mdd_depth);
@@ -3737,7 +3740,6 @@ namespace boOX
 
         #ifdef sDEBUG
 	{
-	    /*
 	    printf("<----\n");	
 	    printf("MDD printout (extra:%d)\n", extra_cost);
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
@@ -3760,7 +3762,6 @@ namespace boOX
 		printf("\n");
 	    }
 	    printf("<----\n");
-	    */
 	}
 	#endif
 	
@@ -3847,17 +3848,20 @@ namespace boOX
 		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
 		{
 		    sInt_32 agent_sink_vertex_id = *task;
-		    sInt_32 agent_cost = endpoint_Distances[agent_sink_vertex_id][vertex_id];
-		    
 		    node_IDs.push_back(agent_sink_vertex_id);
+
+		    /*
+		    sInt_32 agent_cost = endpoint_Distances[agent_sink_vertex_id][vertex_id];		    
 
 		    if (agent_cost < commitment_distance)
 		    {
 			commitment_distance = agent_cost;
-		    }		    
+		    }
+		    */		    
 		}
-		sASSERT(commitment_distance < sINT_32_MAX);
+		//sASSERT(commitment_distance < sINT_32_MAX);
 		sInt_32 commitment_cost = m_environment.calc_MinimumSpanningTree(vertex_id, node_IDs);
+		commitment_distance = 0;
 
 		if (mdd_depth >= commitment_cost)
 		{
@@ -3902,7 +3906,6 @@ namespace boOX
 
         #ifdef sDEBUG
 	{
-	    /*
 	    printf("<----\n");	
 	    printf("MDD printout (extra:%d)\n", extra_cost);
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
@@ -3925,7 +3928,6 @@ namespace boOX
 		printf("\n");
 	    }
 	    printf("<----\n");
-	    */
 	}
 	#endif
 	
