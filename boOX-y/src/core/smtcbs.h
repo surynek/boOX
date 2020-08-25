@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 2-032_planck                                                    */
+/* smtcbs.h / 2-059_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -110,6 +110,7 @@ namespace boOX
 	    VariableIDs_3vector m_vertex_occupancy;
 	    VariableIDs_4vector m_edge_occupancy;
 	    VariableIDs_2vector m_layer_cardinality;
+	    VariableIDs_2vector m_layer_fulfillment;	    
 
 	    Coordinates_vector m_variable_mapping;
 	};
@@ -298,7 +299,32 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(sMission          &mission,
 								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit) const;	
+								      sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission          &mission,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;
+	/*----------------------------------------------------------------------------*/	
+
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepleted(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepleted(sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepletedSpanning(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepletedSpanning(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepletedSpanning(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingKarpianInverseDepletedSpanning(sMission          &mission,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;			
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping(Context           &context,
@@ -416,14 +442,38 @@ namespace boOX
 								      AgentPaths_vector &agent_Paths,
 								      sInt_32            cost_limit) const;
 	/*----------------------------------------------------------------------------*/
+	
 	sInt_32 find_NonconflictingHamiltonianInverseDepleted(Context           &context,
 							      AgentPaths_vector &agent_Paths,
 							      sInt_32            cost_limit) const;	
 	sInt_32 find_NonconflictingHamiltonianInverseDepleted(Context           &context,
 							      sMission          &mission,
 							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedSpanning(Context           &context,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedSpanning(Context           &context,
+								      sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingKarpianInverseDepleted(Context           &context,
+							      AgentPaths_vector &agent_Paths,
 							      sInt_32            cost_limit) const;	
-	
+	sInt_32 find_NonconflictingKarpianInverseDepleted(Context           &context,
+							      sMission          &mission,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingKarpianInverseDepletedSpanning(Context           &context,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingKarpianInverseDepletedSpanning(Context           &context,
+								      sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;				
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
@@ -601,7 +651,34 @@ namespace boOX
 										sInstance::InverseMDD_vector &inverse_MDD,
 										sInt_32                       extra_cost,
 										AgentPaths_vector            &agent_Paths,
-										sInt_32                       cost_limit) const;	
+										sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(const sMission              &mission,
+											Context                      &context,
+											sInstance::MDD_vector        &MDD,
+											sInstance::MDD_vector        &extra_MDD,
+											sInstance::InverseMDD_vector &inverse_MDD,
+											sInt_32                       extra_cost,
+											AgentPaths_vector            &agent_Paths,
+											sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingKarpian_GlucoseCollisionsInverseDepleted(const sMission              &mission,
+										Context                      &context,
+										sInstance::MDD_vector        &MDD,
+										sInstance::MDD_vector        &extra_MDD,
+										sInstance::InverseMDD_vector &inverse_MDD,
+										sInt_32                       extra_cost,
+										AgentPaths_vector            &agent_Paths,
+										sInt_32                       cost_limit) const;
+
+	sInt_32 find_NonconflictingKarpian_GlucoseCollisionsInverseDepletedSpanning(const sMission              &mission,
+											Context                      &context,
+											sInstance::MDD_vector        &MDD,
+											sInstance::MDD_vector        &extra_MDD,
+											sInstance::InverseMDD_vector &inverse_MDD,
+											sInt_32                       extra_cost,
+											AgentPaths_vector            &agent_Paths,
+											sInt_32                       cost_limit) const;			
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingPaths(Glucose::Solver       *solver,
@@ -1115,7 +1192,7 @@ namespace boOX
 							       sMission::InverseMDD_vector &inverse_MDD,
 							       sInt_32                      extra_cost,
 							       sInt_32                      cost_limit,
-							       AgentPaths_vector           &agent_Paths) const;
+							       AgentPaths_vector           &agent_Paths) const;	
 
 	sInt_32 check_NonconflictingHamiltonian(const sMission          &mission,
 						const AgentPaths_vector &agent_Paths,
@@ -1124,8 +1201,47 @@ namespace boOX
 	sInt_32 check_NonconflictingHamiltonian(const sMission          &mission,
 						const AgentPaths_vector &agent_Paths,
 						Collisions_vector       &Collisions,
-						EdgeCollisions_vector   &edge_Collisions) const;	
+						EdgeCollisions_vector   &edge_Collisions) const;
+
+	sInt_32 calc_HamiltonianCost(const sMission &mission, const AgentPaths_vector &agent_Paths) const;	
+	/*----------------------------------------------------------------------------*/	
+
+	bool find_InitialNonconflictingKarpianInverseDepleted(Glucose::Solver      *solver,
+							      Context              &context,
+							      Model                &sat_Model,
+							      const sMission       &mission,
+							      sMission::MDD_vector &MDD,
+							      sMission::MDD_vector &extra_MDD,
+							      sMission::InverseMDD_vector &inverse_MDD,
+							      sInt_32               extra_cost,
+							      sInt_32               cost_limit,
+							      AgentPaths_vector    &agent_Paths) const;	
+	
+	bool find_NextNonconflictingKarpianInverseDepleted(Glucose::Solver             *solver,
+							   Context                     &context,
+							   Model                       &sat_Model,
+							   const Collisions_vector     &Collisions,
+							   const EdgeCollisions_vector &edge_Collisions,
+							   const sMission              &mission,
+							   sMission::MDD_vector        &MDD,
+							   sMission::MDD_vector        &extra_MDD,
+							   sMission::InverseMDD_vector &inverse_MDD,
+							   sInt_32                      extra_cost,
+							   sInt_32                      cost_limit,
+							   AgentPaths_vector           &agent_Paths) const;	
+
+	sInt_32 check_NonconflictingKarpian(const sMission          &mission,
+					    const AgentPaths_vector &agent_Paths,
+					    Collision               &principal_collision) const;
+	
+	sInt_32 check_NonconflictingKarpian(const sMission          &mission,
+					    const AgentPaths_vector &agent_Paths,
+					    Collisions_vector       &Collisions,
+					    EdgeCollisions_vector   &edge_Collisions) const;
+	
+	sInt_32 calc_KarpianCost(const sMission &mission, const AgentPaths_vector &agent_Paths) const;	
 	/*----------------------------------------------------------------------------*/
+	
 
 	sInt_32 build_SwappingModelVariables(Glucose::Solver             *solver,
 					     Context                     &context,					 
@@ -1647,7 +1763,45 @@ namespace boOX
 					  const sMission::MDD_vector &MDD,
 					  const Model                &sat_Model,
 					  AgentPaths_vector          &agent_Paths) const;
-	/*----------------------------------------------------------------------------*/	
+	/*----------------------------------------------------------------------------*/
+
+	sInt_32 build_KarpianSmallModelVariablesInverse(Glucose::Solver            *solver,
+							Context                    &context,
+							const sMission             &mission,
+							const sMission::MDD_vector &MDD,
+							const sMission::MDD_vector &extra_MDD,
+							const sMission::InverseMDD_vector &inverse_MDD,
+							sInt_32                     cost_limit,
+							sInt_32                     extra_cost,
+							Model                      &sat_Model) const;
+
+	void build_KarpianSmallModelConstraintsInverse(Glucose::Solver                  *solver,
+						       Context                           &context,
+						       const sMission                    &mission,
+						       const sMission::MDD_vector        &MDD,
+						       const sMission::MDD_vector        &extra_MDD,
+						       const sMission::InverseMDD_vector &inverse_MDD,
+						       sInt_32                            cost_limit,
+						       sInt_32                            extra_cost,
+						       Model                             &sat_Model) const;	
+	
+	void refine_KarpianSmallModelCollisionsInverse(Glucose::Solver                  *solver,
+						       const Collisions_vector           &Collisions,
+						       const EdgeCollisions_vector       &edge_Collisions,
+						       const sMission                    &mission,
+						       const sMission::MDD_vector        &MDD,
+						       const sMission::MDD_vector        &extra_MDD,
+						       const sMission::InverseMDD_vector &inverse_MDD,
+						       sInt_32                            cost_limit,
+						       sInt_32                            extra_cost,
+						       Model                             &sat_Model) const;			
+
+	void decode_KarpianSmallModel(Glucose::Solver            *solver,
+				      const sMission             &mission,
+				      const sMission::MDD_vector &MDD,
+				      const Model                &sat_Model,
+				      AgentPaths_vector          &agent_Paths) const;
+	/*----------------------------------------------------------------------------*/		
 	
 
 	sInt_32 build_RotationSmallCapacitatedModelVariablesInverse(Glucose::Solver             *solver,

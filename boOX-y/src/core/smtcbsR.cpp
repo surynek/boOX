@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR.cpp / 2-032_planck                                                 */
+/* smtcbsR.cpp / 2-059_planck                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF implemented
@@ -1166,7 +1166,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 	    
@@ -1581,7 +1581,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 	    {
@@ -2071,7 +2071,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 	    {
@@ -2562,7 +2562,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 	    {
@@ -3047,7 +3047,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 	    {
@@ -3585,7 +3585,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4249,7 +4249,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -5092,7 +5092,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
     
@@ -6007,7 +6007,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
     

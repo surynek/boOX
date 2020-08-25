@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 2-032_planck                                                     */
+/* cbs.cpp / 2-059_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -1807,6 +1807,202 @@ namespace boOX
     }        
 
 
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaSuperStar(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaSuperStar(const sMission &mission, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonian_DeltaSuperStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }    
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaSuperStar(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaSuperStar(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();	
+	
+        #ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost(max_individual_cost) + N_agents;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving Hamiltonian (MAHPF) cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+	    }
+	    #endif	    
+	    if ((solution_cost = find_NonconflictingHamiltonian_DeltaSuperStar(mission, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }        
+    
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaHyperStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaHyperStar(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaHyperStar(const sMission &mission, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonian_DeltaHyperStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }    
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaHyperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaHyperStar(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaHyperStar(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();	
+	
+        #ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost(max_individual_cost) + N_agents;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving Hamiltonian (MAHPF) cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+	    }
+	    #endif	    
+	    if ((solution_cost = find_NonconflictingHamiltonian_DeltaHyperStar(mission, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }        
+
+    
 /*----------------------------------------------------------------------------*/
         
     sInt_32 sCBS::find_NonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
@@ -2249,7 +2445,73 @@ namespace boOX
 	
 //	return find_NonconflictingRotation_prioritizedCooccupation(instance, agent_Conflicts, agent_Paths, cost_limit);
 	return find_NonconflictingRotation_principalCollision_DeltaSuperStar(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
-    }        
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingHamiltonian_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingHamiltonian_DeltaSuperStar(*m_Mission, agent_Paths, cost_limit, extra_cost);
+    }
+
+    
+    sInt_32 sCBS::find_NonconflictingHamiltonian_DeltaSuperStar(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	mission.collect_Endpoints(source_IDs, goal_IDs);
+	mission.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);	
+	
+//	return find_NonconflictingHamiltonian_prioritizedCooccupation(mission, agent_Conflicts, agent_Paths, cost_limit);
+	return find_NonconflictingHamiltonian_principalCollision_DeltaSuperStar(mission, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingHamiltonian_DeltaHyperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingHamiltonian_DeltaHyperStar(*m_Mission, agent_Paths, cost_limit, extra_cost);
+    }
+
+    
+    sInt_32 sCBS::find_NonconflictingHamiltonian_DeltaHyperStar(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	mission.collect_Endpoints(source_IDs, goal_IDs);
+	mission.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);	
+	
+//	return find_NonconflictingHamiltonian_prioritizedCooccupation(mission, agent_Conflicts, agent_Paths, cost_limit);
+	return find_NonconflictingHamiltonian_principalCollision_DeltaHyperStar(mission, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }                
 
     
 /*----------------------------------------------------------------------------*/
@@ -2544,7 +2806,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2702,7 +2964,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2884,7 +3146,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2895,7 +3157,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -2983,7 +3245,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2994,7 +3256,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -3097,7 +3359,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3108,7 +3370,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -3224,7 +3486,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3248,7 +3510,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -3379,7 +3641,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3403,7 +3665,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -3570,7 +3832,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3594,7 +3856,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -3763,7 +4025,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3787,7 +4049,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -3870,7 +4132,7 @@ namespace boOX
 	    }
 	}	
 	return -1;
-    }                
+    }
 
     
 /*----------------------------------------------------------------------------*/
@@ -3892,7 +4154,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4048,7 +4310,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4227,7 +4489,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4238,7 +4500,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -4326,7 +4588,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4337,7 +4599,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -4440,7 +4702,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4451,7 +4713,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -4578,7 +4840,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4589,7 +4851,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -4738,7 +5000,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4762,7 +5024,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -4929,7 +5191,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif	    
 
@@ -4955,7 +5217,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -5145,7 +5407,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif	    
 
@@ -5171,7 +5433,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -5295,7 +5557,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -5455,7 +5717,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -5639,7 +5901,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -5650,7 +5912,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -5738,7 +6000,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -5749,7 +6011,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -5852,7 +6114,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -5863,7 +6125,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -5990,7 +6252,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -6001,7 +6263,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -6142,7 +6404,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -6166,7 +6428,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld,%lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -6333,7 +6595,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -6357,7 +6619,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -6526,7 +6788,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -6550,7 +6812,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -6655,7 +6917,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -6813,7 +7075,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -6995,7 +7257,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7006,7 +7268,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7094,7 +7356,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7105,7 +7367,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7208,7 +7470,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7219,7 +7481,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7346,7 +7608,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7370,7 +7632,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7512,7 +7774,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7536,7 +7798,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7703,7 +7965,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7727,7 +7989,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7896,7 +8158,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -7920,7 +8182,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		    verbose_period *= 1.5;
 		}
 	    }
@@ -7997,6 +8259,405 @@ namespace boOX
 								   cost_limit,
 								   search_Store,
 								   search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }    
+    
+
+    sInt_32 sCBS::find_NonconflictingHamiltonian_principalCollision_DeltaSuperStar(const sMission            &mission,
+										   AgentConflicts_vector     &agent_Conflicts,
+										   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										   AgentPaths_vector         &agent_Paths,
+										   sInt_32                    cost_limit,
+										   sInt_32                    extra_cost)
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	}
+        #endif
+	
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findSuperStar_NonconflictingHamiltonian(mission.m_environment,
+							mission.m_start_configuration.get_AgentLocation(agent_id),
+							mission.m_goal_commitment.m_agent_Tasks[agent_id],
+							cost_limit,
+							extra_cost,
+							initial_node.m_agent_Conflicts[agent_id],
+							initial_node.m_agent_edge_Conflicts[agent_id],
+							m_first_agent_Paths[agent_id]) < 0)
+	    {
+		return -1;
+	    }	    
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    {
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+
+		if (findSuperStar_NonconflictingHamiltonian(mission.m_environment,
+							    mission.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							    mission.m_goal_commitment.m_agent_Tasks[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    cost_limit,
+							    extra_cost,
+//						    search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//				  		    search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							    m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingHamiltonianDelta(mission,
+								      best_node.m_node_id,
+								      space_Cooccupations,
+								      cost_limit,
+								      search_Store,
+								      search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }    
+
+
+    sInt_32 sCBS::find_NonconflictingHamiltonian_principalCollision_DeltaHyperStar(const sMission            &mission,
+										   AgentConflicts_vector     &agent_Conflicts,
+										   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										   AgentPaths_vector         &agent_Paths,
+										   sInt_32                    cost_limit,
+										   sInt_32                    extra_cost)
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	}
+        #endif	
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findHyperStar_NonconflictingHamiltonian(mission.m_environment,
+							mission.m_start_configuration.get_AgentLocation(agent_id),
+							mission.m_goal_commitment.m_agent_Tasks[agent_id],
+							cost_limit,
+							extra_cost,
+							initial_node.m_agent_Conflicts[agent_id],
+							initial_node.m_agent_edge_Conflicts[agent_id],
+							m_first_agent_Paths[agent_id]) < 0)
+	    {
+		return -1;
+	    }	    
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    {
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+
+		if (findHyperStar_NonconflictingHamiltonian(mission.m_environment,
+							    mission.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							    mission.m_goal_commitment.m_agent_Tasks[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    cost_limit,
+							    extra_cost,
+//						    search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//				  		    search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							    m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingHamiltonianDelta(mission,
+								      best_node.m_node_id,
+								      space_Cooccupations,
+								      cost_limit,
+								      search_Store,
+								      search_Queue)) >= 0)
 	    {
 		agent_Paths = m_delta_agent_Paths;
 		return cummulative;
@@ -9098,7 +9759,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -10194,7 +10855,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -11290,7 +11951,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -12611,7 +13272,7 @@ namespace boOX
 
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -12755,7 +13416,577 @@ namespace boOX
 	}
 	return cummulative;
     }            
-   
+
+
+/*----------------------------------------------------------------------------*/
+    
+    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission          &mission,
+						    const AgentPaths_vector &agent_Paths,
+						    sInt_32                 &tanglement) const
+    {
+	AgentConflicts_vector dummy_Conflicts;
+	AgentEdgeConflicts_vector dummy_edge_Conflicts;
+	
+	return analyze_NonconflictingHamiltonian(mission,
+						 dummy_Conflicts,
+						 dummy_edge_Conflicts,
+						 agent_Paths,
+						 tanglement);
+    }
+    
+
+    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission          &mission,
+						    const AgentPaths_vector &agent_Paths,
+						    Cooccupations_vector    &space_Cooccupations,
+						    sInt_32                 &tanglement) const
+    {
+	AgentConflicts_vector dummy_Conflicts;
+	AgentEdgeConflicts_vector dummy_edge_Conflicts;
+
+	return analyze_NonconflictingHamiltonian(mission,
+						 dummy_Conflicts,
+						 dummy_edge_Conflicts,
+						 agent_Paths,
+						 space_Cooccupations,
+						 tanglement);
+
+    }
+
+    
+    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission            &mission,
+						    AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+						    AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+						    const AgentPaths_vector   &agent_Paths,
+						    sInt_32                   &tanglement) const
+    {
+	sInt_32 agent_path_length;
+	Occupations_vector space_Occupations;
+
+	sInt_32 cummulative = 0;
+	tanglement = 0;
+
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+
+	    if (!space_Occupations.empty())
+	    {
+		while (space_Occupations.size() < agent_path_length)
+		{
+		    space_Occupations.push_back(space_Occupations.back());
+		}
+	    }
+	    else
+	    {
+		space_Occupations.resize(agent_path_length);		
+	    }
+	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
+	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	}
+	
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+		
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Occupation_umap::const_iterator occupation_collision = space_Occupations[i].find(agent_Paths[agent_id][i]);
+		    
+		    if (occupation_collision != space_Occupations[i].end())
+		    {
+			++tanglement;
+		    }
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Occupation_umap::const_iterator swap_expectation_pred = space_Occupations[i - 1].find(agent_Paths[agent_id][i]);		    
+			
+			if (swap_expectation_pred != space_Occupations[i - 1].end()) // move into occupied
+			{
+			    if (i < agent_Paths[swap_expectation_pred->second].size())
+			    {
+				if (agent_Paths[swap_expectation_pred->second][i] == agent_Paths[agent_id][i - 1])
+				{
+				    ++tanglement;				
+				}
+			    }
+			}
+		    }
+		    space_Occupations[i][agent_Paths[agent_id][i]] = agent_id;
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Occupations.size(); ++i)
+	    {
+		Occupation_umap::const_iterator occupation_collision = space_Occupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		if (occupation_collision != space_Occupations[i].end())
+		{
+		    ++tanglement;
+		}
+		space_Occupations[i][agent_Paths[agent_id][agent_path_length - 1]] = agent_id;
+	    }
+	}
+	return cummulative;
+    }
+
+
+    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission            &mission,
+						    AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+						    AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+						    const AgentPaths_vector   &agent_Paths,
+						    Cooccupations_vector      &space_Cooccupations,
+						    sInt_32                   &tanglement) const
+    {
+	sInt_32 agent_path_length;
+	tanglement = 0;
+
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	sInt_32 cummulative = fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
+	
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][i]);
+
+		    if (occupation_collision != space_Cooccupations[i].end())
+		    {
+			for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+			{
+			    if (*collide_agent > agent_id)
+			    {
+				++tanglement;
+			    }
+			}
+		    }
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Cooccupation_umap::const_iterator swap_expectation_pred = space_Cooccupations[i - 1].find(agent_Paths[agent_id][i]);		    
+			
+			if (swap_expectation_pred != space_Cooccupations[i - 1].end()) // move into occupied
+			{
+			    for (AgentIDs_uset::const_iterator exp_agent = swap_expectation_pred->second.begin(); exp_agent != swap_expectation_pred->second.end(); ++exp_agent)
+			    {
+				if (*exp_agent != agent_id)
+				{				
+				    if (i < agent_Paths[*exp_agent].size())
+				    {
+					if (agent_Paths[*exp_agent][i] == agent_Paths[agent_id][i - 1])
+					{				    
+					    ++tanglement;
+					}
+				    }
+				} 
+			    }
+			}
+		    }
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Cooccupations.size(); ++i)
+	    {
+		Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		if (occupation_collision != space_Cooccupations[i].end())
+		{
+		    for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+		    {
+			if (*collide_agent > agent_id)
+			{
+			    ++tanglement;
+			}
+		    }
+		}
+	    }
+	}
+	return cummulative;
+    }
+
+
+    /*
+    sInt_32 sCBS::update_NonconflictingHamiltonian(sInt_32                    upd_agent_id,
+						   const sMission            &mission,
+						   Occupations_vector        &sUNUSED(space_Occupations_),
+						   AgentConflicts_vector     &agent_Conflicts,
+						   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+						   AgentPaths_vector         &agent_Paths,
+						   sInt_32                    cost_limit) const
+    {
+	sASSERT(false);
+
+	sInt_32 cost, cummulative, agent_path_length;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	
+	VertexIDs_vector stored_path = agent_Paths[upd_agent_id];
+  	agent_Paths[upd_agent_id].clear();
+
+	Occupations_vector space_Occupations;
+	cummulative = 0;
+
+	#ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	}
+	#endif
+
+	{
+	    if ((agent_path_length = findSuperStar_NonconflictingHamiltonian(mission.m_environment,
+									     mission.m_start_configuration.get_AgentLocation(upd_agent_id),
+									     mission.m_goal_commitment.m_agent_Tasks[upd_agent_id],
+									     agent_Conflicts[upd_agent_id],
+									     agent_edge_Conflicts[upd_agent_id],
+									     agent_Paths[upd_agent_id])) < 0)
+	    {
+		agent_Paths[upd_agent_id] = stored_path;
+		return -1;
+	    }
+	}
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    
+	    if (!space_Occupations.empty())
+	    {
+		while (space_Occupations.size() < agent_path_length)
+		{
+		    space_Occupations.push_back(space_Occupations.back());
+		}
+	    }
+	    else
+	    {
+		space_Occupations.resize(agent_path_length);
+	    }
+	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
+	}
+	if (cummulative > cost_limit)
+	{
+	    agent_Paths[upd_agent_id] = stored_path;
+	    return -1;
+	}
+	
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+	    
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Occupation_umap::const_iterator occupation_collision = space_Occupations[i].find(agent_Paths[agent_id][i]);
+	
+		    if (occupation_collision != space_Occupations[i].end())
+		    {
+			sCBS_ADD_AGENT_CONFLICT(agent_id, i, agent_Paths[agent_id][i]);
+			if ((cost = update_NonconflictingHamiltonian(agent_id, mission, space_Occupations, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit)) >= 0)
+			{
+			    return cost;
+			}
+			sCBS_DEL_AGENT_CONFLICT(agent_id, i, agent_Paths[agent_id][i]);
+		    
+			sCBS_ADD_AGENT_CONFLICT(occupation_collision->second, i, agent_Paths[agent_id][i]);
+			if ((cost = update_NonconflictingHamiltonian(occupation_collision->second, mission, space_Occupations, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit)) >= 0)
+			{
+			    return cost;
+			}
+			sCBS_DEL_AGENT_CONFLICT(occupation_collision->second, i, agent_Paths[agent_id][i]);
+			agent_Paths[upd_agent_id] = stored_path;
+			return -1;
+		    }
+
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Occupation_umap::const_iterator swap_expectation_pred = space_Occupations[i - 1].find(agent_Paths[agent_id][i]);		    
+			
+			if (swap_expectation_pred != space_Occupations[i - 1].end()) // move into occupied
+			{
+			    if (i < agent_Paths[swap_expectation_pred->second].size())
+			    {
+				if (agent_Paths[swap_expectation_pred->second][i] == agent_Paths[agent_id][i - 1])
+				{			    			    
+				    sCBS_ADD_AGENT_EDGE_CONFLICT(agent_id, i-1, agent_Paths[agent_id][i-1], agent_Paths[agent_id][i]);
+				    if ((cost = update_NonconflictingHamiltonian(agent_id, mission, space_Occupations, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit)) >= 0)
+				    {
+					return cost;
+				    }
+				    sCBS_DEL_AGENT_EDGE_CONFLICT(agent_id, i-1, agent_Paths[agent_id][i-1], agent_Paths[agent_id][i]);
+				    
+				    sCBS_ADD_AGENT_EDGE_CONFLICT(swap_expectation_pred->second, i-1, agent_Paths[swap_expectation_pred->second][i-1], agent_Paths[swap_expectation_pred->second][i]);
+				    if ((cost = update_NonconflictingHamiltonian(swap_expectation_pred->second, mission, space_Occupations, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit)) >= 0)
+				    {
+					return cost;
+				    }
+				    sCBS_DEL_AGENT_EDGE_CONFLICT(swap_expectation_pred->second, i-1, agent_Paths[swap_expectation_pred->second][i-1], agent_Paths[swap_expectation_pred->second][i]);
+				    agent_Paths[upd_agent_id] = stored_path;
+				    return -1;
+				}
+			    }
+			}
+		    }
+		    space_Occupations[i][agent_Paths[agent_id][i]] = agent_id;
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+		    
+	    for (sInt_32 i = agent_path_length; i < space_Occupations.size(); ++i)
+	    {
+		Occupation_umap::const_iterator occupation_collision = space_Occupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		
+		if (occupation_collision != space_Occupations[i].end())
+		{
+		    sCBS_ADD_AGENT_CONFLICT(agent_id, i, agent_Paths[agent_id][agent_path_length - 1]);
+		    if ((cost = update_NonconflictingHamiltonian(agent_id, mission, space_Occupations, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit)) >= 0)
+		    {
+			return cost;
+		    }
+		    sCBS_DEL_AGENT_CONFLICT(agent_id, i, agent_Paths[agent_id][agent_path_length - 1]);
+		    
+		    sCBS_ADD_AGENT_CONFLICT(occupation_collision->second, i, agent_Paths[agent_id][agent_path_length - 1]);
+		    if ((cost = update_NonconflictingHamiltonian(occupation_collision->second, mission, space_Occupations, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit)) >= 0)
+		    {
+			return cost;
+		    }
+		    sCBS_DEL_AGENT_CONFLICT(occupation_collision->second, i, agent_Paths[agent_id][agent_path_length - 1]);
+		    agent_Paths[upd_agent_id] = stored_path;
+		    return -1;
+		}
+		space_Occupations[i][agent_Paths[agent_id][agent_path_length - 1]] = agent_id;
+	    }	    
+	}
+	return cummulative;
+    }
+    */
+
+    sInt_32 sCBS::examine_NonconflictingHamiltonianDelta(const sMission       &mission,
+							 sInt_32               upper_node_id,
+							 Cooccupations_vector &space_Cooccupations,
+							 sInt_32               cost_limit,
+							 Nodes_vector         &search_Store,
+							 NodeReferences_mset  &search_Queue) const
+    {
+	Collision principal_collision(sINT_32_MAX, 1, 1, 0, 0);
+	EdgeCollision principal_edge_collision(sINT_32_MAX, 1, 1, 0, 0, 0, 0, 0);
+	
+	const AgentPaths_vector &agent_Paths = m_delta_agent_Paths;
+	    
+	sInt_32 agent_path_length;
+	sInt_32 cummulative, tanglement;
+
+	#ifdef sPROFILE
+	{
+	    analyzing_begin = clock();
+	}
+	#endif
+			
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	cummulative = 0;
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (cummulative > cost_limit)
+	    {
+		return -1;
+	    }
+	}		
+	if ((cummulative = analyze_NonconflictingHamiltonian(mission, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	{
+	    sASSERT(false);
+	}
+	#ifdef sPROFILE
+	{	
+	    analyzing_end = clock();
+	    analyzing_cummul += (analyzing_end - analyzing_begin);
+	    
+	    collecting_begin = clock();
+	}
+	#endif		    
+
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+		
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][i]);
+		    
+		    if (occupation_collision != space_Cooccupations[i].end())
+		    {
+			for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+			{
+			    if (*collide_agent > agent_id)
+			    {
+				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
+			
+				if (next_collision < principal_collision)
+				{
+				    principal_collision = next_collision;
+				}
+			    }
+			}
+		    }
+
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Cooccupation_umap::const_iterator swap_expectation_pred = space_Cooccupations[i - 1].find(agent_Paths[agent_id][i]);
+			
+			if (swap_expectation_pred != space_Cooccupations[i - 1].end()) // move into occupied
+			{
+			    for (AgentIDs_uset::const_iterator exp_agent = swap_expectation_pred->second.begin(); exp_agent != swap_expectation_pred->second.end(); ++exp_agent)
+			    {
+				if (i < agent_Paths[*exp_agent].size())
+				{
+				    if (agent_Paths[*exp_agent][i] == agent_Paths[agent_id][i-1])
+				    {
+					if (*exp_agent != agent_id)
+					{
+					    EdgeCollision next_edge_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent,
+									      i-1,
+									      agent_Paths[agent_id][i-1], agent_Paths[agent_id][i],
+									      agent_Paths[*exp_agent][i-1], agent_Paths[*exp_agent][i]);
+					    
+					    if (next_edge_collision < principal_edge_collision)
+					    {
+						principal_edge_collision = next_edge_collision;
+					    }
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Cooccupations.size(); ++i)
+	    {
+		Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		if (occupation_collision != space_Cooccupations[i].end())
+		{
+		    for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+		    {
+			if (*collide_agent > agent_id)
+			{
+			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
+			
+			    if (next_collision < principal_collision)
+			    {
+				principal_collision = next_collision;
+			    }			    
+			}
+		    }		    
+		}
+	    }
+	}
+	#ifdef sPROFILE
+	{		
+	    collecting_end = clock();
+	    collecting_cummul += (collecting_end - collecting_begin);
+	}
+	#endif
+
+	sInt_32 cummulative_result = cummulative;
+
+	if (principal_collision.m_cooccupation < sINT_32_MAX)
+	{
+	    if (principal_edge_collision.m_cooccupation < sINT_32_MAX)
+	    {
+		if (principal_edge_collision < principal_collision)
+		{
+		    sCBS_INTRODUCE_ROTATION_EDGE_DELTA_CONFLICTS(upper_node_id);
+		    cummulative_result = -1;
+		}
+		else
+		{
+		    sCBS_INTRODUCE_ROTATION_VERTEX_DELTA_CONFLICTS(upper_node_id);
+		    cummulative_result = -1;		    
+		}
+	    }
+	    else
+	    {
+		sCBS_INTRODUCE_ROTATION_VERTEX_DELTA_CONFLICTS(upper_node_id);
+		cummulative_result = -1;
+	    }
+	}
+	else
+	{
+	    if (principal_edge_collision.m_cooccupation < sINT_32_MAX)
+	    {
+		sCBS_INTRODUCE_ROTATION_EDGE_DELTA_CONFLICTS(upper_node_id);	    
+		cummulative_result = -1;
+	    }
+	}
+
+        #ifdef sPROFILE
+	{		
+	    printf("** Times: ana:%.3f col:%.3f (bal:%.3f)\n", analyzing_cummul / (double)CLOCKS_PER_SEC, collecting_cummul / (double)CLOCKS_PER_SEC, analyzing_cummul / (double)(analyzing_cummul + collecting_cummul));
+	}
+	#endif
+	
+	return cummulative_result;
+    }    
+    
     
 /*----------------------------------------------------------------------------*/
 
@@ -12829,6 +14060,12 @@ namespace boOX
 	
 	while (!visit_Queue.empty())
 	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
 	    const Visit &front_visit = visit_Queue.front();
             /*
 	    #ifdef sDEBUG
@@ -13086,6 +14323,12 @@ namespace boOX
 	
 	while (!visit_Queue.empty())
 	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
 	    const Visit &front_visit = visit_Queue.front();
             /*
 	    #ifdef sDEBUG
@@ -13393,6 +14636,12 @@ namespace boOX
 	
 	while (!visit_Queue.empty())
 	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
 	    const Visit &front_visit = visit_Queue.front();
             /*
 	    #ifdef sDEBUG
@@ -13705,6 +14954,12 @@ namespace boOX
 	
 	while (!visit_Queue.empty())
 	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
 	    const Visit &front_visit = visit_Queue.begin()->second;    
 	    Visits_mmap::iterator visit_erase = visit_Queue.begin();
 	        
@@ -13720,7 +14975,8 @@ namespace boOX
 	    {
 		visited_Vertices.push_back(Visits_umap());
 	    }
-    
+
+//	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= m_goal_Distances[sink_id][source_id] + extra_cost)	    
 	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= relaxation * (m_goal_Distances[sink_id][source_id] + extra_cost))
 	    {
 		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
@@ -13751,6 +15007,7 @@ namespace boOX
 				|| (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
 				|| edge_vertex->second.find(neighbor_id) == edge_vertex->second.end())
 			    {
+				
 			    /*
                             #ifdef sDEBUG
 			    {
@@ -13826,7 +15083,7 @@ namespace boOX
 					return front_visit.m_level + 2;
 				    }	 		
 				}			    
-				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] + neighbor_visit.m_level, neighbor_visit));
+				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] + neighbor_visit.m_level, neighbor_visit));				
 			    }
 			}
 		    }
@@ -13909,8 +15166,7 @@ namespace boOX
 					}
 					return front_visit.m_level + 1;
 				    }
-				}
-				
+				}												
 				Visit identity_visit(front_visit.m_level + 1, front_visit.m_vertex_id, front_visit.m_vertex_id);
 				next_visited_Vertices[front_visit.m_vertex_id] = identity_visit;
 				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][identity_visit.m_vertex_id] + identity_visit.m_level, identity_visit));
@@ -13923,7 +15179,647 @@ namespace boOX
 	    visit_Queue.erase(visit_erase);	    
 	}
 	return -1;
-    }        
+    }
+
+
+    sInt_32 sCBS::findSuperStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
+							  sInt_32                     source_id,
+							  const VertexIDs_vector     &sink_IDs,
+							  sInt_32                    cost_limit,
+							  sInt_32                    extra_cost,
+							  const Conflicts_vector     &Conflicts,
+							  const EdgeConflicts_vector &edge_Conflicts,
+							  VertexIDs_vector           &Path) const
+    {
+	//sDouble relaxation = 1.0;
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("seq:%d -> %d\n", source_id, sink_id);
+	    */
+	}
+	#endif
+		
+	HamiltonianVisits_mmap visit_Queue;
+	HamiltonianVisits_vector explored_Circuits;
+       
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (VertexIDs_uset::const_iterator conf = Conflicts[level].begin(); conf != Conflicts[level].end(); ++conf)
+		{
+		    printf("%d ", *conf);
+		}
+		printf("\n");
+	    }
+
+	    printf("edge conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < edge_Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (NeighborIDs_umap::const_iterator neigh = edge_Conflicts[level].begin(); neigh != edge_Conflicts[level].end(); ++neigh)
+		{
+		    printf("%d [", neigh->first);
+		    for (VertexIDs_uset::const_iterator vertex = neigh->second.begin(); vertex != neigh->second.end(); ++vertex)
+		    {
+			printf("%d ", *vertex);
+		    }
+		    printf("] ");
+		}
+		printf("\n");
+	    }	    
+	    */
+	}
+	#endif
+
+	if (sink_IDs.empty())
+	{
+	    return 0;
+	}
+	if (Conflicts.empty() || Conflicts[0].find(source_id) == Conflicts[0].end())
+	{	
+	    explored_Circuits.push_back(LevelHamiltonianVisits_vector());    
+	    HamiltonianVisit source_visit(0, explored_Circuits[0].size(), source_id, -1);
+	    explored_Circuits[0].push_back(source_visit);
+	    
+	    visit_Queue.insert(HamiltonianVisits_mmap::value_type(0 /*+ relaxation * m_goal_Distances[sink_id][source_id]*/, source_visit));
+	}
+	else
+	{
+	    return -1;
+	}
+	
+	while (!visit_Queue.empty())
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
+	    const HamiltonianVisit &front_visit = visit_Queue.begin()->second;    
+	    HamiltonianVisits_mmap::iterator visit_erase = visit_Queue.begin();
+	        
+            /*
+	    #ifdef sDEBUG
+	    {
+		printf("  v:%d,%d,%d\n", front_visit.m_level, front_visit.m_vertex_id, front_visit.m_previous_id);
+		printf("%ld, %d\n", explored_Circuits.size(), front_visit.m_level + 1);
+	    }
+	    #endif
+	    */
+		
+	    if (explored_Circuits.size() <= front_visit.m_level + 1)
+	    {
+		explored_Circuits.push_back(LevelHamiltonianVisits_vector());
+		sASSERT(explored_Circuits.size() > front_visit.m_level + 1);
+	    }
+
+	    if (front_visit.m_level <= cost_limit + extra_cost)	    	    
+	    {
+		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
+		{
+		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+		    LevelHamiltonianVisits_vector &next_explored_Visits = explored_Circuits[front_visit.m_level + 1];
+		    
+		    if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(neighbor_id) == Conflicts[front_visit.m_level + 1].end())
+		    {
+			NeighborIDs_umap::const_iterator edge_vertex;
+			
+			if (   edge_Conflicts.size() <= front_visit.m_level
+			    || (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
+			    || edge_vertex->second.find(neighbor_id) == edge_vertex->second.end())
+			{
+			    HamiltonianVisit neighbor_visit(front_visit.m_level + 1, next_explored_Visits.size(), neighbor_id, front_visit.m_visit_id);
+			    next_explored_Visits.push_back(neighbor_visit);
+			    
+			    bool non_conflicting_terminal = true;
+			    
+			    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
+			    {
+				if (Conflicts[level].find(neighbor_id) != Conflicts[level].end())
+				{
+				    non_conflicting_terminal = false;
+				    break;
+				}
+			    }
+			    
+			    if (non_conflicting_terminal)
+			    {												
+				VertexIDs_vector candidate_Path;
+				candidate_Path.resize(front_visit.m_level + 2, -1);
+
+				/*
+                                #ifdef sDEBUG
+				{
+				    printf("Circuits standard:\n");
+				    for (sInt_32 i = 0; i <= front_visit.m_level + 1; ++i)
+				    {
+					for (LevelHamiltonianVisits_vector::const_iterator visit_vertex = explored_Circuits[i].begin(); visit_vertex != explored_Circuits[i].end(); ++visit_vertex)
+					{
+					    printf("(%d,%d,%d,%d) ", visit_vertex->m_level, visit_vertex->m_visit_id, visit_vertex->m_vertex_id, visit_vertex->m_prev_visit_id);
+					}
+					printf("\n");
+				    }
+				}
+				#endif
+				*/
+
+				sInt_32 prev_visit_id = neighbor_visit.m_visit_id;				
+				    
+				for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+				{
+				    candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
+
+				    /*
+                                    #ifdef sDEBUG
+				    {
+					printf("%d ", candidate_Path[i]);
+				    }
+				    #endif
+				    */
+				    prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;	   					
+				}
+				/*
+                                #ifdef sDEBUG
+				{
+				    printf("\n");
+				}
+				#endif
+				*/
+
+				bool finished_hamiltonian = true;
+				
+				for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+				{
+				    bool sink_fulfilled = false;
+				    for (VertexIDs_vector::const_iterator v = candidate_Path.begin(); v != candidate_Path.end(); ++v)
+				    {
+					if (*v == *sink)
+					{
+					    sink_fulfilled = true;
+					    break;
+					}
+				    }
+				    if (!sink_fulfilled)
+				    {
+					finished_hamiltonian = false;
+					break;
+				    }
+				}
+				if (finished_hamiltonian)
+				{
+				    Path = candidate_Path;
+				    return front_visit.m_level + 2;
+				}
+				/*
+				else
+				{
+				    printf("This path - Oh! No, no!\n");
+				}
+				*/
+			    }			    
+			    visit_Queue.insert(HamiltonianVisits_mmap::value_type(/*relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] +*/ neighbor_visit.m_level, neighbor_visit));
+			}
+		    }
+		}
+	        { /* wait action */
+		    LevelHamiltonianVisits_vector &next_explored_Visits = explored_Circuits[front_visit.m_level + 1];
+		    
+		    if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(front_visit.m_vertex_id) == Conflicts[front_visit.m_level + 1].end())
+		    {
+			NeighborIDs_umap::const_iterator edge_vertex;
+			
+			if (   edge_Conflicts.size() <= front_visit.m_level
+			    || (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
+			    || edge_vertex->second.find(front_visit.m_vertex_id) == edge_vertex->second.end())
+			{
+			    HamiltonianVisit identity_visit(front_visit.m_level + 1, next_explored_Visits.size(), front_visit.m_vertex_id, front_visit.m_visit_id);
+			    next_explored_Visits.push_back(identity_visit);
+			    
+			    bool non_conflicting_terminal = true;
+			    
+			    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
+			    {
+				if (Conflicts[level].find(front_visit.m_vertex_id) != Conflicts[level].end())
+				{
+				    non_conflicting_terminal = false;
+				    break;
+				}
+			    }				    
+			    
+			    if (non_conflicting_terminal)
+			    {
+				VertexIDs_vector candidate_Path;
+				candidate_Path.resize(front_visit.m_level + 2, -1);
+
+				/*
+                                #ifdef sDEBUG
+				{
+				    printf("Circuits wait:\n");
+				    for (sInt_32 i = 0; i <= front_visit.m_level + 1; ++i)
+				    {
+					for (LevelHamiltonianVisits_vector::const_iterator visit_vertex = explored_Circuits[i].begin(); visit_vertex != explored_Circuits[i].end(); ++visit_vertex)
+					{
+					    printf("(%d,%d,%d,%d) ", visit_vertex->m_level, visit_vertex->m_visit_id, visit_vertex->m_vertex_id, visit_vertex->m_prev_visit_id);
+					}
+					printf("\n");
+				    }
+				}
+				#endif
+				*/
+
+				sInt_32 prev_visit_id = identity_visit.m_visit_id;				
+				    
+				for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+				{
+				    candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
+
+				    /*
+                                    #ifdef sDEBUG
+				    {
+					printf("%d ", candidate_Path[i]);
+				    }
+				    #endif
+				    */
+				    prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;	   					
+				}
+				/*
+                                #ifdef sDEBUG
+				{
+				    printf("\n");
+				}
+				#endif	
+				*/
+								
+				bool finished_hamiltonian = true;
+				
+				for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+				{
+				    bool sink_fulfilled = false;
+				    for (VertexIDs_vector::const_iterator v = candidate_Path.begin(); v != candidate_Path.end(); ++v)
+				    {
+					if (*v == *sink)
+					{
+					    sink_fulfilled = true;
+					    break;
+					}
+				    }
+				    if (!sink_fulfilled)
+				    {
+					finished_hamiltonian = false;
+					break;
+				    }
+				}
+				if (finished_hamiltonian)
+				{
+				    Path = candidate_Path;					
+				    return front_visit.m_level + 1;
+				}
+				/*
+				else
+				{
+				    printf("This path 2 - Oh! No, no!\n");
+				}
+				*/
+			    }
+			    visit_Queue.insert(HamiltonianVisits_mmap::value_type(/*relaxation * m_goal_Distances[sink_id][identity_visit.m_vertex_id] +*/ identity_visit.m_level, identity_visit));
+			}
+		    }
+		}
+	    }
+	    visit_Queue.erase(visit_erase);	    
+	}
+	return -1;	
+    }
+
+
+    sInt_32 sCBS::findHyperStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
+							  sInt_32                     source_id,
+							  const VertexIDs_vector     &sink_IDs,
+							  sInt_32                    cost_limit,
+							  sInt_32                    extra_cost,
+							  const Conflicts_vector     &Conflicts,
+							  const EdgeConflicts_vector &edge_Conflicts,
+							  VertexIDs_vector           &Path) const
+    {
+	//sDouble relaxation = 1.0;
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("seq:%d -> %d\n", source_id, sink_id);
+	    */
+	}
+	#endif
+		
+	HamiltonianVisits_mmap visit_Queue;
+	HamiltonianVisits_vector explored_Circuits;
+       
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (VertexIDs_uset::const_iterator conf = Conflicts[level].begin(); conf != Conflicts[level].end(); ++conf)
+		{
+		    printf("%d ", *conf);
+		}
+		printf("\n");
+	    }
+
+	    printf("edge conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < edge_Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (NeighborIDs_umap::const_iterator neigh = edge_Conflicts[level].begin(); neigh != edge_Conflicts[level].end(); ++neigh)
+		{
+		    printf("%d [", neigh->first);
+		    for (VertexIDs_uset::const_iterator vertex = neigh->second.begin(); vertex != neigh->second.end(); ++vertex)
+		    {
+			printf("%d ", *vertex);
+		    }
+		    printf("] ");
+		}
+		printf("\n");
+	    }	    
+	    */
+	}
+	#endif
+
+	if (sink_IDs.empty())
+	{
+	    return 0;
+	}
+	if (Conflicts.empty() || Conflicts[0].find(source_id) == Conflicts[0].end())
+	{	
+	    explored_Circuits.push_back(LevelHamiltonianVisits_vector());    
+	    HamiltonianVisit source_visit(0, explored_Circuits[0].size(), source_id, -1);
+	    explored_Circuits[0].push_back(source_visit);
+	    
+	    visit_Queue.insert(HamiltonianVisits_mmap::value_type(0 /*+ relaxation * m_goal_Distances[sink_id][source_id]*/, source_visit));
+	}
+	else
+	{
+	    return -1;
+	}
+	
+	while (!visit_Queue.empty())
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
+	    const HamiltonianVisit &front_visit = visit_Queue.begin()->second;    
+	    HamiltonianVisits_mmap::iterator visit_erase = visit_Queue.begin();
+	        
+            /*
+	    #ifdef sDEBUG
+	    {
+		printf("  v:%d,%d,%d\n", front_visit.m_level, front_visit.m_vertex_id, front_visit.m_previous_id);
+		printf("%ld, %d\n", explored_Circuits.size(), front_visit.m_level + 1);
+	    }
+	    #endif
+	    */
+		
+	    if (explored_Circuits.size() <= front_visit.m_level + 1)
+	    {
+		explored_Circuits.push_back(LevelHamiltonianVisits_vector());
+		sASSERT(explored_Circuits.size() > front_visit.m_level + 1);
+	    }
+
+	    if (front_visit.m_level <= cost_limit + extra_cost)	    	    
+	    {
+		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
+		{
+		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+		    LevelHamiltonianVisits_vector &next_explored_Visits = explored_Circuits[front_visit.m_level + 1];
+		    
+		    if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(neighbor_id) == Conflicts[front_visit.m_level + 1].end())
+		    {
+			NeighborIDs_umap::const_iterator edge_vertex;
+			
+			if (   edge_Conflicts.size() <= front_visit.m_level
+			    || (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
+			    || edge_vertex->second.find(neighbor_id) == edge_vertex->second.end())
+			{
+			    HamiltonianVisit neighbor_visit(front_visit.m_level + 1, next_explored_Visits.size(), neighbor_id, front_visit.m_visit_id);
+			    next_explored_Visits.push_back(neighbor_visit);
+			    
+			    VertexIDs_vector candidate_Path;
+			    candidate_Path.resize(front_visit.m_level + 2, -1);
+
+				/*
+                                #ifdef sDEBUG
+				{
+				    printf("Circuits standard:\n");
+				    for (sInt_32 i = 0; i <= front_visit.m_level + 1; ++i)
+				    {
+					for (LevelHamiltonianVisits_vector::const_iterator visit_vertex = explored_Circuits[i].begin(); visit_vertex != explored_Circuits[i].end(); ++visit_vertex)
+					{
+					    printf("(%d,%d,%d,%d) ", visit_vertex->m_level, visit_vertex->m_visit_id, visit_vertex->m_vertex_id, visit_vertex->m_prev_visit_id);
+					}
+					printf("\n");
+				    }
+				}
+				#endif
+				*/
+
+			    sInt_32 prev_visit_id = neighbor_visit.m_visit_id;				
+			    
+			    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+			    {
+				candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
+				prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;	   					
+			    }
+
+			    bool finished_hamiltonian = true;
+			    VertexIDs_vector fulfilled_sink_IDs;
+			    
+			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+			    {
+				bool sink_fulfilled = false;
+				for (VertexIDs_vector::const_iterator v = candidate_Path.begin(); v != candidate_Path.end(); ++v)
+				{
+				    if (*v == *sink)
+				    {
+					sink_fulfilled = true;
+					fulfilled_sink_IDs.push_back(*v);
+					break;
+				    }
+				}
+				if (!sink_fulfilled)
+				{
+				    finished_hamiltonian = false;
+				}
+			    }
+
+			    bool non_conflicting_terminal = true;
+			    
+			    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
+			    {
+				if (Conflicts[level].find(neighbor_id) != Conflicts[level].end())
+				{
+				    non_conflicting_terminal = false;
+				    break;
+				}
+			    }
+			    
+			    if (non_conflicting_terminal)
+			    {															     
+				if (finished_hamiltonian)
+				{
+				    Path = candidate_Path;
+				    return front_visit.m_level + 2;
+				}
+			    }
+			    VertexIDs_vector node_IDs;
+			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+			    {
+				bool sink_fulfilled = false;
+				for (VertexIDs_vector::const_iterator fulfill = fulfilled_sink_IDs.begin(); fulfill != fulfilled_sink_IDs.end(); ++fulfill)
+				{
+				    if (*fulfill == *sink)
+				    {
+					sink_fulfilled = true;
+					break;
+				    }
+				}
+				if (!sink_fulfilled)
+				{
+				    node_IDs.push_back(*sink);
+				}
+			    }
+			    node_IDs.push_back(neighbor_visit.m_vertex_id);
+			    sInt_32 estimated_remaining_cost =  graph.calc_MinimumSpanningTree(node_IDs);
+
+			    visit_Queue.insert(HamiltonianVisits_mmap::value_type(/*relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] +*/ neighbor_visit.m_level + estimated_remaining_cost, neighbor_visit));
+			}
+		    }
+		}
+	        { /* wait action */
+		    LevelHamiltonianVisits_vector &next_explored_Visits = explored_Circuits[front_visit.m_level + 1];
+		    
+		    if (Conflicts.size() <= front_visit.m_level + 1 || Conflicts[front_visit.m_level + 1].find(front_visit.m_vertex_id) == Conflicts[front_visit.m_level + 1].end())
+		    {
+			NeighborIDs_umap::const_iterator edge_vertex;
+			
+			if (   edge_Conflicts.size() <= front_visit.m_level
+			    || (edge_vertex = edge_Conflicts[front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[front_visit.m_level].end()
+			    || edge_vertex->second.find(front_visit.m_vertex_id) == edge_vertex->second.end())
+			{
+			    HamiltonianVisit identity_visit(front_visit.m_level + 1, next_explored_Visits.size(), front_visit.m_vertex_id, front_visit.m_visit_id);
+			    next_explored_Visits.push_back(identity_visit);
+			    
+			    VertexIDs_vector candidate_Path;
+			    candidate_Path.resize(front_visit.m_level + 2, -1);
+				
+				/*
+                                #ifdef sDEBUG
+				{
+				    printf("Circuits wait:\n");
+				    for (sInt_32 i = 0; i <= front_visit.m_level + 1; ++i)
+				    {
+					for (LevelHamiltonianVisits_vector::const_iterator visit_vertex = explored_Circuits[i].begin(); visit_vertex != explored_Circuits[i].end(); ++visit_vertex)
+					{
+					    printf("(%d,%d,%d,%d) ", visit_vertex->m_level, visit_vertex->m_visit_id, visit_vertex->m_vertex_id, visit_vertex->m_prev_visit_id);
+					}
+					printf("\n");
+				    }
+				}
+				#endif
+				*/
+			    
+			    sInt_32 prev_visit_id = identity_visit.m_visit_id;				
+			    
+			    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+			    {
+				candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
+				prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;	   					
+			    }
+			    bool finished_hamiltonian = true;
+			    VertexIDs_vector fulfilled_sink_IDs;			    
+			    
+			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+			    {
+				bool sink_fulfilled = false;
+				for (VertexIDs_vector::const_iterator v = candidate_Path.begin(); v != candidate_Path.end(); ++v)
+				{
+				    if (*v == *sink)
+				    {
+					sink_fulfilled = true;
+					fulfilled_sink_IDs.push_back(*v);					
+					break;
+				    }
+				}
+				if (!sink_fulfilled)
+				{
+				    finished_hamiltonian = false;
+				}
+			    }			    
+
+			    bool non_conflicting_terminal = true;
+			    
+			    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
+			    {
+				if (Conflicts[level].find(front_visit.m_vertex_id) != Conflicts[level].end())
+				{
+				    non_conflicting_terminal = false;
+				    break;
+				}
+			    }				    
+				
+			    if (non_conflicting_terminal)
+			    {				
+				if (finished_hamiltonian)
+				{
+				    Path = candidate_Path;					
+				    return front_visit.m_level + 1;
+				}
+			    }
+
+			    VertexIDs_vector node_IDs;
+			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+			    {
+				bool sink_fulfilled = false;
+				for (VertexIDs_vector::const_iterator fulfill = fulfilled_sink_IDs.begin(); fulfill != fulfilled_sink_IDs.end(); ++fulfill)
+				{
+				    if (*fulfill == *sink)
+				    {
+					sink_fulfilled = true;
+					break;
+				    }
+				}
+				if (!sink_fulfilled)
+				{
+				    node_IDs.push_back(*sink);
+				}
+			    }
+			    node_IDs.push_back(identity_visit.m_vertex_id);
+			    sInt_32 estimated_remaining_cost =  graph.calc_MinimumSpanningTree(node_IDs);
+
+			    visit_Queue.insert(HamiltonianVisits_mmap::value_type(/*relaxation * m_goal_Distances[sink_id][identity_visit.m_vertex_id] +*/ identity_visit.m_level + estimated_remaining_cost, identity_visit));
+			}
+		    }
+		}
+	    }
+	    visit_Queue.erase(visit_erase);	    
+	}
+	return -1;	
+    }                
 
 
     void sCBS::equalize_NonconflictingSequences(AgentPaths_vector &agent_Paths) const

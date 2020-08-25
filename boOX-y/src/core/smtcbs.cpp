@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-032_planck                                                  */
+/* smtcbs.cpp / 2-059_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -1537,6 +1537,52 @@ namespace boOX
 	return cost;
     }
 
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sSolution &solution, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission &mission, sSolution &solution, sInt_32 cost_limit) const
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }    
+
     
     sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
@@ -1553,7 +1599,7 @@ namespace boOX
 	sDouble start_time = sStatistics::get_CPU_Seconds();
 	#endif
 
-	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost(max_individual_cost);
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_rough(max_individual_cost);
 	Context context;	
 	
 	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
@@ -1561,7 +1607,7 @@ namespace boOX
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
-		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
+		printf("Solving MAHPF (Hamiltonian) cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
 	    if ((solution_cost = find_NonconflictingHamiltonianInverseDepleted(context, mission, agent_Paths, cost)) >= 0)
@@ -1581,6 +1627,231 @@ namespace boOX
 	return -1;
     }
 
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	sInt_32 solution_cost, max_individual_cost;	
+	
+	#ifdef sVERBOSE
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();		
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_spanning(max_individual_cost);
+	Context context;	
+	
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAHPF (Hamiltonian) cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingHamiltonianInverseDepletedSpanning(context, mission, agent_Paths, cost)) >= 0)
+	    {
+		return solution_cost;
+	    }
+
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	}
+	return -1;
+    }    
+
+
+/*----------------------------------------------------------------------------*/
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingKarpianInverseDepleted(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepleted(sMission &mission, sSolution &solution, sInt_32 cost_limit) const
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingKarpianInverseDepleted(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepletedSpanning(sSolution &solution, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingKarpianInverseDepletedSpanning(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepletedSpanning(sMission &mission, sSolution &solution, sInt_32 cost_limit) const
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingKarpianInverseDepletedSpanning(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }    
+
+    
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingKarpianInverseDepleted(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepleted(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	sInt_32 solution_cost, max_individual_cost;	
+	
+	#ifdef sVERBOSE
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();		
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalKarpianCost_rough(max_individual_cost);
+	Context context;	
+	
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAHPF (Karpian) cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingKarpianInverseDepleted(context, mission, agent_Paths, cost)) >= 0)
+	    {
+		return solution_cost;
+	    }
+
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	}
+	return -1;
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepletedSpanning(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingKarpianInverseDepletedSpanning(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sSMTCBS::find_ShortestNonconflictingKarpianInverseDepletedSpanning(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	sInt_32 solution_cost, max_individual_cost;	
+	
+	#ifdef sVERBOSE
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();		
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalKarpianCost_spanning(max_individual_cost);
+	Context context;	
+	
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAHPF (Karpian) cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingKarpianInverseDepletedSpanning(context, mission, agent_Paths, cost)) >= 0)
+	    {
+		return solution_cost;
+	    }
+
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	}
+	return -1;
+    }    
     
 /*----------------------------------------------------------------------------*/
     
@@ -1881,14 +2152,76 @@ namespace boOX
 	sMission::MDD_vector MDD, extra_MDD;
 	sMission::InverseMDD_vector inverse_MDD;
 	
-	mission.construct_HamiltonianMDD(cost_limit, MDD, extra_cost, extra_MDD);
+	mission.construct_HamiltonianMDD_rough(cost_limit, MDD, extra_cost, extra_MDD);
 	mission.construct_InverseMDD(MDD, inverse_MDD);	
 
 	return find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepleted(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
     }
 
+
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonianInverseDepletedSpanning(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_NonconflictingHamiltonianInverseDepletedSpanning(context, *m_Mission, agent_Paths, cost_limit);
+    }
+    
+    
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonianInverseDepletedSpanning(Context &context, sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	AgentConflicts_vector agent_Conflicts;
+	sInt_32 extra_cost;
+	sMission::MDD_vector MDD, extra_MDD;
+	sMission::InverseMDD_vector inverse_MDD;
+	
+	mission.construct_HamiltonianMDD_spanning(cost_limit, MDD, extra_cost, extra_MDD);
+	mission.construct_InverseMDD(MDD, inverse_MDD);	
+
+	return find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
+    }    
+
     
 /*----------------------------------------------------------------------------*/
+    
+    sInt_32 sSMTCBS::find_NonconflictingKarpianInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_NonconflictingKarpianInverseDepleted(context, *m_Mission, agent_Paths, cost_limit);
+    }
+    
+    
+    sInt_32 sSMTCBS::find_NonconflictingKarpianInverseDepleted(Context &context, sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	AgentConflicts_vector agent_Conflicts;
+	sInt_32 extra_cost;
+	sMission::MDD_vector MDD, extra_MDD;
+	sMission::InverseMDD_vector inverse_MDD;
+	
+	mission.construct_KarpianMDD_rough(cost_limit, MDD, extra_cost, extra_MDD);
+	mission.construct_InverseMDD(MDD, inverse_MDD);	
+
+	return find_NonconflictingKarpian_GlucoseCollisionsInverseDepleted(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_NonconflictingKarpianInverseDepletedSpanning(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_NonconflictingKarpianInverseDepletedSpanning(context, *m_Mission, agent_Paths, cost_limit);
+    }
+    
+    
+    sInt_32 sSMTCBS::find_NonconflictingKarpianInverseDepletedSpanning(Context &context, sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	AgentConflicts_vector agent_Conflicts;
+	sInt_32 extra_cost;
+	sMission::MDD_vector MDD, extra_MDD;
+	sMission::InverseMDD_vector inverse_MDD;
+	
+	mission.construct_KarpianMDD_spanning(cost_limit, MDD, extra_cost, extra_MDD);
+	mission.construct_InverseMDD(MDD, inverse_MDD);	
+
+	return find_NonconflictingKarpian_GlucoseCollisionsInverseDepletedSpanning(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
+    }    
+    
+/*----------------------------------------------------------------------------*/
+    
 
     sInt_32 sSMTCBS::find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
 							       Context               &context,
@@ -1906,7 +2239,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -1967,7 +2300,7 @@ namespace boOX
 
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2025,7 +2358,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2086,7 +2419,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2147,7 +2480,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2220,7 +2553,7 @@ namespace boOX
 	    */
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2284,7 +2617,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2345,7 +2678,7 @@ namespace boOX
 	    
                 #ifdef sSTATISTICS
 		{
-		    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 		}
                 #endif
 
@@ -2407,7 +2740,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2483,7 +2816,7 @@ namespace boOX
 		    
                     #ifdef sSTATISTICS
 		    {
-			++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+			++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 		    }
                     #endif
 
@@ -2553,7 +2886,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2623,7 +2956,7 @@ namespace boOX
 		
                 #ifdef sSTATISTICS
 		{
-		    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 		}
                 #endif
 
@@ -2685,7 +3018,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2769,7 +3102,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2842,7 +3175,7 @@ namespace boOX
 	    */
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -2907,7 +3240,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -2968,7 +3301,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3026,7 +3359,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3088,7 +3421,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3150,7 +3483,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3213,7 +3546,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3276,7 +3609,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3339,7 +3672,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3403,7 +3736,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3464,7 +3797,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3522,7 +3855,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3583,7 +3916,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3643,7 +3976,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3705,7 +4038,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3766,7 +4099,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3827,7 +4160,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3889,7 +4222,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -3949,7 +4282,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4007,7 +4340,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4068,7 +4401,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4130,7 +4463,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4192,7 +4525,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4255,7 +4588,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4317,7 +4650,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4380,7 +4713,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4447,7 +4780,7 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -4518,7 +4851,7 @@ namespace boOX
 	
 	#ifdef sSTATISTICS
 	{
-	    ++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	}
 	#endif
 
@@ -4546,6 +4879,7 @@ namespace boOX
 
 	#ifdef sDEBUG
 	{
+	    /*
 	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	    {
 		sInt_32 agent_path_length = agent_Paths[agent_id].size();
@@ -4556,6 +4890,7 @@ namespace boOX
 		}
 		printf("\n");
 	    }
+	    */
 	}
 	#endif
 
@@ -4580,28 +4915,29 @@ namespace boOX
 	    
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
 	    if (!find_NextNonconflictingHamiltonianInverseDepleted(solver,
-								context,
-								sat_Model,
-								Collisions,
-								edge_Collisions,
-								mission,
-								MDD,
-								extra_MDD,
-								inverse_MDD,
-								extra_cost,
-								cost_limit,
-								agent_Paths))
+								   context,
+								   sat_Model,
+								   Collisions,
+								   edge_Collisions,
+								   mission,
+								   MDD,
+								   extra_MDD,
+								   inverse_MDD,
+								   extra_cost,
+								   cost_limit,
+								   agent_Paths))
 	    {
 		return -1;
 	    }
 	    
 	    #ifdef sDEBUG
 	    {
+		/*
 		for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 		{
 		    sInt_32 agent_path_length = agent_Paths[agent_id].size();
@@ -4612,6 +4948,7 @@ namespace boOX
 		    }
 		    printf("\n");
 		}
+		*/
 	    }
 	    #endif   
 	    Collisions.clear();
@@ -4624,6 +4961,396 @@ namespace boOX
 	}
 	return -1;
     }
+
+
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(const sMission              &mission,
+											     Context                      &context,
+											     sMission::MDD_vector        &MDD,
+											     sMission::MDD_vector        &extra_MDD,
+											     sMission::InverseMDD_vector &inverse_MDD,
+											     sInt_32                       extra_cost,
+											     AgentPaths_vector            &agent_Paths,
+											     sInt_32                       cost_limit) const
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	
+	agent_Paths.clear();
+	agent_Paths.resize(N_agents + 1);
+	
+	#ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	}
+	#endif
+
+	Model sat_Model;
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Glucose::Solver *solver;
+	solver = new Glucose::Solver;
+
+	solver->s_Glucose_timeout = m_timeout;	
+
+	if (!find_InitialNonconflictingHamiltonianInverseDepleted(solver,
+								  context,
+								  sat_Model,
+								  mission,
+								  MDD,
+								  extra_MDD,
+								  inverse_MDD,
+								  extra_cost,
+								  cost_limit,
+								  agent_Paths))	   
+	{
+	    return -1;
+	}
+
+	#ifdef sDEBUG
+	{
+	    /*
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		sInt_32 agent_path_length = agent_Paths[agent_id].size();
+		printf("%d: ", agent_id);
+		for (sInt_32 i = 0; i < agent_path_length; ++i)
+		{
+		    printf("%d ", agent_Paths[agent_id][i]);
+		}
+		printf("\n");
+	    }
+	    */
+	}
+	#endif
+
+	Collisions_vector Collisions;
+	EdgeCollisions_vector edge_Collisions;
+	
+	if ((cummulative = check_NonconflictingHamiltonian(mission, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	{
+	    return cummulative;
+	}
+
+	while (true)
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	    }
+            #endif
+
+	    if (!find_NextNonconflictingHamiltonianInverseDepleted(solver,
+								   context,
+								   sat_Model,
+								   Collisions,
+								   edge_Collisions,
+								   mission,
+								   MDD,
+								   extra_MDD,
+								   inverse_MDD,
+								   extra_cost,
+								   cost_limit,
+								   agent_Paths))
+	    {
+		return -1;
+	    }
+	    
+	    #ifdef sDEBUG
+	    {
+		/*
+		for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+		{
+		    sInt_32 agent_path_length = agent_Paths[agent_id].size();
+		    printf("%d: ", agent_id);
+		    for (sInt_32 i = 0; i < agent_path_length; ++i)
+		    {
+			printf("%d ", agent_Paths[agent_id][i]);
+		    }
+		    printf("\n");
+		}
+		*/
+	    }
+	    #endif   
+	    Collisions.clear();
+	    edge_Collisions.clear();
+	    
+	    if ((cummulative = check_NonconflictingHamiltonian(mission, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    {
+		return cummulative;
+	    }
+	}
+	return -1;
+    }
+    
+    
+/*----------------------------------------------------------------------------*/
+
+    sInt_32 sSMTCBS::find_NonconflictingKarpian_GlucoseCollisionsInverseDepleted(const sMission              &mission,
+										 Context                      &context,
+										 sMission::MDD_vector        &MDD,
+										 sMission::MDD_vector        &extra_MDD,
+										 sMission::InverseMDD_vector &inverse_MDD,
+										 sInt_32                       extra_cost,
+										 AgentPaths_vector            &agent_Paths,
+										 sInt_32                       cost_limit) const
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	
+	agent_Paths.clear();
+	agent_Paths.resize(N_agents + 1);
+	
+	#ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	}
+	#endif
+
+	Model sat_Model;
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Glucose::Solver *solver;
+	solver = new Glucose::Solver;
+
+	solver->s_Glucose_timeout = m_timeout;	
+
+	if (!find_InitialNonconflictingKarpianInverseDepleted(solver,
+							      context,
+							      sat_Model,
+							      mission,
+							      MDD,
+							      extra_MDD,
+							      inverse_MDD,
+							      extra_cost,
+							      cost_limit,
+							      agent_Paths))	   
+	{
+	    return -1;
+	}
+
+	#ifdef sDEBUG
+	{
+	    /*
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		sInt_32 agent_path_length = agent_Paths[agent_id].size();
+		printf("%d: ", agent_id);
+		for (sInt_32 i = 0; i < agent_path_length; ++i)
+		{
+		    printf("%d ", agent_Paths[agent_id][i]);
+		}
+		printf("\n");
+	    }
+	    */
+	}
+	#endif
+
+	Collisions_vector Collisions;
+	EdgeCollisions_vector edge_Collisions;
+	
+	if ((cummulative = check_NonconflictingKarpian(mission, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	{
+	    return cummulative;
+	}
+
+	while (true)
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	    }
+            #endif
+	    
+	    if (!find_NextNonconflictingKarpianInverseDepleted(solver,
+							       context,
+							       sat_Model,
+							       Collisions,
+							       edge_Collisions,
+							       mission,
+							       MDD,
+							       extra_MDD,
+							       inverse_MDD,
+							       extra_cost,
+							       cost_limit,
+							       agent_Paths))
+	    {
+		return -1;
+	    }
+	    
+	    #ifdef sDEBUG
+	    {
+		/*
+		for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+		{
+		    sInt_32 agent_path_length = agent_Paths[agent_id].size();
+		    printf("%d: ", agent_id);
+		    for (sInt_32 i = 0; i < agent_path_length; ++i)
+		    {
+			printf("%d ", agent_Paths[agent_id][i]);
+		    }
+		    printf("\n");
+		}
+		*/
+	    }
+	    #endif   
+	    Collisions.clear();
+	    edge_Collisions.clear();
+	    
+	    if ((cummulative = check_NonconflictingKarpian(mission, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    {
+		return cummulative;
+	    }
+	}
+	return -1;
+    }
+
+
+    sInt_32 sSMTCBS::find_NonconflictingKarpian_GlucoseCollisionsInverseDepletedSpanning(const sMission              &mission,
+											 Context                      &context,
+											 sMission::MDD_vector        &MDD,
+											 sMission::MDD_vector        &extra_MDD,
+											 sMission::InverseMDD_vector &inverse_MDD,
+											 sInt_32                       extra_cost,
+											 AgentPaths_vector            &agent_Paths,
+											 sInt_32                       cost_limit) const
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	
+	agent_Paths.clear();
+	agent_Paths.resize(N_agents + 1);
+	
+	#ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	}
+	#endif
+
+	Model sat_Model;
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Glucose::Solver *solver;
+	solver = new Glucose::Solver;
+
+	solver->s_Glucose_timeout = m_timeout;	
+
+	if (!find_InitialNonconflictingKarpianInverseDepleted(solver,
+							      context,
+							      sat_Model,
+							      mission,
+							      MDD,
+							      extra_MDD,
+							      inverse_MDD,
+							      extra_cost,
+							      cost_limit,
+							      agent_Paths))	   
+	{
+	    return -1;
+	}
+
+	#ifdef sDEBUG
+	{
+	    /*
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		sInt_32 agent_path_length = agent_Paths[agent_id].size();
+		printf("%d: ", agent_id);
+		for (sInt_32 i = 0; i < agent_path_length; ++i)
+		{
+		    printf("%d ", agent_Paths[agent_id][i]);
+		}
+		printf("\n");
+	    }
+	    */
+	}
+	#endif
+
+	Collisions_vector Collisions;
+	EdgeCollisions_vector edge_Collisions;
+	
+	if ((cummulative = check_NonconflictingKarpian(mission, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	{
+	    return cummulative;
+	}
+
+	while (true)
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	    }
+            #endif
+
+	    if (!find_NextNonconflictingKarpianInverseDepleted(solver,
+							       context,
+							       sat_Model,
+							       Collisions,
+							       edge_Collisions,
+							       mission,
+							       MDD,
+							       extra_MDD,
+							       inverse_MDD,
+							       extra_cost,
+							       cost_limit,
+							       agent_Paths))
+	    {
+		return -1;
+	    }
+	    
+	    #ifdef sDEBUG
+	    {
+		/*
+		for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+		{
+		    sInt_32 agent_path_length = agent_Paths[agent_id].size();
+		    printf("%d: ", agent_id);
+		    for (sInt_32 i = 0; i < agent_path_length; ++i)
+		    {
+			printf("%d ", agent_Paths[agent_id][i]);
+		    }
+		    printf("\n");
+		}
+		*/
+	    }
+	    #endif   
+	    Collisions.clear();
+	    edge_Collisions.clear();
+	    
+	    if ((cummulative = check_NonconflictingKarpian(mission, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    {
+		return cummulative;
+	    }
+	}
+	return -1;
+    }
+    
     
 /*----------------------------------------------------------------------------*/
 
@@ -8627,6 +9354,145 @@ namespace boOX
     
 
 /*----------------------------------------------------------------------------*/
+
+    bool sSMTCBS::find_InitialNonconflictingKarpianInverseDepleted(Glucose::Solver              *solver,
+								   Context                      &context,						  
+								   Model                        &sat_Model,
+								   const sMission               &mission,
+								   sMission::MDD_vector         &MDD,
+								   sMission::MDD_vector         &extra_MDD,
+								   sMission::InverseMDD_vector  &inverse_MDD,
+								   sInt_32                       extra_cost,
+								   sInt_32                       cost_limit,
+								   AgentPaths_vector            &agent_Paths) const
+    {
+	sInt_32 variable_ID;
+
+	variable_ID = build_KarpianSmallModelVariablesInverse(solver, context, mission, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
+	m_solver_Encoder->set_LastVariableID(variable_ID);
+
+	build_KarpianSmallModelConstraintsInverse(solver, context, mission, MDD, extra_MDD, inverse_MDD, cost_limit, extra_cost, sat_Model);
+
+	if (!solver->simplify())
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	   
+	    return false;
+	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+	decode_KarpianSmallModel(solver, mission, MDD, sat_Model, agent_Paths);
+	
+	return true;
+    }    
+
+
+    bool sSMTCBS::find_NextNonconflictingKarpianInverseDepleted(Glucose::Solver              *solver,
+								Context                      &context,
+								Model                        &sat_Model,
+								const Collisions_vector      &Collisions,
+								const EdgeCollisions_vector  &edge_Collisions,
+								const sMission               &mission,
+								sMission::MDD_vector         &MDD,
+								sMission::MDD_vector         &extra_MDD,
+								sMission::InverseMDD_vector  &inverse_MDD,
+								sInt_32                       extra_cost,
+								sInt_32                       cost_limit,
+								AgentPaths_vector            &agent_Paths) const
+    {
+	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
+	{
+	    context.m_trans_Collisions.push_back(*collision);
+	}
+	for (EdgeCollisions_vector::const_iterator edge_collision = edge_Collisions.begin(); edge_collision != edge_Collisions.end(); ++edge_collision)
+	{
+	    context.m_trans_edge_Collisions.push_back(*edge_collision);
+	}	
+		
+	refine_KarpianSmallModelCollisionsInverse(solver,
+						  Collisions,
+						  edge_Collisions,
+						  mission,
+						  MDD,
+						  extra_MDD,
+						  inverse_MDD,
+						  cost_limit,
+						  extra_cost,
+						  sat_Model);
+	
+	if (!solver->simplify())
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	   
+	    return false;
+	}
+
+	Glucose::lbool result = solver->solve_();
+
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+	decode_KarpianSmallModel(solver, mission, MDD, sat_Model, agent_Paths);
+	
+	return true;
+    }
+    
+
+/*----------------------------------------------------------------------------*/
     
     sInt_32 sSMTCBS::check_NonconflictingRotation(const sInstance         &instance,
 						  const AgentPaths_vector &agent_Paths,
@@ -9169,7 +10035,8 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(mission, agent_Paths, space_Cooccupations);	
+	fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
+	sInt_32 cummulative_cost = calc_HamiltonianCost(mission, agent_Paths);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -9196,7 +10063,7 @@ namespace boOX
 				{
 				    best_collision = next_collision;
 				}
-				cummulative = -1;
+				cummulative_cost = -1;
 			    }
 			}
 		    }
@@ -9222,7 +10089,7 @@ namespace boOX
 					{
 					    best_collision = next_collision;
 					}
-					cummulative = -1;
+					cummulative_cost = -1;
 				    }
 				}
 			    }
@@ -9258,7 +10125,7 @@ namespace boOX
 			    {
 				best_collision = next_collision;
 			    }
-			    cummulative = -1;			    
+			    cummulative_cost = -1;			    
 			}
 		    }		    
 		}
@@ -9269,7 +10136,7 @@ namespace boOX
 	#ifdef sDEBUG
 	{
 	    /*
-	    if (cummulative < 0)
+	    if (cummulative_cost < 0)
 	    {
 		printf("Collision: %d,%d,%d %d,%d,%d\n",
 		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
@@ -9279,7 +10146,7 @@ namespace boOX
 	}
 	#endif
 	
-	return cummulative;
+	return cummulative_cost;
     }
 
 
@@ -9300,7 +10167,8 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(mission, agent_Paths, space_Cooccupations);	
+	fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
+	sInt_32 cummulative_cost = calc_HamiltonianCost(mission, agent_Paths);
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -9324,7 +10192,7 @@ namespace boOX
 			    {
 				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
 				Collisions.push_back(next_collision);
-				cummulative = -1;
+				cummulative_cost = -1;
 			    }
 			}
 		    }
@@ -9353,7 +10221,7 @@ namespace boOX
 					Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
 					Collisions.push_back(next_collision);
 					*/
-					cummulative = -1;
+					cummulative_cost = -1;
 				    }
 				}
 			    }
@@ -9384,7 +10252,7 @@ namespace boOX
 			{
 			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
 			    Collisions.push_back(next_collision);
-			    cummulative = -1;			    
+			    cummulative_cost = -1;			    
 			}
 		    }		    
 		}
@@ -9407,8 +10275,362 @@ namespace boOX
 	}
 	#endif
 	
-	return cummulative;
-    }    
+	return cummulative_cost;
+    }
+
+
+    sInt_32 sSMTCBS::calc_HamiltonianCost(const sMission &mission, const AgentPaths_vector &agent_Paths) const
+    {
+	sInt_32 cummulative = 0;
+
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{	    
+	    sInt_32 agent_cost = -1;
+
+	    for (sInt_32 i = 0; i < agent_Paths[agent_id].size(); ++i)
+	    {
+		bool fulfilled = true;
+
+		for (sCommitment::AgentTask_vector::const_iterator task = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+		{
+		    bool task_fulfilled = false;
+		    
+		    for (sInt_32 j = i; j >= 0; --j)
+		    {
+			if (agent_Paths[agent_id][j] == *task)
+			{
+			    task_fulfilled = true;
+			    break;
+			}
+		    }
+		    if (!task_fulfilled)
+		    {
+			fulfilled = false;
+			break;
+		    }
+		}		
+		if (fulfilled)
+		{
+		    agent_cost = i;
+		    break;
+		}
+	    }
+	    sASSERT(agent_cost >= 0);
+	    
+	    cummulative += agent_cost;
+	}
+	return cummulative;	
+    }
+
+    
+/*----------------------------------------------------------------------------*/
+    
+    sInt_32 sSMTCBS::check_NonconflictingKarpian(const sMission         &mission,
+						     const AgentPaths_vector &agent_Paths,
+						     Collision               &principal_collision) const
+    {
+	sInt_32 agent_path_length;
+	Collision best_collision(sINT_32_MAX, 1, 1, 0, 0);	
+	    
+	#ifdef sPROFILE
+	{
+	    analyzing_begin = clock();
+	}
+	#endif
+
+	Cooccupations_vector space_Cooccupations;	
+			
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
+	sInt_32 cummulative_cost = calc_KarpianCost(mission, agent_Paths);	
+	
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+		
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][i]);
+		    
+		    if (occupation_collision != space_Cooccupations[i].end())
+		    {
+			for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+			{
+			    if (*collide_agent > agent_id)
+			    {
+				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
+				
+				if (next_collision < best_collision)
+				{
+				    best_collision = next_collision;
+				}
+				cummulative_cost = -1;
+			    }
+			}
+		    }
+
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Cooccupation_umap::const_iterator swap_expectation_pred = space_Cooccupations[i - 1].find(agent_Paths[agent_id][i]);
+			
+			if (swap_expectation_pred != space_Cooccupations[i - 1].end()) // swap with occupied
+			{
+			    for (AgentIDs_uset::const_iterator exp_agent = swap_expectation_pred->second.begin(); exp_agent != swap_expectation_pred->second.end(); ++exp_agent)
+			    {
+				sInt_32 ii = sMIN(agent_Paths[*exp_agent].size() - 1, i);
+				sASSERT(i < agent_Paths[*exp_agent].size());
+
+				if (agent_Paths[*exp_agent][ii] == agent_Paths[agent_id][i - 1])
+				{				    
+				    if (*exp_agent != agent_id)
+				    {
+					Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
+				    
+					if (next_collision < best_collision)
+					{
+					    best_collision = next_collision;
+					}
+					cummulative_cost = -1;
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Cooccupations.size(); ++i)
+	    {
+		sASSERT(false);
+						
+		Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		if (occupation_collision != space_Cooccupations[i].end())
+		{
+		    for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+		    {
+			if (*collide_agent > agent_id)
+			{
+			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
+			
+			    if (next_collision < best_collision)
+			    {
+				best_collision = next_collision;
+			    }
+			    cummulative_cost = -1;			    
+			}
+		    }		    
+		}
+	    }
+	}
+	principal_collision = best_collision;
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    if (cummulative_cost < 0)
+	    {
+		printf("Collision: %d,%d,%d %d,%d,%d\n",
+		       principal_collision.m_agent_A_id, principal_collision.m_level_A, principal_collision.m_vertex_A_id,
+		       principal_collision.m_agent_B_id, principal_collision.m_level_B, principal_collision.m_vertex_B_id);
+	    }
+	    */
+	}
+	#endif
+	
+	return cummulative_cost;
+    }
+
+
+    sInt_32 sSMTCBS::check_NonconflictingKarpian(const sMission          &mission,
+						 const AgentPaths_vector &agent_Paths,
+						 Collisions_vector       &Collisions,
+						 EdgeCollisions_vector   &edge_Collisions) const
+    {
+	sInt_32 agent_path_length;
+	    
+	#ifdef sPROFILE
+	{
+	    analyzing_begin = clock();
+	}
+	#endif
+
+	sASSERT(Collisions.empty());
+	Cooccupations_vector space_Cooccupations;	
+			
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
+	sInt_32 cummulative_cost = calc_KarpianCost(mission, agent_Paths);
+	
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+		
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][i]);
+		    
+		    if (occupation_collision != space_Cooccupations[i].end())
+		    {
+			for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+			{
+//			    if (*collide_agent > agent_id)
+			    if (*collide_agent != agent_id)			    
+			    {
+				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
+				Collisions.push_back(next_collision);
+				cummulative_cost = -1;
+			    }
+			}
+		    }
+
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Cooccupation_umap::const_iterator swap_expectation_pred = space_Cooccupations[i - 1].find(agent_Paths[agent_id][i]);
+			
+			if (swap_expectation_pred != space_Cooccupations[i - 1].end()) // swap with occupied
+			{
+			    for (AgentIDs_uset::const_iterator exp_agent = swap_expectation_pred->second.begin(); exp_agent != swap_expectation_pred->second.end(); ++exp_agent)
+			    {
+				sInt_32 ii = sMIN(agent_Paths[*exp_agent].size() - 1, i);
+				sASSERT(i < agent_Paths[*exp_agent].size());				
+
+				if (agent_Paths[*exp_agent][ii] == agent_Paths[agent_id][i - 1])
+				{				
+				    if (*exp_agent != agent_id)
+				    {
+					EdgeCollision next_edge_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent,
+									  i-1,
+									  agent_Paths[agent_id][i-1], agent_Paths[agent_id][i],
+									  agent_Paths[*exp_agent][i-1], agent_Paths[*exp_agent][i]);
+					edge_Collisions.push_back(next_edge_collision);
+					/*
+					Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
+					Collisions.push_back(next_collision);
+					*/
+					cummulative_cost = -1;
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Cooccupations.size(); ++i)
+	    {
+		Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		if (occupation_collision != space_Cooccupations[i].end())
+		{
+		    for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+		    {
+//			if (*collide_agent > agent_id)
+			if (*collide_agent != agent_id)			
+			{
+			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
+			    Collisions.push_back(next_collision);
+			    cummulative_cost = -1;			    
+			}
+		    }		    
+		}
+	    }
+	}
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("Number of collisions: %ld\n", Collisions.size());
+	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
+	    {       	
+		printf("Collision: %d,%d,%d %d,%d,%d\n",
+		       collision->m_agent_A_id, collision->m_level_A, collision->m_vertex_A_id,
+		       collision->m_agent_B_id, collision->m_level_B, collision->m_vertex_B_id);
+		
+		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
+	    }
+	    */
+	}
+	#endif
+	
+	return cummulative_cost;
+    }
+
+
+    sInt_32 sSMTCBS::calc_KarpianCost(const sMission &mission, const AgentPaths_vector &agent_Paths) const
+    {
+	sInt_32 cummulative = 0;
+
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{	    
+	    sInt_32 agent_cost = -1;
+
+	    for (sInt_32 i = 0; i < agent_Paths[agent_id].size(); ++i)
+	    {
+		bool fulfilled = true;
+
+		for (sCommitment::AgentTask_vector::const_iterator task = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+		{
+		    bool task_fulfilled = false;
+		    
+		    for (sInt_32 j = i; j >= 0; --j)
+		    {
+			if (agent_Paths[agent_id][j] == *task)
+			{
+			    task_fulfilled = true;
+			    break;
+			}
+		    }
+		    if (!task_fulfilled)
+		    {
+			fulfilled = false;
+			break;
+		    }
+		}		
+		if (fulfilled)
+		{
+		    agent_cost = i;
+		    break;
+		}
+	    }
+	    sASSERT(agent_cost >= 0);
+	    
+	    cummulative += agent_cost;
+	}
+	return cummulative;	
+    }
 
     
 /*----------------------------------------------------------------------------*/
@@ -9699,6 +10921,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -9971,8 +11200,15 @@ namespace boOX
 		    mutex_source_Identifiers[MDD[agent_id][layer + 1][v]].clear();
 		}		
 */
-//		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10573,9 +11809,7 @@ namespace boOX
 	sInt_32 N_layers = MDD[1].size() - 1;
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
-	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
+	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -10620,8 +11854,15 @@ namespace boOX
 							    mutex_target_Identifiers);
 		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			
 	    }
-	    //m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -10736,9 +11977,7 @@ namespace boOX
 	sInt_32 N_layers = MDD[1].size() - 1;	
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
-	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
+	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -10783,8 +12022,15 @@ namespace boOX
 							    mutex_target_Identifiers);
 		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			
 	    }
-	    // m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -11303,8 +12549,15 @@ namespace boOX
 									  mutex_source_Identifiers[MDD[agent_id][layer + 1][v]]);
 		    }
 		}
-//		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -11614,6 +12867,13 @@ namespace boOX
 */		
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -12174,8 +13434,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -12220,8 +13478,15 @@ namespace boOX
 							    mutex_target_Identifiers);
 //		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 		
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -12734,6 +13999,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13041,6 +14313,13 @@ namespace boOX
 */		
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13471,8 +14750,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -13517,8 +14794,15 @@ namespace boOX
 							    mutex_target_Identifiers);
 //		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}	
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -13929,6 +15213,13 @@ namespace boOX
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14225,6 +15516,13 @@ namespace boOX
 */		
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
 	    }
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 /*
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14784,8 +16082,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -14830,8 +16126,15 @@ namespace boOX
 							    mutex_target_Identifiers);
 		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -15181,8 +16484,6 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
@@ -15227,8 +16528,15 @@ namespace boOX
 							    mutex_target_Identifiers);
 		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
 	}
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -15509,6 +16817,17 @@ namespace boOX
 		sat_Model.m_layer_cardinality[agent_id][layer] = variable_ID++;
 	    }
 	}
+
+	sat_Model.m_layer_fulfillment.resize(N_agents + 1);
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    sat_Model.m_layer_fulfillment[agent_id].resize(N_layers + 1);
+	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+	    {
+		sat_Model.m_layer_fulfillment[agent_id][layer] = variable_ID++;
+	    }
+	}	
 	
 	return variable_ID;
     }
@@ -15536,32 +16855,25 @@ namespace boOX
 	    {
 		if (!extra_MDD[agent_id][layer].empty())
 		{
-		    sASSERT(extra_MDD[agent_id][layer].size() == 1);
-
-		    for (sInt_32 u = 0; u < MDD[agent_id][layer].size(); ++u)
+		    m_solver_Encoder->cast_NonImplication(solver,
+							  sat_Model.m_layer_fulfillment[agent_id][layer],
+							  sat_Model.m_layer_cardinality[agent_id][layer]);
+		}
+		
+		VariableIDs_vector prev_cardinality_Identifiers;
+		
+		for (sInt_32 prev_layer = 0; prev_layer < layer; ++prev_layer)
+		{
+		    if (!extra_MDD[agent_id][prev_layer].empty())
 		    {
-			if (extra_MDD[agent_id][layer][0] != MDD[agent_id][layer][u])
-			{
-			    m_solver_Encoder->cast_Implication(solver,
-							       sat_Model.m_vertex_occupancy[agent_id][layer][u],
-							       sat_Model.m_layer_cardinality[agent_id][layer]);
-			}
+			prev_cardinality_Identifiers.push_back(sat_Model.m_layer_cardinality[agent_id][prev_layer]);
 		    }
-		    VariableIDs_vector prev_cardinality_Identifiers;
-
-		    for (sInt_32 prev_layer = 0; prev_layer < layer; ++prev_layer)
-		    {
-			if (!extra_MDD[agent_id][prev_layer].empty())
-			{
-			    prev_cardinality_Identifiers.push_back(sat_Model.m_layer_cardinality[agent_id][prev_layer]);
-			}
-		    }
-		    if (!prev_cardinality_Identifiers.empty())
-		    {
-			m_solver_Encoder->cast_MultiConjunctiveImplication(solver,
-									   sat_Model.m_layer_cardinality[agent_id][layer],
-									   prev_cardinality_Identifiers);
-		    }
+		}
+		if (!prev_cardinality_Identifiers.empty())
+		{
+		    m_solver_Encoder->cast_MultiConjunctiveImplication(solver,
+								       sat_Model.m_layer_cardinality[agent_id][layer],
+								       prev_cardinality_Identifiers);
 		}
 	    }
 	}
@@ -15594,32 +16906,31 @@ namespace boOX
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
-	{
-	    VariableIDs_vector mutex_vertex_Identifiers;
-			    
+	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
 		VariableIDs_vector mutex_vertex_Identifiers;
-		
+	
 		for (sInt_32 u = 0; u < MDD[agent_id][layer].size(); ++u)
 		{
 		    VariableIDs_vector mutex_target_Identifiers;
 
 		    for (sVertex::Neighbors_list::const_iterator neighbor = mission.m_environment.m_Vertices[MDD[agent_id][layer][u]].m_Neighbors.begin(); neighbor != mission.m_environment.m_Vertices[MDD[agent_id][layer][u]].m_Neighbors.end(); ++neighbor)
 		    {				    
-			sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+			sInt_32 neighbor_id = (*neighbor)->m_target->m_id;		
 			sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[agent_id][layer + 1].find(neighbor_id);
 			
 			if (inverse_neighbor != inverse_MDD[agent_id][layer + 1].end())
 			{
 			    mutex_target_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
 
-			    /*
-			    m_solver_Encoder->cast_Implication(solver,
-							       sat_Model.m_edge_occupancy[agent_id][layer][u][neighbor_index],
-							       sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
-			    ++neighbor_index;
-			    */
+			    if (!extra_MDD[agent_id][layer].empty())
+			    {			    
+				m_solver_Encoder->cast_Biimplication(solver,
+								     sat_Model.m_vertex_occupancy[agent_id][layer][u],
+								     sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second],
+								     sat_Model.m_layer_cardinality[agent_id][layer]);
+			    }
 			}
 		    }
 		    sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[agent_id][layer + 1].find(MDD[agent_id][layer][u]);
@@ -15631,8 +16942,8 @@ namespace boOX
 			m_solver_Encoder->cast_Implication(solver,
 							   sat_Model.m_edge_occupancy[agent_id][layer][u][neighbor_index],
 							   sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
-			++neighbor_index;
 			*/
+			
 		    }
 		    mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][u]);
 
@@ -15641,8 +16952,17 @@ namespace boOX
 							    mutex_target_Identifiers);
 		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
 		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
+	    }	    
+	    
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
 	    }
-	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
+	    
 	}
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -15657,26 +16977,55 @@ namespace boOX
 	}
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    for (VertexIDs_vector::const_iterator commitment = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); commitment != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++commitment)
 	    {
-		/* TODO Hamilton
-		if (MDD[agent_id][N_layers][u] == mission.m_goal_configuration.get_AgentLocation(agent_id))
+		VariableIDs_vector agent_commitment_Identifiers;
+	    
+		for (sInt_32 layer = 0; layer <= N_layers; ++layer)
 		{
-		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);
+		    sMission::InverseVertexIDs_umap::const_iterator inverse_commitment = inverse_MDD[agent_id][layer].find(*commitment);
+
+		    if (inverse_commitment != inverse_MDD[agent_id][layer].end())
+		    {
+			agent_commitment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][inverse_commitment->second]);
+		    }			
 		}
-		*/
+		m_solver_Encoder->cast_Disjunction(solver, agent_commitment_Identifiers);
 	    }
 	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    for (VertexIDs_vector::const_iterator commitment = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); commitment != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++commitment)
+	    {	  
+		for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+		{
+		    VariableIDs_vector agent_fulfillment_Identifiers;
+		
+		    for (sInt_32 prev_layer = 0; prev_layer <= layer; ++prev_layer)
+		    {
+			sMission::InverseVertexIDs_umap::const_iterator inverse_commitment = inverse_MDD[agent_id][prev_layer].find(*commitment);
+
+			if (inverse_commitment != inverse_MDD[agent_id][prev_layer].end())
+			{
+			    agent_fulfillment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][prev_layer][inverse_commitment->second]);
+			}
+		    }
+		    m_solver_Encoder->cast_MultiImplication(solver, sat_Model.m_layer_fulfillment[agent_id][layer], agent_fulfillment_Identifiers);		    
+		}
+	    }
+	}
+
 	refine_HamiltonianSmallModelCollisionsInverse(solver,
-						   context.m_trans_Collisions,
-						   context.m_trans_edge_Collisions,
-						   mission,
-						   MDD,
-						   extra_MDD,
-						   inverse_MDD,
-						   cost_limit,
-						   extra_cost,
-						   sat_Model);
+						      context.m_trans_Collisions,
+						      context.m_trans_edge_Collisions,
+						      mission,
+						      MDD,
+						      extra_MDD,
+						      inverse_MDD,
+						      cost_limit,
+						      extra_cost,
+						      sat_Model);
     }    
 
 
@@ -15840,6 +17189,11 @@ namespace boOX
 
 	    if (literal > 0)
 	    {
+		#ifdef sDEBUG
+		{
+		    // printf("Literal (true): %d\n", literal);
+		}
+		#endif
 		sInt_32 variable_ID = sABS(literal);
 		if (variable_ID < sat_Model.m_variable_mapping.size())
 		{
@@ -15849,11 +17203,9 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
-		    /*
 		    {
-			printf("Extratracted from satisfying a:%d, v:%d, l:%d\n", agent_id, level, vertex_id);
+			// printf("Extratracted from satisfying a:%d, v:%d, l:%d [%d]\n", agent_id, vertex_id, level, literal);
 		    }
-		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}
@@ -15863,6 +17215,451 @@ namespace boOX
     
     
 /*----------------------------------------------------------------------------*/
+
+    sInt_32 sSMTCBS::build_KarpianSmallModelVariablesInverse(Glucose::Solver                    *sUNUSED(solver),
+							     Context                            &sUNUSED(context),
+							     const sMission                     &mission,
+							     const sMission::MDD_vector         &MDD,
+							     const sMission::MDD_vector         &sUNUSED(extra_MDD),
+							     const sMission::InverseMDD_vector  &sUNUSED(inverse_MDD),
+							     sInt_32                             sUNUSED(cost_limit),
+							     sInt_32                             sUNUSED(extra_cost),
+							     Model                              &sat_Model) const
+    {
+	sASSERT(!MDD.empty());
+	
+	sInt_32 variable_ID = 1;
+	
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	sInt_32 N_layers = MDD[1].size() - 1;
+
+	sat_Model.m_vertex_occupancy.resize(N_agents + 1);
+	sat_Model.m_variable_mapping.push_back(Coordinate());
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    sat_Model.m_vertex_occupancy[agent_id].resize(N_layers + 1);
+	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+	    {
+		sat_Model.m_vertex_occupancy[agent_id][layer].resize(MDD[agent_id][layer].size());
+		for (sInt_32 v = 0; v < MDD[agent_id][layer].size(); ++v)
+		{
+		    sat_Model.m_vertex_occupancy[agent_id][layer][v] = variable_ID++;
+		    sat_Model.m_variable_mapping.push_back(Coordinate(agent_id, MDD[agent_id][layer][v], layer));
+		}
+	    }
+	}
+
+	sat_Model.m_layer_cardinality.resize(N_agents + 1);
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    sat_Model.m_layer_cardinality[agent_id].resize(N_layers + 1);
+	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+	    {
+		sat_Model.m_layer_cardinality[agent_id][layer] = variable_ID++;
+	    }
+	}
+
+	sat_Model.m_layer_fulfillment.resize(N_agents + 1);
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    sat_Model.m_layer_fulfillment[agent_id].resize(N_layers + 1);
+	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+	    {
+		sat_Model.m_layer_fulfillment[agent_id][layer] = variable_ID++;
+	    }
+	}	
+	
+	return variable_ID;
+    }
+
+    
+    void sSMTCBS::build_KarpianSmallModelConstraintsInverse(Glucose::Solver                   *solver,
+							    Context                            &context,
+							    const sMission                    &mission,
+							    const sMission::MDD_vector        &MDD,
+							    const sMission::MDD_vector        &extra_MDD,
+							    const sMission::InverseMDD_vector &inverse_MDD,
+							    sInt_32                             cost_limit,
+							    sInt_32                             extra_cost,
+							    Model                              &sat_Model) const
+    {
+	sASSERT(!MDD.empty());
+
+//	sInt_32 N_vertices = mission.m_environment.get_VertexCount();
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+	sInt_32 N_layers = MDD[1].size() - 1;
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+	    {
+		if (!extra_MDD[agent_id][layer].empty())
+		{
+		    m_solver_Encoder->cast_NonImplication(solver,
+							  sat_Model.m_layer_fulfillment[agent_id][layer],
+							  sat_Model.m_layer_cardinality[agent_id][layer]);
+		}
+		
+		VariableIDs_vector prev_cardinality_Identifiers;
+		
+		for (sInt_32 prev_layer = 0; prev_layer < layer; ++prev_layer)
+		{
+		    if (!extra_MDD[agent_id][prev_layer].empty())
+		    {
+			prev_cardinality_Identifiers.push_back(sat_Model.m_layer_cardinality[agent_id][prev_layer]);
+		    }
+		}
+		if (!prev_cardinality_Identifiers.empty())
+		{
+		    m_solver_Encoder->cast_MultiConjunctiveImplication(solver,
+								       sat_Model.m_layer_cardinality[agent_id][layer],
+								       prev_cardinality_Identifiers);
+		}
+	    }
+	}
+
+	VariableIDs_vector cardinality_Identifiers;
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+	    {
+		if (!extra_MDD[agent_id][layer].empty())
+		{
+		    cardinality_Identifiers.push_back(sat_Model.m_layer_cardinality[agent_id][layer]);
+		}
+	    }
+	}
+	if (!cardinality_Identifiers.empty())
+	{
+	    if (m_subopt_weight >= 0)
+	    {
+		if (m_subopt_weight >= 1.0)
+		{
+		    sDouble sub_extra_cost = cost_limit * m_subopt_weight - (cost_limit - extra_cost);	    
+		    m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, sub_extra_cost);		    
+		}
+	    }
+	    else
+	    {
+		m_solver_Encoder->cast_Cardinality(solver, cardinality_Identifiers, extra_cost);
+	    }
+	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{			    
+	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
+	    {
+		VariableIDs_vector mutex_vertex_Identifiers;
+	
+		for (sInt_32 u = 0; u < MDD[agent_id][layer].size(); ++u)
+		{
+		    VariableIDs_vector mutex_target_Identifiers;
+
+		    for (sVertex::Neighbors_list::const_iterator neighbor = mission.m_environment.m_Vertices[MDD[agent_id][layer][u]].m_Neighbors.begin(); neighbor != mission.m_environment.m_Vertices[MDD[agent_id][layer][u]].m_Neighbors.end(); ++neighbor)
+		    {				    
+			sInt_32 neighbor_id = (*neighbor)->m_target->m_id;		
+			sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[agent_id][layer + 1].find(neighbor_id);
+			
+			if (inverse_neighbor != inverse_MDD[agent_id][layer + 1].end())
+			{
+			    mutex_target_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
+
+			    if (!extra_MDD[agent_id][layer].empty())
+			    {			    
+				m_solver_Encoder->cast_Biimplication(solver,
+								     sat_Model.m_vertex_occupancy[agent_id][layer][u],
+								     sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second],
+								     sat_Model.m_layer_cardinality[agent_id][layer]);
+			    }
+			}
+		    }
+		    sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[agent_id][layer + 1].find(MDD[agent_id][layer][u]);
+
+		    if (inverse_neighbor != inverse_MDD[agent_id][layer + 1].end())		    
+		    {
+			mutex_target_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
+			/*
+			m_solver_Encoder->cast_Implication(solver,
+							   sat_Model.m_edge_occupancy[agent_id][layer][u][neighbor_index],
+							   sat_Model.m_vertex_occupancy[agent_id][layer + 1][inverse_neighbor->second]);
+			*/
+			
+		    }
+		    mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][u]);
+
+		    m_solver_Encoder->cast_MultiImplication(solver,
+							    sat_Model.m_vertex_occupancy[agent_id][layer][u],
+							    mutex_target_Identifiers);
+		    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_target_Identifiers);		    
+		}
+		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
+	    }	    
+	    
+	    VariableIDs_vector mutex_vertex_Identifiers;
+	    
+	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    {
+		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
+	    }
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);		
+	    
+	}
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    for (sInt_32 u = 0; u < MDD[agent_id][0].size(); ++u)
+	    {
+		if (MDD[agent_id][0][u] == mission.m_start_configuration.get_AgentLocation(agent_id))
+		{
+		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][0][u]);
+		}
+	    }
+	}
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    for (VertexIDs_vector::const_iterator commitment = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); commitment != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++commitment)
+	    {
+		VariableIDs_vector agent_commitment_Identifiers;
+	    
+		for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+		{
+		    sMission::InverseVertexIDs_umap::const_iterator inverse_commitment = inverse_MDD[agent_id][layer].find(*commitment);
+
+		    if (inverse_commitment != inverse_MDD[agent_id][layer].end())
+		    {
+			agent_commitment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][inverse_commitment->second]);
+		    }			
+		}
+		m_solver_Encoder->cast_Disjunction(solver, agent_commitment_Identifiers);
+	    }
+	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    for (VertexIDs_vector::const_iterator commitment = mission.m_goal_commitment.m_agent_Tasks[agent_id].begin(); commitment != mission.m_goal_commitment.m_agent_Tasks[agent_id].end(); ++commitment)
+	    {	  
+		for (sInt_32 layer = 0; layer <= N_layers; ++layer)
+		{
+		    VariableIDs_vector agent_fulfillment_Identifiers;
+		
+		    for (sInt_32 prev_layer = 0; prev_layer <= layer; ++prev_layer)
+		    {
+			sMission::InverseVertexIDs_umap::const_iterator inverse_commitment = inverse_MDD[agent_id][prev_layer].find(*commitment);
+
+			if (inverse_commitment != inverse_MDD[agent_id][prev_layer].end())
+			{
+			    agent_fulfillment_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][prev_layer][inverse_commitment->second]);
+			}
+		    }
+		    m_solver_Encoder->cast_MultiImplication(solver, sat_Model.m_layer_fulfillment[agent_id][layer], agent_fulfillment_Identifiers);		    
+		}
+	    }
+	}
+
+	refine_KarpianSmallModelCollisionsInverse(solver,
+						  context.m_trans_Collisions,
+						  context.m_trans_edge_Collisions,
+						  mission,
+						  MDD,
+						  extra_MDD,
+						  inverse_MDD,
+						  cost_limit,
+						  extra_cost,
+						  sat_Model);
+    }    
+
+
+    void sSMTCBS::refine_KarpianSmallModelCollisionsInverse(Glucose::Solver                    *solver,
+							    const Collisions_vector            &Collisions,
+							    const EdgeCollisions_vector        &edge_Collisions,
+							    const sMission                     &sUNUSED(mission),
+							    const sMission::MDD_vector         &sUNUSED(MDD),
+							    const sMission::MDD_vector         &sUNUSED(extra_MDD),
+							    const sMission::InverseMDD_vector  &inverse_MDD,
+							    sInt_32                             sUNUSED(cost_limit),
+							    sInt_32                             sUNUSED(extra_cost),
+							    Model                              &sat_Model) const
+    {	
+	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
+	{
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_u = inverse_MDD[collision->m_agent_A_id][collision->m_level_A].find(collision->m_vertex_A_id);
+	    sASSERT(inverse_u != inverse_MDD[collision->m_agent_A_id][collision->m_level_A].end());
+	    sInt_32 u = inverse_u->second;
+	    
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_v = inverse_MDD[collision->m_agent_B_id][collision->m_level_B].find(collision->m_vertex_B_id);
+	    sASSERT(inverse_v != inverse_MDD[collision->m_agent_B_id][collision->m_level_B].end());	    
+	    sInt_32 v = inverse_v->second;
+	    
+	    m_solver_Encoder->cast_Mutex(solver,
+					 sat_Model.m_vertex_occupancy[collision->m_agent_A_id][collision->m_level_A][u],
+					 sat_Model.m_vertex_occupancy[collision->m_agent_B_id][collision->m_level_B][v]);
+	}
+
+	// TODO
+	for (EdgeCollisions_vector::const_iterator edge_collision = edge_Collisions.begin(); edge_collision != edge_Collisions.end(); ++edge_collision)
+	{
+	    /*
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_A_u = inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A].find(edge_collision->m_edge_A_u_id);
+	    sASSERT(inverse_A_u != inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A].end());
+	    sInt_32 A_u = inverse_A_u->second;
+
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_B_u = inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B].find(edge_collision->m_edge_B_u_id);
+	    sASSERT(inverse_B_u != inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B].end());	    
+	    sInt_32 B_u = inverse_B_u->second;	    
+
+	    sInt_32 neighbor_index = 0, A_n = -1, B_n = -1;
+
+	    for (sVertex::Neighbors_list::const_iterator neighbor = mission.m_environment.m_Vertices[MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A][A_u]].m_Neighbors.begin();
+		 neighbor != mission.m_environment.m_Vertices[MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A][A_u]].m_Neighbors.end(); ++neighbor)
+	    {		
+		sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+		
+		sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A + 1].find(neighbor_id);		    
+		if (inverse_neighbor != inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A + 1].end())
+		{
+		    if (neighbor_id == edge_collision->m_edge_A_v_id)
+		    {
+			A_n = neighbor_index;
+			break;
+		    }
+		    ++neighbor_index;
+		}		
+	    }
+	    if (edge_collision->m_edge_A_u_id == edge_collision->m_edge_A_v_id)
+	    {
+		sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A + 1].find(MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A][A_u]);
+			
+		if (inverse_neighbor != inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A + 1].end())
+		{
+		    {
+			A_n = neighbor_index;		    
+		    }
+		}
+	    }
+	    sASSERT(A_n != -1);
+	    
+	    neighbor_index = 0;
+    
+	    for (sVertex::Neighbors_list::const_iterator neighbor = mission.m_environment.m_Vertices[MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B][B_u]].m_Neighbors.begin();
+		 neighbor != mission.m_environment.m_Vertices[MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B][B_u]].m_Neighbors.end(); ++neighbor)
+	    {
+		sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+		sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B + 1].find(neighbor_id);
+		
+		if (inverse_neighbor != inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B + 1].end())
+		{
+		    if (neighbor_id == edge_collision->m_edge_B_v_id)
+		    {
+			B_n = neighbor_index;
+			break;
+		    }		    
+		    ++neighbor_index;
+		}		
+	    }
+	    if (edge_collision->m_edge_B_u_id == edge_collision->m_edge_B_v_id)
+	    {
+		sMission::InverseVertexIDs_umap::const_iterator inverse_neighbor = inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B + 1].find(MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B][B_u]);
+	    
+		if (inverse_neighbor != inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B + 1].end())
+		{
+		    B_n = neighbor_index;
+		}
+	    }
+	    sASSERT(B_n != -1);	    
+	    */
+	    /*
+	    m_solver_Encoder->cast_Mutex(solver,
+					 sat_Model.m_edge_occupancy[edge_collision->m_agent_A_id][edge_collision->m_level_A][A_u][A_n],
+					 sat_Model.m_edge_occupancy[edge_collision->m_agent_B_id][edge_collision->m_level_B][B_u][B_n]);
+	    */
+
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_A_u = inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A].find(edge_collision->m_edge_A_u_id);
+	    sASSERT(inverse_A_u != inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A].end());
+	    sInt_32 A_u = inverse_A_u->second;
+
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_A_v = inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A + 1].find(edge_collision->m_edge_A_v_id);
+	    sASSERT(inverse_A_v != inverse_MDD[edge_collision->m_agent_A_id][edge_collision->m_level_A].end());
+	    sInt_32 A_v = inverse_A_v->second;
+
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_B_u = inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B].find(edge_collision->m_edge_B_u_id);
+	    sASSERT(inverse_B_u != inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B].end());
+	    sInt_32 B_u = inverse_B_u->second;
+
+	    sMission::InverseVertexIDs_umap::const_iterator inverse_B_v = inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B + 1].find(edge_collision->m_edge_B_v_id);
+	    sASSERT(inverse_B_v != inverse_MDD[edge_collision->m_agent_B_id][edge_collision->m_level_B].end());
+	    sInt_32 B_v = inverse_B_v->second;	        
+	    	        
+	    m_solver_Encoder->cast_4Mutex(solver,
+					 sat_Model.m_vertex_occupancy[edge_collision->m_agent_A_id][edge_collision->m_level_A][A_u],
+					 sat_Model.m_vertex_occupancy[edge_collision->m_agent_A_id][edge_collision->m_level_A + 1][A_v],
+					 sat_Model.m_vertex_occupancy[edge_collision->m_agent_B_id][edge_collision->m_level_B][B_u],
+					 sat_Model.m_vertex_occupancy[edge_collision->m_agent_B_id][edge_collision->m_level_B + 1][B_v]);
+	}	
+    }
+    
+
+    void sSMTCBS::decode_KarpianSmallModel(Glucose::Solver             *solver,
+					   const sMission             &mission,
+					   const sMission::MDD_vector &MDD,
+					   const Model                 &sat_Model,
+					   AgentPaths_vector           &agent_Paths) const
+    {
+	Configurations_vector mdd_Configurations;
+	sInt_32 mdd_depth = MDD[1].size();
+
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	agent_Paths.resize(N_agents + 1);
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_Paths[agent_id].resize(mdd_depth);
+	}
+	for (sInt_32 i = 0; i < solver->nVars(); i++)
+	{
+	    sInt_32 literal;
+		    
+	    if (solver->model[i] != l_Undef)
+	    {
+		literal = (solver->model[i] == l_True) ? i + 1 : -(i+1);
+	    }
+	    else
+	    {
+		sASSERT(false);
+	    }
+
+	    if (literal > 0)
+	    {
+		#ifdef sDEBUG
+		{
+		    // printf("Literal (true): %d\n", literal);
+		}
+		#endif
+		sInt_32 variable_ID = sABS(literal);
+		if (variable_ID < sat_Model.m_variable_mapping.size())
+		{
+		    const Coordinate &coordinate = sat_Model.m_variable_mapping[variable_ID];
+		    sInt_32 agent_id = coordinate.m_agent_id;
+		    sInt_32 vertex_id = coordinate.m_vertex_id;
+		    sInt_32 level = coordinate.m_layer;
+
+		    #ifdef sDEBUG
+		    {
+			// printf("Extratracted from satisfying a:%d, v:%d, l:%d [%d]\n", agent_id, vertex_id, level, literal);
+		    }
+		    #endif
+		    agent_Paths[agent_id][level] = vertex_id;
+		}
+	    }
+	}
+    }
+    
+    
+/*----------------------------------------------------------------------------*/
+
+
     
 
 } // namespace boOX

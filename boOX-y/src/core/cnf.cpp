@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 2-032_planck                                                     */
+/* cnf.cpp / 2-059_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -458,7 +458,7 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
 	}
 	#endif
-    }    
+    }
 
 
     void sBoolEncoder::cast_Implication(Glucose::Solver *solver,
@@ -475,7 +475,38 @@ namespace boOX
 	    s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses += 2;
 	}
 	#endif
+    }
+
+
+    void sBoolEncoder::cast_Biimplication(Glucose::Solver *solver,
+					  sInt_32          variable_ID_PREC_A,
+					  sInt_32          variable_ID_PREC_B,
+					  sInt_32          variable_ID_POST,
+					  sInt_32          sUNUSED(weight))
+    {
+	cast_Clause(solver, -variable_ID_PREC_A, -variable_ID_PREC_B, variable_ID_POST);
+
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses += 1;
+	}
+	#endif
     }    
+
+
+    void sBoolEncoder::cast_NonImplication(Glucose::Solver *solver,
+					   sInt_32          variable_ID_PREC,
+					   sInt_32          variable_ID_POST,
+					   sInt_32          sUNUSED(weight))
+    {
+	cast_Clause(solver, variable_ID_PREC, variable_ID_POST);
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
+	}
+	#endif
+    }        
 
 
     void sBoolEncoder::cast_Effect(Glucose::Solver *solver,
@@ -789,6 +820,7 @@ namespace boOX
 	
 	for (std::vector<int>::const_iterator lit = Lits.begin(); lit != Lits.end(); ++lit)
 	{
+//	    printf("%d ", *lit);
 	    sInt_32 glu_var = sABS(*lit) - 1;
 	    while (glu_var >= solver->nVars())
 	    {
@@ -796,6 +828,7 @@ namespace boOX
 	    }
 	    glu_Lits.push((*lit > 0) ? Glucose::mkLit(glu_var, false) : ~Glucose::mkLit(glu_var, false));
 	}
+//	printf("0\n");
 	solver->addClause(glu_Lits);
     }
 

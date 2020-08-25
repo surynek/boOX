@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-032_planck                                                   */
+/* agent.cpp / 2-059_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1517,6 +1517,19 @@ namespace boOX
 	m_agent_Tasks[agent_id].clear();
     }
 
+
+    bool sCommitment::is_Committed(sInt_32 agent_id, sInt_32 vertex_id) const
+    {
+	for (VertexIDs_vector::const_iterator vertex = m_agent_Tasks[agent_id].begin(); vertex != m_agent_Tasks[agent_id].end(); ++vertex)
+	{
+	    if (*vertex == vertex_id)
+	    {
+		return true;
+	    }
+	}
+	return false;
+    }
+
     
 /*----------------------------------------------------------------------------*/
 
@@ -1940,6 +1953,7 @@ namespace boOX
 
         #ifdef sDEBUG
 	{
+	    /*
 	    printf("<----\n");	
 	    printf("MDD printout\n");
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
@@ -1956,6 +1970,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    printf("<----\n");
+	    */
 	}
 	#endif
 	
@@ -3450,6 +3465,23 @@ namespace boOX
 
 
 /*----------------------------------------------------------------------------*/
+
+    void sMission::collect_Endpoints(VertexIDs_vector &endpoint_IDs) const
+    {
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{	    
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    endpoint_IDs.push_back(agent_source_vertex_id);	    
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+	    {		
+		sInt_32 agent_sink_vertex_id = *task;
+		endpoint_IDs.push_back(agent_sink_vertex_id);
+	    }
+	}	
+    }
+
     
     void sMission::collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const
     {
@@ -3470,7 +3502,8 @@ namespace boOX
 
     sInt_32 sMission::estimate_TotalHamiltonianCost(sInt_32 &max_individual_cost)
     {
-	return estimate_TotalHamiltonianCost_rough(max_individual_cost);
+//	return estimate_TotalHamiltonianCost_rough(max_individual_cost);	
+	return estimate_TotalHamiltonianCost_spanning(max_individual_cost);
     }
     
     
@@ -3483,7 +3516,6 @@ namespace boOX
 	m_environment.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
 
 	const sUndirectedGraph::Distances_2d_vector &source_Distances = m_environment.get_SourceShortestPaths();
-//	const sUndirectedGraph::Distances_2d_vector &goal_Distances = m_environment.get_GoalShortestPaths();
 
 	sInt_32 min_total_cost = 0;
 	max_individual_cost = 0;
@@ -3492,7 +3524,6 @@ namespace boOX
 	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
 	{
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
-
 	    sInt_32 agent_max_cost = 0;
 
 	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
@@ -3516,10 +3547,123 @@ namespace boOX
     }
 
 
-    sInt_32 sMission::estimate_TotalHamiltonianCost_spanning(sInt_32 &sUNUSED(max_individual_cost))
+    sInt_32 sMission::estimate_TotalHamiltonianCost_spanning(sInt_32 &max_individual_cost)
     {
-	return 0;
-    }    
+	VertexIDs_vector endpoint_IDs;
+
+	collect_Endpoints(endpoint_IDs);
+	m_environment.calc_EndpointShortestPaths(endpoint_IDs);
+
+	sInt_32 min_total_cost = 0;
+	max_individual_cost = 0;
+
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    VertexIDs_vector node_IDs;
+		
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    node_IDs.push_back(agent_source_vertex_id);
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+	    {		
+		node_IDs.push_back(*task);
+	    }
+
+	    sInt_32 agent_cost = m_environment.calc_MinimumSpanningTree(node_IDs);
+	    min_total_cost += agent_cost;
+
+	    if (agent_cost > max_individual_cost)
+	    {
+		max_individual_cost = agent_cost;
+	    }
+	}
+	return min_total_cost;
+    }
+
+
+    sInt_32 sMission::estimate_TotalKarpianCost(sInt_32 &max_individual_cost)
+    {
+//	return estimate_TotalKarpianCost_rough(max_individual_cost);	
+	return estimate_TotalKarpianCost_spanning(max_individual_cost);
+    }
+    
+    
+    sInt_32 sMission::estimate_TotalKarpianCost_rough(sInt_32 &max_individual_cost)
+    {	
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	collect_Endpoints(source_IDs, goal_IDs);
+	m_environment.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
+
+	const sUndirectedGraph::Distances_2d_vector &source_Distances = m_environment.get_SourceShortestPaths();
+
+	sInt_32 min_total_cost = 0;
+	max_individual_cost = 0;
+
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    sInt_32 agent_max_cost = 0;
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+	    {		
+		sInt_32 agent_sink_vertex_id = *task;
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+		if (agent_cost > agent_max_cost)
+		{
+		    agent_max_cost = agent_cost;
+		}
+	    }	    
+	    min_total_cost += agent_max_cost;
+
+	    if (agent_max_cost > max_individual_cost)
+	    {
+		max_individual_cost = agent_max_cost;
+	    }
+	}
+	return min_total_cost;
+    }
+
+
+    sInt_32 sMission::estimate_TotalKarpianCost_spanning(sInt_32 &max_individual_cost)
+    {
+	VertexIDs_vector endpoint_IDs;
+
+	collect_Endpoints(endpoint_IDs);
+	m_environment.calc_EndpointShortestPaths(endpoint_IDs);
+
+	sInt_32 min_total_cost = 0;
+	max_individual_cost = 0;
+
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    VertexIDs_vector node_IDs;
+		
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    node_IDs.push_back(agent_source_vertex_id);
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[agent_id].end(); ++task)
+	    {		
+		node_IDs.push_back(*task);
+	    }
+
+	    sInt_32 agent_cost = m_environment.calc_MinimumSpanningTree(node_IDs);
+	    min_total_cost += agent_cost;
+
+	    if (agent_cost > max_individual_cost)
+	    {
+		max_individual_cost = agent_cost;
+	    }
+	}
+	return min_total_cost;
+    }        
+
+/*----------------------------------------------------------------------------*/
 
     
     sInt_32 sMission::construct_HamiltonianMDD(sInt_32     max_total_cost,
@@ -3527,8 +3671,26 @@ namespace boOX
 					       sInt_32    &extra_cost,
 					       MDD_vector &extra_MDD)
     {
-	return construct_GraphHamiltonianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);	
-    }    
+//	return construct_GraphHamiltonianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);
+	return construct_GraphHamiltonianMDD_spanning(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);		
+    }
+
+
+    sInt_32 sMission::construct_HamiltonianMDD_rough(sInt_32     max_total_cost,
+						     MDD_vector &MDD,
+						     sInt_32    &extra_cost,
+						     MDD_vector &extra_MDD)
+    {
+	return construct_GraphHamiltonianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);		
+    }
+
+    sInt_32 sMission::construct_HamiltonianMDD_spanning(sInt_32     max_total_cost,
+							MDD_vector &MDD,
+							sInt_32    &extra_cost,
+							MDD_vector &extra_MDD)
+    {
+	return construct_GraphHamiltonianMDD_spanning(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);		
+    }        
 
     
     sInt_32 sMission::construct_GraphHamiltonianMDD_rough(sUndirectedGraph &graph,
@@ -3548,10 +3710,10 @@ namespace boOX
 	collect_Endpoints(source_IDs, goal_IDs);
 
 	graph.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
-	sInt_32 min_total_cost = estimate_TotalHamiltonianCost(max_individual_cost);
+	sInt_32 min_total_cost = estimate_TotalHamiltonianCost_rough(max_individual_cost);
 	
 	const sUndirectedGraph::Distances_2d_vector &source_Distances = graph.get_SourceShortestPaths();
-	const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	
+	//const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	
 
 	extra_cost = max_total_cost - min_total_cost;
 	sInt_32 mdd_depth = max_individual_cost + extra_cost;
@@ -3605,6 +3767,7 @@ namespace boOX
 	    {
 		sInt_32 commitment_distance = sINT_32_MAX;
 
+		/*
 		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
 		{		
 		    sInt_32 agent_sink_vertex_id = *task;
@@ -3615,12 +3778,183 @@ namespace boOX
 			commitment_distance = agent_cost;
 		    }
 		}
+		sASSERT(commitment_distance < sINT_32_MAX);
+		*/
+		commitment_distance = 0;
 		    
 		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
 		     mdd_level <= sMIN(agent_lower_cost_Bounds[mdd_agent_id] + extra_cost - commitment_distance, mdd_depth);
 		     ++mdd_level)
 		{
 		    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		}
+	    }
+
+	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    {
+		if (MDD[mdd_agent_id][mdd_level].empty())
+		{
+//		    printf("Empto: %d\n", mdd_level);
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}
+		/*
+		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		{
+		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		}
+		*/
+		if (   mdd_level > agent_lower_cost_Bounds[mdd_agent_id]
+		    && mdd_level <= agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
+		{
+//		    printf("extra Empto: %d\n", mdd_level);
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    		    
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}		
+	    }
+	    ++sort_index;
+	}
+
+        #ifdef sDEBUG
+	{
+	    printf("<----\n");	
+	    printf("MDD printout (extra:%d)\n", extra_cost);
+	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
+	    {	    
+		printf("agent:%d (lower bound:%d)\n", mdd_agent, agent_lower_cost_Bounds[mdd_agent]);
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    for (sInt_32 i = 0; i < MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("[");
+		    for (sInt_32 i = 0; i < extra_MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", extra_MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("]");
+		    printf("\n");
+		}
+		printf("\n");
+	    }
+	    printf("<----\n");
+	}
+	#endif
+	
+	return mdd_depth;
+    }
+
+
+    sInt_32 sMission::construct_GraphHamiltonianMDD_spanning(sUndirectedGraph &graph,
+							     sInt_32           max_total_cost,
+							     MDD_vector       &MDD,
+							     sInt_32          &extra_cost,
+							     MDD_vector       &extra_MDD)
+    {
+	sInt_32 max_individual_cost;
+	sInt_32 N_Vertices = graph.get_VertexCount();	
+
+	MDD.clear();
+	extra_MDD.clear();
+
+	VertexIDs_vector endpoint_IDs;
+	collect_Endpoints(endpoint_IDs);
+
+	graph.calc_EndpointShortestPaths(endpoint_IDs);
+	sInt_32 min_total_cost = estimate_TotalHamiltonianCost_spanning(max_individual_cost);
+	const sUndirectedGraph::Distances_2d_vector &endpoint_Distances = graph.get_EndpointShortestPaths();
+
+	extra_cost = max_total_cost - min_total_cost;
+	sInt_32 mdd_depth = max_individual_cost + extra_cost;
+	
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+
+	MDD.resize(N_Agents + 1);
+	extra_MDD.resize(N_Agents + 1);
+
+	std::vector<sInt_32> agent_lower_cost_Bounds;
+	agent_lower_cost_Bounds.resize(N_Agents + 1);
+
+	AgentIndices_mmap sorted_mdd_Agents;
+
+	for (sInt_32 mdd_agent_id = 1; mdd_agent_id <= N_Agents; ++mdd_agent_id)
+	{
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+
+	    VertexIDs_vector node_IDs;
+		
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
+	    node_IDs.push_back(agent_source_vertex_id);
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+	    {		
+		node_IDs.push_back(*task);
+	    }
+
+	    sInt_32 agent_cost = m_environment.calc_MinimumSpanningTree(node_IDs);
+	    min_total_cost += agent_cost;
+
+	    if (agent_cost > max_individual_cost)
+	    {
+		max_individual_cost = agent_cost;
+	    }
+	    agent_lower_cost_Bounds[mdd_agent_id] = agent_cost;
+	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	}
+
+	sInt_32 sort_index = 0;
+	for (AgentIndices_mmap::const_reverse_iterator sort_agent = sorted_mdd_Agents.rbegin(); sort_agent != sorted_mdd_Agents.rend(); ++sort_agent)
+	{
+	    sInt_32 mdd_agent_id = sort_agent->second;
+	    
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+ 
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
+	    
+	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+	    {
+		VertexIDs_vector node_IDs;
+		node_IDs.push_back(vertex_id);
+		node_IDs.push_back(agent_source_vertex_id);
+
+		sInt_32 commitment_distance = sINT_32_MAX;		
+
+		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		{
+		    sInt_32 agent_sink_vertex_id = *task;
+		    node_IDs.push_back(agent_sink_vertex_id);
+
+		    /*
+		    sInt_32 agent_cost = endpoint_Distances[agent_sink_vertex_id][vertex_id];		    
+
+		    if (agent_cost < commitment_distance)
+		    {
+			commitment_distance = agent_cost;
+		    }
+		    */		    
+		}
+		//sASSERT(commitment_distance < sINT_32_MAX);
+		sInt_32 commitment_cost = m_environment.calc_MinimumSpanningTree(vertex_id, node_IDs);
+		commitment_distance = 0;
+
+		if (mdd_depth >= commitment_cost)
+		{
+		    for (sInt_32 mdd_level = endpoint_Distances[agent_source_vertex_id][vertex_id];		     
+			 mdd_level <= sMIN(agent_lower_cost_Bounds[mdd_agent_id] + extra_cost - commitment_distance, mdd_depth);
+			 ++mdd_level)
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    }
 		}
 	    }
 
@@ -3641,8 +3975,8 @@ namespace boOX
 		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
 		}
 		*/
-		if (   mdd_level >= agent_lower_cost_Bounds[mdd_agent_id]
-		    && mdd_level < agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
+		if (   mdd_level > agent_lower_cost_Bounds[mdd_agent_id]
+		    && mdd_level <= agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
 		{
 		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
 		    {		
@@ -3657,16 +3991,211 @@ namespace boOX
         #ifdef sDEBUG
 	{
 	    printf("<----\n");	
-	    printf("MDD printout\n");
+	    printf("MDD printout (extra:%d)\n", extra_cost);
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
 	    {	    
-		printf("agent:%d\n", mdd_agent);
+		printf("agent:%d (lower bound:%d)\n", mdd_agent, agent_lower_cost_Bounds[mdd_agent]);
 		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
 		{
 		    for (sInt_32 i = 0; i < MDD[mdd_agent][mdd_level].size(); ++i)
 		    {		    
 			printf("%d ", MDD[mdd_agent][mdd_level][i]);
 		    }
+		    printf("[");
+		    for (sInt_32 i = 0; i < extra_MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", extra_MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("]");
+		    printf("\n");
+		}
+		printf("\n");
+	    }
+	    printf("<----\n");
+	}
+	#endif
+	
+	return mdd_depth;
+    }    
+
+
+/*----------------------------------------------------------------------------*/
+    
+    sInt_32 sMission::construct_KarpianMDD(sInt_32     max_total_cost,
+					   MDD_vector &MDD,
+					   sInt_32    &extra_cost,
+					   MDD_vector &extra_MDD)
+    {
+//	return construct_GraphKarpianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);
+	return construct_GraphKarpianMDD_spanning(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);		
+    }
+
+
+    sInt_32 sMission::construct_KarpianMDD_rough(sInt_32     max_total_cost,
+						 MDD_vector &MDD,
+						 sInt_32    &extra_cost,
+						 MDD_vector &extra_MDD)
+    {
+	return construct_GraphKarpianMDD_rough(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);		
+    }
+
+    sInt_32 sMission::construct_KarpianMDD_spanning(sInt_32     max_total_cost,
+						    MDD_vector &MDD,
+						    sInt_32    &extra_cost,
+						    MDD_vector &extra_MDD)
+    {
+	return construct_GraphKarpianMDD_spanning(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);		
+    }        
+
+    
+    sInt_32 sMission::construct_GraphKarpianMDD_rough(sUndirectedGraph &graph,
+						      sInt_32           max_total_cost,
+						      MDD_vector       &MDD,
+						      sInt_32          &extra_cost,
+						      MDD_vector       &extra_MDD)
+    {
+	sInt_32 max_individual_cost;
+	sInt_32 N_Vertices = graph.get_VertexCount();	
+
+	MDD.clear();
+	extra_MDD.clear();
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+	collect_Endpoints(source_IDs, goal_IDs);
+
+	graph.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
+	sInt_32 min_total_cost = estimate_TotalKarpianCost_rough(max_individual_cost);
+	
+	const sUndirectedGraph::Distances_2d_vector &source_Distances = graph.get_SourceShortestPaths();
+	//const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	
+
+	extra_cost = max_total_cost - min_total_cost;
+	sInt_32 mdd_depth = max_individual_cost + extra_cost;
+	
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+
+	MDD.resize(N_Agents + 1);
+	extra_MDD.resize(N_Agents + 1);
+
+	std::vector<sInt_32> agent_lower_cost_Bounds;
+	agent_lower_cost_Bounds.resize(N_Agents + 1);
+
+	AgentIndices_mmap sorted_mdd_Agents;
+
+	for (sInt_32 mdd_agent_id = 1; mdd_agent_id <= N_Agents; ++mdd_agent_id)
+	{
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
+	    
+	    sInt_32 agent_max_cost = 0;
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+	    {		
+		sInt_32 agent_sink_vertex_id = *task;
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+		if (agent_cost > agent_max_cost)
+		{
+		    agent_max_cost = agent_cost;
+		}
+	    }
+	    agent_lower_cost_Bounds[mdd_agent_id] = agent_max_cost;
+	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_max_cost, mdd_agent_id));
+	}
+
+	sInt_32 sort_index = 0;
+	for (AgentIndices_mmap::const_reverse_iterator sort_agent = sorted_mdd_Agents.rbegin(); sort_agent != sorted_mdd_Agents.rend(); ++sort_agent)
+	{
+	    sInt_32 mdd_agent_id = sort_agent->second;
+	    
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);	    
+//	    sInt_32 agent_sink_vertex_id  = m_goal_configuration.get_AgentLocation(mdd_agent_id);
+//   	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+	    {
+		sInt_32 commitment_distance = sINT_32_MAX;
+
+		/*
+		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		{		
+		    sInt_32 agent_sink_vertex_id = *task;
+		    sInt_32 agent_cost = goal_Distances[agent_sink_vertex_id][vertex_id];
+		    
+		    if (agent_cost < commitment_distance)
+		    {
+			commitment_distance = agent_cost;
+		    }
+		}
+		sASSERT(commitment_distance < sINT_32_MAX);
+		*/
+		commitment_distance = 0;
+		    
+		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
+		     mdd_level <= sMIN(agent_lower_cost_Bounds[mdd_agent_id] + extra_cost - commitment_distance, mdd_depth);
+		     ++mdd_level)
+		{
+		    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		}
+	    }
+
+	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    {
+		if (MDD[mdd_agent_id][mdd_level].empty())
+		{
+//		    printf("Empto: %d\n", mdd_level);
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}
+		/*
+		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		{
+		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		}
+		*/
+		if (   mdd_level > agent_lower_cost_Bounds[mdd_agent_id]
+		    && mdd_level <= agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
+		{
+//		    printf("extra Empto: %d\n", mdd_level);
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    		    
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}		
+	    }
+	    ++sort_index;
+	}
+
+        #ifdef sDEBUG
+	{
+	    printf("<----\n");	
+	    printf("MDD printout (extra:%d)\n", extra_cost);
+	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
+	    {	    
+		printf("agent:%d (lower bound:%d)\n", mdd_agent, agent_lower_cost_Bounds[mdd_agent]);
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    for (sInt_32 i = 0; i < MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("[");
+		    for (sInt_32 i = 0; i < extra_MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", extra_MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("]");
 		    printf("\n");
 		}
 		printf("\n");
@@ -3677,6 +4206,172 @@ namespace boOX
 	
 	return mdd_depth;
     }
+
+
+    sInt_32 sMission::construct_GraphKarpianMDD_spanning(sUndirectedGraph &graph,
+							 sInt_32           max_total_cost,
+							 MDD_vector       &MDD,
+							 sInt_32          &extra_cost,
+							 MDD_vector       &extra_MDD)
+    {
+	sInt_32 max_individual_cost;
+	sInt_32 N_Vertices = graph.get_VertexCount();	
+
+	MDD.clear();
+	extra_MDD.clear();
+
+	VertexIDs_vector endpoint_IDs;
+	collect_Endpoints(endpoint_IDs);
+
+	graph.calc_EndpointShortestPaths(endpoint_IDs);
+	sInt_32 min_total_cost = estimate_TotalKarpianCost_spanning(max_individual_cost);
+	const sUndirectedGraph::Distances_2d_vector &endpoint_Distances = graph.get_EndpointShortestPaths();
+
+	extra_cost = max_total_cost - min_total_cost;
+	sInt_32 mdd_depth = max_individual_cost + extra_cost;
+	
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+
+	MDD.resize(N_Agents + 1);
+	extra_MDD.resize(N_Agents + 1);
+
+	std::vector<sInt_32> agent_lower_cost_Bounds;
+	agent_lower_cost_Bounds.resize(N_Agents + 1);
+
+	AgentIndices_mmap sorted_mdd_Agents;
+
+	for (sInt_32 mdd_agent_id = 1; mdd_agent_id <= N_Agents; ++mdd_agent_id)
+	{
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+
+	    VertexIDs_vector node_IDs;
+		
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
+	    node_IDs.push_back(agent_source_vertex_id);
+
+	    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+	    {		
+		node_IDs.push_back(*task);
+	    }
+
+	    sInt_32 agent_cost = m_environment.calc_MinimumSpanningTree(node_IDs);
+	    min_total_cost += agent_cost;
+
+	    if (agent_cost > max_individual_cost)
+	    {
+		max_individual_cost = agent_cost;
+	    }
+	    agent_lower_cost_Bounds[mdd_agent_id] = agent_cost;
+	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	}
+
+	sInt_32 sort_index = 0;
+	for (AgentIndices_mmap::const_reverse_iterator sort_agent = sorted_mdd_Agents.rbegin(); sort_agent != sorted_mdd_Agents.rend(); ++sort_agent)
+	{
+	    sInt_32 mdd_agent_id = sort_agent->second;
+	    
+	    MDD[mdd_agent_id].resize(mdd_depth + 1);
+	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
+ 
+	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
+	    
+	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+	    {
+		VertexIDs_vector node_IDs;
+		node_IDs.push_back(vertex_id);
+		node_IDs.push_back(agent_source_vertex_id);
+
+		sInt_32 commitment_distance = sINT_32_MAX;		
+
+		for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		{
+		    sInt_32 agent_sink_vertex_id = *task;
+		    node_IDs.push_back(agent_sink_vertex_id);
+
+		    /*
+		    sInt_32 agent_cost = endpoint_Distances[agent_sink_vertex_id][vertex_id];		    
+
+		    if (agent_cost < commitment_distance)
+		    {
+			commitment_distance = agent_cost;
+		    }
+		    */		    
+		}
+		//sASSERT(commitment_distance < sINT_32_MAX);
+		sInt_32 commitment_cost = m_environment.calc_MinimumSpanningTree(vertex_id, node_IDs);
+		commitment_distance = 0;
+
+		if (mdd_depth >= commitment_cost)
+		{
+		    for (sInt_32 mdd_level = endpoint_Distances[agent_source_vertex_id][vertex_id];		     
+			 mdd_level <= sMIN(agent_lower_cost_Bounds[mdd_agent_id] + extra_cost - commitment_distance, mdd_depth);
+			 ++mdd_level)
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    }
+		}
+	    }
+
+	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    {
+		if (MDD[mdd_agent_id][mdd_level].empty())
+		{
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}
+		/*
+		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		{
+		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		}
+		*/
+		if (   mdd_level > agent_lower_cost_Bounds[mdd_agent_id]
+		    && mdd_level <= agent_lower_cost_Bounds[mdd_agent_id] + extra_cost)
+		{
+		    for (sCommitment::AgentTask_vector::const_iterator task = m_goal_commitment.m_agent_Tasks[mdd_agent_id].begin(); task != m_goal_commitment.m_agent_Tasks[mdd_agent_id].end(); ++task)
+		    {		
+			sInt_32 agent_sink_vertex_id = *task;		    		    
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}		
+	    }
+	    ++sort_index;
+	}
+
+        #ifdef sDEBUG
+	{
+	    printf("<----\n");	
+	    printf("MDD printout (extra:%d)\n", extra_cost);
+	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
+	    {	    
+		printf("agent:%d (lower bound:%d)\n", mdd_agent, agent_lower_cost_Bounds[mdd_agent]);
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    for (sInt_32 i = 0; i < MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("[");
+		    for (sInt_32 i = 0; i < extra_MDD[mdd_agent][mdd_level].size(); ++i)
+		    {		    
+			printf("%d ", extra_MDD[mdd_agent][mdd_level][i]);
+		    }
+		    printf("]");
+		    printf("\n");
+		}
+		printf("\n");
+	    }
+	    printf("<----\n");
+	}
+	#endif
+	
+	return mdd_depth;
+    }    
 
     
 /*----------------------------------------------------------------------------*/

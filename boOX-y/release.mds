@@ -18,6 +18,7 @@ swap_solver_boOX
 mapf_solver_boOX
 perm_solver_boOX
 rota_solver_boOX
+hamilton_solver_boOX
 mapR_convert_boOX
 movimap_convert_boOX
 moviscen_convert_boOX

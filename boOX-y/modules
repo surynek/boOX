@@ -151,6 +151,14 @@ rota_solver_main.cpp
 pthread
 /src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
+hamilton_solver_boOX
+application
+/src/main
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h hamilton_solver_main.h
+hamilton_solver_main.cpp
+pthread
+/src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
 mapR_convert_boOX
 application
 /src/main

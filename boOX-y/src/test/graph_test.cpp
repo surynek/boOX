@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.cpp / 2-032_planck                                              */
+/* graph_test.cpp / 2-059_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
@@ -188,6 +188,40 @@ namespace boOX
     }
 
 
+    void test_undirected_graph_5(void)
+    {
+	printf("Undirecteg graph test 5 ...\n");
+	sUndirectedGraph grid_graph_A(4, 4);
+	grid_graph_A.to_Screen();
+
+	sUndirectedGraph grid_graph_B(4, 4);
+	grid_graph_B.to_Screen();	
+
+	sUndirectedGraph::VertexIDs_vector endpoint_A_IDs;
+	endpoint_A_IDs.push_back(0);
+	endpoint_A_IDs.push_back(7);
+	endpoint_A_IDs.push_back(13);
+	endpoint_A_IDs.push_back(8);
+
+	sUndirectedGraph::VertexIDs_vector endpoint_B_IDs;	
+	endpoint_B_IDs.push_back(14);
+	endpoint_B_IDs.push_back(11);
+	endpoint_B_IDs.push_back(4);
+	endpoint_B_IDs.push_back(12);
+
+	grid_graph_A.calc_EndpointShortestPaths(endpoint_A_IDs);
+	sInt_32 span_cost_A = grid_graph_A.calc_MinimumSpanningTree(endpoint_A_IDs);
+	
+	grid_graph_B.calc_EndpointShortestPaths(endpoint_B_IDs);
+	sInt_32 span_cost_B = grid_graph_B.calc_MinimumSpanningTree(endpoint_B_IDs);
+
+	printf("Spanning tree A cost: %d\n", span_cost_A);
+	printf("Spanning tree B cost: %d\n", span_cost_B);
+
+	printf("Undirecteg graph test 5 ... finished\n");
+    }    
+
+
     void test_statistics_1(void)
     {
 	double wc_start = sStatistics::get_WC_Seconds();
@@ -208,16 +242,16 @@ namespace boOX
 	printf("Wall clock time: %.3f\n", wc_finish - wc_start);
 	printf("CPU time       : %.3f\n", cpu_finish - cpu_start);
 
-	++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
-	++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
-	++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
-	++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 
 	s_GlobalStatistics.to_Screen();
 	s_GlobalStatistics.enter_Phase("extreme");
 
-	++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
-	++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+	++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
 
 	s_GlobalStatistics.to_Screen();
     }
@@ -234,6 +268,7 @@ namespace boOX
 int main(int sUNUSED(argc), char **sUNUSED(argv))
 {
     print_Introduction();
+    /*
     test_undirected_graph_1();
 
     test_undirected_graph_2(16, 0.1);
@@ -245,6 +280,8 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
     test_statistics_1();
 
     test_undirected_graph_4();
+    */
+    test_undirected_graph_5();
 }
 
 

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 2-032_planck                                                    */
+/* cbsR.cpp / 2-059_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -2473,7 +2473,7 @@ namespace boOX
     }
 
     
-    sDouble sRealCBSBase::calc_Cost(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules)
+    sDouble sRealCBSBase::calc_Cost(const sRealInstance &sUNUSED_(real_Instance), const KruhobotSchedules_vector &kruhobot_Schedules)
     {
 	sDouble cost = 0.0;
 	sDouble alter_cost = 0.0;
@@ -2532,7 +2532,7 @@ namespace boOX
     }
 
 
-    sDouble sRealCBSBase::calc_Cost(const sRealInstance &real_Instance, const KruhobotSchedules_vector &kruhobot_Schedules, Costs_vector &individual_Costs)
+    sDouble sRealCBSBase::calc_Cost(const sRealInstance &sUNUSED_(real_Instance), const KruhobotSchedules_vector &kruhobot_Schedules, Costs_vector &individual_Costs)
     {
 	sDouble cost = 0.0;
 	sDouble alter_cost = 0.0;
@@ -3123,7 +3123,7 @@ namespace boOX
 	    }
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3153,7 +3153,7 @@ namespace boOX
 		if (end_time - start_time > verbose_period)
 		{
 		    printf("Search steps: %lld (time: %.3f s, make %.3f, cost %.3f)\n",
-			   s_GlobalStatistics.get_CurrentPhase().m_search_Steps,
+			   s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps,
 			   end_time - start_time,
 			   search_Store[best_node.m_node_id].m_makespan,
 			   search_Store[best_node.m_node_id].m_cost);
@@ -3199,7 +3199,7 @@ namespace boOX
                 #ifdef sVERBOSE	    
 		{
 		    sDouble end_time = sStatistics::get_CPU_Seconds();
-		    printf("Final search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Final search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		}
 		#endif
 		kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;
@@ -3325,7 +3325,7 @@ namespace boOX
 	    }
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3354,8 +3354,9 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s, make %.3f, cost %.3f)\n",
-			   s_GlobalStatistics.get_CurrentPhase().m_search_Steps,
+		    printf("Search steps: %lld, %lld (time: %.3f s, make %.3f, cost %.3f)\n",
+			   s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps,
+			   s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps,			   
 			   end_time - start_time,
 			   search_Store[best_node.m_node_id].m_makespan,
 			   search_Store[best_node.m_node_id].m_cost);
@@ -3401,7 +3402,7 @@ namespace boOX
                 #ifdef sVERBOSE	    
 		{
 		    sDouble end_time = sStatistics::get_CPU_Seconds();
-		    printf("Final search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Final search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		}
 		#endif
 		kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;
@@ -3527,7 +3528,7 @@ namespace boOX
 	    }
             #ifdef sSTATISTICS
 	    {
-		++s_GlobalStatistics.get_CurrentPhase().m_search_Steps;
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
 
@@ -3556,8 +3557,9 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > verbose_period)
 		{
-		    printf("Search steps: %lld (time: %.3f s, make %.3f, cost %.3f)\n",
-			   s_GlobalStatistics.get_CurrentPhase().m_search_Steps,
+		    printf("Search steps: %lld, %lld (time: %.3f s, make %.3f, cost %.3f)\n",
+			   s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps,
+			   s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps,			   
 			   end_time - start_time,
 			   search_Store[best_node.m_node_id].m_makespan,
 			   search_Store[best_node.m_node_id].m_cost);
@@ -3603,7 +3605,7 @@ namespace boOX
                 #ifdef sVERBOSE	    
 		{
 		    sDouble end_time = sStatistics::get_CPU_Seconds();
-		    printf("Final search steps: %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_search_Steps, end_time - start_time);
+		    printf("Final search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
 		}
 		#endif
 		kruhobot_Schedules = search_Store[best_node.m_node_id].m_kruhobot_Schedules;

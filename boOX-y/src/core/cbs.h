@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 2-032_planck                                                       */
+/* cbs.h / 2-059_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -73,7 +73,7 @@ namespace boOX
 			  sInt_32 agent_id,
 			  sInt_32 level,
 			  sInt_32 vertex_id)
-	    : m_cooccupation(cooccupation)
+    : m_cooccupation(cooccupation)
 	    , m_agent_id(agent_id)
 	    , m_level(level)
 	    , m_vertex_id(vertex_id)
@@ -409,10 +409,30 @@ namespace boOX
 	    const Nodes_vector *m_nodes_Store;
 	};
 
-	typedef std::unordered_map<sInt_32, Visit> Visits_umap;
+	typedef std::unordered_map<sInt_32, Visit> Visits_umap;	
 	typedef std::vector<Visits_umap> Visits_vector;
 	typedef std::list<Visit> Visits_list;
 	typedef std::multimap<sInt_32, Visit> Visits_mmap;
+
+	struct HamiltonianVisit
+	{
+	    HamiltonianVisit() { /* nothing */ }
+	    HamiltonianVisit(sInt_32 level, sInt_32 visit_id, sInt_32 vertex_id, sInt_32 prev_visit_id)
+	    : m_level(level)
+	    , m_visit_id(visit_id)
+	    , m_vertex_id(vertex_id)
+	    , m_prev_visit_id(prev_visit_id) { /* nothing */ }
+	    
+	    sInt_32 m_level;
+	    sInt_32 m_visit_id;
+	    sInt_32 m_vertex_id;
+	    sInt_32 m_prev_visit_id;
+	};
+
+	typedef std::multimap<sInt_32, HamiltonianVisit> HamiltonianVisits_mmap;	
+	
+	typedef std::vector<HamiltonianVisit> LevelHamiltonianVisits_vector;
+	typedef std::vector<LevelHamiltonianVisits_vector> HamiltonianVisits_vector;
 	
 	typedef std::map<sInt_32, Node, std::less<sInt_32> > Nodes_map;
 	typedef std::multimap<sInt_32, Node, std::less<sInt_32>> Nodes_mmap;
@@ -423,7 +443,34 @@ namespace boOX
 	typedef std::set<NodeReference, std::less<NodeReference> > NodeReferences_set;
 	typedef std::multiset<NodeReference, std::less<NodeReference> > NodeReferences_mset;
 
-	typedef std::vector<sInt_32> NodeIDs_vector;	
+	typedef std::vector<sInt_32> NodeIDs_vector;
+
+	struct Interconnection
+	{
+	    Interconnection(sInt_32 start_id, sInt_32 goal_id)
+	    : m_start_id(start_id)
+	    , m_goal_id(goal_id)
+	    {
+		// nothing
+	    }
+
+	    bool operator<(const Interconnection &interconnection) const
+	    {
+		return (m_start_id < interconnection.m_start_id || (m_start_id == interconnection.m_start_id && m_goal_id < interconnection.m_goal_id));
+	    }
+
+	    sInt_32 m_start_id;
+	    sInt_32 m_goal_id;
+	};
+
+	struct InterconnectionPath
+	{
+	    sInt_32 m_cost;
+	    VertexIDs_vector m_Path;
+	};
+
+	typedef std::map<Interconnection, InterconnectionPath, std::less<Interconnection> > Interconnections_map;
+	       
 	
     public:
 	sCBS(sInstance *instance);
@@ -560,7 +607,23 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingRotation_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
 	sInt_32 find_ShortestNonconflictingRotation_DeltaSuperStar(sInstance         &instance,
 								   AgentPaths_vector &agent_Paths,
-								   sInt_32            cost_limit);		
+								   sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaSuperStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaSuperStar(const sMission &mission, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaSuperStar(sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaHyperStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaHyperStar(const sMission &mission, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaHyperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaHyperStar(sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit);				
 
 	sInt_32 find_NonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_NonconflictingSwapping(const sInstance   &instance,
@@ -648,7 +711,19 @@ namespace boOX
 	sInt_32 find_NonconflictingRotation_DeltaSuperStar(sInstance         &instance,
 							   AgentPaths_vector &agent_Paths,
 							   sInt_32            cost_limit,
-							   sInt_32            extra_cost);		
+							   sInt_32            extra_cost);
+
+	sInt_32 find_NonconflictingHamiltonian_DeltaSuperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingHamiltonian_DeltaSuperStar(sMission          &mission,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit,
+							      sInt_32            extra_cost);
+
+	sInt_32 find_NonconflictingHamiltonian_DeltaHyperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingHamiltonian_DeltaHyperStar(sMission          &mission,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit,
+							      sInt_32            extra_cost);				
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping_baseRecompute(const sInstance           &instance,
@@ -910,7 +985,33 @@ namespace boOX
 					      AgentEdgeConflicts_vector &agent_edge_Conflicts,
 					      AgentPaths_vector         &agent_Paths,
 					      sInt_32                    cost_limit) const;		
+	/*----------------------------------------------------------------------------*/
+
+	sInt_32 find_NonconflictingHamiltonian_principalCollision_DeltaSuperStar(const sMission            &mission,
+										 AgentConflicts_vector     &agent_Conflicts,
+										 AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										 AgentPaths_vector         &agent_Paths,
+										 sInt_32                    cost_limit,
+										 sInt_32                    extra_cost);
+
+	sInt_32 find_NonconflictingHamiltonian_principalCollision_DeltaHyperStar(const sMission            &mission,
+										 AgentConflicts_vector     &agent_Conflicts,
+										 AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										 AgentPaths_vector         &agent_Paths,
+										 sInt_32                    cost_limit,
+										 sInt_32                    extra_cost);		
+
+	/*
+	sInt_32 update_NonconflictingHamiltonian(sInt_32                    upd_agent_id,
+						 const sMission            &mission,
+						 Occupations_vector        &space_Occupations,
+						 AgentConflicts_vector     &agent_Conflicts,
+						 AgentEdgeConflicts_vector &agent_edge_Conflicts,
+						 AgentPaths_vector         &agent_Paths,
+						 sInt_32                    cost_limit) const;		
+	*/
 	/*----------------------------------------------------------------------------*/	
+	
 
 	sInt_32 revise_NonconflictingSwapping(const sInstance           &instance,
 					      AgentConflicts_vector     &agent_Conflicts,
@@ -1128,7 +1229,38 @@ namespace boOX
 					       const AgentPaths_vector   &agent_Paths,
 					       Cooccupations_vector      &space_Cooccupations,
 					       sInt_32                   &tanglement) const;
+	/*----------------------------------------------------------------------------*/
+
+	sInt_32 examine_NonconflictingHamiltonianDelta(const sMission       &mission,
+						       sInt_32               upper_node_id,
+						       Cooccupations_vector &space_Cooccupations,
+						       sInt_32               cost_limit,
+						       Nodes_vector         &search_Store,
+						       NodeReferences_mset  &search_Queue) const;
+
+	sInt_32 analyze_NonconflictingHamiltonian(const sMission          &mission,
+						  const AgentPaths_vector &agent_Paths,
+						  sInt_32                 &tanglement) const;
+
+	sInt_32 analyze_NonconflictingHamiltonian(const sMission          &mission,
+						  const AgentPaths_vector &agent_Paths,
+						  Cooccupations_vector    &space_Cooccupations,
+						  sInt_32                 &tanglement) const;
+		
+	sInt_32 analyze_NonconflictingHamiltonian(const sMission            &mission,
+						  AgentConflicts_vector     &agent_Conflicts,
+						  AgentEdgeConflicts_vector &agent_edge_Conflicts,
+						  const AgentPaths_vector   &agent_Paths,
+						  sInt_32                   &tanglement) const;
+	
+	sInt_32 analyze_NonconflictingHamiltonian(const sMission            &mission,
+						  AgentConflicts_vector     &agent_Conflicts,
+						  AgentEdgeConflicts_vector &agent_edge_Conflicts,
+						  const AgentPaths_vector   &agent_Paths,
+						  Cooccupations_vector      &space_Cooccupations,
+						  sInt_32                   &tanglement) const;
 	/*----------------------------------------------------------------------------*/	
+	
 	sInt_32 find_NonconflictingSequence(const sUndirectedGraph &graph,
 					    sInt_32                 source_id,
 					    sInt_32                 sink_id,
@@ -1158,7 +1290,25 @@ namespace boOX
 						     sInt_32                    extra_cost,
 						     const Conflicts_vector     &Conflicts,
 						     const EdgeConflicts_vector &edge_Conflicts,					    
-						     VertexIDs_vector           &Path) const;		
+						     VertexIDs_vector           &Path) const;
+
+	sInt_32 findSuperStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
+							sInt_32                    source_id,
+							const VertexIDs_vector     &sink_IDs,
+							sInt_32                    cost_limit,
+							sInt_32                    extra_cost,
+							const Conflicts_vector     &Conflicts,
+							const EdgeConflicts_vector &edge_Conflicts,
+							VertexIDs_vector           &Path) const;
+
+	sInt_32 findHyperStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
+							sInt_32                    source_id,
+							const VertexIDs_vector     &sink_IDs,
+							sInt_32                    cost_limit,
+							sInt_32                    extra_cost,
+							const Conflicts_vector     &Conflicts,
+							const EdgeConflicts_vector &edge_Conflicts,
+							VertexIDs_vector           &Path) const;	
 
 	void equalize_NonconflictingSequences(AgentPaths_vector &agent_Paths) const;
 	void equalize_NonconflictingSequences(const AgentPaths_vector &agent_Paths, AgentPaths_vector &equal_agent_Paths) const;	

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 2-032_planck                                                    */
+/* result.h / 2-059_planck                                                    */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -263,10 +263,19 @@ enum sTokenPermutationSolverProgram_Result
 };
 
 
+enum sTokenHamiltonutationSolverProgram_Result
+{
+    sHAMILTON_SOLVER_PROGRAM_INFO                         =  190000,
+    sHAMILTON_SOLVER_PROGRAM_ERROR                        = -190000,
+    sHAMILTON_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sHAMILTON_SOLVER_PROGRAM_ERROR - 1),
+    sHAMILTON_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR     = (sHAMILTON_SOLVER_PROGRAM_ERROR - 2)        
+};
+
+
 enum sRealMapConvertorProgram_Result
 {
-    sMAP_R_CONVERT_PROGRAM_INFO                          =  190000,
-    sMAP_R_CONVERT_PROGRAM_ERROR                         = -190000,
+    sMAP_R_CONVERT_PROGRAM_INFO                          =  200000,
+    sMAP_R_CONVERT_PROGRAM_ERROR                         = -200000,
     sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR  = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
     sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR   = (sMAP_R_CONVERT_PROGRAM_ERROR - 2),
     sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 3)    
@@ -275,8 +284,8 @@ enum sRealMapConvertorProgram_Result
 
 enum sMoviMapConvertorProgram_Result
 {
-    sMOVIMAP_CONVERT_PROGRAM_INFO                             =  200000,
-    sMOVIMAP_CONVERT_PROGRAM_ERROR                            = -200000,
+    sMOVIMAP_CONVERT_PROGRAM_INFO                             =  210000,
+    sMOVIMAP_CONVERT_PROGRAM_ERROR                            = -210000,
     sMOVIMAP_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR     = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 1),
     sMOVIMAP_CONVERT_PROGRAM_NO_MOVI_MAP_FILE_SPECIFIED_ERROR = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 2),
     sMOVIMAP_CONVERT_PROGRAM_NO_XML_MAP_FILE_SPECIFIED_ERROR  = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 3)
@@ -285,8 +294,8 @@ enum sMoviMapConvertorProgram_Result
 
 enum sMoviScenConvertorProgram_Result
 {
-    sMOVISCEN_CONVERT_PROGRAM_INFO                              =  210000,
-    sMOVISCEN_CONVERT_PROGRAM_ERROR                             = -210000,
+    sMOVISCEN_CONVERT_PROGRAM_INFO                              =  220000,
+    sMOVISCEN_CONVERT_PROGRAM_ERROR                             = -220000,
     sMOVISCEN_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR      = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 1),
     sMOVISCEN_CONVERT_PROGRAM_NO_MOVI_MAP_FILE_SPECIFIED_ERROR  = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 2),
     sMOVISCEN_CONVERT_PROGRAM_NO_MOVI_SCEN_FILE_SPECIFIED_ERROR = (sMOVISCEN_CONVERT_PROGRAM_ERROR - 3),    
@@ -296,16 +305,16 @@ enum sMoviScenConvertorProgram_Result
 
 enum sRealInstanceGeneratorProgram_Result
 {
-    sKRUHOBOT_R_GENERATE_PROGRAM_INFO                         =  220000,
-    sKRUHOBOT_R_GENERATE_PROGRAM_ERROR                        = -220000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_INFO                         =  230000,
+    sKRUHOBOT_R_GENERATE_PROGRAM_ERROR                        = -230000,
     sKRUHOBOT_R_GENERATE_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sKRUHOBOT_R_GENERATE_PROGRAM_ERROR - 1)
 };
 
 
 enum sRealMutliAgentPathfindingSolverProgram_Result
 {
-    sMAPF_R_SOLVER_PROGRAM_INFO                         =  230000,
-    sMAPF_R_SOLVER_PROGRAM_ERROR                        = -230000,
+    sMAPF_R_SOLVER_PROGRAM_INFO                         =  240000,
+    sMAPF_R_SOLVER_PROGRAM_ERROR                        = -240000,
     sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR = (sMAPF_R_SOLVER_PROGRAM_ERROR - 1),
     sMAPF_R_SOLVER_PROGRAM_MISSING_MAP_FILE_ERROR       = (sMAPF_R_SOLVER_PROGRAM_ERROR - 2),
     sMAPF_R_SOLVER_PROGRAM_MISSING_KRUHOBOT_FILE_ERROR  = (sMAPF_R_SOLVER_PROGRAM_ERROR - 3)    

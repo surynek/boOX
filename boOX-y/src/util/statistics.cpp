@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-032_planck                              */
+/*                             boOX 2-059_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* statistics.cpp / 2-032_planck                                              */
+/* statistics.cpp / 2-059_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Statistical data collection and analytical tools.
@@ -55,7 +55,8 @@ namespace boOX
 	: m_name(name)
 	, m_WC_Seconds(0.0)
 	, m_CPU_Seconds(0.0)
-	, m_search_Steps(0)
+	, m_micro_search_Steps(0)
+	, m_macro_search_Steps(0)	  
 	, m_move_Executions(0)
 	, m_produced_cnf_Clauses(0)
 	, m_satisfiable_SAT_solver_Calls(0)
@@ -208,7 +209,8 @@ namespace boOX
     void sStatistics::to_Stream_subphases(FILE *output, const Phase &phase, const sString &indent) const
     {
 	fprintf(output, "%s%sPhase (name = '%s') [\n", indent.c_str(), s_INDENT.c_str(), phase.m_name.c_str());
-	fprintf(output, "%s%s%sSearch steps                   = %lld\n", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str(), phase.m_search_Steps);
+	fprintf(output, "%s%s%sMicro search steps             = %lld\n", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str(), phase.m_micro_search_Steps);
+	fprintf(output, "%s%s%sMacro search steps             = %lld\n", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str(), phase.m_macro_search_Steps);	
 	fprintf(output, "%s%s%sMove executions                = %lld\n", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str(), phase.m_move_Executions);
 	fprintf(output, "%s%s%sProduced cnf clauses           = %lld\n", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str(), phase.m_produced_cnf_Clauses);
 	fprintf(output, "%s%s%sSatisfiable SAT solver calls   = %lld\n", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str(), phase.m_satisfiable_SAT_solver_Calls);
