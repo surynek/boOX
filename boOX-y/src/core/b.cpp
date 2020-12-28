@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-123_planck                              */
+/*                             boOX 2-124_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* b.cpp / 2-123_planck                                                       */
+/* b.cpp / 2-124_planck                                                       */
 /*----------------------------------------------------------------------------*/
 				const sVertex::Neighbors_list &Neighbors = map.m_Network.m_Vertices[front_respectful_transition.m_location_id].m_Neighbors;
 				for (sVertex::Neighbors_list::const_iterator neighbor = Neighbors.begin(); neighbor != Neighbors.end(); ++neighbor)
