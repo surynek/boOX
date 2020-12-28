@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-125_planck                              */
+/*                             boOX 2-126_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 2-125_planck                                                    */
+/* cbsR.cpp / 2-126_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -1752,13 +1752,13 @@ namespace boOX
     }
 
 
-    #define sRETURN_NO_CHANCE_OF_AVOIDANCE                                                                                                                                                          \
-    {                                                                                                                                                                                               \
-	LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, kruhobot_traversal_A_linear.m_interval);               \
-	kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id,                                                                                                      \
-                                                       kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_A_linear.m_interval, linear_conflict_A)); \
-	++affection;                                                                                                                                                                                \
-	return affection;                                                                                                                                                                           \
+    #define sRETURN_NO_CHANCE_OF_AVOIDANCE                                                                                                                                                              \
+    {                                                                                                                                                                                                   \
+	LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, kruhobot_traversal_A_linear.m_interval);                   \
+	kruhobot_linear_Conflicts[ctx.kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id,                                                                                                      \
+							   kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_A_linear.m_interval, linear_conflict_A)); \
+	++affection;                                                                                                                                                                                    \
+	return affection;                                                                                                                                                                               \
     }
     
 
@@ -1801,7 +1801,12 @@ namespace boOX
 												 sInt_32             &last_conflict_id,
 												 bool                 infinity) const
     {
-	sInt_32 affection_A = resolve_KruhobotCollision_linear_X_linear_directional(real_Instance,
+	LinearDifferentialContext ctx(real_Instance,
+				      kruhobot_traversal_A_linear,
+				      kruhobot_traversal_B_linear);
+	    
+	sInt_32 affection_A = resolve_KruhobotCollision_linear_X_linear_directional(ctx,
+										    real_Instance,
 										    kruhobot_traversal_A_linear,
 										    kruhobot_traversal_B_linear,
 										    kruhobot_location_Conflicts,
@@ -1809,7 +1814,8 @@ namespace boOX
 										    last_conflict_id,
 										    infinity);
 	
-	sInt_32 affection_B = resolve_KruhobotCollision_linear_X_linear_directional(real_Instance,
+	sInt_32 affection_B = resolve_KruhobotCollision_linear_X_linear_directional(ctx,
+										    real_Instance,
 										    kruhobot_traversal_B_linear,
 										    kruhobot_traversal_A_linear,
 										    kruhobot_location_Conflicts,
@@ -1818,22 +1824,24 @@ namespace boOX
 										    infinity);
 	return KruhobotAffection_pair(affection_A, affection_B);	
     }
-
+  
     
     template<class T1, class T2>
-    sInt_32 sRealCBSBase::resolve_KruhobotCollision_linear_X_linear_directional(const sRealInstance &real_Instance,
-										const Traversal     &kruhobot_traversal_A_linear,
-										const Traversal     &kruhobot_traversal_B_linear,
-										T1                  &sUNUSED(kruhobot_location_Conflicts),
-										T2                  &kruhobot_linear_Conflicts,
-										sInt_32             &last_conflict_id,
-										bool                 sUNUSED(infinity)) const
+    sInt_32 sRealCBSBase::resolve_KruhobotCollision_linear_X_linear_directional(const LinearDifferentialContext &ctx,
+										const sRealInstance             &real_Instance,
+										const Traversal                 &kruhobot_traversal_A_linear,
+										const Traversal                 &kruhobot_traversal_B_linear,
+										T1                              &sUNUSED(kruhobot_location_Conflicts),
+										T2                              &kruhobot_linear_Conflicts,
+										sInt_32                         &last_conflict_id,
+										bool                             sUNUSED(infinity)) const
     {
 	sASSERT(kruhobot_traversal_A_linear.m_u_loc_id != kruhobot_traversal_A_linear.m_v_loc_id);
 	sASSERT(kruhobot_traversal_B_linear.m_u_loc_id != kruhobot_traversal_B_linear.m_v_loc_id);
 
+	/*
 	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
-	map.to_Screen();
+	//map.to_Screen();
 
 	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
 	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
@@ -1881,19 +1889,20 @@ namespace boOX
 	sDouble dxAB = x1A - x1B;
 	sDouble dyAB = y1A - y1B;
 	sDouble rAB = rA + rB;
+	*/
 	// end of context
 
-	sInt_32 affection;
+	sInt_32 affection = 0;
 	
-	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
-	sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
+	sDouble beta_x = ctx.vA * ctx.dxA / ctx.dA - ctx.vB * ctx.dxB / ctx.dB;
+	sDouble beta_y = ctx.vA * ctx.dyA / ctx.dA - ctx.vB * ctx.dyB / ctx.dB;
+	sDouble beta = 2 * (ctx.dxAB * beta_x + ctx.dyAB * beta_y);
 	    
 	sDouble alpha = beta_x * beta_x + beta_y * beta_y;
 	
 	{
 	    /* distance quadratic coefficients */	    
-	    sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	    sDouble gamma = ctx.dxAB * ctx.dxAB + ctx.dyAB * ctx.dyAB - ctx.rAB * ctx.rAB;
 
 	    if (sABS(alpha) > s_EPSILON) /* quadratic distance */
 	    {
@@ -1927,9 +1936,9 @@ namespace boOX
 			}			
 		    }
 
-		    sASSERT(tau_1 < uA || tau_2 < uA);
+		    sASSERT(tau_1 < ctx.uA || tau_2 < ctx.uA);
 
-		    if (tau_1 <= lA && tau_2 > lA)
+		    if (tau_1 <= ctx.lA && tau_2 > ctx.lA)
 		    {
 			sRETURN_NO_CHANCE_OF_AVOIDANCE;
 		    }
@@ -1974,7 +1983,8 @@ namespace boOX
 		sDouble time0 = -1;
 		
 		sDouble time0_Q_1, time0_Q_2;	       
-		sInt_32 Q_count = solve_QuadraticTangent_linear_X_linear<T1, T2>(real_Instance,
+		sInt_32 Q_count = solve_QuadraticTangent_linear_X_linear<T1, T2>(ctx,
+										 real_Instance,
 										 kruhobot_traversal_A_linear,
 										 kruhobot_traversal_B_linear,
 										 time0_Q_1,
@@ -1985,7 +1995,8 @@ namespace boOX
 		}
 		
 		sDouble time0_lB_1, time0_lB_2;
-		sInt_32 lB_count = solve_BoundTangent_linear_X_linear<T1, T2>(lB,
+		sInt_32 lB_count = solve_BoundTangent_linear_X_linear<T1, T2>(ctx,
+									      ctx.lB,
 									      real_Instance,
 									      kruhobot_traversal_A_linear,
 									      kruhobot_traversal_B_linear,
@@ -1997,7 +2008,8 @@ namespace boOX
 		}
 
 		sDouble time0_uB_1, time0_uB_2;		
-		sInt_32 uB_count = solve_BoundTangent_linear_X_linear<T1, T2>(uB,
+		sInt_32 uB_count = solve_BoundTangent_linear_X_linear<T1, T2>(ctx,
+									      ctx.uB,
 									      real_Instance,
 									      kruhobot_traversal_A_linear,
 									      kruhobot_traversal_B_linear,
@@ -2033,7 +2045,8 @@ namespace boOX
 	    {
 		sDouble time0 = -1;
 		sDouble time0_lB_1, time0_lB_2;		
-		sInt_32 lB_count = solve_NonQuadraticTangent_linear_X_linear<T1, T2>(lB,
+		sInt_32 lB_count = solve_NonQuadraticTangent_linear_X_linear<T1, T2>(ctx,
+										     ctx.lB,
 										     real_Instance,
 										     kruhobot_traversal_A_linear,
 										     kruhobot_traversal_B_linear,
@@ -2045,7 +2058,8 @@ namespace boOX
 		}
 
 		sDouble time0_uB_1, time0_uB_2;
-		sInt_32 uB_count = solve_NonQuadraticTangent_linear_X_linear<T1, T2>(uB,
+		sInt_32 uB_count = solve_NonQuadraticTangent_linear_X_linear<T1, T2>(ctx,
+										     ctx.uB,
 										     real_Instance,
 										     kruhobot_traversal_A_linear,
 										     kruhobot_traversal_B_linear,
@@ -2203,70 +2217,21 @@ namespace boOX
 
 
     template<class T1, class T2>
-    sInt_32 sRealCBSBase::solve_QuadraticTangent_linear_X_linear(const sRealInstance &real_Instance,
-								 const Traversal     &kruhobot_traversal_A_linear,
-								 const Traversal     &kruhobot_traversal_B_linear,
-								 sDouble             &time0_1,
-								 sDouble             &time0_2) const
-    {
-	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+    sInt_32 sRealCBSBase::solve_QuadraticTangent_linear_X_linear(const LinearDifferentialContext &ctx,
+								 const sRealInstance             &sUNUSED(real_Instance),
+								 const Traversal                 &sUNUSED(kruhobot_traversal_A_linear),
+								 const Traversal                 &sUNUSED(kruhobot_traversal_B_linear),
+								 sDouble                         &time0_1,
+								 sDouble                         &time0_2) const
+    {	
+	sDouble gamma_0 = ctx.dxAB * ctx.dxAB + ctx.dyAB * ctx.dyAB - ctx.rAB * ctx.rAB;
+	sDouble gamma_1 = 2 * (ctx.vA * (ctx.dxAB * ctx.dxA + ctx.dyAB * ctx.dyA)) / ctx.dA;	
+	sDouble gamma_2 = ctx.vA * ctx.vA;
 	
-	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
-	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
-
-	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
-	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
-	
-	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
-	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
-
-	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
-	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
-	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
-	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
-	
-	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
-	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
-	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
-	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
-
-	sDouble dxA = x2A_ - x1A_;
-	sDouble dyA = y2A_ - y1A_;
-
-	sDouble dxB = x2B_ - x1B_;
-	sDouble dyB = y2B_ - y1B_;
-
-	sDouble d2A = dxA * dxA + dyA * dyA;
-	sDouble dA = sqrt(d2A);
-
-	sDouble d2B = dxB * dxB + dyB * dyB;
-	sDouble dB = sqrt(d2B);
-
-	sDouble lA = kruhobot_traversal_A_linear.m_interval.m_lower;
-	//sDouble uA = kruhobot_traversal_A_linear.m_interval.m_upper;
-
-	sDouble lB = kruhobot_traversal_B_linear.m_interval.m_lower;
-	//sDouble uB = kruhobot_traversal_B_linear.m_interval.m_upper;				
-	
-	sDouble x1A = x1A_ + (vA * (-lA) * dxA) / dA;
-	sDouble y1A = y1A_ + (vA * (-lA) * dyA) / dA;
-
-	sDouble x1B = x1B_ + (vB * (-lB) * dxB) / dB;
-	sDouble y1B = y1B_ + (vB * (-lB) * dyB) / dB;
-
-	sDouble dxAB = x1A - x1B;
-	sDouble dyAB = y1A - y1B;
-	sDouble rAB = rA + rB;
-        // end of context
-	
-	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
-	sDouble gamma_2 = vA * vA;
-	
-	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
-	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
-	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+	sDouble beta_0 = 2 * ((ctx.vA * ctx.dxAB * ctx.dxA / ctx.dA) - ((ctx.vB * ctx.dxAB * ctx.dxB) / ctx.dB) + (ctx.vA * ctx.dyAB * ctx.dyA / ctx.dA) - ((ctx.vB * ctx.dyAB * ctx.dyB) / ctx.dB));
+	sDouble beta_x = ctx.vA * ctx.dxA / ctx.dA - ctx.vB * ctx.dxB / ctx.dB;
+	sDouble beta_y = ctx.vA * ctx.dyA / ctx.dA - ctx.vB * ctx.dyB / ctx.dB;	
+	sDouble beta_1 = 2 * ((ctx.vA * ctx.dxA * beta_x) / ctx.dA + (ctx.vA * ctx.dyA * beta_y) / ctx.dA);
 
 	sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
 
@@ -2322,71 +2287,22 @@ namespace boOX
 
 
     template<class T1, class T2>
-    sInt_32 sRealCBSBase::solve_NonQuadraticTangent_linear_X_linear(sDouble              time,
-								    const sRealInstance &real_Instance,
-								    const Traversal     &kruhobot_traversal_A_linear,
-								    const Traversal     &kruhobot_traversal_B_linear,
-								    sDouble             &time0_1,
-								    sDouble             &time0_2) const	
-    {
-	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+    sInt_32 sRealCBSBase::solve_NonQuadraticTangent_linear_X_linear(const LinearDifferentialContext &ctx,
+								    sDouble                          time,
+								    const sRealInstance             &sUNUSED(real_Instance),
+								    const Traversal                 &sUNUSED(kruhobot_traversal_A_linear),
+								    const Traversal                 &sUNUSED(kruhobot_traversal_B_linear),
+								    sDouble                         &time0_1,
+								    sDouble                         &time0_2) const	
+    {	
+	sDouble gamma_0 = ctx.dxAB * ctx.dxAB + ctx.dyAB * ctx.dyAB - ctx.rAB * ctx.rAB;
+	sDouble gamma_1 = 2 * (ctx.vA * (ctx.dxAB * ctx.dxA + ctx.dyAB * ctx.dyA)) / ctx.dA;	
+	sDouble gamma_2 = ctx.vA * ctx.vA;
 	
-	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
-	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
-
-	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
-	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
-	
-	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
-	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
-
-	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
-	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
-	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
-	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
-	
-	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
-	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
-	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
-	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
-
-	sDouble dxA = x2A_ - x1A_;
-	sDouble dyA = y2A_ - y1A_;
-
-	sDouble dxB = x2B_ - x1B_;
-	sDouble dyB = y2B_ - y1B_;
-
-	sDouble d2A = dxA * dxA + dyA * dyA;
-	sDouble dA = sqrt(d2A);
-
-	sDouble d2B = dxB * dxB + dyB * dyB;
-	sDouble dB = sqrt(d2B);
-
-	sDouble lA = kruhobot_traversal_A_linear.m_interval.m_lower;
-	//sDouble uA = kruhobot_traversal_A_linear.m_interval.m_upper;
-
-	sDouble lB = kruhobot_traversal_B_linear.m_interval.m_lower;
-	//sDouble uB = kruhobot_traversal_B_linear.m_interval.m_upper;				
-	
-	sDouble x1A = x1A_ + (vA * (-lA) * dxA) / dA;
-	sDouble y1A = y1A_ + (vA * (-lA) * dyA) / dA;
-
-	sDouble x1B = x1B_ + (vB * (-lB) * dxB) / dB;
-	sDouble y1B = y1B_ + (vB * (-lB) * dyB) / dB;
-
-	sDouble dxAB = x1A - x1B;
-	sDouble dyAB = y1A - y1B;
-	sDouble rAB = rA + rB;
-        // end of context
-	
-	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
-	sDouble gamma_2 = vA * vA;
-	
-	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
-	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
-	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+	sDouble beta_0 = 2 * ((ctx.vA * ctx.dxAB * ctx.dxA / ctx.dA) - ((ctx.vB * ctx.dxAB * ctx.dxB) / ctx.dB) + (ctx.vA * ctx.dyAB * ctx.dyA / ctx.dA) - ((ctx.vB * ctx.dyAB * ctx.dyB) / ctx.dB));
+	sDouble beta_x = ctx.vA * ctx.dxA / ctx.dA - ctx.vB * ctx.dxB / ctx.dB;
+	sDouble beta_y = ctx.vA * ctx.dyA / ctx.dA - ctx.vB * ctx.dyB / ctx.dB;	
+	sDouble beta_1 = 2 * ((ctx.vA * ctx.dxA * beta_x) / ctx.dA + (ctx.vA * ctx.dyA * beta_y) / ctx.dA);
 
 	//sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
 
@@ -2535,57 +2451,14 @@ namespace boOX
 
 
     template<class T1, class T2>
-    sInt_32 sRealCBSBase::solve_BoundTangent_linear_X_linear(sDouble          bound_time,
-							     const sRealInstance &real_Instance,
-							     const Traversal &kruhobot_traversal_A_linear,
-							     const Traversal &kruhobot_traversal_B_linear,
-							     sDouble         &time0_1,
-							     sDouble         &time0_2) const								     
+    sInt_32 sRealCBSBase::solve_BoundTangent_linear_X_linear(const LinearDifferentialContext &ctx,
+							     sDouble                          bound_time,
+							     const sRealInstance             &sUNUSED(real_Instance),
+							     const Traversal                 &sUNUSED(kruhobot_traversal_A_linear),
+							     const Traversal                 &sUNUSED(kruhobot_traversal_B_linear),
+							     sDouble                         &time0_1,
+							     sDouble                         &time0_2) const
     {
-	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
-	
-	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
-	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
-
-	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
-	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
-	
-	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
-	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
-
-	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
-	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
-	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
-	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
-	
-	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
-	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
-	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
-	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
-
-	sDouble dxA = x2A_ - x1A_;
-	sDouble dyA = y2A_ - y1A_;
-
-	sDouble dxB = x2B_ - x1B_;
-	sDouble dyB = y2B_ - y1B_;
-
-	sDouble d2A = dxA * dxA + dyA * dyA;
-	sDouble dA = sqrt(d2A);
-
-	sDouble d2B = dxB * dxB + dyB * dyB;
-	sDouble dB = sqrt(d2B);
-
-	sDouble x1A = x1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dxA) / dA;
-	sDouble y1A = y1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dyA) / dA;
-
-	sDouble x1B = x1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
-	sDouble y1B = y1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;
-
-	sDouble dxAB = x1A - x1B;
-	sDouble dyAB = y1A - y1B;
-	sDouble rAB = rA + rB;
-        // end of context	
-
 	/*
 	sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
 	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
@@ -2594,14 +2467,14 @@ namespace boOX
 	sDouble alpha = beta_x * beta_x + beta_y * beta_y;
 	*/
 
-	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
-	sDouble gamma_2 = vA * vA;
+	sDouble gamma_0 = ctx.dxAB * ctx.dxAB + ctx.dyAB * ctx.dyAB - ctx.rAB * ctx.rAB;
+	sDouble gamma_1 = 2 * (ctx.vA * (ctx.dxAB * ctx.dxA + ctx.dyAB * ctx.dyA)) / ctx.dA;	
+	sDouble gamma_2 = ctx.vA * ctx.vA;
 	
-	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
-	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
-	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+	sDouble beta_0 = 2 * ((ctx.vA * ctx.dxAB * ctx.dxA / ctx.dA) - ((ctx.vB * ctx.dxAB * ctx.dxB) / ctx.dB) + (ctx.vA * ctx.dyAB * ctx.dyA / ctx.dA) - ((ctx.vB * ctx.dyAB * ctx.dyB) / ctx.dB));
+	sDouble beta_x = ctx.vA * ctx.dxA / ctx.dA - ctx.vB * ctx.dxB / ctx.dB;
+	sDouble beta_y = ctx.vA * ctx.dyA / ctx.dA - ctx.vB * ctx.dyB / ctx.dB;	
+	sDouble beta_1 = 2 * ((ctx.vA * ctx.dxA * beta_x) / ctx.dA + (ctx.vA * ctx.dyA * beta_y) / ctx.dA);
 
 	sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
 

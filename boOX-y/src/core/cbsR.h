@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-125_planck                              */
+/*                             boOX 2-126_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 2-125_planck                                                      */
+/* cbsR.h / 2-126_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -26,6 +26,8 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+
+#include <math.h>
 
 #include "result.h"
 
@@ -765,7 +767,107 @@ namespace boOX
 	typedef std::pair<sInt_32, sInt_32> KruhobotAffection_pair;
 
 	typedef std::multimap<sDouble, sInt_32, std::less<sDouble> > ExtraVariables_mmap;
-	typedef std::vector<ExtraVariables_mmap> KruhobotExtraVariables_vector;		
+	typedef std::vector<ExtraVariables_mmap> KruhobotExtraVariables_vector;
+
+	struct LinearDifferentialContext
+	{
+	    LinearDifferentialContext() { /* nothing */ }
+	    LinearDifferentialContext(const sRealInstance &real_Instance,
+				      const Traversal     &kruhobot_traversal_A_linear,
+				      const Traversal     &kruhobot_traversal_B_linear)
+		: map(real_Instance.m_start_conjunction.m_Map)
+		, kruhobot_A_id(sABS(kruhobot_traversal_A_linear.m_kruhobot_id))
+		, kruhobot_B_id(sABS(kruhobot_traversal_B_linear.m_kruhobot_id))
+		, vA(real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo)
+		, rA(real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius)	
+		, vB(real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo)
+		, rB(real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius)
+		  
+		, x1A_(map->m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x)
+		, x2A_(map->m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x)
+		, y1A_(map->m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y)
+		, y2A_(map->m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y)
+		  
+		, x1B_(map->m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x)
+		, x2B_(map->m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x)
+		, y1B_(map->m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y)
+		, y2B_(map->m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y)
+		  
+		, lA(kruhobot_traversal_A_linear.m_interval.m_lower)
+		, uA(kruhobot_traversal_A_linear.m_interval.m_upper)
+		, lB(kruhobot_traversal_B_linear.m_interval.m_lower)
+		, uB(kruhobot_traversal_B_linear.m_interval.m_upper)
+		  
+		, dxA(x2A_ - x1A_)
+		, dyA(y2A_ - y1A_)
+		, dxB(x2B_ - x1B_)
+		, dyB(y2B_ - y1B_)
+		  
+		, d2A(dxA * dxA + dyA * dyA)
+		, dA(sqrt(d2A))
+		, d2B(dxB * dxB + dyB * dyB)
+		, dB(sqrt(d2B))
+		  
+		, x1A(x1A_ + (vA * (-lA) * dxA) / dA)
+		, y1A(y1A_ + (vA * (-lA) * dyA) / dA)
+		, x1B(x1B_ + (vB * (-lB) * dxB) / dB)
+		, y1B(y1B_ + (vB * (-lB) * dyB) / dB)
+		  
+		, dxAB(x1A - x1B)
+		, dyAB(y1A - y1B)
+		, rAB(rA + rB)
+	    {
+		// nothing
+	    }
+	    const s2DMap *map;
+	    
+	    sInt_32 kruhobot_A_id;
+	    sInt_32 kruhobot_B_id;
+	    
+	    sDouble vA;
+	    sDouble rA;
+	    
+	    sDouble vB;
+	    sDouble rB;
+	    
+	    sDouble x1A_;
+	    sDouble x2A_;
+	    sDouble y1A_;
+	    sDouble y2A_;
+	    
+	    sDouble x1B_;
+	    sDouble x2B_;
+	    sDouble y1B_;
+	    sDouble y2B_;
+	    
+	    sDouble lA;
+	    sDouble uA;
+	    
+	    sDouble lB;
+	    sDouble uB;
+	    
+	    sDouble dxA;
+	    sDouble dyA;
+	    
+	    sDouble dxB;
+	    sDouble dyB;
+	    
+	    sDouble d2A;
+	    sDouble dA;
+	    
+	    sDouble d2B;
+	    sDouble dB;
+	    
+	    sDouble x1A;
+	    sDouble y1A;
+	    
+	    sDouble x1B;
+	    sDouble y1B;
+	    
+	    sDouble dxAB;
+	    sDouble dyAB;
+	    sDouble rAB;
+	};	
 	
     public:
 	sRealCBSBase(sRealInstance *real_Instance);
@@ -880,13 +982,14 @@ namespace boOX
 									 bool                 infinity = false) const;
 
 	template<class T1, class T2>
-	sInt_32 resolve_KruhobotCollision_linear_X_linear_directional(const sRealInstance &real_Instance,
-								      const Traversal     &kruhobot_traversal_A,
-								      const Traversal     &kruhobot_traversal_B,
-								      T1                  &kruhobot_location_Conflicts,
-								      T2                  &kruhobot_linear_Conflicts,
-								      sInt_32             &last_conflict_id,
-								      bool                 infinity = false) const;	
+	sInt_32 resolve_KruhobotCollision_linear_X_linear_directional(const LinearDifferentialContext &ctx,
+								      const sRealInstance             &real_Instance,
+								      const Traversal                 &kruhobot_traversal_A,
+								      const Traversal                 &kruhobot_traversal_B,
+								      T1                              &kruhobot_location_Conflicts,
+								      T2                              &kruhobot_linear_Conflicts,
+								      sInt_32                         &last_conflict_id,
+								      bool                             infinity = false) const;	
 
 	template<class T1, class T2>
 	void resolve_KruhobotCollisionMiddleTouch_linear_X_linear(const sRealInstance &real_Instance,
@@ -908,27 +1011,30 @@ namespace boOX
 								 sInt_32             &affection) const;
 
 	template<class T1, class T2>
-	sInt_32 solve_QuadraticTangent_linear_X_linear(const sRealInstance &real_Instance,
-						       const Traversal     &kruhobot_traversal_A_linear,
-						       const Traversal     &kruhobot_traversal_B_linear,
-						       sDouble             &time0_1,
-						       sDouble             &time0_2) const;
+	sInt_32 solve_QuadraticTangent_linear_X_linear(const LinearDifferentialContext &ctx,
+						       const sRealInstance             &real_Instance,
+						       const Traversal                 &kruhobot_traversal_A_linear,
+						       const Traversal                 &kruhobot_traversal_B_linear,
+						       sDouble                         &time0_1,
+						       sDouble                         &time0_2) const;
 	
 	template<class T1, class T2>
-	sInt_32 solve_NonQuadraticTangent_linear_X_linear(sDouble              time,
-							   const sRealInstance &real_Instance,
-							   const Traversal     &kruhobot_traversal_A_linear,
-							   const Traversal     &kruhobot_traversal_B_linear,
-							   sDouble             &time0_1,
-							   sDouble             &time0_2) const;
+	sInt_32 solve_NonQuadraticTangent_linear_X_linear(const LinearDifferentialContext &ctx,
+							  sDouble                          time,
+							  const sRealInstance             &real_Instance,
+							  const Traversal                 &kruhobot_traversal_A_linear,
+							  const Traversal                 &kruhobot_traversal_B_linear,
+							  sDouble                         &time0_1,
+							  sDouble                         &time0_2) const;
 
 	template<class T1, class T2>
-	sInt_32 solve_BoundTangent_linear_X_linear(sDouble              bound_time,
-						   const sRealInstance &real_Instance,
-						   const Traversal     &kruhobot_traversal_A_linear,
-						   const Traversal     &kruhobot_traversal_B_linear,
-						   sDouble             &time0_1,
-						   sDouble             &time0_2) const;	
+	sInt_32 solve_BoundTangent_linear_X_linear(const LinearDifferentialContext &ctx,
+						   sDouble                          bound_time,
+						   const sRealInstance             &real_Instance,
+						   const Traversal                 &kruhobot_traversal_A_linear,
+						   const Traversal                 &kruhobot_traversal_B_linear,
+						   sDouble                         &time0_1,
+						   sDouble                         &time0_2) const;	
 
 	template<class T1, class T2>
 	void insert_LinearConflict(sDouble          lower_unsafe,
