@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 2-058_planck                                                       */
+/* cbs.h / 2-123_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -154,7 +154,12 @@ namespace boOX
 	    bool operator<(const Collision &collision) const
 	    {
 		return (m_cooccupation < collision.m_cooccupation);
-	    }	    
+	    }
+
+	    void to_Screen(void) const
+	    {
+		printf("a:%d,l:%d,v:%d X a:%d,l:%d,v:%d\n", m_agent_A_id, m_level_A, m_vertex_A_id, m_agent_B_id, m_level_B, m_vertex_B_id);
+	    }
 	};
 
 	struct EdgeCollision
@@ -427,12 +432,36 @@ namespace boOX
 	    sInt_32 m_visit_id;
 	    sInt_32 m_vertex_id;
 	    sInt_32 m_prev_visit_id;
+
+	    VertexIDs_vector m_fulfilled_sink_IDs;
 	};
 
-	typedef std::multimap<sInt_32, HamiltonianVisit> HamiltonianVisits_mmap;	
-	
+	struct UltraVisit
+	{
+	    UltraVisit() { /* nothing */ }
+	    UltraVisit(sInt_32 level, sInt_32 visit_id, sInt_32 vertex_id, sInt_32 prev_visit_id)
+	    : m_level(level)
+	    , m_visit_id(visit_id)
+	    , m_vertex_id(vertex_id)
+	    , m_prev_visit_id(prev_visit_id) { /* nothing */ }
+	    
+	    sInt_32 m_level;
+	    sInt_32 m_cost;
+	    sInt_32 m_visit_id;
+	    sInt_32 m_vertex_id;
+	    sInt_32 m_prev_visit_id;
+
+	    VertexIDs_vector m_remaining_sink_IDs;
+	    VertexIDs_vector m_partial_Path;
+	};	
+
+	typedef std::multimap<sInt_32, HamiltonianVisit> HamiltonianVisits_mmap;		
 	typedef std::vector<HamiltonianVisit> LevelHamiltonianVisits_vector;
 	typedef std::vector<LevelHamiltonianVisits_vector> HamiltonianVisits_vector;
+
+	typedef std::multimap<sInt_32, UltraVisit> UltraVisits_mmap;		
+	typedef std::vector<UltraVisit> LevelUltraVisits_vector;
+	typedef std::vector<LevelUltraVisits_vector> UltraVisits_vector;		
 	
 	typedef std::map<sInt_32, Node, std::less<sInt_32> > Nodes_map;
 	typedef std::multimap<sInt_32, Node, std::less<sInt_32>> Nodes_mmap;
@@ -623,7 +652,23 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaHyperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
 	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaHyperStar(sMission          &mission,
 								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit);				
+								      sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStar(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStar(const sMission &mission, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStar(sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit);
+
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(sSolution &solution, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(const sMission &mission, sSolution &solution, sInt_32 cost_limit);
+	
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);
+	sInt_32 find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(sMission          &mission,
+									  AgentPaths_vector &agent_Paths,
+									  sInt_32            cost_limit);						
 
 	sInt_32 find_NonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_NonconflictingSwapping(const sInstance   &instance,
@@ -723,7 +768,13 @@ namespace boOX
 	sInt_32 find_NonconflictingHamiltonian_DeltaHyperStar(sMission          &mission,
 							      AgentPaths_vector &agent_Paths,
 							      sInt_32            cost_limit,
-							      sInt_32            extra_cost);				
+							      sInt_32            extra_cost);
+
+	sInt_32 find_NonconflictingHamiltonian_DeltaUltraStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost);
+	sInt_32 find_NonconflictingHamiltonian_DeltaUltraStar(sMission          &mission,
+							      AgentPaths_vector &agent_Paths,
+							      sInt_32            cost_limit,
+							      sInt_32            extra_cost);					
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping_baseRecompute(const sInstance           &instance,
@@ -999,7 +1050,14 @@ namespace boOX
 										 AgentEdgeConflicts_vector &agent_edge_Conflicts,
 										 AgentPaths_vector         &agent_Paths,
 										 sInt_32                    cost_limit,
-										 sInt_32                    extra_cost);		
+										 sInt_32                    extra_cost);
+
+	sInt_32 find_NonconflictingHamiltonian_principalCollision_DeltaUltraStar(const sMission            &mission,
+										 AgentConflicts_vector     &agent_Conflicts,
+										 AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										 AgentPaths_vector         &agent_Paths,
+										 sInt_32                    cost_limit,
+										 sInt_32                    extra_cost);
 
 	/*
 	sInt_32 update_NonconflictingHamiltonian(sInt_32                    upd_agent_id,
@@ -1289,9 +1347,19 @@ namespace boOX
 						     sInt_32                    cost_limit,
 						     sInt_32                    extra_cost,
 						     const Conflicts_vector     &Conflicts,
-						     const EdgeConflicts_vector &edge_Conflicts,					    
+						     const EdgeConflicts_vector &edge_Conflicts,
 						     VertexIDs_vector           &Path) const;
 
+	sInt_32 findSuperStar_NonconflictingSequence(const sUndirectedGraph     &graph,
+						     sInt_32                    source_id,
+						     sInt_32                    sink_id,
+						     sInt_32                    start_level,
+						     sInt_32                    cost_limit,
+						     sInt_32                    extra_cost,
+						     const Conflicts_vector     &Conflicts,
+						     const EdgeConflicts_vector &edge_Conflicts,
+						     VertexIDs_vector           &Path) const;	
+	
 	sInt_32 findSuperStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
 							sInt_32                    source_id,
 							const VertexIDs_vector     &sink_IDs,
@@ -1308,7 +1376,16 @@ namespace boOX
 							sInt_32                    extra_cost,
 							const Conflicts_vector     &Conflicts,
 							const EdgeConflicts_vector &edge_Conflicts,
-							VertexIDs_vector           &Path) const;	
+							VertexIDs_vector           &Path) const;
+
+	sInt_32 findUltraStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
+							sInt_32                    source_id,
+							const VertexIDs_vector     &sink_IDs,
+							sInt_32                    cost_limit,
+							sInt_32                    extra_cost,
+							const Conflicts_vector     &Conflicts,
+							const EdgeConflicts_vector &edge_Conflicts,
+							VertexIDs_vector           &Path) const;		
 
 	void equalize_NonconflictingSequences(AgentPaths_vector &agent_Paths) const;
 	void equalize_NonconflictingSequences(const AgentPaths_vector &agent_Paths, AgentPaths_vector &equal_agent_Paths) const;	

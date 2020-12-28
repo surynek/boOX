@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.cpp / 2-058_planck                                              */
+/* graph_test.cpp / 2-123_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
@@ -27,6 +27,7 @@
 #include "common/types.h"
 #include "core/graph.h"
 #include "core/agent.h"
+#include "core/cbs.h"
 #include "util/statistics.h"
 
 #include "test/graph_test.h"
@@ -219,7 +220,83 @@ namespace boOX
 	printf("Spanning tree B cost: %d\n", span_cost_B);
 
 	printf("Undirecteg graph test 5 ... finished\n");
-    }    
+    }
+
+    
+    void test_undirected_graph_6(void)
+    {
+	printf("Undirecteg graph test 6 ...\n");
+	sUndirectedGraph grid_graph_A(4, 4);
+	grid_graph_A.to_Screen();
+
+	sUndirectedGraph grid_graph_B(4, 4);
+	grid_graph_B.to_Screen();	
+
+	sUndirectedGraph::VertexIDs_vector endpoint_A_IDs;
+	endpoint_A_IDs.push_back(0);
+	endpoint_A_IDs.push_back(7);
+	endpoint_A_IDs.push_back(13);
+	endpoint_A_IDs.push_back(8);
+
+	sUndirectedGraph::VertexIDs_vector endpoint_B_IDs;	
+	endpoint_B_IDs.push_back(14);
+	endpoint_B_IDs.push_back(11);
+	endpoint_B_IDs.push_back(4);
+	endpoint_B_IDs.push_back(12);
+
+	sUndirectedGraph::VertexIDs_vector source_IDs, sink_IDs, endpoint_IDs;	
+	sCBS CBS_1((sInstance*)NULL);
+	sink_IDs = endpoint_A_IDs;
+	source_IDs.push_back(1);	
+	grid_graph_A.calc_SourceGoalShortestPaths(CBS_1.m_source_Distances, CBS_1.m_goal_Distances, source_IDs, sink_IDs);	
+	grid_graph_A.calc_EndpointShortestPaths(endpoint_A_IDs);
+	
+	sInt_32 hamilton_cost_A = grid_graph_A.calc_MinimumHamiltonianPath(CBS_1, 1, endpoint_A_IDs);
+
+	sCBS CBS_2((sInstance*)NULL);
+	sink_IDs.clear();
+	source_IDs.clear();
+	sink_IDs = endpoint_B_IDs;
+	source_IDs.push_back(2);	
+	grid_graph_B.calc_SourceGoalShortestPaths(CBS_1.m_source_Distances, CBS_2.m_goal_Distances, source_IDs, sink_IDs);	
+	
+	grid_graph_B.calc_EndpointShortestPaths(endpoint_B_IDs);
+	sInt_32 hamilton_cost_B = grid_graph_B.calc_MinimumHamiltonianPath(CBS_2, 2, endpoint_B_IDs);
+
+	printf("Hamiltonian path A cost: %d\n", hamilton_cost_A);
+	printf("Hamiltonian path B cost: %d\n", hamilton_cost_B);
+
+	printf("Undirecteg graph test 6 ... finished\n");
+    }
+
+
+    void test_undirected_graph_7(void)
+    {
+	printf("Undirecteg graph test 7 ...\n");
+	sUndirectedGraph grid_graph(4, 4);
+	grid_graph.to_Screen();
+
+	sUndirectedGraph::VertexIDs_vector endpoint_IDs;
+	endpoint_IDs.push_back(0);
+	endpoint_IDs.push_back(7);
+	endpoint_IDs.push_back(15);
+	endpoint_IDs.push_back(8);
+
+	grid_graph.calc_AllPairsShortestPaths();
+	grid_graph.m_source_Distances = grid_graph.m_all_pairs_Distances;
+	grid_graph.m_goal_Distances = grid_graph.m_all_pairs_Distances;
+	printf("goal: %ld\n", grid_graph.m_goal_Distances.size());
+	grid_graph.m_endpoint_Distances = grid_graph.m_all_pairs_Distances;
+	grid_graph.calc_HamiltonianCosts(1, endpoint_IDs);
+
+	for (sUndirectedGraph::Distances_vector::const_iterator hc = grid_graph.m_hamiltonian_Costs.begin(); hc != grid_graph.m_hamiltonian_Costs.end(); ++hc)
+	{
+	    printf("%d ", *hc);
+	}
+	printf("\n");
+
+	printf("Undirecteg graph test 7 ... finished\n");
+    }            
 
 
     void test_statistics_1(void)
@@ -282,6 +359,10 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
     test_undirected_graph_4();
     */
     test_undirected_graph_5();
+    getchar();
+    test_undirected_graph_6();
+    getchar();   
+    test_undirected_graph_7();
 }
 
 

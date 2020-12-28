@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 2-058_planck                                                     */
+/* cbs.cpp / 2-123_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -1948,7 +1948,7 @@ namespace boOX
             #endif	    
 	}	
 	return cost;
-    }    
+    }   
 
     
     sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaHyperStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
@@ -1966,7 +1966,7 @@ namespace boOX
 	sDouble start_time = sStatistics::get_CPU_Seconds();
 	#endif
 
-	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost(max_individual_cost) + N_agents;
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_spanning(max_individual_cost) + N_agents;
 	
 //	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
 	sInt_32 extra = 0;
@@ -2000,7 +2000,205 @@ namespace boOX
 	    ++extra;
 	}
 	return -1;
-    }        
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStar(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaUltraStar(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStar(const sMission &mission, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonian_DeltaUltraStar(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }   
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaUltraStar(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStar(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	//sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();	
+	
+        #ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_spanning(max_individual_cost) /*+ N_agents*/;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving Hamiltonian (MAHPF) cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+	    }
+	    #endif
+	    
+	    if ((solution_cost = find_NonconflictingHamiltonian_DeltaUltraStar(mission, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(sSolution &solution, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(const sMission &mission, sSolution &solution, sInt_32 cost_limit)
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }   
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	return find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sCBS::find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    {
+	sInt_32 solution_cost, max_individual_cost;
+	//sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();	
+	
+        #ifdef sVERBOSE
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_hamiltonian(max_individual_cost) /*+ N_agents*/;
+	
+//	for (sInt_32 cost = 0; cost <= cost_limit; ++cost)
+	sInt_32 extra = 0;
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
+	{
+	    m_delta_conflict_node_IDs.clear();
+	    m_delta_path_node_IDs.clear();
+	    m_delta_agent_Conflicts.clear();
+	    m_delta_agent_edge_Conflicts.clear();
+	    m_first_agent_Paths.clear();
+	    m_delta_agent_Paths.clear();
+	    
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving Hamiltonian (MAHPF) cost %d (elapsed time [seconds]: %.3f)...\n", cost, (end_time - start_time));		
+	    }
+	    #endif
+	    
+	    if ((solution_cost = find_NonconflictingHamiltonian_DeltaUltraStar(mission, agent_Paths, cost, extra)) >= 0)
+	    {
+		return solution_cost;
+	    }
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    ++extra;
+	}
+	return -1;
+    }                
 
     
 /*----------------------------------------------------------------------------*/
@@ -2511,7 +2709,41 @@ namespace boOX
 	
 //	return find_NonconflictingHamiltonian_prioritizedCooccupation(mission, agent_Conflicts, agent_Paths, cost_limit);
 	return find_NonconflictingHamiltonian_principalCollision_DeltaHyperStar(mission, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingHamiltonian_DeltaUltraStar(AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	return find_NonconflictingHamiltonian_DeltaUltraStar(*m_Mission, agent_Paths, cost_limit, extra_cost);
+    }
+
+    
+    sInt_32 sCBS::find_NonconflictingHamiltonian_DeltaUltraStar(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
+    {
+	AgentConflicts_vector agent_Conflicts;
+	AgentEdgeConflicts_vector agent_edge_Conflicts;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	agent_Conflicts.resize(N_agents + 1);
+	agent_edge_Conflicts.resize(N_agents + 1);
+
+	m_delta_conflict_node_IDs.resize(N_agents + 1, -1);
+	m_delta_path_node_IDs.resize(N_agents + 1, -1);	
+	m_delta_agent_Conflicts.resize(N_agents + 1);
+	m_delta_agent_edge_Conflicts.resize(N_agents + 1);
+	m_first_agent_Paths.resize(N_agents + 1);	
+	m_delta_agent_Paths.resize(N_agents + 1);
+
+	VertexIDs_vector source_IDs;
+	VertexIDs_vector goal_IDs;
+
+	mission.collect_Endpoints(source_IDs, goal_IDs);
+	mission.m_environment.calc_SourceGoalShortestPaths(m_source_Distances, m_goal_Distances, source_IDs, goal_IDs);	
+	
+//	return find_NonconflictingHamiltonian_prioritizedCooccupation(mission, agent_Conflicts, agent_Paths, cost_limit);
+	return find_NonconflictingHamiltonian_principalCollision_DeltaUltraStar(mission, agent_Conflicts, agent_edge_Conflicts, agent_Paths, cost_limit, extra_cost);
     }                
+    
 
     
 /*----------------------------------------------------------------------------*/
@@ -3490,6 +3722,7 @@ namespace boOX
 	    }
             #endif
 
+	    /*
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -3502,7 +3735,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
-
+	    */
 	    #ifdef sVERBOSE	    
 	    {
 		static sDouble verbose_period = 1.0;
@@ -3836,6 +4069,7 @@ namespace boOX
 	    }
             #endif
 
+	    /*
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -3848,7 +4082,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
-
+	    */
 	    #ifdef sVERBOSE	    
 	    {
 		static sDouble verbose_period = 1.0;
@@ -4029,6 +4263,7 @@ namespace boOX
 	    }
             #endif
 
+	    /*
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -4041,7 +4276,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
-
+	    */
 	    #ifdef sVERBOSE	    
 	    {
 		static sDouble verbose_period = 1.0;
@@ -5004,6 +5239,7 @@ namespace boOX
 	    }
             #endif
 
+	    /*
 	    #ifdef sDEBUG
 	    {
 		printf("Search queue size:%ld\n", search_Queue.size());
@@ -5016,7 +5252,8 @@ namespace boOX
 		printf("\n");
 	    }
 	    #endif
-
+	    */
+	    
 	    #ifdef sVERBOSE	    
 	    {
 		static sDouble verbose_period = 1.0;
@@ -8664,7 +8901,206 @@ namespace boOX
 	    }
 	}	
 	return -1;
-    }    
+    }
+
+
+    sInt_32 sCBS::find_NonconflictingHamiltonian_principalCollision_DeltaUltraStar(const sMission            &mission,
+										   AgentConflicts_vector     &agent_Conflicts,
+										   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+										   AgentPaths_vector         &agent_Paths,
+										   sInt_32                    cost_limit,
+										   sInt_32                    extra_cost)
+    {
+	sInt_32 cummulative;
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	
+	Node initial_node(-1);
+
+	initial_node.m_node_id = 0;
+	initial_node.m_upper_node_id = -1;
+
+	initial_node.m_next_conflict = NULL;
+	initial_node.m_next_edge_conflict = NULL;
+
+	initial_node.m_next_path = NULL;
+	initial_node.m_prev_path = NULL;
+	
+	initial_node.m_agent_Conflicts = agent_Conflicts;
+	initial_node.m_agent_edge_Conflicts = agent_edge_Conflicts;	
+	initial_node.m_agent_Paths.resize(N_agents + 1);
+
+	#ifdef sPROFILE
+	{		
+	    sequencing_cummul = revising_cummul = analyzing_cummul = collecting_cummul = 0;
+	}
+	#endif
+
+        #ifdef sSTATISTICS
+	{
+	    ++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	}
+        #endif	
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    if (findUltraStar_NonconflictingHamiltonian(mission.m_environment,
+							mission.m_start_configuration.get_AgentLocation(agent_id),
+							mission.m_goal_commitment.m_agent_Tasks[agent_id],
+							cost_limit,
+							extra_cost,
+							initial_node.m_agent_Conflicts[agent_id],
+							initial_node.m_agent_edge_Conflicts[agent_id],
+							m_first_agent_Paths[agent_id]) < 0)
+	    {		
+		return -1;
+	    }	    
+	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
+	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
+	}
+	{
+	    Cooccupations_vector space_Cooccupations;
+	    
+	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    {		
+		return -1;
+	    }
+	}
+	
+	Nodes_vector search_Store;
+	NodeReferences_mset search_Queue;
+
+	search_Store.push_back(initial_node);
+	search_Queue.insert(NodeReference(0, &search_Store));
+	
+	while (!search_Queue.empty())
+	{
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	    
+	    #ifdef sPROFILE
+	    {		
+		printf("Times: seq:%.3f\n", sequencing_cummul / (double)CLOCKS_PER_SEC);
+	    }
+	    #endif
+	    
+            #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
+	    }
+            #endif
+
+	    #ifdef sDEBUG
+	    {
+		printf("Search queue size:%ld\n", search_Queue.size());
+
+		printf("Search queue agents: ");
+		for (NodeReferences_mset::const_iterator node = search_Queue.begin(); node != search_Queue.end(); ++node)
+		{
+		    printf("%d ", search_Store[node->m_node_id].m_upd_agent_id);
+		}
+		printf("\n");
+	    }
+	    #endif
+
+	    #ifdef sVERBOSE	    
+	    {
+		static sDouble verbose_period = 1.0;
+		
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > verbose_period)
+		{
+		    printf("Search steps: %lld, %lld (time: %.3f s)\n", s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps, s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps, end_time - start_time);
+		    verbose_period *= 1.5;
+		}
+	    }
+	    #endif	    
+
+	    NodeReference best_node = *search_Queue.begin();
+	    search_Queue.erase(search_Queue.begin());
+
+	    if (search_Store[best_node.m_node_id].m_upd_agent_id > 0)
+	    {
+                #ifdef sPROFILE
+		{		
+		    sequencing_begin = clock();
+		}
+		#endif
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif		
+
+		rebuild_NodeConflictsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+					   best_node.m_node_id,
+					   search_Store);	
+
+		#ifdef sDEBUG
+		{
+		    sCBS_SHOW_AGENT_CONFLICTS(m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		    sCBS_SHOW_AGENT_EDGE_CONFLICTS(m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		}
+		#endif
+
+		rebuild_NodePathsDelta(search_Store[best_node.m_node_id].m_upd_agent_id,
+				       best_node.m_node_id,
+				       search_Store);		
+		search_Store[best_node.m_node_id].m_prev_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+
+		if (findUltraStar_NonconflictingHamiltonian(mission.m_environment,
+							    mission.m_start_configuration.get_AgentLocation(search_Store[best_node.m_node_id].m_upd_agent_id),
+							    mission.m_goal_commitment.m_agent_Tasks[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    cost_limit,
+							    extra_cost,
+//						    search_Store[best_node.m_node_id].m_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+//				  		    search_Store[best_node.m_node_id].m_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],						
+							    m_delta_agent_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    m_delta_agent_edge_Conflicts[search_Store[best_node.m_node_id].m_upd_agent_id],
+							    m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]) < 0)
+		{		   
+		    continue;
+		}
+		search_Store[best_node.m_node_id].m_next_path = new VertexIDs_vector(m_delta_agent_Paths[search_Store[best_node.m_node_id].m_upd_agent_id]);
+		m_delta_path_node_IDs[search_Store[best_node.m_node_id].m_upd_agent_id] = best_node.m_node_id;
+
+		#ifdef sPROFILE
+		{		
+		    sequencing_end = clock();
+		    sequencing_cummul += (sequencing_end - sequencing_begin);
+		}
+		#endif
+	    }
+	    Cooccupations_vector space_Cooccupations;
+
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		rebuild_NodePathsDelta(agent_id,
+				       best_node.m_node_id,
+				       search_Store);
+	    }	    
+	    if ((cummulative = examine_NonconflictingHamiltonianDelta(mission,
+								      best_node.m_node_id,
+								      space_Cooccupations,
+								      cost_limit,
+								      search_Store,
+								      search_Queue)) >= 0)
+	    {
+		agent_Paths = m_delta_agent_Paths;
+		return cummulative;
+	    }
+	}	
+	return -1;
+    }        
     
     
 /*----------------------------------------------------------------------------*/
@@ -13832,12 +14268,12 @@ namespace boOX
 
 	    if (cummulative > cost_limit)
 	    {
-		return -1;
+//		return -1;
 	    }
 	}		
 	if ((cummulative = analyze_NonconflictingHamiltonian(mission, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
 	{
-	    sASSERT(false);
+//	    sASSERT(false);
 	}
 	#ifdef sPROFILE
 	{	
@@ -13846,7 +14282,7 @@ namespace boOX
 	    
 	    collecting_begin = clock();
 	}
-	#endif		    
+        #endif
 
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -14257,6 +14693,7 @@ namespace boOX
        
 	#ifdef sDEBUG
 	{
+	    /*
 	    printf("conflicts:\n");
 	    
 	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
@@ -14284,7 +14721,8 @@ namespace boOX
 		    printf("] ");
 		}
 		printf("\n");
-	    }	    
+	    }
+	    */	    
 	}
 	#endif
 
@@ -14865,7 +15303,7 @@ namespace boOX
     sInt_32 sCBS::findSuperStar_NonconflictingSequence(const sUndirectedGraph     &graph,
 						       sInt_32                     source_id,
 						       sInt_32                     sink_id,
-						       sInt_32                     sUNUSED(cost_limit),
+						       sInt_32                     cost_limit,
 						       sInt_32                     extra_cost,
 						       const Conflicts_vector     &Conflicts,
 						       const EdgeConflicts_vector &edge_Conflicts,
@@ -14919,6 +15357,7 @@ namespace boOX
 	}
 	#endif
 
+	printf("gamma 1\n");
 	if (source_id == sink_id)
 	{
 	    bool non_conflicting_sink = true;
@@ -14938,20 +15377,27 @@ namespace boOX
 		return 1;
 	    }
 	}
-  
+
+	printf("gamma 2\n");	
 	if (Conflicts.empty() || Conflicts[0].find(source_id) == Conflicts[0].end())
 	{
+	    printf("gamma 2.1\n");
 	    visit_Queue.insert(Visits_mmap::value_type(0 + relaxation * m_goal_Distances[sink_id][source_id], Visit(0, source_id, -1)));
+	    printf("gamma 2.2\n");
 	    visited_Vertices.push_back(Visits_umap());
+	    printf("gamma 2.3\n");	    
 	    
 	    Visit source_visit(0, source_id, -1);
+	    printf("gamma 2.4\n");	    
 	    visited_Vertices[0][source_id] = source_visit;
+	    printf("gamma 2.5\n");	    
 	}
 	else
 	{
 	    return -1;
 	}
-	
+
+	printf("gamma 3\n");	
 	while (!visit_Queue.empty())
 	{
   	    #ifdef sSTATISTICS
@@ -14976,9 +15422,11 @@ namespace boOX
 		visited_Vertices.push_back(Visits_umap());
 	    }
 
-//	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= m_goal_Distances[sink_id][source_id] + extra_cost)	    
-	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= relaxation * (m_goal_Distances[sink_id][source_id] + extra_cost))
+//	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= m_goal_Distances[sink_id][source_id] + extra_cost)
+	    printf("gamma 4\n");
+	    if (cost_limit < 0 || front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= relaxation * (m_goal_Distances[sink_id][source_id] + extra_cost))
 	    {
+		printf("gamma 5\n");
 		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
 		{
 		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
@@ -15097,6 +15545,7 @@ namespace boOX
 		}
                 #endif		
 		*/
+		    printf("gamma 6\n");		    
 		    
 		    if (visited_Vertices.size() <= front_visit.m_level + 1)
 		    {
@@ -15182,6 +15631,328 @@ namespace boOX
     }
 
 
+    sInt_32 sCBS::findSuperStar_NonconflictingSequence(const sUndirectedGraph     &graph,
+						       sInt_32                     source_id,
+						       sInt_32                     sink_id,
+						       sInt_32                     start_level,
+						       sInt_32                     cost_limit,
+						       sInt_32                     extra_cost,
+						       const Conflicts_vector     &Conflicts,
+						       const EdgeConflicts_vector &edge_Conflicts,
+						       VertexIDs_vector           &Path) const
+    {
+	sDouble relaxation = 1.0;
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("seq:%d -> %d\n", source_id, sink_id);
+	    */
+	}
+	#endif
+		
+	Visits_mmap visit_Queue;
+	Visits_vector visited_Vertices;
+       
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("conflicts (start:%d):\n", start_level);
+	    
+	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (VertexIDs_uset::const_iterator conf = Conflicts[level].begin(); conf != Conflicts[level].end(); ++conf)
+		{
+		    printf("%d ", *conf);
+		}
+		printf("\n");
+	    }
+
+	    printf("edge conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < edge_Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (NeighborIDs_umap::const_iterator neigh = edge_Conflicts[level].begin(); neigh != edge_Conflicts[level].end(); ++neigh)
+		{
+		    printf("%d [", neigh->first);
+		    for (VertexIDs_uset::const_iterator vertex = neigh->second.begin(); vertex != neigh->second.end(); ++vertex)
+		    {
+			printf("%d ", *vertex);
+		    }
+		    printf("] ");
+		}
+		printf("\n");
+	    }
+	    */
+	}
+	#endif
+
+	if (source_id == sink_id)
+	{
+	    bool non_conflicting_sink = true;
+
+	    for (sInt_32 level = start_level; level < Conflicts.size(); ++level)
+	    {
+		if (Conflicts[level].find(sink_id) != Conflicts[level].end())
+		{
+		    non_conflicting_sink = false;
+		    break;
+		}
+	    }
+
+	    if (non_conflicting_sink)
+	    {
+		Path.push_back(sink_id);
+		return 1;
+	    }
+	}
+
+	if (Conflicts.size() <= start_level || Conflicts[start_level].find(source_id) == Conflicts[start_level].end())
+	{
+	    visit_Queue.insert(Visits_mmap::value_type(0 + relaxation * m_goal_Distances[sink_id][source_id], Visit(0, source_id, -1)));
+		    
+	    visited_Vertices.push_back(Visits_umap());
+	    
+	    Visit source_visit(0, source_id, -1);
+	    visited_Vertices[0][source_id] = source_visit;
+	}
+	else
+	{
+	    return -1;
+	}
+	
+	while (!visit_Queue.empty())
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
+	    const Visit &front_visit = visit_Queue.begin()->second;    
+	    Visits_mmap::iterator visit_erase = visit_Queue.begin();
+	        
+            /*
+	    #ifdef sDEBUG
+	    {
+		printf("  v:%d,%d,%d\n", front_visit.m_level, front_visit.m_vertex_id, front_visit.m_previous_id);
+	    }
+	    #endif
+	    */
+
+	    if (visited_Vertices.size() <= front_visit.m_level + 1)
+	    {
+		visited_Vertices.push_back(Visits_umap());
+	    }
+
+//	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= m_goal_Distances[sink_id][source_id] + extra_cost)	    
+	    if (cost_limit < 0 || front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= relaxation * (m_goal_Distances[sink_id][source_id] + extra_cost))
+	    {
+		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
+		{
+		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
+
+		    if (visited_Vertices.size() <= front_visit.m_level + 1)
+		    {
+			sASSERT(visited_Vertices.size() == front_visit.m_level + 1);
+			visited_Vertices.push_back(Visits_umap());
+		    }
+		    Visits_umap &next_visited_Vertices = visited_Vertices[front_visit.m_level + 1];
+		    
+		    if (next_visited_Vertices.find(neighbor_id) == next_visited_Vertices.end())
+		    {
+		    /*
+		    #ifdef sDEBUG
+		    {
+			printf("    n:%d\n", neighbor_id);
+		    }
+		    #endif
+		    */		    
+			if (Conflicts.size() <= start_level + front_visit.m_level + 1 || Conflicts[start_level + front_visit.m_level + 1].find(neighbor_id) == Conflicts[start_level + front_visit.m_level + 1].end())
+			{
+			    NeighborIDs_umap::const_iterator edge_vertex;
+			    
+			    if (   edge_Conflicts.size() <= start_level + front_visit.m_level
+				|| (edge_vertex = edge_Conflicts[start_level + front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[start_level + front_visit.m_level].end()
+				|| edge_vertex->second.find(neighbor_id) == edge_vertex->second.end())
+			    {
+				
+			    /*
+                            #ifdef sDEBUG
+			    {
+			        printf("      *\n");
+			    }
+                            #endif
+			    */			
+				Visit neighbor_visit(front_visit.m_level + 1, neighbor_id, front_visit.m_vertex_id);
+				next_visited_Vertices[neighbor_id] = neighbor_visit;
+
+				if (neighbor_id == sink_id)
+				{
+				    bool non_conflicting_sink = true;
+				    
+				    for (sInt_32 level = start_level + front_visit.m_level + 1; level < Conflicts.size(); ++level)
+				    {
+					if (Conflicts[level].find(sink_id) != Conflicts[level].end())
+					{
+					    non_conflicting_sink = false;
+					    break;
+					}
+				    }
+				    
+				    if (non_conflicting_sink)
+				    {
+					sInt_32 prev_vertex_id = sink_id;
+					Path.resize(front_visit.m_level + 2, -1);
+
+					/* Lambda
+                                        #ifdef sDEBUG
+					{
+					    printf("Path:\n");
+					    for (sInt_32 i = 0; i <= front_visit.m_level + 1; ++i)
+					    {
+						for (Visits_umap::const_iterator visit_vertex = visited_Vertices[i].begin(); visit_vertex != visited_Vertices[i].end(); ++visit_vertex)
+						{
+						    printf("(%d,%d,%d) ", visit_vertex->second.m_level, visit_vertex->second.m_vertex_id, visit_vertex->second.m_previous_id);
+						}
+						printf("\n");
+					    }
+					}
+				        #endif
+
+                                        #ifdef sDEBUG
+					{
+					    printf("P:");
+					}
+				        #endif
+					*/
+					for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+					{
+					    Path[i] = prev_vertex_id;
+					    /*
+                                            #ifdef sDEBUG
+					    {
+						printf("%d ", Path[i]);
+					    }
+				            #endif
+					    */
+					    Visits_umap::const_iterator prev_visit = visited_Vertices[i].find(prev_vertex_id);
+					    
+					    sASSERT(prev_visit != visited_Vertices[i].end());
+					    
+					    prev_vertex_id = prev_visit->second.m_previous_id;
+					}
+					/*
+				        #ifdef sDEBUG
+					{
+					    printf("\n");
+					}
+				        #endif
+					*/
+					return front_visit.m_level + 2;
+				    }	 		
+				}			    
+				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] + neighbor_visit.m_level, neighbor_visit));				
+			    }
+			}
+		    }
+		}
+	        { /* wait action */
+
+		/*
+                #ifdef sDEBUG
+		{
+		    printf("    -:%d\n", front_visit.m_vertex_id);
+		}
+                #endif		
+		*/
+		    
+		    if (visited_Vertices.size() <= front_visit.m_level + 1)
+		    {
+			sASSERT(visited_Vertices.size() == front_visit.m_level + 1);
+			visited_Vertices.push_back(Visits_umap());
+		    }		
+		    Visits_umap &next_visited_Vertices = visited_Vertices[front_visit.m_level + 1];
+		    
+		    if (next_visited_Vertices.find(front_visit.m_vertex_id) == next_visited_Vertices.end())
+		    {
+			if (Conflicts.size() <= start_level + front_visit.m_level + 1 || Conflicts[start_level + front_visit.m_level + 1].find(front_visit.m_vertex_id) == Conflicts[start_level + front_visit.m_level + 1].end())
+			{
+			    NeighborIDs_umap::const_iterator edge_vertex;
+			    
+			    if (   edge_Conflicts.size() <= start_level + front_visit.m_level
+				|| (edge_vertex = edge_Conflicts[start_level + front_visit.m_level].find(front_visit.m_vertex_id)) == edge_Conflicts[start_level + front_visit.m_level].end()
+				|| edge_vertex->second.find(front_visit.m_vertex_id) == edge_vertex->second.end())
+			    {
+			
+			    /*
+                            #ifdef sDEBUG
+			    {
+			        printf("      *\n");
+			    }
+                            #endif
+			    */		
+				if (front_visit.m_vertex_id == sink_id)
+				{
+				    bool non_conflicting_sink = true;
+				    
+				    for (sInt_32 level = start_level + front_visit.m_level + 1; level < Conflicts.size(); ++level)
+				    {
+					if (Conflicts[level].find(sink_id) != Conflicts[level].end())
+					{
+					    non_conflicting_sink = false;
+					    break;
+					}
+				    }
+				    
+				    if (non_conflicting_sink)
+				    {
+					sInt_32 prev_vertex_id = sink_id;
+					Path.resize(front_visit.m_level + 1, -1);
+				
+                                        #ifdef sDEBUG
+					{
+					    printf("Path:\n");
+					    for (sInt_32 i = 0; i <= front_visit.m_level; ++i)
+					    {
+						for (Visits_umap::const_iterator visit_vertex = visited_Vertices[i].begin(); visit_vertex != visited_Vertices[i].end(); ++visit_vertex)
+						{
+						    printf("(%d,%d,%d) ", visit_vertex->second.m_level, visit_vertex->second.m_vertex_id, visit_vertex->second.m_previous_id);
+						}
+						printf("\n");
+					    }
+					}
+				        #endif
+					
+					for (sInt_32 i = front_visit.m_level; i >= 0; --i)
+					{
+					    Path[i] = prev_vertex_id;
+					    Visits_umap::const_iterator prev_visit = visited_Vertices[i].find(prev_vertex_id);
+					    
+					    sASSERT(prev_visit != visited_Vertices[i].end());
+					    
+					    prev_vertex_id = prev_visit->second.m_previous_id;
+					}
+					return front_visit.m_level + 1;
+				    }
+				}												
+				Visit identity_visit(front_visit.m_level + 1, front_visit.m_vertex_id, front_visit.m_vertex_id);
+				next_visited_Vertices[front_visit.m_vertex_id] = identity_visit;
+				visit_Queue.insert(Visits_mmap::value_type(relaxation * m_goal_Distances[sink_id][identity_visit.m_vertex_id] + identity_visit.m_level, identity_visit));
+			    }
+			}
+		    }
+		}
+	    }
+//	    visit_Queue.erase(visit_Queue.begin());
+	    visit_Queue.erase(visit_erase);	    
+	}
+	return -1;
+    }    
+
+
     sInt_32 sCBS::findSuperStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
 							  sInt_32                     source_id,
 							  const VertexIDs_vector     &sink_IDs,
@@ -15234,7 +16005,7 @@ namespace boOX
 		    printf("] ");
 		}
 		printf("\n");
-	    }	    
+	    }
 	    */
 	}
 	#endif
@@ -15617,12 +16388,33 @@ namespace boOX
 			    || edge_vertex->second.find(neighbor_id) == edge_vertex->second.end())
 			{
 			    HamiltonianVisit neighbor_visit(front_visit.m_level + 1, next_explored_Visits.size(), neighbor_id, front_visit.m_visit_id);
+			    neighbor_visit.m_fulfilled_sink_IDs = front_visit.m_fulfilled_sink_IDs;
+
+			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
+			    {
+				if (*sink == neighbor_visit.m_vertex_id)
+				{
+				    bool already_fulfilled = false;
+				    for (VertexIDs_vector::const_iterator fulfill = neighbor_visit.m_fulfilled_sink_IDs.begin(); fulfill != neighbor_visit.m_fulfilled_sink_IDs.end(); ++fulfill)
+				    {
+					if (*fulfill == *sink)
+					{
+					    already_fulfilled = true;
+					    break;
+					}
+				    }
+				    if (!already_fulfilled)
+				    {					
+					neighbor_visit.m_fulfilled_sink_IDs.push_back(*sink);
+				    }
+				}
+			    }			    
 			    next_explored_Visits.push_back(neighbor_visit);
 			    
 			    VertexIDs_vector candidate_Path;
 			    candidate_Path.resize(front_visit.m_level + 2, -1);
 
-				/*
+			    /*
                                 #ifdef sDEBUG
 				{
 				    printf("Circuits standard:\n");
@@ -15636,26 +16428,21 @@ namespace boOX
 				    }
 				}
 				#endif
-				*/
-
-			    sInt_32 prev_visit_id = neighbor_visit.m_visit_id;				
-			    
-			    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
-			    {
-				candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
-				prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;	   					
-			    }
-
+			    */			   
 			    bool finished_hamiltonian = true;
+			    /*
 			    VertexIDs_vector fulfilled_sink_IDs;
-			    
+
+			    printf("Recomputed\n");
 			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
 			    {
 				bool sink_fulfilled = false;
 				for (VertexIDs_vector::const_iterator v = candidate_Path.begin(); v != candidate_Path.end(); ++v)
 				{
+				    printf("%d ", *v);
 				    if (*v == *sink)
 				    {
+					printf("[%d] ", *v);
 					sink_fulfilled = true;
 					fulfilled_sink_IDs.push_back(*v);
 					break;
@@ -15665,6 +16452,25 @@ namespace boOX
 				{
 				    finished_hamiltonian = false;
 				}
+			    }
+			    printf("\n");			    
+			    */
+			    /*
+			    printf("Memorized\n");
+			    for (VertexIDs_vector::const_iterator fulfill = neighbor_visit.m_fulfilled_sink_IDs.begin(); fulfill != neighbor_visit.m_fulfilled_sink_IDs.end(); ++fulfill)
+			    {
+				printf("%d ", *fulfill);				
+			    }
+			    printf("\n");
+			    */
+
+			    if (neighbor_visit.m_fulfilled_sink_IDs.size() == sink_IDs.size())
+			    {
+				finished_hamiltonian = true;
+			    }
+			    else
+			    {
+				finished_hamiltonian = false;				
 			    }
 
 			    bool non_conflicting_terminal = true;
@@ -15679,18 +16485,25 @@ namespace boOX
 			    }
 			    
 			    if (non_conflicting_terminal)
-			    {															     
+			    {				
 				if (finished_hamiltonian)
 				{
+				    sInt_32 prev_visit_id = neighbor_visit.m_visit_id;
+				    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+				    {
+					candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
+					prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;
+				    }
+				    				    
 				    Path = candidate_Path;
 				    return front_visit.m_level + 2;
 				}
 			    }
-			    VertexIDs_vector node_IDs;
+			    VertexIDs_vector node_IDs;			    
 			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
 			    {
 				bool sink_fulfilled = false;
-				for (VertexIDs_vector::const_iterator fulfill = fulfilled_sink_IDs.begin(); fulfill != fulfilled_sink_IDs.end(); ++fulfill)
+				for (VertexIDs_vector::const_iterator fulfill = neighbor_visit.m_fulfilled_sink_IDs.begin(); fulfill != neighbor_visit.m_fulfilled_sink_IDs.end(); ++fulfill)
 				{
 				    if (*fulfill == *sink)
 				    {
@@ -15704,7 +16517,7 @@ namespace boOX
 				}
 			    }
 			    node_IDs.push_back(neighbor_visit.m_vertex_id);
-			    sInt_32 estimated_remaining_cost =  graph.calc_MinimumSpanningTree(node_IDs);
+			    sInt_32 estimated_remaining_cost = graph.calc_MinimumSpanningTree(node_IDs);
 
 			    visit_Queue.insert(HamiltonianVisits_mmap::value_type(/*relaxation * m_goal_Distances[sink_id][neighbor_visit.m_vertex_id] +*/ neighbor_visit.m_level + estimated_remaining_cost, neighbor_visit));
 			}
@@ -15722,6 +16535,8 @@ namespace boOX
 			    || edge_vertex->second.find(front_visit.m_vertex_id) == edge_vertex->second.end())
 			{
 			    HamiltonianVisit identity_visit(front_visit.m_level + 1, next_explored_Visits.size(), front_visit.m_vertex_id, front_visit.m_visit_id);
+			    identity_visit.m_fulfilled_sink_IDs = front_visit.m_fulfilled_sink_IDs;
+			    
 			    next_explored_Visits.push_back(identity_visit);
 			    
 			    VertexIDs_vector candidate_Path;
@@ -15742,7 +16557,7 @@ namespace boOX
 				}
 				#endif
 				*/
-			    
+			    /*
 			    sInt_32 prev_visit_id = identity_visit.m_visit_id;				
 			    
 			    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
@@ -15750,7 +16565,19 @@ namespace boOX
 				candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
 				prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;	   					
 			    }
+			    */
 			    bool finished_hamiltonian = true;
+
+			    if (identity_visit.m_fulfilled_sink_IDs.size() == sink_IDs.size())
+			    {
+				finished_hamiltonian = true;
+			    }
+			    else
+			    {
+				finished_hamiltonian = false;				
+			    }
+
+			    /*
 			    VertexIDs_vector fulfilled_sink_IDs;			    
 			    
 			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
@@ -15770,7 +16597,8 @@ namespace boOX
 				    finished_hamiltonian = false;
 				}
 			    }			    
-
+			    */
+			    
 			    bool non_conflicting_terminal = true;
 			    
 			    for (sInt_32 level = front_visit.m_level + 1; level < Conflicts.size(); ++level)
@@ -15786,6 +16614,13 @@ namespace boOX
 			    {				
 				if (finished_hamiltonian)
 				{
+				    sInt_32 prev_visit_id = identity_visit.m_visit_id;
+				    for (sInt_32 i = front_visit.m_level + 1; i >= 0; --i)
+				    {
+					candidate_Path[i] = explored_Circuits[i][prev_visit_id].m_vertex_id;
+					prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;
+				    }
+				    				    				    
 				    Path = candidate_Path;					
 				    return front_visit.m_level + 1;
 				}
@@ -15795,7 +16630,7 @@ namespace boOX
 			    for (VertexIDs_vector::const_iterator sink = sink_IDs.begin(); sink != sink_IDs.end(); ++sink)
 			    {
 				bool sink_fulfilled = false;
-				for (VertexIDs_vector::const_iterator fulfill = fulfilled_sink_IDs.begin(); fulfill != fulfilled_sink_IDs.end(); ++fulfill)
+				for (VertexIDs_vector::const_iterator fulfill = identity_visit.m_fulfilled_sink_IDs.begin(); fulfill != identity_visit.m_fulfilled_sink_IDs.end(); ++fulfill)
 				{
 				    if (*fulfill == *sink)
 				    {
@@ -15819,8 +16654,221 @@ namespace boOX
 	    visit_Queue.erase(visit_erase);	    
 	}
 	return -1;	
-    }                
+    }
 
+
+    sInt_32 sCBS::findUltraStar_NonconflictingHamiltonian(const sUndirectedGraph     &graph,
+							  sInt_32                     source_id,
+							  const VertexIDs_vector     &sink_IDs,
+							  sInt_32                    cost_limit,
+							  sInt_32                    extra_cost,
+							  const Conflicts_vector     &Conflicts,
+							  const EdgeConflicts_vector &edge_Conflicts,
+							  VertexIDs_vector           &Path) const
+    {
+	//sDouble relaxation = 1.0;
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("seq:%d -> %d\n", source_id, sink_id);
+	    */
+	}
+	#endif
+		
+	UltraVisits_mmap visit_Queue;
+	UltraVisits_vector explored_Circuits;
+
+	/*
+	#ifdef sDEBUG
+	{
+	    printf("conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (VertexIDs_uset::const_iterator conf = Conflicts[level].begin(); conf != Conflicts[level].end(); ++conf)
+		{
+		    printf("%d ", *conf);
+		}
+		printf("\n");
+	    }
+
+	    printf("edge conflicts:\n");
+	    
+	    for (sInt_32 level = 0; level < edge_Conflicts.size(); ++level)
+	    {
+		printf("%d: ", level);
+		for (NeighborIDs_umap::const_iterator neigh = edge_Conflicts[level].begin(); neigh != edge_Conflicts[level].end(); ++neigh)
+		{
+		    printf("%d [", neigh->first);
+		    for (VertexIDs_uset::const_iterator vertex = neigh->second.begin(); vertex != neigh->second.end(); ++vertex)
+		    {
+			printf("%d ", *vertex);
+		    }
+		    printf("] ");
+		}
+		printf("\n");
+	    }	    
+	}
+	#endif
+	*/
+
+	if (sink_IDs.empty())
+	{
+	    return 0;
+	}
+	
+	if (Conflicts.empty() || Conflicts[0].find(source_id) == Conflicts[0].end())
+	{
+	    explored_Circuits.push_back(LevelUltraVisits_vector());    	    
+	    UltraVisit source_visit(0, explored_Circuits[0].size(), source_id, -1);
+	    
+	    source_visit.m_remaining_sink_IDs = sink_IDs;
+	    source_visit.m_cost = 0;
+
+	    explored_Circuits[0].push_back(source_visit);
+
+	    VertexIDs_vector node_IDs = source_visit.m_remaining_sink_IDs;
+	    node_IDs.push_back(source_id);
+
+	    sInt_32 estimated_remaining_cost = graph.calc_MinimumSpanningTree(node_IDs);
+	    
+	    visit_Queue.insert(UltraVisits_mmap::value_type(0 + estimated_remaining_cost, source_visit));
+	}
+	else
+	{	    
+	    return -1;
+	}
+
+	while (!visit_Queue.empty())
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_micro_search_Steps;
+	    }
+	    #endif
+	    
+	    const UltraVisit &front_visit = visit_Queue.begin()->second;	    
+	    UltraVisits_mmap::iterator visit_erase = visit_Queue.begin();
+	        
+            /*
+	    #ifdef sDEBUG
+	    {
+		printf("  v:%d,%d,%d\n", front_visit.m_level, front_visit.m_vertex_id, front_visit.m_previous_id);
+		printf("%ld, %d\n", explored_Circuits.size(), front_visit.m_level + 1);
+	    }
+	    #endif
+	    */
+	    
+	    if (explored_Circuits.size() <= front_visit.m_level + 1)
+	    {
+		explored_Circuits.push_back(LevelUltraVisits_vector());
+		sASSERT(explored_Circuits.size() > front_visit.m_level + 1);
+	    }
+	    //printf("Remaining: %ld (%d, %d)\n", front_visit.m_remaining_sink_IDs.size(), front_visit.m_cost, cost_limit + extra_cost);
+	    if (cost_limit < 0 || front_visit.m_cost <= cost_limit + extra_cost)
+	    {       	
+		if (front_visit.m_remaining_sink_IDs.empty())
+		{
+		    VertexIDs_vector candidate_Path, final_Path;		    
+		    sInt_32 prev_visit_id = front_visit.m_visit_id;
+		    		    
+		    for (sInt_32 i = front_visit.m_level; i >= 0; --i)
+		    {
+			const VertexIDs_vector &partial_Path = explored_Circuits[i][prev_visit_id].m_partial_Path;
+			if (!partial_Path.empty())
+			{
+			    for (VertexIDs_vector::const_reverse_iterator pnode = partial_Path.rbegin(); pnode != partial_Path.rend(); ++pnode)
+			    {
+				candidate_Path.push_back(*pnode);
+			    }
+			    candidate_Path.pop_back();
+			}
+			prev_visit_id = explored_Circuits[i][prev_visit_id].m_prev_visit_id;
+		    }
+		    candidate_Path.push_back(source_id);
+
+		    for (VertexIDs_vector::const_reverse_iterator fnode = candidate_Path.rbegin(); fnode != candidate_Path.rend(); ++fnode)
+		    {
+			final_Path.push_back(*fnode);
+		    }
+		    Path = final_Path;
+		    
+		    return front_visit.m_cost;		    
+		}
+		else
+		{
+		    LevelUltraVisits_vector &next_explored_Visits = explored_Circuits[front_visit.m_level + 1];
+			
+		    for (VertexIDs_vector::const_iterator remaining = front_visit.m_remaining_sink_IDs.begin(); remaining != front_visit.m_remaining_sink_IDs.end(); ++remaining)
+		    {		    
+			sInt_32 remaining_id = *remaining;			
+			UltraVisit neighbor_visit(front_visit.m_level + 1, next_explored_Visits.size(), remaining_id, front_visit.m_visit_id);
+			
+			for (VertexIDs_vector::const_iterator rema = front_visit.m_remaining_sink_IDs.begin(); rema != front_visit.m_remaining_sink_IDs.end(); ++rema)
+			{
+			    if (*rema != *remaining)
+			    {
+				neighbor_visit.m_remaining_sink_IDs.push_back(*rema);
+			    }
+			}
+
+			sInt_32 partial_path_length = findSuperStar_NonconflictingSequence(graph,
+											   front_visit.m_vertex_id,
+											   remaining_id,
+											   front_visit.m_cost,
+											   cost_limit < 0 ? -1 : cost_limit - front_visit.m_cost,
+											   extra_cost,
+											   Conflicts,
+											   edge_Conflicts,
+											   neighbor_visit.m_partial_Path);
+
+			if (partial_path_length >= 0)
+			{
+			    /*
+			    #ifdef sDEBUG
+			    {
+				printf("path len (%d,%d):%d\n", front_visit.m_vertex_id, remaining_id, partial_path_length);
+				for (VertexIDs_vector::const_iterator pp = neighbor_visit.m_partial_Path.begin(); pp != neighbor_visit.m_partial_Path.end(); ++pp)
+				{
+				    printf("%d ", *pp);
+				}
+				printf("\n");
+			    }
+			    #endif
+			    */
+			    
+			    neighbor_visit.m_cost = front_visit.m_cost + partial_path_length - 1;
+
+			    /*
+			    if (neighbor_visit.m_cost == 0)
+			    {
+				neighbor_visit.m_cost = front_visit.m_cost + partial_path_length - 1;
+			    }
+			    else
+			    {
+				neighbor_visit.m_cost = front_visit.m_cost + partial_path_length - 1;				
+			    }
+			    */
+			    next_explored_Visits.push_back(neighbor_visit);
+				
+			    VertexIDs_vector node_IDs = neighbor_visit.m_remaining_sink_IDs;
+			    node_IDs.push_back(front_visit.m_vertex_id);
+			    sInt_32 estimated_remaining_cost = graph.calc_MinimumSpanningTree(node_IDs);
+			    
+			    visit_Queue.insert(UltraVisits_mmap::value_type(neighbor_visit.m_cost + estimated_remaining_cost, neighbor_visit));
+			}
+		    }
+		}
+	    }
+	    visit_Queue.erase(visit_erase);	    
+	}
+	return -1;	
+    }                
+    
+
+/*----------------------------------------------------------------------------*/
 
     void sCBS::equalize_NonconflictingSequences(AgentPaths_vector &agent_Paths) const
     {

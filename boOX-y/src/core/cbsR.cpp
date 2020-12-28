@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 2-058_planck                                                    */
+/* cbsR.cpp / 2-123_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -1305,7 +1305,7 @@ namespace boOX
 
     sDouble sRealCBSBase::analyze_NonconflictingSchedulesCosts(const sRealInstance                 &sUNUSED(real_Instance),
 							       const KruhobotSchedules_vector      &kruhobot_Schedules,
-							       sDouble                              cost_bound,					      
+							       sDouble                              cost_bound,
 							       const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
 							       const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
 							       const KruhobotExtraVariables_vector &kruhobot_all_extra_Variables,
@@ -1330,7 +1330,7 @@ namespace boOX
 		total_cost += kruhobot_lower_cost_Bounds[kruhobot_id];
 	    }
 	}	
-	//printf("total cost: %.3f, bound: %.3f\n", total_cost, cost_bound);
+        //printf("total cost: %.3f, bound: %.3f\n", total_cost, cost_bound);
 	sDouble envelope_cost = total_cost;	
 
 	/* go low */
@@ -1548,13 +1548,13 @@ namespace boOX
 
 
     template<class T1, class T2>
-    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_location_X_location(const sRealInstance                    &real_Instance,
-												     const Traversal                        &kruhobot_traversal_location_A,
-												     const Traversal                        &kruhobot_traversal_location_B,				       
-												     T1                                     &kruhobot_location_Conflicts,
-												     T2                                     &sUNUSED(kruhobot_linear_Conflicts),
-												     sInt_32                                &last_conflict_id,
-												     bool                                    infinity) const
+    sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_location_X_location(const sRealInstance &real_Instance,
+												     const Traversal     &kruhobot_traversal_location_A,
+												     const Traversal     &kruhobot_traversal_location_B,				       
+												     T1                  &kruhobot_location_Conflicts,
+												     T2                  &sUNUSED(kruhobot_linear_Conflicts),
+												     sInt_32             &last_conflict_id,
+												     bool                 infinity) const
     {
 	sASSERT(kruhobot_traversal_location_A.m_u_loc_id == kruhobot_traversal_location_A.m_v_loc_id);
 	sASSERT(kruhobot_traversal_location_B.m_u_loc_id == kruhobot_traversal_location_B.m_v_loc_id);
@@ -1579,6 +1579,8 @@ namespace boOX
 	    LocationConflict location_conflict_A(last_conflict_id++, kruhobot_traversal_location_A.m_u_loc_id, avoid_interval_A, infinity);
 	    kruhobot_location_Conflicts[kruhobot_A_id][kruhobot_traversal_location_A.m_u_loc_id].insert(LocationConflicts_map::value_type(avoid_interval_A, location_conflict_A));
 	    ++affection_A;
+	    printf("gamma 1\n");
+	    location_conflict_A.to_Screen();			    	    
 	}
 	
 	sDouble escape_time_B = (rA + rB) / vB;
@@ -1588,7 +1590,9 @@ namespace boOX
 	{	
 	    LocationConflict location_conflict_B(last_conflict_id++, kruhobot_traversal_location_B.m_u_loc_id, avoid_interval_B, infinity);
 	    kruhobot_location_Conflicts[kruhobot_B_id][kruhobot_traversal_location_B.m_u_loc_id].insert(LocationConflicts_map::value_type(avoid_interval_B, location_conflict_B));
-	    ++affection_B;	    
+	    ++affection_B;
+	    printf("gamma 2\n");	    
+	    location_conflict_B.to_Screen();			    	    
 	}
 
 	return KruhobotAffection_pair(affection_A, affection_B);
@@ -1667,6 +1671,13 @@ namespace boOX
 		Interval check_intersection_A = kruhobot_traversal_A_location.m_interval.intersect(Interval(tau_1, tau_2));
 		Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
 
+		printf("check 0\n");
+		Interval(tau_1, tau_2).to_Screen();
+		printf("check 1\n");
+		check_intersection_A.to_Screen();
+		printf("check 2\n");
+		check_intersection_B.to_Screen();		
+
 		if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
 		{
 		    return KruhobotAffection_pair(0, 0);
@@ -1676,17 +1687,25 @@ namespace boOX
 		    sDouble delta_tau_A = tau_2 - kruhobot_traversal_A_location.m_interval.m_lower;
 		    sDouble delta_tau_B = kruhobot_traversal_A_location.m_interval.m_upper - tau_1;
 
-		    Interval avoid_interval_A(kruhobot_traversal_A_location.m_interval.m_lower, kruhobot_traversal_A_location.m_interval.m_lower + delta_tau_A);
+		    printf("deltas A,B: %.3f, %.3f\n", delta_tau_A, delta_tau_B);
+
+		    //Interval avoid_interval_A(kruhobot_traversal_A_location.m_interval.m_lower, kruhobot_traversal_A_location.m_interval.m_lower + delta_tau_A);
+		    Interval avoid_interval_A = check_intersection_A;
 
 		    if (avoid_interval_A.size() > s_DELTION)
 		    {
-			Interval intersection_A = kruhobot_traversal_A_location.m_interval.intersect(avoid_interval_A);
+			//Interval intersection_A = kruhobot_traversal_A_location.m_interval.intersect(avoid_interval_A);
+			Interval intersection_A = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_A);			
+			avoid_interval_A.to_Screen();
+			intersection_A.to_Screen();
 			
 			if (intersection_A.size() > s_DELTION)
 			{
 			    LocationConflict location_conflict_A(last_conflict_id++, kruhobot_traversal_A_location.m_u_loc_id, intersection_A);
 			    kruhobot_location_Conflicts[kruhobot_A_id][kruhobot_traversal_A_location.m_u_loc_id].insert(LocationConflicts_map::value_type(intersection_A, location_conflict_A));
 			    ++affection_A;
+			    printf("gamma 3\n");
+			    location_conflict_A.to_Screen();			    			    
 			}
 		    }		    		    		    
 		    
@@ -1701,6 +1720,8 @@ namespace boOX
 			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B);
 			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_B));
 			    ++affection_B;
+			    printf("gamma 4\n");
+			    linear_conflict_B.to_Screen();			    			    
 			}
 		    }		    		    
 		}
@@ -1731,20 +1752,698 @@ namespace boOX
     }
 
 
+    #define sRETURN_NO_CHANCE_OF_AVOIDANCE                                                                                                                                                          \
+    {                                                                                                                                                                                               \
+	LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, kruhobot_traversal_A_linear.m_interval);               \
+	kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id,                                                                                                      \
+                                                       kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_A_linear.m_interval, linear_conflict_A)); \
+	++affection;                                                                                                                                                                                \
+	return affection;                                                                                                                                                                           \
+    }
+    
+
+    void update_MinimumTimeZero(sDouble time0_1, sDouble &min_time)
+    {
+	sDouble candidate_1 = sMAX(0, -time0_1);
+	if (candidate_1 >= s_EPSILON)
+	{
+	    if(min_time >= 0)
+	    {
+		min_time = sMIN(min_time, candidate_1);
+	    }
+	    else
+	    {
+		min_time = candidate_1;
+	    }
+	}
+    }
+
+    
+    void update_MinimumTimeZero(sDouble time0_1, sDouble time0_2, sDouble &min_time)
+    {
+	if (time0_1 < time0_2)
+	{
+	    update_MinimumTimeZero(time0_1, min_time);
+	}
+	else
+	{	    
+	    update_MinimumTimeZero(time0_2, min_time);
+	}
+    }
+    
+
     template<class T1, class T2>
     sRealCBSBase::KruhobotAffection_pair sRealCBSBase::resolve_KruhobotCollision_linear_X_linear(const sRealInstance &real_Instance,
 												 const Traversal     &kruhobot_traversal_A_linear,
 												 const Traversal     &kruhobot_traversal_B_linear,
-												 T1                  &sUNUSED(kruhobot_location_Conflicts),
+												 T1                  &kruhobot_location_Conflicts,
 												 T2                  &kruhobot_linear_Conflicts,
 												 sInt_32             &last_conflict_id,
-												 bool                 sUNUSED(infinity)) const
+												 bool                 infinity) const
+    {
+	sInt_32 affection_A = resolve_KruhobotCollision_linear_X_linear_directional(real_Instance,
+										    kruhobot_traversal_A_linear,
+										    kruhobot_traversal_B_linear,
+										    kruhobot_location_Conflicts,
+										    kruhobot_linear_Conflicts,
+										    last_conflict_id,
+										    infinity);
+	
+	sInt_32 affection_B = resolve_KruhobotCollision_linear_X_linear_directional(real_Instance,
+										    kruhobot_traversal_B_linear,
+										    kruhobot_traversal_A_linear,
+										    kruhobot_location_Conflicts,
+										    kruhobot_linear_Conflicts,
+										    last_conflict_id,
+										    infinity);
+	return KruhobotAffection_pair(affection_A, affection_B);	
+    }
+
+    
+    template<class T1, class T2>
+    sInt_32 sRealCBSBase::resolve_KruhobotCollision_linear_X_linear_directional(const sRealInstance &real_Instance,
+										const Traversal     &kruhobot_traversal_A_linear,
+										const Traversal     &kruhobot_traversal_B_linear,
+										T1                  &sUNUSED(kruhobot_location_Conflicts),
+										T2                  &kruhobot_linear_Conflicts,
+										sInt_32             &last_conflict_id,
+										bool                 sUNUSED(infinity)) const
     {
 	sASSERT(kruhobot_traversal_A_linear.m_u_loc_id != kruhobot_traversal_A_linear.m_v_loc_id);
 	sASSERT(kruhobot_traversal_B_linear.m_u_loc_id != kruhobot_traversal_B_linear.m_v_loc_id);
 
-	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;	
+	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+	map.to_Screen();
 
+	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
+	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
+
+	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
+	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
+	
+	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
+	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
+
+	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
+	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
+	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
+	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
+	
+	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
+	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
+	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
+	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
+
+	sDouble lA = kruhobot_traversal_A_linear.m_interval.m_lower;
+	sDouble uA = kruhobot_traversal_A_linear.m_interval.m_upper;
+
+	sDouble lB = kruhobot_traversal_B_linear.m_interval.m_lower;
+	sDouble uB = kruhobot_traversal_B_linear.m_interval.m_upper;			
+
+	sDouble dxA = x2A_ - x1A_;
+	sDouble dyA = y2A_ - y1A_;
+
+	sDouble dxB = x2B_ - x1B_;
+	sDouble dyB = y2B_ - y1B_;
+
+	sDouble d2A = dxA * dxA + dyA * dyA;
+	sDouble dA = sqrt(d2A);
+
+	sDouble d2B = dxB * dxB + dyB * dyB;
+	sDouble dB = sqrt(d2B);
+
+	sDouble x1A = x1A_ + (vA * (-lA) * dxA) / dA;
+	sDouble y1A = y1A_ + (vA * (-lA) * dyA) / dA;
+
+	sDouble x1B = x1B_ + (vB * (-lB) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-lB) * dyB) / dB;
+
+	sDouble dxAB = x1A - x1B;
+	sDouble dyAB = y1A - y1B;
+	sDouble rAB = rA + rB;
+	// end of context
+
+	sInt_32 affection;
+	
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
+	sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
+	    
+	sDouble alpha = beta_x * beta_x + beta_y * beta_y;
+	
+	{
+	    /* distance quadratic coefficients */	    
+	    sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+
+	    if (sABS(alpha) > s_EPSILON) /* quadratic distance */
+	    {
+		sDouble discriminant = beta * beta - 4 * alpha * gamma;
+
+		if (discriminant < 0)
+		{
+		    return 0;
+		}
+		else
+		{
+		    sDouble tau_1 = (-beta - sqrt(discriminant)) / (2 * alpha); 
+		    sDouble tau_2 = (-beta + sqrt(discriminant)) / (2 * alpha);
+
+		    Interval check_intersection_A = kruhobot_traversal_A_linear.m_interval.intersect(Interval(tau_1, tau_2));
+		    Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
+			
+		    if (alpha > 0)
+		    {		    
+			if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
+			{
+			    return 0;
+			}
+		    }
+		    else
+		    {
+			if (   sABS(check_intersection_A.size() - kruhobot_traversal_A_linear.m_interval.size()) <= s_DELTION
+			    || sABS(check_intersection_B.size() - kruhobot_traversal_B_linear.m_interval.size()) <= s_DELTION)
+			{
+			    return 0;
+			}			
+		    }
+
+		    sASSERT(tau_1 < uA || tau_2 < uA);
+
+		    if (tau_1 <= lA && tau_2 > lA)
+		    {
+			sRETURN_NO_CHANCE_OF_AVOIDANCE;
+		    }
+		}
+	    }
+	    else /* non-quadratic case */
+	    {
+		if (sABS(beta) > s_EPSILON) /* non-quadratic linear */
+		{
+		    sDouble tau = -gamma / beta;
+
+		    if (beta > 0)
+		    {
+			if (kruhobot_traversal_A_linear.m_interval.m_lower >= tau && kruhobot_traversal_B_linear.m_interval.m_lower >= tau)
+			{
+			    return 0;
+			}
+		    }
+		    else
+		    {
+			if (kruhobot_traversal_A_linear.m_interval.m_upper <= tau && kruhobot_traversal_B_linear.m_interval.m_upper <= tau)
+			{
+			    return 0;
+			}
+		    }
+		}
+		else /* non-quadratic constant */
+		{
+		    if (gamma >= 0)
+		    {
+			return 0;
+		    }
+		}
+	    }
+	}
+	    
+	{ /* kruhobots are colliding, calculating time shift t0, depending on cases */
+	    sDouble lower_unsafe_A, upper_unsafe_A;
+	    
+	    if (sABS(alpha) > s_EPSILON) /* the distance is quadratic in t */
+	    {
+		sDouble time0 = -1;
+		
+		sDouble time0_Q_1, time0_Q_2;	       
+		sInt_32 Q_count = solve_QuadraticTangent_linear_X_linear<T1, T2>(real_Instance,
+										 kruhobot_traversal_A_linear,
+										 kruhobot_traversal_B_linear,
+										 time0_Q_1,
+										 time0_Q_2);
+		if (Q_count >= 1)
+		{
+		    update_MinimumTimeZero(time0_Q_1, time0_Q_2, time0);
+		}
+		
+		sDouble time0_lB_1, time0_lB_2;
+		sInt_32 lB_count = solve_BoundTangent_linear_X_linear<T1, T2>(lB,
+									      real_Instance,
+									      kruhobot_traversal_A_linear,
+									      kruhobot_traversal_B_linear,
+									      time0_lB_1,
+									      time0_lB_2);
+		if (lB_count >= 1)
+		{
+		    update_MinimumTimeZero(time0_lB_1, time0_lB_2, time0);
+		}
+
+		sDouble time0_uB_1, time0_uB_2;		
+		sInt_32 uB_count = solve_BoundTangent_linear_X_linear<T1, T2>(uB,
+									      real_Instance,
+									      kruhobot_traversal_A_linear,
+									      kruhobot_traversal_B_linear,
+									      time0_uB_1,
+									      time0_uB_2);
+		if (uB_count >= 1)
+		{
+		    update_MinimumTimeZero(time0_uB_1, time0_uB_2, time0);		
+		}
+		/*
+		#ifdef sDEBUG
+		{
+		    printf("Q: %d, %.3f, %.3f\n", Q_count, time0_Q_1, time0_Q_2);		
+		    printf("LB: %d, %.3f, %.3f\n", lB_count, time0_lB_1, time0_lB_2);		
+		    printf("UB: %d, %.3f, %.3f\n", uB_count, time0_uB_1, time0_uB_2);
+		    printf("Time0: %.3f\n", time0);
+		}
+		#endif
+		*/
+		
+		if (time0 >= 0)
+		{
+		    lower_unsafe_A = kruhobot_traversal_A_linear.m_interval.m_lower;
+		    upper_unsafe_A = time0 + kruhobot_traversal_A_linear.m_interval.m_lower;
+		    insert_LinearConflict<T1, T2>(lower_unsafe_A, upper_unsafe_A, kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
+		}
+		else
+		{
+		    insert_LinearConflict<T1, T2>(kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
+		}
+	    }
+	    else /* the distance is non-quadratic in t */
+	    {
+		sDouble time0 = -1;
+		sDouble time0_lB_1, time0_lB_2;		
+		sInt_32 lB_count = solve_NonQuadraticTangent_linear_X_linear<T1, T2>(lB,
+										     real_Instance,
+										     kruhobot_traversal_A_linear,
+										     kruhobot_traversal_B_linear,
+										     time0_lB_1,
+										     time0_lB_2);
+		if (lB_count >= 1)
+		{
+		    update_MinimumTimeZero(time0_lB_1, time0_lB_2, time0);
+		}
+
+		sDouble time0_uB_1, time0_uB_2;
+		sInt_32 uB_count = solve_NonQuadraticTangent_linear_X_linear<T1, T2>(uB,
+										     real_Instance,
+										     kruhobot_traversal_A_linear,
+										     kruhobot_traversal_B_linear,
+										     time0_uB_1,
+										     time0_uB_2);
+		if (uB_count >= 1)
+		{
+		    update_MinimumTimeZero(time0_uB_1, time0_uB_2, time0);
+		}
+
+		if (time0 >= 0)
+		{
+		    lower_unsafe_A = kruhobot_traversal_A_linear.m_interval.m_lower;
+		    upper_unsafe_A = time0 + kruhobot_traversal_A_linear.m_interval.m_lower;
+		    insert_LinearConflict<T1, T2>(lower_unsafe_A, upper_unsafe_A, kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
+		}
+		else
+		{
+		    insert_LinearConflict<T1, T2>(kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
+		}
+	    }
+	}
+	return affection;
+    }
+    
+
+    template<class T1, class T2>
+    void sRealCBSBase::resolve_KruhobotCollisionMiddleTouch_linear_X_linear(const sRealInstance &real_Instance,
+									    const Traversal     &kruhobot_traversal_A_linear,
+									    const Traversal     &kruhobot_traversal_B_linear,
+									    T1                  &kruhobot_location_Conflicts,
+									    T2                  &kruhobot_linear_Conflicts,
+									    sInt_32             &last_conflict_id,
+									    sInt_32             &affection) const	
+    {
+	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+	
+	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
+	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
+
+	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
+	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
+	
+	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
+	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
+
+	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
+	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
+	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
+	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
+	
+	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
+	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
+	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
+	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
+
+	sDouble dxA = x2A_ - x1A_;
+	sDouble dyA = y2A_ - y1A_;
+
+	sDouble dxB = x2B_ - x1B_;
+	sDouble dyB = y2B_ - y1B_;
+
+	sDouble d2A = dxA * dxA + dyA * dyA;
+	sDouble dA = sqrt(d2A);
+
+	sDouble d2B = dxB * dxB + dyB * dyB;
+	sDouble dB = sqrt(d2B);
+
+	sDouble lA = kruhobot_traversal_A_linear.m_interval.m_lower;
+	//sDouble uA = kruhobot_traversal_A_linear.m_interval.m_upper;
+
+	sDouble lB = kruhobot_traversal_B_linear.m_interval.m_lower;
+	sDouble uB = kruhobot_traversal_B_linear.m_interval.m_upper;				
+	
+	sDouble x1A = x1A_ + (vA * (-lA) * dxA) / dA;
+	sDouble y1A = y1A_ + (vA * (-lA) * dyA) / dA;
+
+	sDouble x1B = x1B_ + (vB * (-lB) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-lB) * dyB) / dB;
+
+	sDouble dxAB = x1A - x1B;
+	sDouble dyAB = y1A - y1B;
+	sDouble rAB = rA + rB;
+        // end of context
+	
+	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
+	sDouble gamma_2 = vA * vA;
+	
+	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
+	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+
+	sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
+
+	sDouble lower_unsafe_A, upper_unsafe_A;
+	
+	/* t_0 shift to single touch quadratic coefficients */
+	sDouble A = beta_1 * beta_1 - 4 * alpha * gamma_2;
+	sDouble B = 2 * beta_0 * beta_1 - 4 * alpha * gamma_1;
+	sDouble C = beta_0 * beta_0 - 4 * alpha * gamma_0;
+	
+	if (sABS(A) > s_EPSILON) /* single touch equation is quadratic */
+	{
+	    sDouble D = B * B - 4 * A * C;
+	    
+	    if (D >= 0)
+	    {
+		sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
+		sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
+
+		lower_unsafe_A = -t0_1 + kruhobot_traversal_A_linear.m_interval.m_lower;		    
+		upper_unsafe_A = -t0_2 + kruhobot_traversal_A_linear.m_interval.m_lower;
+
+		insert_LinearConflict<T1, T2>(lower_unsafe_A, upper_unsafe_A, kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
+	    }
+	}
+	else /* single touch equation is non-quadratic */
+	{
+	    if (sABS(B) > s_EPSILON) /* non-quadratic linear */
+	    {
+		sDouble lower_unsafe_A, upper_unsafe_A;
+		sDouble t0 = -C / B;
+		
+		if (B > 0)
+		{
+		    lower_unsafe_A = kruhobot_traversal_A_linear.m_interval.m_lower;		    
+		    upper_unsafe_A = -t0;
+		}
+		else
+		{
+		    lower_unsafe_A = -t0;
+		    upper_unsafe_A = kruhobot_traversal_A_linear.m_interval.m_upper;
+		}
+
+		insert_LinearConflict<T1, T2>(lower_unsafe_A, upper_unsafe_A, kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
+	    }
+	    else /* non-quadratic constant */
+	    {
+		if (sABS(C) > s_EPSILON)
+		{
+		    resolve_KruhobotCollisionBoundTouch_linear_X_linear<T1, T2>(uB,
+										real_Instance,
+										kruhobot_traversal_A_linear,
+										kruhobot_traversal_B_linear,
+										kruhobot_location_Conflicts,
+										kruhobot_linear_Conflicts,
+										last_conflict_id,
+										affection);
+		}
+	    }
+	}
+    }
+
+
+    template<class T1, class T2>
+    sInt_32 sRealCBSBase::solve_QuadraticTangent_linear_X_linear(const sRealInstance &real_Instance,
+								 const Traversal     &kruhobot_traversal_A_linear,
+								 const Traversal     &kruhobot_traversal_B_linear,
+								 sDouble             &time0_1,
+								 sDouble             &time0_2) const
+    {
+	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+	
+	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
+	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
+
+	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
+	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
+	
+	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
+	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
+
+	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
+	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
+	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
+	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
+	
+	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
+	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
+	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
+	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
+
+	sDouble dxA = x2A_ - x1A_;
+	sDouble dyA = y2A_ - y1A_;
+
+	sDouble dxB = x2B_ - x1B_;
+	sDouble dyB = y2B_ - y1B_;
+
+	sDouble d2A = dxA * dxA + dyA * dyA;
+	sDouble dA = sqrt(d2A);
+
+	sDouble d2B = dxB * dxB + dyB * dyB;
+	sDouble dB = sqrt(d2B);
+
+	sDouble lA = kruhobot_traversal_A_linear.m_interval.m_lower;
+	//sDouble uA = kruhobot_traversal_A_linear.m_interval.m_upper;
+
+	sDouble lB = kruhobot_traversal_B_linear.m_interval.m_lower;
+	//sDouble uB = kruhobot_traversal_B_linear.m_interval.m_upper;				
+	
+	sDouble x1A = x1A_ + (vA * (-lA) * dxA) / dA;
+	sDouble y1A = y1A_ + (vA * (-lA) * dyA) / dA;
+
+	sDouble x1B = x1B_ + (vB * (-lB) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-lB) * dyB) / dB;
+
+	sDouble dxAB = x1A - x1B;
+	sDouble dyAB = y1A - y1B;
+	sDouble rAB = rA + rB;
+        // end of context
+	
+	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
+	sDouble gamma_2 = vA * vA;
+	
+	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
+	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+
+	sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
+
+	/* t_0 shift to single touch quadratic coefficients */
+	sDouble A = beta_1 * beta_1 - 4 * alpha * gamma_2;
+	sDouble B = 2 * beta_0 * beta_1 - 4 * alpha * gamma_1;
+	sDouble C = beta_0 * beta_0 - 4 * alpha * gamma_0;
+	
+	if (sABS(A) > s_EPSILON) /* single touch equation is quadratic */
+	{
+	    sDouble D = B * B - 4 * A * C;
+	    
+	    if (D >= 0)
+	    {
+		time0_1 = (-B - sqrt(D)) / (2 * A); 
+		time0_2 = (-B + sqrt(D)) / (2 * A);
+
+		return 2;
+	    }
+	    else
+	    {
+		return 0;
+	    }
+	}
+	else /* single touch equation is non-quadratic */
+	{
+	    if (sABS(B) > s_EPSILON) /* non-quadratic linear */
+	    {
+		time0_1 = time0_2 = -C / B;
+		
+		if (B > 0)
+		{
+		    return -1;
+		}
+		else
+		{
+		    return 1;
+		}
+	    }
+	    else /* non-quadratic constant */
+	    {
+		if (sABS(C) > s_EPSILON)
+		{
+		    return 0;
+		}
+		else
+		{
+		    return sINT_32_MAX;
+		}
+	    }
+	}
+    }    
+
+
+    template<class T1, class T2>
+    sInt_32 sRealCBSBase::solve_NonQuadraticTangent_linear_X_linear(sDouble              time,
+								    const sRealInstance &real_Instance,
+								    const Traversal     &kruhobot_traversal_A_linear,
+								    const Traversal     &kruhobot_traversal_B_linear,
+								    sDouble             &time0_1,
+								    sDouble             &time0_2) const	
+    {
+	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+	
+	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
+	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
+
+	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
+	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
+	
+	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
+	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
+
+	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
+	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
+	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
+	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
+	
+	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
+	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
+	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
+	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
+
+	sDouble dxA = x2A_ - x1A_;
+	sDouble dyA = y2A_ - y1A_;
+
+	sDouble dxB = x2B_ - x1B_;
+	sDouble dyB = y2B_ - y1B_;
+
+	sDouble d2A = dxA * dxA + dyA * dyA;
+	sDouble dA = sqrt(d2A);
+
+	sDouble d2B = dxB * dxB + dyB * dyB;
+	sDouble dB = sqrt(d2B);
+
+	sDouble lA = kruhobot_traversal_A_linear.m_interval.m_lower;
+	//sDouble uA = kruhobot_traversal_A_linear.m_interval.m_upper;
+
+	sDouble lB = kruhobot_traversal_B_linear.m_interval.m_lower;
+	//sDouble uB = kruhobot_traversal_B_linear.m_interval.m_upper;				
+	
+	sDouble x1A = x1A_ + (vA * (-lA) * dxA) / dA;
+	sDouble y1A = y1A_ + (vA * (-lA) * dyA) / dA;
+
+	sDouble x1B = x1B_ + (vB * (-lB) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-lB) * dyB) / dB;
+
+	sDouble dxAB = x1A - x1B;
+	sDouble dyAB = y1A - y1B;
+	sDouble rAB = rA + rB;
+        // end of context
+	
+	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
+	sDouble gamma_2 = vA * vA;
+	
+	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
+	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+
+	//sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
+
+	sDouble A = gamma_2;
+	sDouble B = time * beta_1 + gamma_1;
+	sDouble C = time * beta_0 + gamma_0;
+	
+	if (sABS(A) > s_EPSILON)
+	{
+	    sDouble D = B * B - 4 * A * C;
+	    
+	    if (D >= 0)
+	    {
+		time0_1 = (-B - sqrt(D)) / (2 * A); 
+		time0_2 = (-B + sqrt(D)) / (2 * A);
+
+		return 2;
+	    }
+	    else
+	    {
+		return 0;
+	    }
+	}
+	else
+	{
+	    if (sABS(B) > s_EPSILON)
+	    {
+		time0_1 = time0_2 = -C / B;
+		return 1;
+	    }
+	    else
+	    {
+		if (sABS(C) > s_EPSILON)
+		{
+		    return 0;
+		}
+		else
+		{
+		    return sINT_32_MAX;
+		}
+	    }
+	}
+    }    
+	
+
+    template<class T1, class T2>
+    void sRealCBSBase::resolve_KruhobotCollisionBoundTouch_linear_X_linear(sDouble              bound_time,
+									   const sRealInstance &real_Instance,
+									   const Traversal     &kruhobot_traversal_A_linear,
+									   const Traversal     &kruhobot_traversal_B_linear,
+									   T1                  &sUNUSED(kruhobot_location_Conflicts),
+									   T2                  &kruhobot_linear_Conflicts,
+									   sInt_32             &last_conflict_id,
+									   sInt_32             &affection) const	
+    {
+	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+	
 	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
 	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
 
@@ -1777,330 +2476,230 @@ namespace boOX
 	sDouble dB = sqrt(d2B);
 
 	sDouble x1A = x1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dxA) / dA;
-//	sDouble x2A = x2A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dxA) / dA;
 	sDouble y1A = y1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dyA) / dA;
-//	sDouble y2A = y2A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dyA) / dA;
 
 	sDouble x1B = x1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
-//	sDouble x2B = x2B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
 	sDouble y1B = y1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;
-//	sDouble y2B = y2B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;	
 
 	sDouble dxAB = x1A - x1B;
 	sDouble dyAB = y1A - y1B;
 	sDouble rAB = rA + rB;
+        // end of context	
 
-	sInt_32 affection_A = 0;
-	sInt_32 affection_B = 0;
-
-	{
-	    sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	    sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-	    sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
-	    sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
-	    sDouble alpha = beta_x * beta_x + beta_y * beta_y;
-	    
-	    sDouble discriminant = beta * beta - 4 * alpha * gamma;
-		
-	    if (discriminant <= s_EPSILON)
-	    {
-		return KruhobotAffection_pair(0, 0);
-	    }
-	    else
-	    {
-		sDouble tau_1 = (-beta - sqrt(discriminant)) / (2 * alpha); 
-		sDouble tau_2 = (-beta + sqrt(discriminant)) / (2 * alpha);
-
-		Interval check_intersection_A = kruhobot_traversal_A_linear.m_interval.intersect(Interval(tau_1, tau_2));
-		Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
-
-		if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
-		{
-		    return KruhobotAffection_pair(0, 0);
-		}
-	    }
-	}
-	    
-	{
-	    sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-	    sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
-	    sDouble gamma_2 = vA * vA;
-
-	    sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
-	    sDouble beta_x = (vA * dxA / dA) - (vB * dxB / dB);
-	    sDouble beta_y = (vA * dyA / dA) - (vB * dyB / dB);	
-	    sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
-
-	    sDouble alpha = beta_x * beta_x + beta_y * beta_y;
-	    
-	    sDouble lower_unsafe_A, upper_unsafe_A;
+	/*
+	sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
+	sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
+	sDouble alpha = beta_x * beta_x + beta_y * beta_y;
+	*/
 	
-	    sDouble A = beta_1 * beta_1 - 4 * alpha * gamma_2;
-	    sDouble B = 2 * beta_0 * beta_1 - 4 * alpha * gamma_1;
-	    sDouble C = beta_0 * beta_0 - 4 * alpha * gamma_0;
-	    
-	    if (sABS(A) > s_EPSILON)
-	    {
-		sDouble D = B * B - 4 * A * C;
-
-		if (D > s_EPSILON)
-		{
-		    sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
-		    sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
-
-		    lower_unsafe_A = -t0_1 + kruhobot_traversal_A_linear.m_interval.m_lower;		    
-		    upper_unsafe_A = -t0_2 + kruhobot_traversal_A_linear.m_interval.m_lower;
+	sDouble AA = vA * vA + vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+	sDouble BB0 = 2 * (vA * (dxAB * dxA + dyAB * dyA) / dA - vB * (dxAB * dxB + dyAB * dyB) / dB);
+	sDouble BB1 = 2 * vA * vA - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+	sDouble CC0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble CC1 = 2 * vA * (dxAB * dxA + dyAB * dyA) / dA;
+	sDouble CC2 = vA * vA;
 		    
-		    Interval avoid_interval_A(sMAX(0, sMIN(lower_unsafe_A, upper_unsafe_A)), sMAX(0, sMAX(lower_unsafe_A, upper_unsafe_A)));
-
-		    if (avoid_interval_A.size() > s_DELTION)
-		    {
-			Interval intersection_A = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_A);
-			
-			if (intersection_A.size() > s_DELTION)
-			{
-			    LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, intersection_A);
-			    kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_A, linear_conflict_A));
-			    ++affection_A;
-			    /*
-			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_A);
-			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_A, linear_conflict_B));
-			    ++affection_B;
-			    */
-			}
-		    }
-		}
-	    }
-	    else
-	    {
-		/*
-		sDouble dxAB2 = x1A_ - x2B_;
-		sDouble dyAB2 = y1A_ - y2B_;
-
-		sDouble gamma = dxAB2 * dxAB2 + dyAB2 * dyAB2 - rAB * rAB;
-		sDouble beta = 2 * vA * (dxAB2 * dxA + dyAB2 * dyA) / dA;
-		sDouble alpha = vA * vA;
-		*/
-		sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-		sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-		sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
-		sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
-		sDouble alpha = beta_x * beta_x + beta_y * beta_y;
-		
-		sDouble disc = beta * beta - 4 * alpha * gamma;
-
-		if (disc > s_EPSILON)
-		{
-		    sDouble time0_1 = (-beta - sqrt(disc)) / (2 * alpha); 
-		    sDouble time0_2 = (-beta + sqrt(disc)) / (2 * alpha);
-
-		    //lower_unsafe_A = kruhobot_traversal_B_linear.m_interval.m_upper - time0_1;
-		    //upper_unsafe_A = kruhobot_traversal_B_linear.m_interval.m_upper - time0_2;
-
-		    lower_unsafe_A = time0_1;
-		    upper_unsafe_A = time0_2;
-
-		    Interval avoid_interval_A(sMAX(0, sMIN(lower_unsafe_A, upper_unsafe_A)), sMAX(0, sMAX(lower_unsafe_A, upper_unsafe_A)));
-
-		    if (avoid_interval_A.size() > s_DELTION)
-		    {
-			Interval intersection_A = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_A);
-		    
-			if (intersection_A.size() > s_DELTION)
-			{
-			    sDouble AA = vA * vA + vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
-			    sDouble BB0 = 2 * (vA * (dxAB * dxA + dyAB * dyA) / dA - vB * (dxAB * dxB + dyAB * dyB) / dB);
-			    sDouble BB1 = 2 * vA * vA - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
-			    sDouble CC0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
-			    sDouble CC1 = 2 * vA * (dxAB * dxA + dyAB * dyA) / dA;
-			    sDouble CC2 = vA * vA;
-
-			    sDouble tB2 = kruhobot_traversal_B_linear.m_interval.m_upper;
-
-			    sDouble A = AA * CC2;
-			    sDouble B = AA * BB1 * tB2 + AA * CC1;
-			    sDouble C = AA * BB0 * tB2 + AA * CC0 + AA * AA * tB2 * tB2;
-
-			    sDouble DD = B * B - 4 * A * C;
-
-			    if (DD > s_EPSILON)
-			    {
-				sDouble T0_1 = (-B - sqrt(DD)) / (2 * A); 
-				sDouble T0_2 = (-B + sqrt(DD)) / (2 * A);
-				
-				sDouble lower_unsafe_A_ = kruhobot_traversal_A_linear.m_interval.m_lower - sMIN(0, T0_1);
-				sDouble upper_unsafe_A_ = kruhobot_traversal_A_linear.m_interval.m_lower - sMIN(0, T0_2);
-
-				Interval avoid_interval_A_(sMAX(0, sMIN(lower_unsafe_A_, upper_unsafe_A_)), sMAX(0, sMAX(lower_unsafe_A_, upper_unsafe_A_)));
-				
-				if (avoid_interval_A_.size() > s_DELTION)
-				{
-				    Interval intersection_A_ = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_A_);
-				    
-				    if (intersection_A_.size() > s_DELTION)
-				    {
-					LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, intersection_A_);
-					kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_A_, linear_conflict_A));
-					++affection_A;
-				    }
-				}
-			    }
-			    else
-			    {
-				LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, kruhobot_traversal_A_linear.m_interval);
-				kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_A_linear.m_interval, linear_conflict_A));
-				++affection_A;				
-			    }
-			}
-		    }		    
-		}		
-	    }
-	}
-
-	sDouble dxBA = x1B - x1A;
-	sDouble dyBA = y1B - y1A;
-
-	{
-	    sDouble gamma_0 = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
-	    sDouble gamma_1 = 2 * (vB * (dxBA * dxB + dyBA * dyB)) / dB;	
-	    sDouble gamma_2 = vB * vB;
-
-	    sDouble beta_0 = 2 * ((vB * dxBA * dxB / dB) - ((vA * dxBA * dxA) / dA) + (vB * dyBA * dyB / dB) - ((vA * dyBA * dyA) / dA));
-	    sDouble beta_x = (vB * dxB / dB) - (vA * dxA / dA);
-	    sDouble beta_y = (vB * dyB / dB) - (vA * dyA / dA);
-	    sDouble beta_1 = 2 * ((vB * dxB * beta_x) / dB + (vB * dyB * beta_y) / dB);	    
-
-	    sDouble alpha = beta_x * beta_x + beta_y * beta_y;
-	    
-	    sDouble lower_unsafe_B, upper_unsafe_B;
+	sDouble tB2 = bound_time;
 	
-	    sDouble A = beta_1 * beta_1 - 4 * alpha * gamma_2;
-	    sDouble B = 2 * beta_0 * beta_1 - 4 * alpha * gamma_1;
-	    sDouble C = beta_0 * beta_0 - 4 * alpha * gamma_0;
+	sDouble A = AA * CC2;
+	sDouble B = AA * BB1 * tB2 + AA * CC1;
+	sDouble C = AA * BB0 * tB2 + AA * CC0 + AA * AA * tB2 * tB2;
 
-	    if (sABS(A) > s_EPSILON)
+	if (sABS(A) > s_EPSILON)
+	{
+	    sDouble DD = B * B - 4 * A * C;
+	
+	    if (DD > 0)
 	    {
-		sDouble D = B * B - 4 * A * C;
+		sDouble T0_1 = (-B - sqrt(DD)) / (2 * A); 
+		sDouble T0_2 = (-B + sqrt(DD)) / (2 * A);
+		
+		sDouble lower_unsafe_A_ = kruhobot_traversal_A_linear.m_interval.m_lower;
+		sDouble upper_unsafe_A_ = kruhobot_traversal_A_linear.m_interval.m_lower + sMAX(T0_1, T0_2);
 
-		if (D > s_EPSILON)
-		{
-		    sDouble t0_1 = (-B - sqrt(D)) / (2 * A); 
-		    sDouble t0_2 = (-B + sqrt(D)) / (2 * A);
-
-		    lower_unsafe_B = -t0_1 + kruhobot_traversal_B_linear.m_interval.m_lower;
-		    upper_unsafe_B = -t0_2 + kruhobot_traversal_B_linear.m_interval.m_lower;
-
-		    Interval avoid_interval_B(sMAX(0, sMIN(lower_unsafe_B, upper_unsafe_B)), sMAX(0, sMAX(lower_unsafe_B, upper_unsafe_B)));
-
-		    if (avoid_interval_B.size() > s_DELTION)
-		    {
-			Interval intersection_B = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_B);
-		    
-			if (intersection_B.size() > s_DELTION)
-			{
-			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B);
-			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_B));
-			    ++affection_B;
-/*
-			    LinearConflict linear_conflict_A(last_conflict_id++, kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id, intersection_B);
-			    kruhobot_linear_Conflicts[kruhobot_A_id][Uline(kruhobot_traversal_A_linear.m_u_loc_id, kruhobot_traversal_A_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_A));
-			    ++affection_A;
-*/
-			}
-		    }
-		}
+		insert_LinearConflict<T1, T2>(lower_unsafe_A_, upper_unsafe_A_, kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
 	    }
 	    else
 	    {
-		/*
-		sDouble dxBA2 = x1B_ - x2A_;
-		sDouble dyBA2 = y1B_ - y2A_;
-
-		sDouble gamma = dxBA2 * dxBA2 + dyBA2 * dyBA2 - rAB * rAB;
-		sDouble beta = 2 * vB * (dxBA2 * dxB + dyBA2 * dyB) / dB;
-		sDouble alpha = vB * vB;
-		*/
-		/*
-		sDouble gamma = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
-		sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
-		sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
-		sDouble beta = 2 * (beta_x + beta_y);
-		sDouble alpha = beta_x * beta_x + beta_y * beta_y;		
-		*/
-		sDouble gamma = dxBA * dxBA + dyBA * dyBA - rAB * rAB;
-		sDouble beta_x = vB * dxB / dB - vA * dxA / dA;
-		sDouble beta_y = vB * dyB / dB - vA * dyA / dA;
-		sDouble beta = 2 * (dxBA * beta_x + dyBA * beta_y);
-		sDouble alpha = beta_x * beta_x + beta_y * beta_y;		
-
-		sDouble disc = beta * beta - 4 * alpha * gamma;
-
-		if (disc > s_EPSILON)
-		{
-		    sDouble time0_1 = (-beta - sqrt(disc)) / (2 * alpha); 
-		    sDouble time0_2 = (-beta + sqrt(disc)) / (2 * alpha);
-
-		    lower_unsafe_B = time0_1;
-		    upper_unsafe_B = time0_2;		    
-
-		    Interval avoid_interval_B(sMAX(0, sMIN(lower_unsafe_B, upper_unsafe_B)), sMAX(0, sMAX(lower_unsafe_B, upper_unsafe_B)));
-
-		    if (avoid_interval_B.size() > s_DELTION)
-		    {
-			Interval intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_B);
-		    
-			if (intersection_B.size() > s_DELTION)
-			{
-			    sDouble AA = vA * vA + vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
-			    sDouble BB0 = 2 * (vB * (dxBA * dxB + dyBA * dyB) / dB - vA * (dxBA * dxA + dyBA * dyA) / dA);
-			    sDouble BB1 = 2 * vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);			    
-			    sDouble CC0 = dxBA * dxBA + dyBA * dyBA - rAB * rAB;			    
-			    sDouble CC1 = 2 * vB * (dxBA * dxB + dyBA * dyB) / dB;
-			    sDouble CC2 = vB * vB;
-
-			    sDouble tB2 = kruhobot_traversal_A_linear.m_interval.m_upper;
-
-			    sDouble A = AA * CC2;
-			    sDouble B = AA * BB1 * tB2 + AA * CC1;
-			    sDouble C = AA * BB0 * tB2 + AA * CC0 + AA * AA * tB2 * tB2;
-
-			    sDouble DD = B * B - 4 * A * C;
-
-			    if (DD > s_EPSILON)
-			    {
-				sDouble T0_1 = (-B - sqrt(DD)) / (2 * A); 
-				sDouble T0_2 = (-B + sqrt(DD)) / (2 * A);
-			    
-				sDouble lower_unsafe_B_ = kruhobot_traversal_B_linear.m_interval.m_lower - sMIN(0, T0_1);
-				sDouble upper_unsafe_B_ = kruhobot_traversal_B_linear.m_interval.m_lower - sMIN(0, T0_2);
-				
-				Interval avoid_interval_B_(sMAX(0, sMIN(lower_unsafe_B_, upper_unsafe_B_)), sMAX(0, sMAX(lower_unsafe_B_, upper_unsafe_B_)));
-				
-				if (avoid_interval_B_.size() > s_DELTION)
-				{
-				    Interval intersection_B_ = kruhobot_traversal_A_linear.m_interval.intersect(avoid_interval_B_);
-				    
-				    if (intersection_B_.size() > s_DELTION)
-				    {
-					LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B_);
-					kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B_, linear_conflict_B));
-					++affection_B;			    				    
-				    }
-				}
-			    }
-			    else
-			    {
-				LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, kruhobot_traversal_B_linear.m_interval);
-				kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_B_linear.m_interval, linear_conflict_B));
-				++affection_B;			    				    				
-			    }
-			}
-		    }		    
-		}		
+		insert_LinearConflict<T1, T2>(kruhobot_traversal_A_linear, kruhobot_linear_Conflicts, last_conflict_id, affection);
 	    }
 	}
-	return KruhobotAffection_pair(affection_A, affection_B);
-    } 
+	else /* non-quadratic */
+	{
+	    // TODO
+	    sASSERT(false);
+	}
+    }
+
+
+    template<class T1, class T2>
+    sInt_32 sRealCBSBase::solve_BoundTangent_linear_X_linear(sDouble          bound_time,
+							     const sRealInstance &real_Instance,
+							     const Traversal &kruhobot_traversal_A_linear,
+							     const Traversal &kruhobot_traversal_B_linear,
+							     sDouble         &time0_1,
+							     sDouble         &time0_2) const								     
+    {
+	const s2DMap &map = *real_Instance.m_start_conjunction.m_Map;
+	
+	sInt_32 kruhobot_A_id = sABS(kruhobot_traversal_A_linear.m_kruhobot_id);
+	sInt_32 kruhobot_B_id = sABS(kruhobot_traversal_B_linear.m_kruhobot_id);
+
+	sDouble vA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_linear_velo;
+	sDouble rA = real_Instance.m_Kruhobots[kruhobot_A_id].m_properties.m_radius;
+	
+	sDouble vB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_linear_velo;
+	sDouble rB = real_Instance.m_Kruhobots[kruhobot_B_id].m_properties.m_radius;
+
+	sDouble x1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_x;
+	sDouble x2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_x;
+	sDouble y1A_ = map.m_Locations[kruhobot_traversal_A_linear.m_u_loc_id].m_y;
+	sDouble y2A_ = map.m_Locations[kruhobot_traversal_A_linear.m_v_loc_id].m_y;
+	
+	sDouble x1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_x;
+	sDouble x2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_x;
+	sDouble y1B_ = map.m_Locations[kruhobot_traversal_B_linear.m_u_loc_id].m_y;
+	sDouble y2B_ = map.m_Locations[kruhobot_traversal_B_linear.m_v_loc_id].m_y;
+
+	sDouble dxA = x2A_ - x1A_;
+	sDouble dyA = y2A_ - y1A_;
+
+	sDouble dxB = x2B_ - x1B_;
+	sDouble dyB = y2B_ - y1B_;
+
+	sDouble d2A = dxA * dxA + dyA * dyA;
+	sDouble dA = sqrt(d2A);
+
+	sDouble d2B = dxB * dxB + dyB * dyB;
+	sDouble dB = sqrt(d2B);
+
+	sDouble x1A = x1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dxA) / dA;
+	sDouble y1A = y1A_ + (vA * (-kruhobot_traversal_A_linear.m_interval.m_lower) * dyA) / dA;
+
+	sDouble x1B = x1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dxB) / dB;
+	sDouble y1B = y1B_ + (vB * (-kruhobot_traversal_B_linear.m_interval.m_lower) * dyB) / dB;
+
+	sDouble dxAB = x1A - x1B;
+	sDouble dyAB = y1A - y1B;
+	sDouble rAB = rA + rB;
+        // end of context	
+
+	/*
+	sDouble gamma = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;
+	sDouble beta = 2 * (dxAB * beta_x + dyAB * beta_y);
+	sDouble alpha = beta_x * beta_x + beta_y * beta_y;
+	*/
+
+	sDouble gamma_0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble gamma_1 = 2 * (vA * (dxAB * dxA + dyAB * dyA)) / dA;	
+	sDouble gamma_2 = vA * vA;
+	
+	sDouble beta_0 = 2 * ((vA * dxAB * dxA / dA) - ((vB * dxAB * dxB) / dB) + (vA * dyAB * dyA / dA) - ((vB * dyAB * dyB) / dB));
+	sDouble beta_x = vA * dxA / dA - vB * dxB / dB;
+	sDouble beta_y = vA * dyA / dA - vB * dyB / dB;	
+	sDouble beta_1 = 2 * ((vA * dxA * beta_x) / dA + (vA * dyA * beta_y) / dA);
+
+	sDouble alpha = beta_x * beta_x + beta_y * beta_y;	
+
+	sDouble A = gamma_2;
+	sDouble B = beta_1 * bound_time + gamma_1;
+	sDouble C = alpha * bound_time * bound_time + beta_0 * bound_time + gamma_0;
+
+	/*
+	sDouble AA = vA * vA + vB * vB - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+	sDouble BB0 = 2 * (vA * (dxAB * dxA + dyAB * dyA) / dA - vB * (dxAB * dxB + dyAB * dyB) / dB);
+	sDouble BB1 = 2 * vA * vA - 2 * vA * vB * (dxA * dxB + dyA * dyB) / (dA * dB);
+	sDouble CC0 = dxAB * dxAB + dyAB * dyAB - rAB * rAB;
+	sDouble CC1 = 2 * vA * (dxAB * dxA + dyAB * dyA) / dA;
+	sDouble CC2 = vA * vA;
+		    
+	sDouble tB2 = bound_time;
+	
+	sDouble A = AA * CC2;
+	sDouble B = AA * BB1 * tB2 + AA * CC1;
+	sDouble C = AA * BB0 * tB2 + AA * CC0 + AA * AA * tB2 * tB2;
+	*/
+
+	if (sABS(A) > s_EPSILON)
+	{
+	    sDouble DD = B * B - 4 * A * C;
+	
+	    if (DD > 0)
+	    {
+		time0_1 = (-B - sqrt(DD)) / (2 * A); 
+		time0_2 = (-B + sqrt(DD)) / (2 * A);
+
+		return 2;
+	    }
+	    else
+	    {
+		return 0;
+	    }
+	}
+	else /* non-quadratic */
+	{
+	    if (sABS(B) > s_EPSILON)
+	    {
+		time0_1 = time0_2 = -C / B;
+
+		return 1;
+	    }
+	    else
+	    {
+		if (sABS(C) > s_EPSILON)
+		{
+		    return 0;
+		}
+		else
+		{
+		    return sINT_32_MAX;
+		}
+	    }
+	}
+    }    
+
+
+    template<class T1, class T2>
+    void sRealCBSBase::insert_LinearConflict(sDouble          lower_unsafe,
+					     sDouble          upper_unsafe,
+					     const Traversal &kruhobot_traversal_linear,
+					     T2              &kruhobot_linear_Conflicts,
+					     sInt_32         &last_conflict_id,
+					     sInt_32         &affection) const
+    {
+	sInt_32 kruhobot_id = sABS(kruhobot_traversal_linear.m_kruhobot_id);	
+	Interval avoid_interval(sMAX(0, sMIN(lower_unsafe, upper_unsafe)), sMAX(0, sMAX(lower_unsafe, upper_unsafe)));
+	
+	if (avoid_interval.size() > s_DELTION)
+	{
+	    Interval intersection = kruhobot_traversal_linear.m_interval.intersect(avoid_interval);
+	    
+	    if (intersection.size() > s_DELTION)
+	    {
+		LinearConflict linear_conflict(last_conflict_id++, kruhobot_traversal_linear.m_u_loc_id, kruhobot_traversal_linear.m_v_loc_id, intersection);
+		kruhobot_linear_Conflicts[kruhobot_id][Uline(kruhobot_traversal_linear.m_u_loc_id, kruhobot_traversal_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection, linear_conflict));
+		++affection;
+	    }
+	}
+    }
+
+
+    template<class T1, class T2>
+    void sRealCBSBase::insert_LinearConflict(const Traversal &kruhobot_traversal_linear,
+					     T2              &kruhobot_linear_Conflicts,
+					     sInt_32         &last_conflict_id,
+					     sInt_32         &affection) const
+    {
+	sInt_32 kruhobot_id = sABS(kruhobot_traversal_linear.m_kruhobot_id);
+		
+	LinearConflict linear_conflict(last_conflict_id++, kruhobot_traversal_linear.m_u_loc_id, kruhobot_traversal_linear.m_v_loc_id, kruhobot_traversal_linear.m_interval);
+	kruhobot_linear_Conflicts[kruhobot_id][Uline(kruhobot_traversal_linear.m_u_loc_id, kruhobot_traversal_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(kruhobot_traversal_linear.m_interval, linear_conflict));
+	++affection;
+    }    
 
     
 /*----------------------------------------------------------------------------*/
@@ -2528,7 +3127,7 @@ namespace boOX
 	}
 	sASSERT(sABS(cost - alter_cost) <= s_EPSILON);	
 	
-	return cost;		
+	return alter_cost;		
     }
 
 
@@ -2595,7 +3194,7 @@ namespace boOX
 	}
 	sASSERT(sABS(cost - alter_cost) <= s_EPSILON);
 	
-	return cost;		
+	return alter_cost;		
     }    
 
     

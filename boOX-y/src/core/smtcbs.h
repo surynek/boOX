@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 2-058_planck                                                    */
+/* smtcbs.h / 2-123_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -308,6 +308,22 @@ namespace boOX
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(sMission          &mission,
 									      AgentPaths_vector &agent_Paths,
 									      sInt_32            cost_limit) const;
+	
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(sMission          &mission,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(sSolution &solution, sInt_32 cost_limit) const;
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
+
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(sMission          &mission,
+										  AgentPaths_vector &agent_Paths,
+										  sInt_32            cost_limit) const;	
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_ShortestNonconflictingKarpianInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
@@ -323,8 +339,8 @@ namespace boOX
 
 	sInt_32 find_ShortestNonconflictingKarpianInverseDepletedSpanning(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingKarpianInverseDepletedSpanning(sMission          &mission,
-									      AgentPaths_vector &agent_Paths,
-									      sInt_32            cost_limit) const;			
+									  AgentPaths_vector &agent_Paths,
+									  sInt_32            cost_limit) const;			
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingSwapping(Context           &context,
@@ -458,6 +474,22 @@ namespace boOX
 								      sMission          &mission,
 								      AgentPaths_vector &agent_Paths,
 								      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedHamilton(Context           &context,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedHamilton(Context           &context,
+								      sMission          &mission,
+								      AgentPaths_vector &agent_Paths,
+								      sInt_32            cost_limit) const;
+
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedHamiltonPlus(Context           &context,
+									  AgentPaths_vector &agent_Paths,
+									  sInt_32            cost_limit) const;	
+	sInt_32 find_NonconflictingHamiltonianInverseDepletedHamiltonPlus(Context           &context,
+									  sMission          &mission,
+									  AgentPaths_vector &agent_Paths,
+									  sInt_32            cost_limit) const;		
 
 	sInt_32 find_NonconflictingKarpianInverseDepleted(Context           &context,
 							      AgentPaths_vector &agent_Paths,

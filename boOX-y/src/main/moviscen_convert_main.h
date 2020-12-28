@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.h / 2-058_planck                                     */
+/* moviscen_convert_main.h / 2-123_planck                                     */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -45,15 +45,17 @@ namespace boOX
         /*--------------------------------*/
 
 	sInt_32 m_N_kruhobots;
-	sInt_32 m_N_agents;	
+	sInt_32 m_N_agents;
+	sInt_32 m_N_tasks;
 	
 	sString m_input_movi_map_filename;
-	sString m_input_movi_scen_filename;	
+	sString m_input_movi_scen_filename;
 	sString m_output_xml_scen_filename;
 	
 	sString m_output_mpf_filename;
 	sString m_output_cpf_filename;
 	sString m_output_bgu_filename;
+	sString m_output_mHpf_filename;	
     };
 
 
@@ -66,7 +68,8 @@ namespace boOX
     sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &parameters);
     
     sResult convert_MoviScen2XmlTask(const sCommandParameters &parameters);
-    sResult convert_MoviScen2MultirobotTask(const sCommandParameters &parameters);    
+    sResult convert_MoviScen2MultirobotTask(const sCommandParameters &parameters);
+    sResult convert_MoviScen2HamiltonianTask(const sCommandParameters &parameters);
 
 
 /*----------------------------------------------------------------------------*/

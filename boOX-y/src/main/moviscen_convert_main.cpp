@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.cpp / 2-058_planck                                   */
+/* moviscen_convert_main.cpp / 2-123_planck                                   */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -83,9 +83,11 @@ namespace boOX
 	printf("                       --output-xml-scen-file=<string>\n");
 	printf("                       --output-mpf-file=<string>\n");
 	printf("                       --output-cpf-file=<string>\n");
-	printf("                       --output-bgu-file=<string>\n");			
+	printf("                       --output-bgu-file=<string>\n");
+	printf("                       --output-mHpf-file=<string>\n");	
 	printf("                      [--N-kruhobots=<int>]\n");
-	printf("                      [--N-agents=<int>]\n");		
+	printf("                      [--N-agents=<int>]\n");
+	printf("                      [--N-tasks=<int>]\n");	
 	printf("\n");
 	printf("Examples:\n");
 	printf("moviscen_convert_boOX --input-movi-map-file=empty-16-16.map\n");
@@ -274,7 +276,77 @@ namespace boOX
 	#endif
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult convert_MoviScen2HamiltonianTask(const sCommandParameters &parameters)
+    {
+	sResult result;
+	s2DMap real_Map;
+
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.enter_Phase("CONVERSION");
+	}
+  	#endif
+
+	if (!parameters.m_output_mHpf_filename.empty())
+	{
+	    sInstance mapf_Instance;
+	    sMission mHpf_Mission;
+
+	    if (!parameters.m_input_movi_map_filename.empty())
+	    {
+		result = mapf_Instance.m_environment.from_File_movi(parameters.m_input_movi_map_filename);
+		
+		if (sFAILED(result))
+		{
+		    printf("Error: Failed to open movingai.com map file %s (code = %d).\n", parameters.m_input_movi_map_filename.c_str(), result);
+		    return result;
+		}
+	    }
+
+	    if (!parameters.m_input_movi_scen_filename.empty())
+	    {
+		result = mapf_Instance.from_File_movi(parameters.m_input_movi_scen_filename, mapf_Instance.m_environment, -1);
+		
+		if (sFAILED(result))
+		{
+		    printf("Error: Failed to open movingai.com scenario file %s (code = %d).\n", parameters.m_input_movi_scen_filename.c_str(), result);
+		    return result;
+		}
+	    }
+	    
+	    if (!parameters.m_output_mHpf_filename.empty())
+	    {
+		mHpf_Mission = sMission(mapf_Instance, parameters.m_N_agents, parameters.m_N_tasks);
+
+		if (parameters.m_N_agents >= 0)
+		{
+		    result = mHpf_Mission.to_File_mHpf(parameters.m_output_mHpf_filename);
+		}
+		if (sFAILED(result))
+		{
+		    printf("Error: Failed to write mHpf file %s (code = %d).\n", parameters.m_output_mHpf_filename.c_str(), result);
+		    return result;
+		}
+	    }
+	}
+	
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.leave_Phase();
+	}
+	#endif
+	
+	#ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.to_Screen();
+	}
+	#endif
+
+	return sRESULT_SUCCESS;	
+    }
 
 
     sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &command_parameters)
@@ -302,7 +374,11 @@ namespace boOX
 	else if (parameter.find("--output-bgu-file=") == 0)
 	{
 	    command_parameters.m_output_bgu_filename = parameter.substr(18, parameter.size());
-	}			
+	}
+	else if (parameter.find("--output-mHpf-file=") == 0)
+	{
+	    command_parameters.m_output_mHpf_filename = parameter.substr(19, parameter.size());
+	}	
 	else if (parameter.find("--N-kruhobots=") == 0)
 	{
 	    command_parameters.m_N_kruhobots = sInt_32_from_String(parameter.substr(14, parameter.size()));
@@ -310,7 +386,11 @@ namespace boOX
 	else if (parameter.find("--N-agents=") == 0)
 	{
 	    command_parameters.m_N_agents = sInt_32_from_String(parameter.substr(11, parameter.size()));
-	}		
+	}
+	else if (parameter.find("--N-tasks=") == 0)
+	{
+	    command_parameters.m_N_tasks = sInt_32_from_String(parameter.substr(10, parameter.size()));
+	}			
 	else
 	{
 	    return sMOVISCEN_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
@@ -386,12 +466,24 @@ int main(int argc, char **argv)
 	    }
 	}
 
+	if (!command_parameters.m_output_mHpf_filename.empty())
+	{
+	    result = convert_MoviScen2HamiltonianTask(command_parameters);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Cannot produce output mHpf file (code = %d).\n", result);		
+		return result;
+	    }
+	}	
+
 	if (   command_parameters.m_output_xml_scen_filename.empty()
 	    && command_parameters.m_output_mpf_filename.empty()
 	    && command_parameters.m_output_cpf_filename.empty()
-	    && command_parameters.m_output_bgu_filename.empty())
+	    && command_parameters.m_output_bgu_filename.empty()
+	    && command_parameters.m_output_mHpf_filename.empty())
 	{    
-	    printf("Error: Neither .xml nor .mpf nor .cpf not .bgu output file specified (code = %d).\n", sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR);
+	    printf("Error: Neither .xml nor .mpf nor .cpf nor .bgu nor .mHpf output file specified (code = %d).\n", sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR);
 	    print_Help();
 	    
 	    return sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR;		

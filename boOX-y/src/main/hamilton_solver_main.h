@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* hamilton_solver_main.h / 2-058_planck                                      */
+/* hamilton_solver_main.h / 2-123_planck                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Hamiltonian Path Finding Solver - main program.
@@ -45,8 +45,12 @@ namespace boOX
 	{
 	    ALGORITHM_CBS_PLUS_PLUS_PLUS,
 	    ALGORITHM_CBS_PLUS_PLUS_PLUS_PLUS,
+	    ALGORITHM_CBS_ULTRA,
+	    ALGORITHM_CBS_ULTRA_PLUS,	    	    
 	    ALGORITHM_SMTCBS_PLUS_PLUS,
-	    ALGORITHM_SMTCBS_PLUS_PLUS_PLUS
+	    ALGORITHM_SMTCBS_PLUS_PLUS_PLUS,
+	    ALGORITHM_SMTCBS_ULTRA,
+	    ALGORITHM_SMTCBS_ULTRA_PLUS
 	};
 	
 	sCommandParameters();

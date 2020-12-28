@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 2-058_planck                                                      */
+/* cbsR.h / 2-123_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -223,7 +223,7 @@ namespace boOX
 	    
 	    void to_Stream(FILE *fw, const sString &indent = "") const
 	    {
-		fprintf(fw, "%s%d: %d <-> %d [%.3f,%.3f]\n", indent.c_str(), m_kruhobot_id, m_u_loc_id, m_v_loc_id, m_interval.m_lower, m_interval.m_upper);
+		fprintf(fw, "%s%d: %d --> %d [%.3f,%.3f]\n", indent.c_str(), m_kruhobot_id, m_u_loc_id, m_v_loc_id, m_interval.m_lower, m_interval.m_upper);
 	    }	    
 	};
 
@@ -749,7 +749,9 @@ namespace boOX
 	typedef std::multimap<sDouble, Transition, std::less<sDouble> > Transitions_mmap;
 	typedef std::vector<Transition> Transitions_vector;
 
-	typedef std::map<Interval, KruhobotIDs_uset, Interval::CompareColexicographic> Cooccupations_map;
+	typedef std::map<Interval, KruhobotIDs_uset, Interval::CompareColexicographic> Cooccupations_map;	
+//	typedef std::map<Interval, EventKruhobotIDs_uset, Interval::CompareColexicographic> EventCooccupations_map;
+	
 	typedef std::unordered_map<sInt_32, Cooccupations_map> LocationCooccupations_umap;
 	typedef std::map<Uline, Cooccupations_map, std::less<Uline> > LinearCooccupations_map;
 	typedef std::map<Uline, Cooccupations_map, std::less<Uline> > UlinearCooccupations_map;
@@ -784,7 +786,7 @@ namespace boOX
 
 	sDouble analyze_NonconflictingSchedulesCosts(const sRealInstance                 &real_Instance,
 						     const KruhobotSchedules_vector      &kruhobot_Schedules,
-						     sDouble                              cost_bound,					      
+						     sDouble                              cost_bound,
 						     const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
 						     const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
 						     const KruhobotExtraVariables_vector &kruhobot_all_extra_Variables,
@@ -792,17 +794,17 @@ namespace boOX
 
 	sDouble analyze_NonconflictingSchedulesCosts(const sRealInstance                 &real_Instance,
 						     const KruhobotSchedules_vector      &kruhobot_Schedules,
-						     sDouble                              cost_bound,					      
+						     sDouble                              cost_bound,
 						     const std::vector<sDouble>          &kruhobot_lower_cost_Bounds,
 						     const KruhobotExtraVariables_vector &kruhobot_set_extra_Variables,
 						     const KruhobotExtraVariables_vector &kruhobot_all_extra_Variables,
 						     KruhobotExtraVariables_vector       &envelope_extra_Variables,
-						     KruhobotExtraVariables_vector       &domus_extra_Variables) const;			
+						     KruhobotExtraVariables_vector       &domus_extra_Variables) const;
         /*----------------------------------------------------------------------------*/
 
 	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance              &real_Instance,
 							 const Traversal                  &kruhobot_traversal_A,
-							 const Traversal                  &kruhobot_traversal_B,				       
+							 const Traversal                  &kruhobot_traversal_B,
 							 KruhobotLocationConflicts_vector &kruhobot_location_Conflicts,
 							 KruhobotLinearConflicts_vector   &kruhobot_linear_Conflicts,
 							 sInt_32                          &last_conflict_id,
@@ -810,7 +812,7 @@ namespace boOX
 
 	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
 							 const Traversal                        &kruhobot_traversal_A,
-							 const Traversal                        &kruhobot_traversal_B,				       
+							 const Traversal                        &kruhobot_traversal_B,
 							 KruhobotLocationConflicts_lower_vector &kruhobot_location_Conflicts,
 							 KruhobotLinearConflicts_lower_vector   &kruhobot_linear_Conflicts,
 							 sInt_32                                &last_conflict_id,
@@ -818,15 +820,15 @@ namespace boOX
 	
 	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                    &real_Instance,
 							 const Traversal                        &kruhobot_traversal_A,
-							 const Traversal                        &kruhobot_traversal_B,				       
+							 const Traversal                        &kruhobot_traversal_B,
 							 KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
 							 KruhobotLinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
 							 sInt_32                                &last_conflict_id,
-							 bool                                    infinity = false) const;		
+							 bool                                    infinity = false) const;
 	
 	KruhobotAffection_pair resolve_KruhobotCollision(const sRealInstance                            &real_Instance,
 							 const Traversal                                &kruhobot_traversal_A,
-							 const Traversal                                &kruhobot_traversal_B,				       
+							 const Traversal                                &kruhobot_traversal_B,
 							 KruhobotLocationConflicts_lexicographic_vector &kruhobot_location_Conflicts,
 							 KruhobotLinearConflicts_lexicographic_vector   &kruhobot_linear_Conflicts,
 							 sInt_32                                        &last_conflict_id,
@@ -875,7 +877,72 @@ namespace boOX
 									 T1                  &kruhobot_location_Conflicts,
 									 T2                  &kruhobot_linear_Conflicts,
 									 sInt_32             &last_conflict_id,
-									 bool                 infinity = false) const;			
+									 bool                 infinity = false) const;
+
+	template<class T1, class T2>
+	sInt_32 resolve_KruhobotCollision_linear_X_linear_directional(const sRealInstance &real_Instance,
+								      const Traversal     &kruhobot_traversal_A,
+								      const Traversal     &kruhobot_traversal_B,
+								      T1                  &kruhobot_location_Conflicts,
+								      T2                  &kruhobot_linear_Conflicts,
+								      sInt_32             &last_conflict_id,
+								      bool                 infinity = false) const;	
+
+	template<class T1, class T2>
+	void resolve_KruhobotCollisionMiddleTouch_linear_X_linear(const sRealInstance &real_Instance,
+								  const Traversal     &kruhobot_traversal_A,
+								  const Traversal     &kruhobot_traversal_B,
+								  T1                  &kruhobot_location_Conflicts,
+								  T2                  &kruhobot_linear_Conflicts,
+								  sInt_32             &last_conflict_id,
+								  sInt_32             &affection) const;
+
+	template<class T1, class T2>	    
+	void resolve_KruhobotCollisionBoundTouch_linear_X_linear(sDouble              bound_time,
+								 const sRealInstance &real_Instance,
+								 const Traversal     &kruhobot_traversal_A,
+								 const Traversal     &kruhobot_traversal_B,
+								 T1                  &kruhobot_location_Conflicts,
+								 T2                  &kruhobot_linear_Conflicts,
+								 sInt_32             &last_conflict_id,
+								 sInt_32             &affection) const;
+
+	template<class T1, class T2>
+	sInt_32 solve_QuadraticTangent_linear_X_linear(const sRealInstance &real_Instance,
+						       const Traversal     &kruhobot_traversal_A_linear,
+						       const Traversal     &kruhobot_traversal_B_linear,
+						       sDouble             &time0_1,
+						       sDouble             &time0_2) const;
+	
+	template<class T1, class T2>
+	sInt_32 solve_NonQuadraticTangent_linear_X_linear(sDouble              time,
+							   const sRealInstance &real_Instance,
+							   const Traversal     &kruhobot_traversal_A_linear,
+							   const Traversal     &kruhobot_traversal_B_linear,
+							   sDouble             &time0_1,
+							   sDouble             &time0_2) const;
+
+	template<class T1, class T2>
+	sInt_32 solve_BoundTangent_linear_X_linear(sDouble              bound_time,
+						   const sRealInstance &real_Instance,
+						   const Traversal     &kruhobot_traversal_A_linear,
+						   const Traversal     &kruhobot_traversal_B_linear,
+						   sDouble             &time0_1,
+						   sDouble             &time0_2) const;	
+
+	template<class T1, class T2>
+	void insert_LinearConflict(sDouble          lower_unsafe,
+				   sDouble          upper_unsafe,
+				   const Traversal &kruhobot_traversal_linear,
+				   T2              &kruhobot_linear_Conflicts,
+				   sInt_32         &last_conflict_id,
+				   sInt_32         &affection) const;
+
+	template<class T1, class T2>
+	void insert_LinearConflict(const Traversal &kruhobot_traversal_linear,
+				   T2              &kruhobot_linear_Conflicts,
+				   sInt_32         &last_conflict_id,
+				   sInt_32         &affection) const;	
         /*----------------------------------------------------------------------------*/		
 
 	void introduce_KruhobotConflict(const Traversal                  &kruhobot_traversal,

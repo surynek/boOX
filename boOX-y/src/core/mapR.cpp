@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 2-058_planck                                                    */
+/* mapR.cpp / 2-123_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -965,6 +965,13 @@ namespace boOX
 	sInt_32 N_locations = m_Locations.size();
 	fprintf(fw, "%s2DMap: (|Locations| = %d)\n", indent.c_str(), N_locations);
 
+	fprintf(fw, "%s%slocations {\n", indent.c_str(), s_INDENT.c_str());	
+	for (sInt_32 id = 0; id < N_locations; ++id)
+	{
+	    fprintf(fw, "%s%s%d: %.3f, %.3f\n", indent.c_str(), s2_INDENT.c_str(), id, m_Locations[id].m_x, m_Locations[id].m_y); 
+	}
+	fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());	
+	
 	if (!m_straight_Distances.empty())
 	{
 	    sInt_32 N_straight_distances = m_straight_Distances.size();

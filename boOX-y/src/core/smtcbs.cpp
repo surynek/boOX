@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-058_planck                                                  */
+/* smtcbs.cpp / 2-123_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -1581,7 +1581,99 @@ namespace boOX
             #endif	    
 	}	
 	return cost;
-    }    
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(sSolution &solution, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(sMission &mission, sSolution &solution, sInt_32 cost_limit) const
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(sSolution &solution, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(*m_Mission, solution, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(sMission &mission, sSolution &solution, sInt_32 cost_limit) const
+    {
+	sInt_32 cost;
+	AgentPaths_vector agent_Paths;
+
+	if ((cost = find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(agent_Paths, cost_limit)) < 0)
+	{
+	    return cost;
+	}
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    #ifdef sDEBUG
+	    {
+		printf("Agent %d: ", agent_id);
+	    }
+	    #endif
+	    for (sInt_32 i = 1; i < agent_Paths[agent_id].size(); ++i)
+	    {
+                #ifdef sDEBUG
+		{
+		    printf("%d ", agent_Paths[agent_id][i - 1]);
+		}
+                #endif
+		if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i])
+		{
+		    solution.add_Move(i - 1, sSolution::Move(agent_id, agent_Paths[agent_id][i - 1], agent_Paths[agent_id][i]));
+		}
+	    }
+            #ifdef sDEBUG
+	    {
+		printf("%d\n", *agent_Paths[agent_id].rbegin());
+	    }
+            #endif	    
+	}	
+	return cost;
+    }            
 
     
     sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
@@ -1644,7 +1736,14 @@ namespace boOX
 	#endif
 
 	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_spanning(max_individual_cost);
-	Context context;	
+/*
+	printf("calcing\n");
+	getchar();
+	mission.calc_HamiltonianCosts();
+	printf("calcing fino\n");
+	getchar();
+*/
+	Context context;
 	
 	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
 	{
@@ -1669,7 +1768,109 @@ namespace boOX
 	    }
 	}
 	return -1;
-    }    
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	sInt_32 solution_cost, max_individual_cost;	
+	
+	#ifdef sVERBOSE
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();		
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_spanning(max_individual_cost);
+/*
+	printf("calcing\n");
+	getchar();
+	mission.calc_HamiltonianCosts();
+	printf("calcing fino\n");
+	getchar();
+*/
+	Context context;
+	
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAHPF (Hamiltonian) cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingHamiltonianInverseDepletedHamilton(context, mission, agent_Paths, cost)) >= 0)
+	    {
+		return solution_cost;
+	    }
+
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	}
+	return -1;
+    }
+
+
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(*m_Mission, agent_Paths, cost_limit);
+    }
+
+    
+    sInt_32 sSMTCBS::find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	sInt_32 solution_cost, max_individual_cost;	
+	
+	#ifdef sVERBOSE
+	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();		
+	sDouble start_time = sStatistics::get_CPU_Seconds();
+	#endif
+
+	sInt_32 min_total_cost = mission.estimate_TotalHamiltonianCost_hamiltonian(max_individual_cost);
+/*
+	printf("calcing\n");
+	getchar();
+	mission.calc_HamiltonianCosts();
+	printf("calcing fino\n");
+	getchar();
+*/
+	Context context;
+	
+	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	    
+	{
+	    #ifdef sVERBOSE
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		printf("Solving MAHPF (Hamiltonian) cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
+	    }
+	    #endif
+	    if ((solution_cost = find_NonconflictingHamiltonianInverseDepletedHamiltonPlus(context, mission, agent_Paths, cost)) >= 0)
+	    {
+		return solution_cost;
+	    }
+
+	    if (m_timeout >= 0)
+	    {
+		sDouble end_time = sStatistics::get_CPU_Seconds();
+		if (end_time - start_time > m_timeout)
+		{
+		    return -2;
+		}
+	    }
+	}
+	return -1;
+    }            
 
 
 /*----------------------------------------------------------------------------*/
@@ -2173,10 +2374,53 @@ namespace boOX
 	sMission::InverseMDD_vector inverse_MDD;
 	
 	mission.construct_HamiltonianMDD_spanning(cost_limit, MDD, extra_cost, extra_MDD);
+//	mission.construct_HamiltonianMDD_hamiltonian(cost_limit, MDD, extra_cost, extra_MDD);	
 	mission.construct_InverseMDD(MDD, inverse_MDD);	
 
 	return find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
-    }    
+    }
+
+
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonianInverseDepletedHamilton(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_NonconflictingHamiltonianInverseDepletedHamilton(context, *m_Mission, agent_Paths, cost_limit);
+    }
+    
+    
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonianInverseDepletedHamilton(Context &context, sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	AgentConflicts_vector agent_Conflicts;
+	sInt_32 extra_cost;
+	sMission::MDD_vector MDD, extra_MDD;
+	sMission::InverseMDD_vector inverse_MDD;
+	
+//	mission.construct_HamiltonianMDD_spanning(cost_limit, MDD, extra_cost, extra_MDD);
+	mission.construct_HamiltonianMDD_hamiltonian(cost_limit, MDD, extra_cost, extra_MDD);	
+	mission.construct_InverseMDD(MDD, inverse_MDD);	
+
+	return find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
+    }
+
+
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonianInverseDepletedHamiltonPlus(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	return find_NonconflictingHamiltonianInverseDepletedHamilton(context, *m_Mission, agent_Paths, cost_limit);
+    }
+    
+    
+    sInt_32 sSMTCBS::find_NonconflictingHamiltonianInverseDepletedHamiltonPlus(Context &context, sMission &mission, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    {
+	AgentConflicts_vector agent_Conflicts;
+	sInt_32 extra_cost;
+	sMission::MDD_vector MDD, extra_MDD;
+	sMission::InverseMDD_vector inverse_MDD;
+	
+//	mission.construct_HamiltonianMDD_spanning(cost_limit, MDD, extra_cost, extra_MDD);
+	mission.construct_HamiltonianMDD_hamiltonian(cost_limit, MDD, extra_cost, extra_MDD);	
+	mission.construct_InverseMDD(MDD, inverse_MDD);	
+
+	return find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepletedSpanning(mission, context, MDD, extra_MDD, inverse_MDD, extra_cost, agent_Paths, cost_limit);
+    }            
 
     
 /*----------------------------------------------------------------------------*/
@@ -9298,17 +9542,17 @@ namespace boOX
 	{
 	    context.m_trans_edge_Collisions.push_back(*edge_collision);
 	}	
-		
+	
 	refine_HamiltonianSmallModelCollisionsInverse(solver,
-						   Collisions,
-						   edge_Collisions,
-						   mission,
-						   MDD,
-						   extra_MDD,
-						   inverse_MDD,
-						   cost_limit,
-						   extra_cost,
-						   sat_Model);
+						      Collisions,
+						      edge_Collisions,
+						      mission,
+						      MDD,
+						      extra_MDD,
+						      inverse_MDD,
+						      cost_limit,
+						      extra_cost,
+						      sat_Model);
 	
 	if (!solver->simplify())
 	{
@@ -9888,7 +10132,7 @@ namespace boOX
 
     sInt_32 sSMTCBS::check_NonconflictingCapacitatedRotation(const sInstance              &instance,
 							     const AgentPaths_vector      &agent_Paths,
-							     Collisions_vector            &Collisions,
+							     Collisions_vector            &sUNUSED_(Collisions),
 							     EdgeCollisions_vector        &edge_Collisions,
 							     CapacitatedCollisions_vector &capacitated_Collisions) const
     {
@@ -17043,6 +17287,8 @@ namespace boOX
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
 	    sMission::InverseVertexIDs_umap::const_iterator inverse_u = inverse_MDD[collision->m_agent_A_id][collision->m_level_A].find(collision->m_vertex_A_id);
+//	    printf("a:%d,l:%d - v:%d,%ld,%d,%d\n", collision->m_agent_A_id, collision->m_level_A, collision->m_vertex_A_id, inverse_MDD[collision->m_agent_A_id][collision->m_level_A].size(), inverse_MDD[collision->m_agent_A_id][collision->m_level_A].begin()->first, inverse_MDD[collision->m_agent_A_id][collision->m_level_A].begin()->second);
+	    
 	    sASSERT(inverse_u != inverse_MDD[collision->m_agent_A_id][collision->m_level_A].end());
 	    sInt_32 u = inverse_u->second;
 	    
@@ -17191,7 +17437,7 @@ namespace boOX
 	    {
 		#ifdef sDEBUG
 		{
-		    // printf("Literal (true): %d\n", literal);
+		    //printf("Literal (true): %d\n", literal);
 		}
 		#endif
 		sInt_32 variable_ID = sABS(literal);
@@ -17203,9 +17449,11 @@ namespace boOX
 		    sInt_32 level = coordinate.m_layer;
 
 		    #ifdef sDEBUG
+		    /*
 		    {
-			// printf("Extratracted from satisfying a:%d, v:%d, l:%d [%d]\n", agent_id, vertex_id, level, literal);
+			printf("Extratracted from satisfying a:%d, v:%d, l:%d [%d]\n", agent_id, vertex_id, level, literal);
 		    }
+		    */
 		    #endif
 		    agent_Paths[agent_id][level] = vertex_id;
 		}

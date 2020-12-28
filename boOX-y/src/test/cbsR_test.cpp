@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-058_planck                              */
+/*                             boOX 2-123_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR_test.cpp / 2-058_planck                                               */
+/* cbsR_test.cpp / 2-123_planck                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search.
@@ -1731,6 +1731,36 @@ namespace boOX
     }
 
 
+    void print_Conflicts(const sRealCBS::KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts, const sRealCBS::KruhobotLinearConflicts_upper_vector &kruhobot_linear_Conflicts)
+    {
+	printf("Location conflicts:\n");
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < kruhobot_location_Conflicts.size(); ++kruhobot_id)
+	{
+	    for (sRealCBS::LocationConflicts_upper__umap::const_iterator location_conflict = kruhobot_location_Conflicts[kruhobot_id].begin(); location_conflict != kruhobot_location_Conflicts[kruhobot_id].end(); ++location_conflict)
+	    {
+		for (sRealCBS::LocationConflicts_upper_map::const_iterator conflict = location_conflict->second.begin(); conflict != location_conflict->second.end(); ++conflict)
+		{
+		    printf("kruhobot: %d\n", kruhobot_id);
+		    conflict->second.to_Screen(s_INDENT);
+		}
+	    }
+	}
+
+	printf("Linear conflicts:\n");
+	for (sInt_32 kruhobot_id = 1; kruhobot_id < kruhobot_linear_Conflicts.size(); ++kruhobot_id)
+	{
+	    for (sRealCBS::UlinearConflicts_upper__map::const_iterator linear_conflict = kruhobot_linear_Conflicts[kruhobot_id].begin(); linear_conflict != kruhobot_linear_Conflicts[kruhobot_id].end(); ++linear_conflict)
+	    {
+		for (sRealCBS::LinearConflicts_upper_map::const_iterator conflict = linear_conflict->second.begin(); conflict != linear_conflict->second.end(); ++conflict)
+		{		
+		    printf("kruhobot: %d\n", kruhobot_id);
+		    conflict->second.to_Screen(s_INDENT);
+		}
+	    }
+	}	
+    }
+    
+
     void test_Collision_1(void)
     {
 	printf("CBS-R collision 1 ...\n");	
@@ -1792,6 +1822,7 @@ namespace boOX
 							     kruhobot_linear_Conflicts,
 							     last_conflict_id,
 							     false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 1 ... finished\n");
     }
@@ -1858,6 +1889,7 @@ namespace boOX
 							     kruhobot_linear_Conflicts,
 							     last_conflict_id,
 							     false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 1B ... finished\n");
     }    
@@ -1924,6 +1956,7 @@ namespace boOX
 							   kruhobot_linear_Conflicts,
 							   last_conflict_id,
 							   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 2 ... finished\n");
     }
@@ -1990,6 +2023,7 @@ namespace boOX
 							   kruhobot_linear_Conflicts,
 							   last_conflict_id,
 							   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 3 ... finished\n");
     }
@@ -2056,6 +2090,7 @@ namespace boOX
 							   kruhobot_linear_Conflicts,
 							   last_conflict_id,
 							   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 4 ... finished\n");
     }
@@ -2129,6 +2164,7 @@ namespace boOX
 							   kruhobot_linear_Conflicts,
 							   last_conflict_id,
 							   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 5 ... finished\n");
     }                
@@ -2202,6 +2238,7 @@ namespace boOX
 							   kruhobot_linear_Conflicts,
 							   last_conflict_id,
 							   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 6 ... finished\n");
     }                
@@ -2275,6 +2312,7 @@ namespace boOX
 							   kruhobot_linear_Conflicts,
 							   last_conflict_id,
 							   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
 	
 	printf("CBS-R collision 7 ... finished\n");
     }                
@@ -2340,7 +2378,8 @@ namespace boOX
 					   kruhobot_linear_Conflicts,
 					   last_conflict_id,
 					   false);
-
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
 	printf("CBS-R collision 8 ... finished\n");
     }
 
@@ -2405,7 +2444,8 @@ namespace boOX
 					   kruhobot_linear_Conflicts,
 					   last_conflict_id,
 					   false);
-
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
 	printf("CBS-R collision 9... finished\n");
     }
 
@@ -2470,7 +2510,8 @@ namespace boOX
 					   kruhobot_linear_Conflicts,
 					   last_conflict_id,
 					   false);
-
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
 	printf("CBS-R collision 10... finished\n");
     }
 
@@ -2535,7 +2576,8 @@ namespace boOX
 					   kruhobot_linear_Conflicts,
 					   last_conflict_id,
 					   false);
-
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
 	printf("CBS-R collision 11... finished\n");
     }            
 
@@ -2604,7 +2646,8 @@ namespace boOX
 					   kruhobot_linear_Conflicts,
 					   last_conflict_id,
 					   false);
-
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
 	printf("CBS-R collision 12... finished\n");
     }                
 
@@ -2672,10 +2715,1339 @@ namespace boOX
 					   kruhobot_linear_Conflicts,
 					   last_conflict_id,
 					   false);
-
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
 	printf("CBS-R collision 13 ... finished\n");
     }
 
+
+    void test_Collision_14(void)
+    {
+	printf("CBS-R collision 14 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 1.0, 0.0);
+	grid_map.add_Location(3, 1.0, 2.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 2);
+	goal_conjunction.place_Kruhobot(2, 0);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 14 ... finished\n");
+    }
+
+
+    void test_Collision_15(void)
+    {
+	printf("CBS-R collision 15 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 0.0, 1.05);
+	grid_map.add_Location(3, 2.0, 1.05);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 15 ... finished\n");
+    }        
+
+
+    void test_Collision_16(void)
+    {
+	printf("CBS-R collision 16 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 0.0, 1.1);
+	grid_map.add_Location(3, 2.0, 1.1);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 3, 2, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 16 ... finished\n");
+    }
+
+
+    void test_Collision_17(void)
+    {
+	printf("CBS-R collision 17 ...\n");	
+
+	s2DMap grid_map(2);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 2);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 2);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 0);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 1, 0, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 17 ... finished\n");
+    }            
+
+
+    void test_Collision_18(void)
+    {
+	printf("CBS-R collision 18 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 0.01);
+	grid_map.add_Location(1, 2.0, 0.01);	
+	grid_map.add_Location(2, 0.01, 0.0);
+	grid_map.add_Location(3, 0.01, 2.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 18 ... finished\n");
+    }
+
+
+    void test_Collision_19(void)
+    {
+	printf("CBS-R collision 19 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 0.0, 1.2);
+	grid_map.add_Location(3, 2.0, 1.2);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 19 ... finished\n");
+    }
+
+    
+    void test_Collision_20(void)
+    {
+	printf("CBS-R collision 20 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 0.1, 1.0);
+	grid_map.add_Location(3, 2.1, 1.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 20 ... finished\n");
+    }
+    
+
+    void test_Collision_21(void)
+    {
+	printf("CBS-R collision 21 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 0.0, 1.0);
+	grid_map.add_Location(3, 2.0, 1.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 21 ... finished\n");
+    }
+
+
+    void test_Collision_22(void)
+    {
+	printf("CBS-R collision 22 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 3.0, 0.9);
+	grid_map.add_Location(3, 1.0, 0.9);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 22 ... finished\n");
+    }
+
+
+    void test_Collision_23(void)
+    {
+	printf("CBS-R collision 23 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 3.0, 1.0);
+	grid_map.add_Location(3, 1.0, 1.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 23 ... finished\n");
+    }        
+
+
+    void test_Collision_24(void)
+    {
+	printf("CBS-R collision 24 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 2.3, 1.0);
+	grid_map.add_Location(3, 0.3, 1.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 24 ... finished\n");
+    }
+
+
+    void test_Collision_25(void)
+    {
+	printf("CBS-R collision 25 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, -0.1, 1.0);
+	grid_map.add_Location(3, -2.1, 1.0);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 25 ... finished\n");
+    }
+
+
+    void test_Collision_26(void)
+    {
+	printf("CBS-R collision 26 ...\n");
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 2.0, 1.0);
+	grid_map.add_Location(2, 0.2, 1.1);
+	grid_map.add_Location(3, 2.2, 1.1);	
+
+	// grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 4);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 2);
+
+	sRealConjunction goal_conjunction(&grid_map, 4);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 3);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 2.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 2.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 26 ... finished\n");
+    }
+
+
+    void test_Collision_27(void)
+    {
+	printf("CBS-R collision 27 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 1.0, 1.0);
+	grid_map.add_Location(2, 2.0, 1.0);	
+	grid_map.add_Location(3, 1.0, 1.0);	
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 1.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 1.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 27 ... finished\n");
+    }
+
+
+    void test_Collision_28(void)
+    {
+	printf("CBS-R collision 28 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 1.0, 1.0);
+	grid_map.add_Location(2, 1.9, 1.0);	
+	grid_map.add_Location(3, 0.9, 1.0);	
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 1.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 1.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 28 ... finished\n");
+    }
+
+
+    void test_Collision_29(void)
+    {
+	printf("CBS-R collision 29 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 1.0, 1.0);
+	grid_map.add_Location(2, 1.9, 0.9);	
+	grid_map.add_Location(3, 0.9, 0.9);	
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 1.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 1.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+	
+	printf("CBS-R collision 29 ... finished\n");
+    }
+
+
+    void test_Collision_30(void)
+    {
+	printf("CBS-R collision 30 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 0.0, 1.0);
+	grid_map.add_Location(1, 1.0, 1.0);
+	grid_map.add_Location(2, 1.9, 1.0);	
+	grid_map.add_Location(3, 0.9, 1.0);	
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 1.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 1.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);	
+
+	printf("CBS-R collision 30 ... finished\n");
+    }
+
+
+    void test_Collision_31(void)
+    {
+	printf("CBS-R collision 31 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 1.0, 0.0);
+	grid_map.add_Location(1, 0.0, 0.0);
+	grid_map.add_Location(2, 0.0, 1.0);	
+	grid_map.add_Location(3, 0.0, 0.0);	
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 1.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 1.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);	
+
+	printf("CBS-R collision 31 ... finished\n");
+    }
+
+
+    void test_Collision_32(void)
+    {
+	printf("CBS-R collision 32 ...\n");	
+
+	s2DMap grid_map(4);
+
+	grid_map.add_Location(0, 1.0, 0.19);
+	grid_map.add_Location(1, 0.0, 0.19);
+	grid_map.add_Location(2, 0.19, 1.0);	
+	grid_map.add_Location(3, 0.19, 0.0);	
+
+	grid_map.populate_Network(1.1);
+	grid_map.to_Screen();
+
+	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_1.to_Screen();
+
+	sKruhobot kruhobot_2(2, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
+	kruhobot_2.to_Screen();
+
+	sRealConjunction start_conjunction(&grid_map, 3);
+	start_conjunction.place_Kruhobot(1, 0);
+	start_conjunction.place_Kruhobot(2, 1);
+
+	sRealConjunction goal_conjunction(&grid_map, 3);
+	goal_conjunction.place_Kruhobot(1, 1);
+	goal_conjunction.place_Kruhobot(2, 2);
+
+	start_conjunction.to_Screen();
+	goal_conjunction.to_Screen();
+
+	sRealInstance instance(start_conjunction, goal_conjunction);
+
+	instance.add_Kruhobot(1, kruhobot_1);
+	instance.add_Kruhobot(2, kruhobot_2);
+	instance.to_Screen();
+
+	const sInt_32 N_kruhobots = 2;
+
+	sDouble t0 = 0;
+	sDouble t1 = 0;	
+	
+	sRealCBS::Traversal pass1_traversal(1, 0, 1, sRealCBS::Interval(0.0 + t0, 1.0 + t0));
+	sRealCBS::Traversal pass2_traversal(2, 2, 3, sRealCBS::Interval(0.0 + t1, 1.0 + t1));
+
+	pass1_traversal.to_Screen();
+	pass2_traversal.to_Screen();
+
+	sRealCBS real_CBS(&instance);
+	sRealCBS::KruhobotLocationConflicts_upper_vector kruhobot_location_Conflicts;
+	kruhobot_location_Conflicts.resize(N_kruhobots + 1);
+	
+	sRealCBS::KruhobotLinearConflicts_upper_vector kruhobot_linear_Conflicts;
+	kruhobot_linear_Conflicts.resize(N_kruhobots + 1);
+
+	sInt_32 last_conflict_id = 0;
+
+	real_CBS.resolve_KruhobotCollision(instance,
+					   pass1_traversal,
+					   pass2_traversal,
+					   kruhobot_location_Conflicts,
+					   kruhobot_linear_Conflicts,
+					   last_conflict_id,
+					   false);
+	print_Conflicts(kruhobot_location_Conflicts, kruhobot_linear_Conflicts);
+
+	printf("CBS-R collision 32 ... finished\n");
+    }                        
+    
 
     #define MIN(x,y) (((x) < (y)) ? (x) : (y))
     #define MAX(x,y) (((x) > (y)) ? (x) : (y))    
@@ -3082,5 +4454,27 @@ int main(int sUNUSED(argc), char **sUNUSED(argv))
       test_Collision_10();
       test_Collision_11();
       test_Collision_12();
-      test_Collision_13();      
+      test_Collision_13();
+
+      /*
+      test_Collision_14();
+      test_Collision_15();
+      test_Collision_16();
+      test_Collision_17();
+      test_Collision_18();
+      test_Collision_19();
+      test_Collision_20();
+      test_Collision_21();      
+      test_Collision_22();
+      test_Collision_23();
+      test_Collision_24();
+      test_Collision_25();
+      test_Collision_26();
+      test_Collision_27();
+      test_Collision_28();
+      test_Collision_29();
+      test_Collision_30();
+      */
+      test_Collision_31();
+      test_Collision_32();
 }
