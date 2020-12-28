@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-124_planck                              */
+/*                             boOX 2-125_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* safe_intervals.cpp / 2-124_planck                                          */
+/* safe_intervals.cpp / 2-125_planck                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Exact safe time interval calculation for circular robots
