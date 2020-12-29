@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-127_planck                              */
+/*                             boOX 2-129_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 2-127_planck                                                  */
+/* kruhoR.cpp / 2-129_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1152,7 +1152,7 @@ namespace boOX
 			sDouble R = rA + rB;
 			sDouble RR = R * R;
 
-			if (DD < RR)
+			if (DD < RR - s_EPSILON)
 			{
 			    #ifdef sVERBOSE
 			    {
@@ -1168,8 +1168,8 @@ namespace boOX
 				       (*active_motion_B)->m_duration.m_start_time, (*active_motion_B)->m_duration.m_finish_time);
 			    }
                             #endif
-			    
-			    return sREAL_SOLUTION_COLLISION_INFO;
+
+			    return sREAL_SOLUTION_COLLISION_INFO;			    
 			}
 		    }
 		}
@@ -1177,7 +1177,7 @@ namespace boOX
 	    
 	    current_time += simulation_step;
 	}
-
+	
 	return sRESULT_SUCCESS;
     }
     

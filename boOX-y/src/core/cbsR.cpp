@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-127_planck                              */
+/*                             boOX 2-129_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.cpp / 2-127_planck                                                    */
+/* cbsR.cpp / 2-129_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -1579,8 +1579,6 @@ namespace boOX
 	    LocationConflict location_conflict_A(last_conflict_id++, kruhobot_traversal_location_A.m_u_loc_id, avoid_interval_A, infinity);
 	    kruhobot_location_Conflicts[kruhobot_A_id][kruhobot_traversal_location_A.m_u_loc_id].insert(LocationConflicts_map::value_type(avoid_interval_A, location_conflict_A));
 	    ++affection_A;
-	    printf("gamma 1\n");
-	    location_conflict_A.to_Screen();			    	    
 	}
 	
 	sDouble escape_time_B = (rA + rB) / vB;
@@ -1591,8 +1589,6 @@ namespace boOX
 	    LocationConflict location_conflict_B(last_conflict_id++, kruhobot_traversal_location_B.m_u_loc_id, avoid_interval_B, infinity);
 	    kruhobot_location_Conflicts[kruhobot_B_id][kruhobot_traversal_location_B.m_u_loc_id].insert(LocationConflicts_map::value_type(avoid_interval_B, location_conflict_B));
 	    ++affection_B;
-	    printf("gamma 2\n");	    
-	    location_conflict_B.to_Screen();			    	    
 	}
 
 	return KruhobotAffection_pair(affection_A, affection_B);
@@ -1671,23 +1667,14 @@ namespace boOX
 		Interval check_intersection_A = kruhobot_traversal_A_location.m_interval.intersect(Interval(tau_1, tau_2));
 		Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
 
-		printf("check 0\n");
-		Interval(tau_1, tau_2).to_Screen();
-		printf("check 1\n");
-		check_intersection_A.to_Screen();
-		printf("check 2\n");
-		check_intersection_B.to_Screen();		
-
 		if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
 		{
 		    return KruhobotAffection_pair(0, 0);
 		}
 		else
 		{
-		    sDouble delta_tau_A = tau_2 - kruhobot_traversal_A_location.m_interval.m_lower;
+		    //sDouble delta_tau_A = tau_2 - kruhobot_traversal_A_location.m_interval.m_lower;
 		    sDouble delta_tau_B = kruhobot_traversal_A_location.m_interval.m_upper - tau_1;
-
-		    printf("deltas A,B: %.3f, %.3f\n", delta_tau_A, delta_tau_B);
 
 		    //Interval avoid_interval_A(kruhobot_traversal_A_location.m_interval.m_lower, kruhobot_traversal_A_location.m_interval.m_lower + delta_tau_A);
 		    Interval avoid_interval_A = check_intersection_A;
@@ -1695,17 +1682,13 @@ namespace boOX
 		    if (avoid_interval_A.size() > s_DELTION)
 		    {
 			//Interval intersection_A = kruhobot_traversal_A_location.m_interval.intersect(avoid_interval_A);
-			Interval intersection_A = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_A);			
-			avoid_interval_A.to_Screen();
-			intersection_A.to_Screen();
-			
+			Interval intersection_A = kruhobot_traversal_B_linear.m_interval.intersect(avoid_interval_A);
+					
 			if (intersection_A.size() > s_DELTION)
 			{
 			    LocationConflict location_conflict_A(last_conflict_id++, kruhobot_traversal_A_location.m_u_loc_id, intersection_A);
 			    kruhobot_location_Conflicts[kruhobot_A_id][kruhobot_traversal_A_location.m_u_loc_id].insert(LocationConflicts_map::value_type(intersection_A, location_conflict_A));
 			    ++affection_A;
-			    printf("gamma 3\n");
-			    location_conflict_A.to_Screen();			    			    
 			}
 		    }		    		    		    
 		    
@@ -1720,8 +1703,6 @@ namespace boOX
 			    LinearConflict linear_conflict_B(last_conflict_id++, kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id, intersection_B);
 			    kruhobot_linear_Conflicts[kruhobot_B_id][Uline(kruhobot_traversal_B_linear.m_u_loc_id, kruhobot_traversal_B_linear.m_v_loc_id)].insert(LinearConflicts_map::value_type(intersection_B, linear_conflict_B));
 			    ++affection_B;
-			    printf("gamma 4\n");
-			    linear_conflict_B.to_Screen();			    			    
 			}
 		    }		    		    
 		}
@@ -1801,11 +1782,11 @@ namespace boOX
 												 sInt_32             &last_conflict_id,
 												 bool                 infinity) const
     {
-	LinearDifferentialContext ctx(real_Instance,
-				      kruhobot_traversal_A_linear,
-				      kruhobot_traversal_B_linear);
+	LinearDifferentialContext ctxAB(real_Instance,
+					kruhobot_traversal_A_linear,
+					kruhobot_traversal_B_linear);
 	    
-	sInt_32 affection_A = resolve_KruhobotCollision_linear_X_linear_directional(ctx,
+	sInt_32 affection_A = resolve_KruhobotCollision_linear_X_linear_directional(ctxAB,
 										    real_Instance,
 										    kruhobot_traversal_A_linear,
 										    kruhobot_traversal_B_linear,
@@ -1814,7 +1795,11 @@ namespace boOX
 										    last_conflict_id,
 										    infinity);
 	
-	sInt_32 affection_B = resolve_KruhobotCollision_linear_X_linear_directional(ctx,
+	LinearDifferentialContext ctxBA(real_Instance,
+					kruhobot_traversal_B_linear,
+					kruhobot_traversal_A_linear);	
+	
+	sInt_32 affection_B = resolve_KruhobotCollision_linear_X_linear_directional(ctxBA,
 										    real_Instance,
 										    kruhobot_traversal_B_linear,
 										    kruhobot_traversal_A_linear,
@@ -1921,7 +1906,7 @@ namespace boOX
 		    Interval check_intersection_B = kruhobot_traversal_B_linear.m_interval.intersect(Interval(tau_1, tau_2));
 			
 		    if (alpha > 0)
-		    {		    
+		    {
 			if (check_intersection_A.size() <= s_DELTION || check_intersection_B.size() <= s_DELTION)
 			{
 			    return 0;
