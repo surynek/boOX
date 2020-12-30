@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-129_planck                              */
+/*                             boOX 2-132_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbsR_test.cpp / 2-129_planck                                            */
+/* smtcbsR_test.cpp / 2-132_planck                                            */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search implemented
@@ -471,7 +471,7 @@ namespace boOX
     	crossing_map.add_Location(7, 3.0, 1.0);			
     
 	crossing_map.calc_AllPairsStraightDistances();
-	crossing_map.populate_Network(3.0);	
+	crossing_map.populate_Network(3.0, 0.1);	
 	crossing_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -560,7 +560,7 @@ namespace boOX
 	grid_map.add_Location(8, 2.0, 2.0);	       
 	    
 	grid_map.calc_AllPairsStraightDistances();
-	grid_map.populate_Network(1.5);	
+	grid_map.populate_Network(1.5, 0.1);	
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -652,7 +652,7 @@ namespace boOX
 	grid_map.add_Location(15, 3.0, 3.0);	       		
 	    
 	grid_map.calc_AllPairsStraightDistances();
-	grid_map.populate_Network(1.5);	
+	grid_map.populate_Network(1.5, 0.1);	
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));

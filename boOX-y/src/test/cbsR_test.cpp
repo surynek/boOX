@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-129_planck                              */
+/*                             boOX 2-132_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR_test.cpp / 2-129_planck                                               */
+/* cbsR_test.cpp / 2-132_planck                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Test of semi-continuous version of conflict-based search.
@@ -1077,7 +1077,7 @@ namespace boOX
     	crossing_map.add_Location(7, 3.0, 1.0);
 	
 	crossing_map.calc_AllPairsStraightDistances();
-	crossing_map.populate_Network(3.0);	
+	crossing_map.populate_Network(3.0, 0.1);	
 	crossing_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -1230,7 +1230,7 @@ namespace boOX
 	crossing_map.add_Location(4, 1.5, 1.0);		
 	
 	crossing_map.calc_AllPairsStraightDistances();
-	crossing_map.populate_Network(1.9);	
+	crossing_map.populate_Network(1.9, 0.1);	
 	crossing_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -1667,7 +1667,7 @@ namespace boOX
 	grid_map.add_Location(15, 3.0, 3.0);	       		
 	    
 	grid_map.calc_AllPairsStraightDistances();
-	grid_map.populate_Network(1.5);	
+	grid_map.populate_Network(1.5, 0.1);	
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -1771,7 +1771,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 0.25);
 	grid_map.add_Location(2, 2.0, 0.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -1838,7 +1838,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 0.25);
 	grid_map.add_Location(2, 2.0, 0.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -1906,7 +1906,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.0, 0.0);
 	grid_map.add_Location(3, 1.0, 2.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -1973,7 +1973,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.0, 0.0);
 	grid_map.add_Location(3, 1.0, 2.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2040,7 +2040,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.0, 0.0);
 	grid_map.add_Location(3, 1.0, 2.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.25, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2106,7 +2106,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 0.0);
 	grid_map.add_Location(2, 2.0, 0.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.2, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2180,7 +2180,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 0.0);
 	grid_map.add_Location(2, 2.0, 0.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.2, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2254,7 +2254,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 0.0);
 	grid_map.add_Location(2, 2.0, 0.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.2, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2328,7 +2328,7 @@ namespace boOX
 	grid_map.add_Location(1, 0.0, 1.0);
 	grid_map.add_Location(2, 1.0, 1.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.4, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2394,7 +2394,7 @@ namespace boOX
 	grid_map.add_Location(1, 0.0, 1.0);
 	grid_map.add_Location(2, 1.0, 1.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.4, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2460,7 +2460,7 @@ namespace boOX
 	grid_map.add_Location(1, 0.0, 1.0);
 	grid_map.add_Location(2, 1.0, 1.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.4, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2526,7 +2526,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 0.0);
 	grid_map.add_Location(2, 2.0, 0.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.4, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2593,7 +2593,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 1.0);
 	grid_map.add_Location(2, 2.0, 1.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.4, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2662,7 +2662,7 @@ namespace boOX
 	grid_map.add_Location(1, 1.0, 1.0);
 	grid_map.add_Location(2, 2.0, 1.0);
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.4, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2732,7 +2732,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.0, 0.0);
 	grid_map.add_Location(3, 1.0, 2.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2802,7 +2802,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.0, 1.05);
 	grid_map.add_Location(3, 2.0, 1.05);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2872,7 +2872,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.0, 1.1);
 	grid_map.add_Location(3, 2.0, 1.1);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -2940,7 +2940,7 @@ namespace boOX
 	grid_map.add_Location(0, 0.0, 1.0);
 	grid_map.add_Location(1, 2.0, 1.0);
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3010,7 +3010,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.01, 0.0);
 	grid_map.add_Location(3, 0.01, 2.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3080,7 +3080,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.0, 1.2);
 	grid_map.add_Location(3, 2.0, 1.2);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3150,7 +3150,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.1, 1.0);
 	grid_map.add_Location(3, 2.1, 1.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3220,7 +3220,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.0, 1.0);
 	grid_map.add_Location(3, 2.0, 1.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3290,7 +3290,7 @@ namespace boOX
 	grid_map.add_Location(2, 3.0, 0.9);
 	grid_map.add_Location(3, 1.0, 0.9);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3360,7 +3360,7 @@ namespace boOX
 	grid_map.add_Location(2, 3.0, 1.0);
 	grid_map.add_Location(3, 1.0, 1.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3430,7 +3430,7 @@ namespace boOX
 	grid_map.add_Location(2, 2.3, 1.0);
 	grid_map.add_Location(3, 0.3, 1.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3500,7 +3500,7 @@ namespace boOX
 	grid_map.add_Location(2, -0.1, 1.0);
 	grid_map.add_Location(3, -2.1, 1.0);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3570,7 +3570,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.2, 1.1);
 	grid_map.add_Location(3, 2.2, 1.1);	
 
-	// grid_map.populate_Network(1.1);
+	// grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3640,7 +3640,7 @@ namespace boOX
 	grid_map.add_Location(2, 2.0, 1.0);	
 	grid_map.add_Location(3, 1.0, 1.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3710,7 +3710,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.9, 1.0);	
 	grid_map.add_Location(3, 0.9, 1.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3780,7 +3780,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.9, 0.9);	
 	grid_map.add_Location(3, 0.9, 0.9);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3850,7 +3850,7 @@ namespace boOX
 	grid_map.add_Location(2, 1.9, 1.0);	
 	grid_map.add_Location(3, 0.9, 1.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3920,7 +3920,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.0, 1.0);	
 	grid_map.add_Location(3, 0.0, 0.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -3990,7 +3990,7 @@ namespace boOX
 	grid_map.add_Location(2, 0.19, 1.0);	
 	grid_map.add_Location(3, 0.19, 0.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -4059,7 +4059,7 @@ namespace boOX
 	grid_map.add_Location(1, 0.0, 0.0);
 	grid_map.add_Location(2, 0.0, 1.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));
@@ -4128,7 +4128,7 @@ namespace boOX
 	grid_map.add_Location(1, 0.0, 1.0);
 	grid_map.add_Location(2, 1.0, 0.0);	
 
-	grid_map.populate_Network(1.1);
+	grid_map.populate_Network(1.1, 0.1);
 	grid_map.to_Screen();
 
 	sKruhobot kruhobot_1(1, sKruhobot::Properties(0.1, 1.0, 1.0, M_PI / 4, M_PI / 6, s_wait_factor), sKruhobot::State(M_PI / 4, sKruhobot::Position(0.0, 0.0)));

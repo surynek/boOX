@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-129_planck                              */
+/*                             boOX 2-132_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.cpp / 2-129_planck                                       */
+/* mapR_convert_main.cpp / 2-132_planck                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -52,6 +52,7 @@ namespace boOX
       : m_neighbor_type(NEIGHBORHOOD_CIRCULAR)
       , m_neighbor_radius(1.0)
       , m_neighbor_k(-1)
+      , m_agent_radius(-1.0)
   {
      // nothing
   }
@@ -82,16 +83,18 @@ namespace boOX
 	printf("                   --output-mapR-file=<string>\n");
 	printf("                  [--neighbor-type={circular|radiant}]\n");		
 	printf("                  [--neighbor-radius=<double>]\n");
-	printf("                  [--neighbor-k=<int>]\n");	
+	printf("                  [--neighbor-k=<int>]\n");
+	printf("                   --agent-radius=<double>\n");		
 	printf("\n");
 	printf("Examples:\n");
 	printf("mapR_convert_boOX --input-map-file=ost003d.map\n");
 	printf("                  --output-file=ost003d.mapR\n");
 	printf("                  --neighbor-type=circular\n");		
-	printf("                  --neighbor-radius=2.0\n");	
+	printf("                  --neighbor-radius=2.0\n");
+	printf("                  --agent-radius=0.2\n");		
 	printf("\n");
 	printf("Defaults: --neighbor-type=circular\n");	
-	printf("          --neighbor-radius=1.0\n");	
+	printf("          --neighbor-radius=1.0\n");
 	printf("\n");
     }
 
@@ -121,7 +124,15 @@ namespace boOX
 	{
 	case sCommandParameters::NEIGHBORHOOD_CIRCULAR:
 	{
-	    real_Map.populate_NetworkCircular(parameters.m_neighbor_radius);
+	    if (parameters.m_agent_radius > 0)
+	    {
+		real_Map.populate_NetworkCircular(parameters.m_neighbor_radius, parameters.m_agent_radius);
+	    }
+	    else
+	    {
+		printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
+		return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;		
+	    }
 	    break;
 	}
 	case sCommandParameters::NEIGHBORHOOD_RADIANT:
@@ -130,8 +141,16 @@ namespace boOX
 	    {		
 		if (parameters.m_neighbor_k >= 2 && parameters.m_neighbor_k < sizeof(s_RADIANT_RADIUS_2K_NEIHBORHOOD) / sizeof(sDouble))
 		{
-		    sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
-		    real_Map.populate_NetworkRadiant(corresponding_radius);		    
+		    if (parameters.m_agent_radius > 0)
+		    {		
+			sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
+			real_Map.populate_NetworkRadiant(corresponding_radius, parameters.m_agent_radius);
+		    }
+		    else
+		    {
+			printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
+			return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;			
+		    }
 		}
 		else
 		{
@@ -141,7 +160,15 @@ namespace boOX
 	    }
 	    else
 	    {
-		real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		if (parameters.m_agent_radius > 0)
+		{		
+		    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius, parameters.m_agent_radius);
+		}
+		else
+		{
+		    printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
+		    return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;		    
+		}
 	    }
 	    break;
 	}
@@ -207,7 +234,7 @@ namespace boOX
 	    {
 	    case sCommandParameters::NEIGHBORHOOD_CIRCULAR:
 	    {
-		real_Map.populate_NetworkCircular(parameters.m_neighbor_radius);
+		real_Map.populate_NetworkCircular(parameters.m_neighbor_radius, parameters.m_agent_radius);
 		break;
 	    }
 	    case sCommandParameters::NEIGHBORHOOD_RADIANT:
@@ -216,8 +243,16 @@ namespace boOX
 		{		
 		    if (parameters.m_neighbor_k >= 2 && parameters.m_neighbor_k < sizeof(s_RADIANT_RADIUS_2K_NEIHBORHOOD) / sizeof(sDouble))
 		    {
-			sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
-			real_Map.populate_NetworkRadiant(corresponding_radius);		    
+			if (parameters.m_agent_radius > 0)
+			{
+			    sDouble corresponding_radius = s_RADIANT_RADIUS_2K_NEIHBORHOOD[parameters.m_neighbor_k];
+			    real_Map.populate_NetworkRadiant(corresponding_radius, parameters.m_agent_radius);
+			}
+			else
+			{
+			    printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
+			    return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;
+			}
 		    }
 		    else
 		    {
@@ -227,7 +262,15 @@ namespace boOX
 		}
 		else
 		{
-		    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius);
+		    if (parameters.m_agent_radius > 0)
+		    {
+			real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius, parameters.m_agent_radius);
+		    }
+		    else
+		    {
+			    printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
+			    return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;			
+		    }
 		}
 		break;
 	    }
@@ -304,6 +347,10 @@ namespace boOX
 	    {
 		return sMAPF_R_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
 	    }
+	}
+	else if (parameter.find("--agent-radius=") == 0)
+	{
+	    command_parameters.m_agent_radius = sDouble_from_String(parameter.substr(15, parameter.size()));
 	}	
 	else
 	{

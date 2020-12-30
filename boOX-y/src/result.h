@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-129_planck                              */
+/*                             boOX 2-132_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 2-129_planck                                                    */
+/* result.h / 2-132_planck                                                    */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -274,11 +274,12 @@ enum sTokenHamiltonutationSolverProgram_Result
 
 enum sRealMapConvertorProgram_Result
 {
-    sMAP_R_CONVERT_PROGRAM_INFO                          =  200000,
-    sMAP_R_CONVERT_PROGRAM_ERROR                         = -200000,
-    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR  = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
-    sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR   = (sMAP_R_CONVERT_PROGRAM_ERROR - 2),
-    sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 3)    
+    sMAP_R_CONVERT_PROGRAM_INFO                             =  200000,
+    sMAP_R_CONVERT_PROGRAM_ERROR                            = -200000,
+    sMAP_R_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR     = (sMAP_R_CONVERT_PROGRAM_ERROR - 1),
+    sMAP_R_CONVERT_PROGRAM_NO_MAP_FILE_SPECIFIED_ERROR      = (sMAP_R_CONVERT_PROGRAM_ERROR - 2),
+    sMAP_R_CONVERT_PROGRAM_K_NEIGHBOR_OUT_OF_RANGE_ERROR    = (sMAP_R_CONVERT_PROGRAM_ERROR - 3),
+    sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR = (sMAP_R_CONVERT_PROGRAM_ERROR - 4)
 };
 
 

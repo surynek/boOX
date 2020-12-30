@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-129_planck                              */
+/*                             boOX 2-132_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-129_planck                                                   */
+/* graph.cpp / 2-132_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -3067,6 +3067,8 @@ namespace boOX
 		add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
 	    }
 	}
+	initialize_InverseMatrix();
+	
 	return sRESULT_SUCCESS;
     }
 
@@ -3170,6 +3172,8 @@ namespace boOX
 		add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
 	    }
 	}
+	initialize_InverseMatrix();
+	
 	return sRESULT_SUCCESS;
     }
 
@@ -3661,6 +3665,7 @@ namespace boOX
 		}
 	    }
 	}
+	initialize_InverseMatrix();
 	    
 	return sRESULT_SUCCESS;
     }

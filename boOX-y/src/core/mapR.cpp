@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-129_planck                              */
+/*                             boOX 2-132_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 2-129_planck                                                    */
+/* mapR.cpp / 2-132_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -94,13 +94,13 @@ namespace boOX
     }
 
 
-    void s2DMap::populate_Network(sDouble max_distance)
+    void s2DMap::populate_Network(sDouble max_distance, sDouble agent_radius)
     {
-	populate_NetworkCircular(max_distance);
+	populate_NetworkCircular(max_distance, agent_radius);
     }
 
     
-    void s2DMap::populate_NetworkCircular(sDouble max_distance)
+    void s2DMap::populate_NetworkCircular(sDouble max_distance, sDouble agent_radius)
     {
 	for (sInt_32 u_id = 0; u_id < m_Locations.size() - 1; ++u_id)
 	{
@@ -109,10 +109,15 @@ namespace boOX
 		sDouble distance = calc_PointDistance(u_id, v_id);
 		
 		if (distance <= max_distance)
-		{
+		{		    
 		    if (!m_Network.is_Adjacent(u_id, v_id))
-		    {			
-			m_Network.add_Edge(u_id, v_id);
+		    {
+			bool visible = check_Visibility(u_id, v_id, agent_radius);
+
+			if (visible)
+			{
+			    m_Network.add_Edge(u_id, v_id);
+			}
 		    }
 		}
 	    }
@@ -120,7 +125,7 @@ namespace boOX
     }
 
     
-    void s2DMap::populate_NetworkRadiant(sDouble max_distance)
+    void s2DMap::populate_NetworkRadiant(sDouble max_distance, sDouble agent_radius)
     {
 	for (sInt_32 u_id = 0; u_id < m_Locations.size() - 1; ++u_id)
 	{
@@ -147,15 +152,97 @@ namespace boOX
 		    if (!underconnected)
 		    {
 			if (!m_Network.is_Adjacent(u_id, v_id))
-			{			
-			    m_Network.add_Edge(u_id, v_id);
+			{
+			    bool visible = check_Visibility(u_id, v_id, agent_radius);
+			    
+			    if (visible)
+			    {
+				m_Network.add_Edge(u_id, v_id);
+			    }
 			}
 		    }
 		}
 	    }
 	}	
     }
-    
+
+
+    bool s2DMap::check_Visibility(sInt_32 source_id, sInt_32 target_id, sDouble radius)
+    {
+	sDouble dX[] = { -0.5, 0.5, -0.5, 0.5 };
+	sDouble dY[] = { -0.5, -0.5, 0.5, 0.5 };
+
+	sInt_32 min_i, max_i, min_j, max_j;
+	
+	if (m_Network.m_inverse_Matrix[source_id].m_row < m_Network.m_inverse_Matrix[target_id].m_row)
+	{
+	    min_i = m_Network.m_inverse_Matrix[source_id].m_row;
+	    max_i = m_Network.m_inverse_Matrix[target_id].m_row;
+	}
+	else
+	{
+	    max_i = m_Network.m_inverse_Matrix[target_id].m_row;
+	    max_i = m_Network.m_inverse_Matrix[source_id].m_row;	    
+	}
+
+	if (m_Network.m_inverse_Matrix[source_id].m_column < m_Network.m_inverse_Matrix[target_id].m_column)
+	{
+	    min_j = m_Network.m_inverse_Matrix[source_id].m_column;
+	    max_j = m_Network.m_inverse_Matrix[target_id].m_column;
+	}
+	else
+	{
+	    min_j = m_Network.m_inverse_Matrix[target_id].m_column;
+	    max_j = m_Network.m_inverse_Matrix[source_id].m_column;	    
+	}
+	/*
+	printf("UV: %d --> %d\n", source_id, target_id);
+	printf("I: %d,%d J:%d,%d\n", min_i, max_i, min_j, max_j);
+	*/
+
+	sDouble x1 = m_Locations[source_id].m_x;
+	sDouble y1 = m_Locations[source_id].m_y;
+
+	sDouble x2 = m_Locations[target_id].m_x;
+	sDouble y2 = m_Locations[target_id].m_y;
+
+	/*
+	printf("XY: %.3f, %.3f --- %.3f, %.3f\n", x1, y1, x2, y2);
+	*/
+
+	sDouble a = y1 - y2;
+	sDouble b = x2 - x1;
+	sDouble c = -a * x1 -b * y1;
+
+	sDouble d = sqrt(a * a + b * b);
+	sASSERT(d > s_EPSILON);
+
+	for (sInt_32 i = min_i; i <= max_i; ++i)
+	{
+	    for (sInt_32 j = min_j; j <= max_j; ++j)
+	    {
+		sInt_32 v_id = m_Network.m_Matrix[i * m_Network.m_x_size + j];
+		
+		if (v_id < 0)
+		{
+		    for (sInt_32 k = 0; k < 4; ++k)
+		    {
+			sDouble px = j + dX[k];
+			sDouble py = i + dY[k];
+
+			sDouble D = sABS(a * px + b * py + c) / d;
+
+			if (D < radius)
+			{
+			    return false;
+			}
+		    }
+		}
+	    }
+	}
+	return true;
+    }
+
 
 /*----------------------------------------------------------------------------*/
 
@@ -1405,10 +1492,7 @@ namespace boOX
 	    {
 		std::map<sString, sInt_32, std::less<sString> > node_Mapping;
 		    
-		sInt_32 location_id = 0;
-		
-//		printf("beta\n");
-
+		sInt_32 location_id = 0;	
 		sString key1_keyword;
 		
 		sConsumeUntilChar(fr, '<');
