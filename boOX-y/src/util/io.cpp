@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* io.cpp / 2-132_planck                                                      */
+/* io.cpp / 2-147_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Input/output functions and utilities.
@@ -162,6 +162,25 @@ namespace boOX
 		break;
 	    }
 	    floatal_string += ch;
+	}
+	return chars_consumed;
+    }
+
+
+    sInt_32 sConsumeDigitalString(FILE *fr, sString &digital_string)
+    {
+	sInt_32 ch, chars_consumed = 0;
+
+	if ((ch = fgetc(fr)) != EOF)
+	{
+	    ++chars_consumed;
+	    
+	    if (!isdigit(ch))
+	    {
+		ungetc(ch, fr);
+		return 0;
+	    }
+	    digital_string += ch;
 	}
 	return chars_consumed;
     }    

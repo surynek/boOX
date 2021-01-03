@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* io.h / 2-132_planck                                                        */
+/* io.h / 2-147_planck                                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Input/output functions and utilities.
@@ -43,7 +43,8 @@ namespace boOX
     sInt_32 sConsumeAlphaString(FILE *fr, sString &alpha_string);
     sInt_32 sConsumeAlnumString(FILE *fr, sString &alnum_string);    
     sInt_32 sConsumeNumericString(FILE *fr, sString &numeric_string);
-    sInt_32 sConsumeFloatalString(FILE *fr, sString &floatal_string);    
+    sInt_32 sConsumeFloatalString(FILE *fr, sString &floatal_string);
+    sInt_32 sConsumeDigitalString(FILE *fr, sString &digital_string);    
 
     sInt_32 sConsumeWhiteSpaces(FILE *fr);
     

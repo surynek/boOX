@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 2-132_planck                                                  */
+/* kruhoR.cpp / 2-147_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1066,7 +1066,7 @@ namespace boOX
 
 	while (!active_Motions.empty() || !future_Motions.empty())
 	{
-	    // printf("%.3f: %ld,%ld\n", current_time, active_Motions.size(), future_Motions.size());
+	    //printf("%.3f: %ld,%ld\n", current_time, active_Motions.size(), future_Motions.size());
 	    
 	    for (Motions_list::iterator future_motion = future_Motions.begin(); future_motion != future_Motions.end();)
 	    {
@@ -1131,7 +1131,7 @@ namespace boOX
 		    sInt_32 kruhobot_A_id = (*active_motion_A)->m_kruhobot_id;
 		    sInt_32 kruhobot_B_id = (*active_motion_B)->m_kruhobot_id;
 
-//		    printf("%d --> %d, %d --> %d\n", (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id, (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id);
+		    //printf("%d --> %d, %d --> %d\n", (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id, (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id);
 
 //		    if (kruhobot_A_id != kruhobot_B_id)
 		    {

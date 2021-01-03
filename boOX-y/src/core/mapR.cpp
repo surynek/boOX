@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 2-132_planck                                                    */
+/* mapR.cpp / 2-147_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -132,7 +132,7 @@ namespace boOX
 	    for (sInt_32 v_id = u_id + 1; v_id < m_Locations.size(); ++v_id)
 	    {
 		sDouble distance = calc_PointDistance(u_id, v_id);
-		
+
 		if (distance <= max_distance)
 		{
 		    bool underconnected = false;
@@ -173,7 +173,7 @@ namespace boOX
 	sDouble dY[] = { -0.5, -0.5, 0.5, 0.5 };
 
 	sInt_32 min_i, max_i, min_j, max_j;
-	
+
 	if (m_Network.m_inverse_Matrix[source_id].m_row < m_Network.m_inverse_Matrix[target_id].m_row)
 	{
 	    min_i = m_Network.m_inverse_Matrix[source_id].m_row;
@@ -181,7 +181,7 @@ namespace boOX
 	}
 	else
 	{
-	    max_i = m_Network.m_inverse_Matrix[target_id].m_row;
+	    min_i = m_Network.m_inverse_Matrix[target_id].m_row;
 	    max_i = m_Network.m_inverse_Matrix[source_id].m_row;	    
 	}
 
@@ -1441,8 +1441,8 @@ namespace boOX
 		    sString number;
 		    sInt_32 position;
 		    
-		    sConsumeNumericString(fr, number);
-//		    printf("numo: %s\n", number.c_str());
+		    //sConsumeNumericString(fr, number);
+		    sConsumeDigitalString(fr, number);		    
 		    position = sInt_32_from_String(number);
 		    
 		    sConsumeWhiteSpaces(fr);
@@ -1643,6 +1643,7 @@ namespace boOX
 		return s2D_MAP_UNRECOGNIZED_XML_FORMATTING_ERROR;
 	    }
 	}
+	m_Network.initialize_InverseMatrix();
 	
 	/*
 	if (sFAILED(result = m_Network.from_Stream_map(fr)))

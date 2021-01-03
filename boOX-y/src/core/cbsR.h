@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbsR.h / 2-132_planck                                                      */
+/* cbsR.h / 2-147_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search for a semi-continuous version of MAPF.
@@ -84,7 +84,7 @@ namespace boOX
 
 	    bool compare_upper_less(const Interval &interval) const
 	    {
-		return (m_upper < interval.m_upper);
+		return (m_upper < interval.m_upper - s_EPSILON);
 	    }
 
 	    bool compare_lower_lteq(const Interval &interval) const

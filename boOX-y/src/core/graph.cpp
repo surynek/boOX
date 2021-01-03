@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-132_planck                                                   */
+/* graph.cpp / 2-147_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -3556,7 +3556,7 @@ namespace boOX
 	    }
 	    fprintf(fw, "</row>\n");
 	}	
-	fprintf(fw, "%s</grid>\n", indent.c_str());			
+	fprintf(fw, "%s</grid>\n", indent.c_str());
     }
     
 

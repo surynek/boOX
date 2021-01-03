@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR_generate_main.cpp / 2-132_planck                                    */
+/* kruhoR_generate_main.cpp / 2-147_planck                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) instance (real kruhobot
@@ -146,7 +146,8 @@ namespace boOX
 	    {
 		printf("Error: Failed to open xml map file %s (code = %d).\n", parameters.m_input_xml_map_filename.c_str(), result);
 		return result;
-	    }	    		
+	    }
+	    
 	    sRealConjunction start_conjunction(&real_Map, 0);    
 	    sRealConjunction goal_conjunction(&real_Map, 0);	
 

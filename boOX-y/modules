@@ -8,7 +8,7 @@ Core_boOX
 library
 /src/core
 /src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h graph.h agent.h smtcbs.h cbs.h icts.h cnf.h mapR.h kruhoR.h cbsR.h smtcbsR.h
-graph.cpp agent.cpp smtcbs.cpp cbs.cpp icts.cpp cnf.cpp mapR.cpp kruhoR.cpp cbsR.cpp smtcbsR.cpp
+graph.cpp agent.cpp smtcbs.cpp cbs.cpp icts.cpp cnf.cpp mapR.cpp kruhoR.cpp cbsR.cpp smtcbsR.cpp smtcbsR_rdd.cpp smtcbsR_sat.cpp smtcbsR_exact.cpp
 
 Util_boOX
 library

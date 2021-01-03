@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-132_planck                              */
+/*                             boOX 2-147_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.cpp / 2-132_planck                                       */
+/* mapR_convert_main.cpp / 2-147_planck                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -161,7 +161,7 @@ namespace boOX
 	    else
 	    {
 		if (parameters.m_agent_radius > 0)
-		{		
+		{
 		    real_Map.populate_NetworkRadiant(parameters.m_neighbor_radius, parameters.m_agent_radius);
 		}
 		else
@@ -268,8 +268,8 @@ namespace boOX
 		    }
 		    else
 		    {
-			    printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
-			    return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;			
+			printf("Error: Agent radius not specified, must be set > 0 (code = %d).\n", sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR);
+			return sMAP_R_CONVERT_PROGRAM_AGENT_RADIUS_NOT_SPECIFIED_ERROR;			
 		    }
 		}
 		break;
