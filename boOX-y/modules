@@ -47,6 +47,14 @@ agent_test.cpp
 pthread
 /src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
 
+test_mapR_boOX
+application
+/src/test
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h mapR_test.h
+mapR_test.cpp
+pthread
+/src/core/Core_boOX /src/common/Common_boOX /src/util/Util_boOX /src/glucose/Glucose_boOX
+
 test_kruhoR_boOX
 application
 /src/test

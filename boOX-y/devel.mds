@@ -6,6 +6,7 @@ test_basic_boOX
 test_graph_boOX
 test_agent_boOX
 test_cbs_boOX
+test_mapR_boOX
 test_kruhoR_boOX
 test_cbsR_boOX
 test_smtcbsR_boOX

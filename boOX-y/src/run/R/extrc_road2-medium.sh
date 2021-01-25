@@ -1,7 +1,7 @@
-PREFIX="road-medium"
+PREFIX="road2-medium"
 
-KRUHOBOTS_LIST=`cat kruhobots_road-medium`
-SCENARIOS_LIST=`cat scenarios_road-medium`
+KRUHOBOTS_LIST=`cat kruhobots_road2-medium`
+SCENARIOS_LIST=`cat scenarios_road2-medium`
 
 for KRUHOBOTS in $KRUHOBOTS_LIST;
 do

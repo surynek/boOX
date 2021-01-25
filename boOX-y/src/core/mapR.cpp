@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-147_planck                              */
+/*                             boOX 2-155_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 2-147_planck                                                    */
+/* mapR.cpp / 2-155_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -129,6 +129,7 @@ namespace boOX
     {
 	for (sInt_32 u_id = 0; u_id < m_Locations.size() - 1; ++u_id)
 	{
+//	    printf("%.3f %d\n", max_distance, u_id);
 	    for (sInt_32 v_id = u_id + 1; v_id < m_Locations.size(); ++v_id)
 	    {
 		sDouble distance = calc_PointDistance(u_id, v_id);
@@ -151,6 +152,8 @@ namespace boOX
 
 		    if (!underconnected)
 		    {
+//			printf("  @ %.3f\n", distance);
+		    
 			if (!m_Network.is_Adjacent(u_id, v_id))
 			{
 			    bool visible = check_Visibility(u_id, v_id, agent_radius);
@@ -173,6 +176,12 @@ namespace boOX
 	sDouble dY[] = { -0.5, -0.5, 0.5, 0.5 };
 
 	sInt_32 min_i, max_i, min_j, max_j;
+
+	printf("BOX: %d, %d, %d, %d\n",
+	       m_Network.m_inverse_Matrix[source_id].m_row,
+	       m_Network.m_inverse_Matrix[source_id].m_column,
+	       m_Network.m_inverse_Matrix[target_id].m_row,
+	       m_Network.m_inverse_Matrix[target_id].m_column);
 
 	if (m_Network.m_inverse_Matrix[source_id].m_row < m_Network.m_inverse_Matrix[target_id].m_row)
 	{
@@ -212,7 +221,7 @@ namespace boOX
 
 	sDouble a = y1 - y2;
 	sDouble b = x2 - x1;
-	sDouble c = -a * x1 -b * y1;
+	sDouble c = -a * x1 - b * y1;
 
 	sDouble d = sqrt(a * a + b * b);
 	sASSERT(d > s_EPSILON);
@@ -221,22 +230,48 @@ namespace boOX
 	{
 	    for (sInt_32 j = min_j; j <= max_j; ++j)
 	    {
+		printf("[%d,%d]\n", i, j);
 		sInt_32 v_id = m_Network.m_Matrix[i * m_Network.m_x_size + j];
 		
 		if (v_id < 0)
 		{
+		    sInt_32 sign = 0;
+		    
 		    for (sInt_32 k = 0; k < 4; ++k)
 		    {
 			sDouble px = j + dX[k];
 			sDouble py = i + dY[k];
 
-			sDouble D = sABS(a * px + b * py + c) / d;
-
-			if (D < radius)
+			sDouble D = (a * px + b * py + c) / d;
+			
+			if (D >= 0)
 			{
-			    return false;
+			    if (sign < 0)
+			    {
+//				printf("|+\n");
+				return false;
+			    }
+			    sign = 1;
+//			    printf("+");
 			}
+			else
+			{
+			    if (sign > 0)
+			    {
+//				printf("|-\n");
+				return false;
+			    }			    
+			    sign = -1;
+//			    printf("-");			    
+			}
+			
+			if (sABS(D) < radius)
+			{
+//			    printf("|o\n");
+			    return false;
+			}			
 		    }
+//		    printf("*\n");
 		}
 	    }
 	}

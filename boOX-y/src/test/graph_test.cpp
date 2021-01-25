@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-147_planck                              */
+/*                             boOX 2-155_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.cpp / 2-147_planck                                              */
+/* graph_test.cpp / 2-155_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
