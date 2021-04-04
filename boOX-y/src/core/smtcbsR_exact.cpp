@@ -377,7 +377,7 @@ namespace boOX
 /*----------------------------------------------------------------------------*/
 
 
-        sDouble sRealSMTCBS::find_ExactNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance                    &real_Instance,
+    sDouble sRealSMTCBS::find_ExactNonconflictingSchedules_individualizedConflictRespectful(const sRealInstance                    &real_Instance,
 											    KruhobotLocationConflicts_upper_vector &kruhobot_location_Conflicts,
 											    KruhobotUlinearConflicts_upper_vector   &kruhobot_linear_Conflicts,
 											    KruhobotSchedules_vector               &kruhobot_Schedules,
@@ -820,7 +820,8 @@ namespace boOX
 
 			printf("next RDD: %d\n", kruhobot_id);
 			to_Screen(next_kruhobot_RDDs[kruhobot_id]);			
-
+			*/
+                        /*
 			printf("Kruhobot location conflicts: %d\n", kruhobot_id);
 			for (LocationConflicts_upper__umap::const_iterator location_Conflict = kruhobot_location_Conflicts[kruhobot_id].begin(); location_Conflict != kruhobot_location_Conflicts[kruhobot_id].end(); ++location_Conflict)
 			{
@@ -842,6 +843,7 @@ namespace boOX
  		        printf("Next makespan bound: %.3f\n", next_makespan_bound);
 			*/
 		    }
+		    //getchar();
 		    #endif
 		}
 		sASSERT(next_makespan_bound > 0.0 || fingerprint_limit >= 0);

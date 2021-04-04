@@ -51,7 +51,7 @@ namespace boOX
 /*----------------------------------------------------------------------------*/
 // sRealSMTCBS
 
-        sDouble sRealSMTCBS::build_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
+    sDouble sRealSMTCBS::build_KruhobotRealDecisionDiagram(const sKruhobot                &kruhobot,
 							   const s2DMap                   &map,
 							   sInt_32                         source_loc_id,
 							   sInt_32                         sink_loc_id,

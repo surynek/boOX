@@ -3358,6 +3358,8 @@ namespace boOX
 		    #endif
 		}
 		//to_Screen(next_kruhobot_RDDs);
+		//getchar();
+		
 		//sDouble build_end_time = sStatistics::get_CPU_Seconds();				
 
 		sASSERT(next_makespan_bound > 0.0);
