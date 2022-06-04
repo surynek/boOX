@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.h / 2-050_planck                                                      */
+/* mapR.h / 2-162_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous maps for semi-continuous version of MAPF (MAPF-R).
@@ -85,10 +85,13 @@ namespace boOX
 	void add_Location(sInt_32 id, sDouble x, sDouble y);
 
 	void populate_Network(void);
-	void populate_Network(sDouble max_distance);
+	void populate_Network(sDouble max_distance, sDouble agent_radius);
 
-	void populate_NetworkCircular(sDouble max_distance);
-	void populate_NetworkRadiant(sDouble max_distance);	
+	void populate_NetworkCircular(sDouble max_distance, sDouble agent_radius);
+	void populate_NetworkRadiant(sDouble max_distance, sDouble agent_radius);
+
+	bool check_Visibility(sInt_32 source_id, sInt_32 target_id, sDouble agent_radius);
+	
 	/*----------------------------------------------------------------------------*/
 
 	sDouble calc_StraightDistance(sInt_32 source_id, sInt_32 target_id) const;

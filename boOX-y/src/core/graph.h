@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 2-050_planck                                                     */
+/* graph.h / 2-162_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -40,6 +40,7 @@ namespace boOX
     class sEdge;
     class sArc;
     class sVertex;
+    class sCBS;
 
    
 /*----------------------------------------------------------------------------*/
@@ -315,12 +316,17 @@ namespace boOX
 	void calc_EndpointShortestPaths(Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs);
 	void calc_EndpointShortestPaths(const VertexIDs_vector &endpoint_IDs);
 
-	sInt_32 calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs);
-	sInt_32 calc_MinimumSpanningTree(sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs);	
-	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs);
-	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs);	
+	sInt_32 calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs) const;
+	sInt_32 calc_MinimumSpanningTree(sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs) const;
+	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs) const;
+	sInt_32 calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs) const;
+
+	sInt_32 calc_MinimumHamiltonianPath(sCBS &CBS, sInt_32 start_id, const VertexIDs_vector &endpoint_IDs);
 
 	const Distances_2d_vector& get_EndpointShortestPaths(void) const;
+
+	void calc_HamiltonianCosts(sInt_32 start_id, const VertexIDs_vector &endpoint_IDs);	
+	void calc_HamiltonianCosts(sInt_32 start_id, const VertexIDs_vector &endpoint_IDs, Distances_vector &hamiltonian_Costs);
 	/*----------------------------------------------------------------------------*/
 
     public:
@@ -421,6 +427,9 @@ namespace boOX
 
 	VertexIDs_vector m_Queue;
 	Distances_vector m_Distances;
+
+	bool m_hamiltonian_costs_calculated;
+	Distances_vector m_hamiltonian_Costs;
     }; 
 
 

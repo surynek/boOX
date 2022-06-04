@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.cpp / 2-050_planck                                                  */
+/* kruhoR.cpp / 2-162_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1012,7 +1012,7 @@ namespace boOX
 
 	for (sInt_32 kruhobot_id = 1; kruhobot_id <= N_kruhobots; ++kruhobot_id)
 	{	    
-	    for (sInt_32 i = 1; i < kruhobot_Schedules[kruhobot_id].size(); ++i)
+	    for (sInt_32 i = 0; i < kruhobot_Schedules[kruhobot_id].size(); ++i)
 	    {
 		add_Motion(Motion(kruhobot_id,
 				  kruhobot_Schedules[kruhobot_id][i].m_from_loc_id,
@@ -1066,7 +1066,7 @@ namespace boOX
 
 	while (!active_Motions.empty() || !future_Motions.empty())
 	{
-//	    printf("%.3f: %ld,%ld\n", current_time, active_Motions.size(), future_Motions.size());
+	    //printf("%.3f: %ld,%ld\n", current_time, active_Motions.size(), future_Motions.size());
 	    
 	    for (Motions_list::iterator future_motion = future_Motions.begin(); future_motion != future_Motions.end();)
 	    {
@@ -1131,7 +1131,7 @@ namespace boOX
 		    sInt_32 kruhobot_A_id = (*active_motion_A)->m_kruhobot_id;
 		    sInt_32 kruhobot_B_id = (*active_motion_B)->m_kruhobot_id;
 
-//		    printf("%d --> %d, %d --> %d\n", (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id, (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id);
+		    //printf("%d --> %d, %d --> %d\n", (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id, (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id);
 
 //		    if (kruhobot_A_id != kruhobot_B_id)
 		    {
@@ -1152,22 +1152,24 @@ namespace boOX
 			sDouble R = rA + rB;
 			sDouble RR = R * R;
 
-			if (DD < RR)
+			if (DD < RR - s_EPSILON)
 			{
 			    #ifdef sVERBOSE
 			    {
-				printf("Collision between kruhobots %d and %d at time %.3f [positions: %d --> %d (%.3f,%.3f) x %d --> %d (%.3f,%.3f)]\n",
+				printf("Collision between kruhobots %d and %d at time %.3f [positions: %d --> %d (%.3f,%.3f) x %d --> %d (%.3f,%.3f)] {at times: [%.3f, %.3f] and [%.3f, %.3f]} \n",
 				       kruhobot_A_id,
 				       kruhobot_B_id,
 				       current_time,
 				       (*active_motion_A)->m_src_loc_id, (*active_motion_A)->m_dest_loc_id,
 				       xA, yA,
 				       (*active_motion_B)->m_src_loc_id, (*active_motion_B)->m_dest_loc_id,
-				       xB, yB);
+				       xB, yB,
+				       (*active_motion_A)->m_duration.m_start_time, (*active_motion_A)->m_duration.m_finish_time,
+				       (*active_motion_B)->m_duration.m_start_time, (*active_motion_B)->m_duration.m_finish_time);
 			    }
                             #endif
-			    
-			    return sREAL_SOLUTION_COLLISION_INFO;
+
+			    return sREAL_SOLUTION_COLLISION_INFO;			    
 			}
 		    }
 		}
@@ -1175,7 +1177,7 @@ namespace boOX
 	    
 	    current_time += simulation_step;
 	}
-
+	
 	return sRESULT_SUCCESS;
     }
     

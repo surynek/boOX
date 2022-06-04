@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 2-050_planck                                                     */
+/* agent.h / 2-162_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -380,13 +380,21 @@ namespace boOX
 		 const sConfiguration   &start_configuration,
 		 const sCommitment      &goal_commitment);
 
+	sMission(const sInstance &instance, sInt_32 N_agents, sInt_32 N_tasks);
+
     public:
 	void collect_Endpoints(VertexIDs_vector &endpoint_IDs) const;		
 	void collect_Endpoints(VertexIDs_vector &source_IDs, VertexIDs_vector &goal_IDs) const;
+	void calc_HamiltonianCosts(void);
 
 	sInt_32 estimate_TotalHamiltonianCost(sInt_32 &max_individual_cost);
 	sInt_32 estimate_TotalHamiltonianCost_rough(sInt_32 &max_individual_cost);
 	sInt_32 estimate_TotalHamiltonianCost_spanning(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalHamiltonianCost_hamiltonian(sInt_32 &max_individual_cost);
+
+	sInt_32 estimate_TotalKarpianCost(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalKarpianCost_rough(sInt_32 &max_individual_cost);
+	sInt_32 estimate_TotalKarpianCost_spanning(sInt_32 &max_individual_cost);	
 	
 	/*
 	sInt_32 estimate_TotalPathCost(sInt_32 &max_individual_cost);
@@ -444,6 +452,11 @@ namespace boOX
 						  MDD_vector &MDD,
 						  sInt_32    &extra_cost,
 						  MDD_vector &extra_MDD);
+
+	sInt_32 construct_HamiltonianMDD_hamiltonian(sInt_32     max_total_cost,
+						     MDD_vector &MDD,
+						     sInt_32    &extra_cost,
+						     MDD_vector &extra_MDD);	
 	
 	sInt_32 construct_GraphHamiltonianMDD_rough(sUndirectedGraph &graph,
 						    sInt_32           max_total_cost,
@@ -454,7 +467,38 @@ namespace boOX
 						       sInt_32           max_total_cost,
 						       MDD_vector       &MDD,
 						       sInt_32          &extra_cost,
-						       MDD_vector       &extra_MDD);	
+						       MDD_vector       &extra_MDD);
+	sInt_32 construct_GraphHamiltonianMDD_hamiltonian(sUndirectedGraph &graph,
+							  sInt_32           max_total_cost,
+							  MDD_vector       &MDD,
+							  sInt_32          &extra_cost,
+							  MDD_vector       &extra_MDD);	
+
+	sInt_32 construct_KarpianMDD(sInt_32     max_total_cost,
+				     MDD_vector &MDD,
+				     sInt_32    &extra_cost,
+				     MDD_vector &extra_MDD);
+	
+	sInt_32 construct_KarpianMDD_rough(sInt_32     max_total_cost,
+					   MDD_vector &MDD,
+					   sInt_32    &extra_cost,
+					   MDD_vector &extra_MDD);
+
+	sInt_32 construct_KarpianMDD_spanning(sInt_32     max_total_cost,
+					      MDD_vector &MDD,
+					      sInt_32    &extra_cost,
+					      MDD_vector &extra_MDD);
+	
+	sInt_32 construct_GraphKarpianMDD_rough(sUndirectedGraph &graph,
+						sInt_32           max_total_cost,
+						MDD_vector       &MDD,
+						sInt_32          &extra_cost,
+						MDD_vector       &extra_MDD);
+	sInt_32 construct_GraphKarpianMDD_spanning(sUndirectedGraph &graph,
+						   sInt_32           max_total_cost,
+						   MDD_vector       &MDD,
+						   sInt_32          &extra_cost,
+						   MDD_vector       &extra_MDD);		
         /*----------------------------------------------------------------------------*/	
 
 	static void construct_InverseMDD(const MDD_vector &MDD, InverseMDD_vector &inverse_MDD);
@@ -492,7 +536,9 @@ namespace boOX
     public:
 	sUndirectedGraph m_environment;
 	sConfiguration m_start_configuration;
-	sCommitment m_goal_commitment;	
+	sCommitment m_goal_commitment;
+
+	sUndirectedGraph::Distances_2d_vector m_hamiltonian_Costs;	
     };
 
     

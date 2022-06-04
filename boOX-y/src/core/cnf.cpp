@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 2-050_planck                                                     */
+/* cnf.cpp / 2-162_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -476,6 +476,22 @@ namespace boOX
 	}
 	#endif
     }
+
+
+    void sBoolEncoder::cast_Biimplication(Glucose::Solver *solver,
+					  sInt_32          variable_ID_PREC_A,
+					  sInt_32          variable_ID_PREC_B,
+					  sInt_32          variable_ID_POST,
+					  sInt_32          sUNUSED(weight))
+    {
+	cast_Clause(solver, -variable_ID_PREC_A, -variable_ID_PREC_B, variable_ID_POST);
+
+        #ifdef sSTATISTICS
+	{
+	    s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses += 1;
+	}
+	#endif
+    }    
 
 
     void sBoolEncoder::cast_NonImplication(Glucose::Solver *solver,

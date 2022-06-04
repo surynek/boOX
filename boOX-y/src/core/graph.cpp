@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-050_planck                                                   */
+/* graph.cpp / 2-162_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -28,6 +28,7 @@
 
 #include "common/types.h"
 #include "core/graph.h"
+#include "core/cbs.h"
 
 using namespace boOX;
 
@@ -1215,7 +1216,7 @@ namespace boOX
     }
 
 
-    void sUndirectedGraph::add_Vertex(sInt_32 id, sInt_32 capacity)
+    void sUndirectedGraph::add_Vertex(sInt_32 sUNUSED_(id), sInt_32 capacity)
     {
 	sASSERT(m_Vertices.size() == id);
 	m_Vertices.push_back(sVertex(m_Vertices.size(), capacity));
@@ -2017,19 +2018,19 @@ namespace boOX
     }
 
 
-    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs)
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const VertexIDs_vector &endpoint_IDs) const
     {
 	return calc_MinimumSpanningTree(m_endpoint_Distances, endpoint_IDs);
     }
 
 
-    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs)
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs) const
     {
 	return calc_MinimumSpanningTree(m_endpoint_Distances, exception_id, endpoint_IDs);
     }    
 
     
-    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs)
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, const VertexIDs_vector &endpoint_IDs) const
     {
 	sInt_32 tree_cost = 0;
 	
@@ -2092,7 +2093,7 @@ namespace boOX
     }
 
 
-    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs)
+    sInt_32 sUndirectedGraph::calc_MinimumSpanningTree(const Distances_2d_vector &endpoint_Distances, sInt_32 exception_id, const VertexIDs_vector &endpoint_IDs) const
     {
 	sInt_32 tree_cost = 0;
 	
@@ -2165,7 +2166,66 @@ namespace boOX
 	}
 
 	return tree_cost;
-    }    
+    }
+
+
+    sInt_32 sUndirectedGraph::calc_MinimumHamiltonianPath(sCBS &CBS, sInt_32 start_id, const VertexIDs_vector &endpoint_IDs)
+    {
+	//sCBS::VertexIDs_vector source_IDs, sink_IDs;
+	//source_IDs = endpoint_IDs;
+
+	//calc_SourceGoalShortestPaths(CBS.m_source_Distances, CBS.m_goal_Distances, source_IDs, sink_IDs);
+	//calc_EndpointShortestPaths(endpoint_IDs);
+
+	sCBS::Conflicts_vector vertex_Conflicts;
+	sCBS::EdgeConflicts_vector edge_Conflicts;
+
+	VertexIDs_vector Path;
+       
+	sInt_32 hamiltonian_cost = CBS.findUltraStar_NonconflictingHamiltonian(*this,
+									       start_id,
+									       endpoint_IDs,
+									       -1,
+									       0,
+									       vertex_Conflicts,
+									       edge_Conflicts,
+									       Path);
+
+	return hamiltonian_cost;
+    }
+
+
+    void sUndirectedGraph::calc_HamiltonianCosts(sInt_32 start_id, const VertexIDs_vector &endpoint_IDs)
+    {
+	calc_HamiltonianCosts(start_id, endpoint_IDs, m_hamiltonian_Costs);
+	m_hamiltonian_costs_calculated = true;
+    }
+
+    
+    void sUndirectedGraph::calc_HamiltonianCosts(sInt_32 start_id, const VertexIDs_vector &endpoint_IDs, Distances_vector &hamiltonian_Costs)
+    {
+	sCBS CBS((sInstance*)NULL);
+
+	CBS.m_source_Distances = m_source_Distances;
+	CBS.m_goal_Distances = m_goal_Distances;
+	hamiltonian_Costs.resize(m_Vertices.size(), 0);
+
+	for (Vertices_vector::const_iterator vertex = m_Vertices.begin(); vertex != m_Vertices.end(); ++vertex)
+	{
+	    VertexIDs_vector extended_endpoint_IDs;
+	    
+	    for (VertexIDs_vector::const_iterator endpoint = endpoint_IDs.begin(); endpoint != endpoint_IDs.end(); ++endpoint)
+	    {
+		if (vertex->m_id != *endpoint)
+		{
+		    extended_endpoint_IDs.push_back(*endpoint);
+		}
+	    }
+	    extended_endpoint_IDs.push_back(vertex->m_id);	    
+	    
+	    hamiltonian_Costs[vertex->m_id] = calc_MinimumHamiltonianPath(CBS, start_id, extended_endpoint_IDs);
+	}
+    }
 
 
     const sUndirectedGraph::Distances_2d_vector& sUndirectedGraph::get_EndpointShortestPaths(void) const
@@ -3007,6 +3067,8 @@ namespace boOX
 		add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
 	    }
 	}
+	initialize_InverseMatrix();
+	
 	return sRESULT_SUCCESS;
     }
 
@@ -3110,6 +3172,8 @@ namespace boOX
 		add_Edge(m_Matrix[u_id], m_Matrix[v_id]);
 	    }
 	}
+	initialize_InverseMatrix();
+	
 	return sRESULT_SUCCESS;
     }
 
@@ -3492,7 +3556,7 @@ namespace boOX
 	    }
 	    fprintf(fw, "</row>\n");
 	}	
-	fprintf(fw, "%s</grid>\n", indent.c_str());			
+	fprintf(fw, "%s</grid>\n", indent.c_str());
     }
     
 
@@ -3601,6 +3665,7 @@ namespace boOX
 		}
 	    }
 	}
+	initialize_InverseMatrix();
 	    
 	return sRESULT_SUCCESS;
     }

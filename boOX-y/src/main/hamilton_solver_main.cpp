@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* hamilton_solver_main.cpp / 2-050_planck                                    */
+/* hamilton_solver_main.cpp / 2-162_planck                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Hamiltonian Path Finding Solver - main program.
@@ -82,7 +82,7 @@ namespace boOX
 	printf("hamilton_solver_boOX  --input-file=<string>\n");
 	printf("                      --output-file=<sting>\n");
 	printf("                     [--cost-limit=<int>]\n");
-	printf("                     [--algorithm={smtcbs++|smtcbs+++}]\n");
+	printf("                     [--algorithm={cbs+++|cbs++++|cbs#|cbs#+|smtcbs++|smtcbs+++|smtcbs#|smtcbs#+}]\n");
         printf("		     [--timeout=<double>]\n");
 	printf("\n");
 	printf("Examples:\n");
@@ -117,6 +117,50 @@ namespace boOX
 	
 	switch (parameters.m_algorithm)
 	{
+	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("CBS-PLUS-PLUS-PLUS");
+	    }
+  	    #endif
+	    sCBS cbs_Solver(&mission, parameters.m_timeout);
+	    cost = cbs_Solver.find_ShortestNonconflictingHamiltonian_DeltaSuperStar(solution, parameters.m_cost_limit);
+	    break;
+	}
+	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("CBS-PLUS-PLUS-PLUS-PLUS");
+	    }
+  	    #endif
+	    sCBS cbs_Solver(&mission, parameters.m_timeout);
+	    cost = cbs_Solver.find_ShortestNonconflictingHamiltonian_DeltaHyperStar(solution, parameters.m_cost_limit);
+	    break;
+	}
+	case sCommandParameters::ALGORITHM_CBS_ULTRA:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("CBS-ULTRA");
+	    }
+  	    #endif
+	    sCBS cbs_Solver(&mission, parameters.m_timeout);
+	    cost = cbs_Solver.find_ShortestNonconflictingHamiltonian_DeltaUltraStar(solution, parameters.m_cost_limit);
+	    break;
+	}	
+	case sCommandParameters::ALGORITHM_CBS_ULTRA_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("CBS-ULTRA-PLUS");
+	    }
+  	    #endif
+	    sCBS cbs_Solver(&mission, parameters.m_timeout);
+	    cost = cbs_Solver.find_ShortestNonconflictingHamiltonian_DeltaUltraStarPlus(solution, parameters.m_cost_limit);
+	    break;
+	}	    		
 	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS:
 	{
             #ifdef sSTATISTICS
@@ -142,7 +186,33 @@ namespace boOX
 	    sSMTCBS smtcbs_Solver(&encoder, &mission, parameters.m_timeout);
 	    cost = smtcbs_Solver.find_ShortestNonconflictingHamiltonianInverseDepletedSpanning(solution, parameters.m_cost_limit);
 	    break;
-	}				
+	}	
+	case sCommandParameters::ALGORITHM_SMTCBS_ULTRA:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-ULTRA");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, &mission, parameters.m_timeout);
+	    cost = smtcbs_Solver.find_ShortestNonconflictingHamiltonianInverseDepletedHamilton(solution, parameters.m_cost_limit);
+	    break;
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_ULTRA_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-ULTRA-PLUS");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, &mission, parameters.m_timeout);
+	    cost = smtcbs_Solver.find_ShortestNonconflictingHamiltonianInverseDepletedHamiltonPlus(solution, parameters.m_cost_limit);
+	    break;
+	}					
 	default:
 	{
 	    sASSERT(false);
@@ -215,14 +285,38 @@ namespace boOX
 	{
 	    sString algorithm_str = parameter.substr(12, parameter.size());
 
-	    if (algorithm_str == "smtcbs++")
+	    if (algorithm_str == "cbs+++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS;
+	    }
+	    else if (algorithm_str == "cbs++++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS_PLUS;
+	    }
+	    else if (algorithm_str == "cbs#")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_ULTRA;
+	    }
+	    else if (algorithm_str == "cbs#+")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_CBS_ULTRA_PLUS;
+	    }	    	    	    	    
+	    else if (algorithm_str == "smtcbs++")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
 	    }
 	    else if (algorithm_str == "smtcbs+++")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS;
-	    }	    
+	    }
+	    else if (algorithm_str == "smtcbs#")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_ULTRA;
+	    }
+	    else if (algorithm_str == "smtcbs#+")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_ULTRA_PLUS;
+	    }	    	    	    
 	    else
 	    {
 		return sHAMILTON_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

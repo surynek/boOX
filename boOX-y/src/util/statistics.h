@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* statistics.h / 2-050_planck                                                */
+/* statistics.h / 2-162_planck                                                */
 /*----------------------------------------------------------------------------*/
 //
 // Statistical data collection and analytical tools.
@@ -60,7 +60,8 @@ namespace boOX
 	    sDouble m_WC_Seconds;
 	    sDouble m_CPU_Seconds;
 
-	    sUInt_64 m_search_Steps;
+	    sUInt_64 m_micro_search_Steps;
+	    sUInt_64 m_macro_search_Steps;	    
 	    sUInt_64 m_move_Executions;
 
 	    sUInt_64 m_produced_cnf_Clauses;

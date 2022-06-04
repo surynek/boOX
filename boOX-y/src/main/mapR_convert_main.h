@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR_convert_main.h / 2-050_planck                                         */
+/* mapR_convert_main.h / 2-162_planck                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Continuous Multi-Agent Path Finding (MAPF-R) map convertor - main program.
@@ -57,6 +57,7 @@ namespace boOX
 	Neighborhood m_neighbor_type;
 	sDouble m_neighbor_radius;
 	sInt_32 m_neighbor_k;
+	sDouble m_agent_radius;
     };
 
 

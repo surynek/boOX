@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph_test.h / 2-050_planck                                                */
+/* graph_test.h / 2-162_planck                                                */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.
@@ -40,7 +40,9 @@ namespace boOX
     void test_undirected_graph_2(int N_Vertices, double edge_prob);
     void test_undirected_graph_3(const sString &filename);
     void test_undirected_graph_4(void);
-    void test_undirected_graph_5(void);    
+    void test_undirected_graph_5(void);
+    void test_undirected_graph_6(void);
+    void test_undirected_graph_7(void);    
 
     void test_statistics_1(void);
 

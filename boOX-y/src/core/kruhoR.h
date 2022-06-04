@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-050_planck                              */
+/*                             boOX 2-162_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2020 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* kruhoR.h / 2-050_planck                                                    */
+/* kruhoR.h / 2-162_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -298,6 +298,22 @@ namespace boOX
 	    {
 		return (m_kruhobot_id == motion.m_kruhobot_id && m_duration.m_start_time == motion.m_duration.m_start_time);
 	    }
+
+	    void to_Screen(const sString &indent = "") const
+	    {
+		to_Stream(stdout, indent);
+	    }
+	    
+	    void to_Stream(FILE *fw, const sString &indent = "") const
+	    {
+		fprintf(fw, "%s%d: %d --> %d [%.3f, %.3f]\n",
+			indent.c_str(),
+			m_kruhobot_id,
+			m_src_loc_id,
+			m_dest_loc_id,
+			m_duration.m_start_time,
+			m_duration.m_finish_time);
+	    }	    
 
 	    sInt_32 m_kruhobot_id;	    
 	    sInt_32 m_src_loc_id;
