@@ -1,0 +1,12 @@
+./mkversion
+./config_devel
+
+python augment.py
+make clean
+
+./incmajor
+./mkversion
+./config
+
+python augment.py
+make clean

@@ -1,0 +1,8 @@
+Kruhobots: 1
+    1: [r = 0.4, lv = 1.000, la = -1.000, av = -1.000, aa = -1.000, wf = 0.200]
+Start
+    Assignments: 1
+        1->0
+Goal
+    Assignments: 1
+        1->1

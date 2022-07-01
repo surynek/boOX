@@ -1,0 +1,8 @@
+VERSION_SHORT=`cat major`
+VERSION=$VERSION_SHORT"-"`cat step`
+VERSION_FULL=$VERSION_SHORT"-"`cat step`"_"`cat codename`
+VERSION_BUILD=$VERSION_FULL
+
+echo -n $VERSION > version_short
+echo -n $VERSION_FULL > version
+echo -n $VERSION_BUILD > build
