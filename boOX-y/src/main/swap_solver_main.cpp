@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-162_planck                              */
+/*                             boOX 2-170_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.cpp / 2-162_planck                                        */
+/* swap_solver_main.cpp / 2-170_planck                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
@@ -206,7 +206,20 @@ namespace boOX
 	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);	    	    	    
 	    cost = smtcbs_Solver.find_ShortestNonconflictingSwappingInverseDepleted(solution, parameters.m_cost_limit);
 	    break;
-	}		
+	}
+	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS:
+	{
+            #ifdef sSTATISTICS
+	    {
+		s_GlobalStatistics.enter_Phase("SMTCBS-PLUS-PLUS-PLUS");
+	    }
+	    #endif
+	    
+	    sBoolEncoder encoder;
+	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);	    	    	    
+	    cost = smtcbs_Solver.find_ShortestNonconflictingSwappingInverseOmitted(solution, parameters.m_cost_limit);
+	    break;
+	}			
 	default:
 	{
 	    sASSERT(false);
@@ -305,7 +318,11 @@ namespace boOX
 	    else if (algorithm_str == "smtcbs++")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
-	    }	    	    
+	    }
+	    else if (algorithm_str == "smtcbs+++")
+	    {
+		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS;
+	    }	    	    	    
 	    else
 	    {
 		return sSWAP_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

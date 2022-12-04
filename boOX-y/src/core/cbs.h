@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-162_planck                              */
+/*                             boOX 2-170_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 2-162_planck                                                       */
+/* cbs.h / 2-170_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -51,6 +51,7 @@ namespace boOX
     {
     public:
 	typedef std::vector<sInt_32> VertexIDs_vector;
+	typedef std::vector<VertexIDs_vector> VertexIDs_2vector;
 	typedef std::vector<sInt_32> AgentIDs_vector;
 	
 	typedef std::list<sInt_32> VertexIDs_list;
@@ -61,6 +62,7 @@ namespace boOX
 	typedef std::vector<VertexIDs_uset> Conflicts_vector;
 	typedef std::vector<NeighborIDs_umap> EdgeConflicts_vector;
 	typedef std::vector<VertexIDs_vector> AgentPaths_vector;
+	typedef std::vector<VertexIDs_2vector> AgentTrees_vector;
 
 	typedef std::vector<Conflicts_vector> AgentConflicts_vector;
 	typedef std::vector<EdgeConflicts_vector> AgentEdgeConflicts_vector;		

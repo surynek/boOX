@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-162_planck                              */
+/*                             boOX 2-170_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cliquegen_main.h / 2-162_planck                                            */
+/* cliquegen_main.h / 2-170_planck                                            */
 /*----------------------------------------------------------------------------*/
 //
 // Clique Graph Instance Generator - main program.

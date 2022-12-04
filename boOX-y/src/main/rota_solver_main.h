@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-162_planck                              */
+/*                             boOX 2-170_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.h / 2-162_planck                                          */
+/* rota_solver_main.h / 2-170_planck                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.
@@ -48,7 +48,8 @@ namespace boOX
 	    ALGORITHM_CBS_PLUS_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS,
 	    ALGORITHM_SMTCBS_PLUS,
-	    ALGORITHM_SMTCBS_PLUS_PLUS	    
+	    ALGORITHM_SMTCBS_PLUS_PLUS,
+	    ALGORITHM_SMTCBS_PLUS_PLUS_PLUS	    
 	};
 
 	sCommandParameters();
