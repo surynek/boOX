@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-170_planck                              */
+/*                             boOX 2-182_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-170_planck                                                   */
+/* agent.cpp / 2-182_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1753,14 +1753,33 @@ namespace boOX
 	return construct_GraphPathMDD(m_environment, max_total_cost, MDD, extra_cost, extra_MDD);	
     }
 
-    
+
     sInt_32 sInstance::construct_GraphPathMDD(sUndirectedGraph &graph,
 					      sInt_32           max_total_cost,
 					      MDD_vector       &MDD,
 					      sInt_32          &extra_cost,
 					      MDD_vector       &extra_MDD)
     {
-	sInt_32 max_individual_cost;
+	sInt_32 dummy_min_total_cost, dummy_max_individual_cost;
+
+	return construct_GraphPathMDD(graph,
+				      max_total_cost,
+				      MDD,
+				      extra_cost,
+				      dummy_min_total_cost,
+				      dummy_max_individual_cost,
+				      extra_MDD);
+    }
+    
+    
+    sInt_32 sInstance::construct_GraphPathMDD(sUndirectedGraph &graph,
+					      sInt_32           max_total_cost,
+					      MDD_vector       &MDD,
+					      sInt_32          &extra_cost,
+					      sInt_32          &min_total_cost,
+					      sInt_32          &max_individual_cost,
+					      MDD_vector       &extra_MDD)
+    {
 	sInt_32 N_Vertices = graph.get_VertexCount();	
 
 	MDD.clear();
@@ -1771,7 +1790,7 @@ namespace boOX
 	collect_Endpoints(source_IDs, goal_IDs);
 
 	graph.calc_SourceGoalShortestPaths(source_IDs, goal_IDs);
-	sInt_32 min_total_cost = estimate_TotalPathCost(max_individual_cost);
+	min_total_cost = estimate_TotalPathCost(max_individual_cost);
 	
 	const sUndirectedGraph::Distances_2d_vector &source_Distances = graph.get_SourceShortestPaths();
 	const sUndirectedGraph::Distances_2d_vector &goal_Distances = graph.get_GoalShortestPaths();	

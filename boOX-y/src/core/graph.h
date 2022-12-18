@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-170_planck                              */
+/*                             boOX 2-182_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 2-170_planck                                                     */
+/* graph.h / 2-182_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.

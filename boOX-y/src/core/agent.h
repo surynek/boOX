@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-170_planck                              */
+/*                             boOX 2-182_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 2-170_planck                                                     */
+/* agent.h / 2-182_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -231,6 +231,14 @@ namespace boOX
 				       sInt_32           max_total_cost,
 				       MDD_vector       &MDD,
 				       sInt_32          &extra_cost,
+				       MDD_vector       &extra_MDD);
+	
+	sInt_32 construct_GraphPathMDD(sUndirectedGraph &graph,
+				       sInt_32           max_total_cost,
+				       MDD_vector       &MDD,
+				       sInt_32          &extra_cost,
+				       sInt_32          &min_total_cost,
+				       sInt_32          &max_individual_cost,
 				       MDD_vector       &extra_MDD);
 
 	sInt_32 construct_SwappingMDD(sInt_32     max_total_cost,
