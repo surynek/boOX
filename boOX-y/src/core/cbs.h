@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-163_planck                              */
+/*                             boOX 2-189_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 2-163_planck                                                       */
+/* cbs.h / 2-189_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -51,6 +51,7 @@ namespace boOX
     {
     public:
 	typedef std::vector<sInt_32> VertexIDs_vector;
+	typedef std::vector<VertexIDs_vector> VertexIDs_2vector;
 	typedef std::vector<sInt_32> AgentIDs_vector;
 	
 	typedef std::list<sInt_32> VertexIDs_list;
@@ -61,6 +62,7 @@ namespace boOX
 	typedef std::vector<VertexIDs_uset> Conflicts_vector;
 	typedef std::vector<NeighborIDs_umap> EdgeConflicts_vector;
 	typedef std::vector<VertexIDs_vector> AgentPaths_vector;
+	typedef std::vector<VertexIDs_2vector> AgentTrees_vector;
 
 	typedef std::vector<Conflicts_vector> AgentConflicts_vector;
 	typedef std::vector<EdgeConflicts_vector> AgentEdgeConflicts_vector;		
@@ -229,6 +231,7 @@ namespace boOX
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;
+	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const;	
 	sInt_32 fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;	
 	/*----------------------------------------------------------------------------*/		
 	

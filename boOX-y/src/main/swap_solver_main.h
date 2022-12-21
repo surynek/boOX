@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-163_planck                              */
+/*                             boOX 2-189_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.h / 2-163_planck                                          */
+/* swap_solver_main.h / 2-189_planck                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.
@@ -48,7 +48,8 @@ namespace boOX
 	    ALGORITHM_CBS_PLUS_PLUS_PLUS,	    
 	    ALGORITHM_SMTCBS,
 	    ALGORITHM_SMTCBS_PLUS,
-	    ALGORITHM_SMTCBS_PLUS_PLUS
+	    ALGORITHM_SMTCBS_PLUS_PLUS,
+	    ALGORITHM_SMTCBS_PLUS_PLUS_PLUS
 	};
 
 	sCommandParameters();

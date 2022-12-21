@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-163_planck                              */
+/*                             boOX 2-189_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 2-163_planck                                                     */
+/* cnf.cpp / 2-189_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -363,7 +363,16 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
 	}
 	#endif
-    }    
+    }
+
+    
+    void sBoolEncoder::cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions)
+    {
+	sInt_32 glu_var = variable_ID - 1;
+	sASSERT(glu_var < solver->nVars());
+	
+	goal_Assumptions.push(Glucose::mkLit(glu_var, false));	
+    }
 
 
     void sBoolEncoder::cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 sUNUSED(weight))
@@ -375,8 +384,17 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
 	}
 	#endif
-    }    
+    }
 
+    
+    void sBoolEncoder::cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions)
+    {
+	sInt_32 glu_var = variable_ID - 1;
+	sASSERT(glu_var < solver->nVars());
+	
+	goal_Assumptions.push(~Glucose::mkLit(glu_var, false));	
+    }
+    
 
     void sBoolEncoder::cast_TriangleMutex(Glucose::Solver *solver,
 					  sInt_32          variable_ID_A,
@@ -756,6 +774,7 @@ namespace boOX
 */
 	     }
 	 }
+	
 	 for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
 	 {
 	     for (sInt_32 j = cardinality; j < variable_IDs.size(); ++j)
@@ -767,9 +786,105 @@ namespace boOX
 */
 	     }
 	 }
+    }
+
+
+    void sBoolEncoder::cast_Cardinality_inactive(Glucose::Solver    *solver,
+						 VariableIDs_vector &variable_IDs,
+						 sInt_32             sUNUSED(cardinality),
+						 sInt_32            &last_variable_ID,
+						 sInt_32             sUNUSED(weight))
+    {
+	 VariableIDs_2vector partial_sum_auxiliary;
+	 partial_sum_auxiliary.resize(variable_IDs.size());
+	 
+	 for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	 {
+	     partial_sum_auxiliary[i].resize(variable_IDs.size());
+	 }
+
+	 last_variable_ID = m_last_variable_ID;
+	 
+	 for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	 {
+	     for (sInt_32 j = 0; j < variable_IDs.size(); ++j)
+	     {
+		 partial_sum_auxiliary[i][j] = m_last_variable_ID++;
+	     }	     
+	 }
+	 cast_Clause(solver, -variable_IDs[0], partial_sum_auxiliary[0][0]);
+	 /*
+	 fprintf(fw, "-%d %d 0\n",
+		 variable_IDs[0], 
+		 partial_sum_auxiliary.calc_CNF(sIntegerIndex(0), sIntegerIndex(0)));
+	 */
+
+	 for (sInt_32 i = 1; i < variable_IDs.size(); ++i)
+	 {
+	     for (sInt_32 j = 0; j <= i; ++j)
+	     {
+		 cast_Clause(solver, -partial_sum_auxiliary[i-1][j], partial_sum_auxiliary[i][j]);
+//		 fprintf(fw, "-%d %d 0\n", partial_sum_auxiliary.calc_CNF(sIntegerIndex(i-1), sIntegerIndex(j)), partial_sum_auxiliary.calc_CNF(sIntegerIndex(i), sIntegerIndex(j)));
+	     }
+	     cast_Clause(solver, -variable_IDs[i], partial_sum_auxiliary[i][0]);
+/*	     
+	     fprintf(fw, "-%d %d 0\n",
+		     variable_IDs[i], 
+		     partial_sum_auxiliary.calc_CNF(sIntegerIndex(i), sIntegerIndex(0)));
+*/
+	     for (sInt_32 j = 1; j <= i; ++j)
+	     {
+		 cast_Clause(solver, -variable_IDs[i], -partial_sum_auxiliary[i-1][j-1], partial_sum_auxiliary[i][j]);
+/*		 
+		 fprintf(fw, "-%d -%d %d 0\n",
+			 variable_IDs[i], 
+			 partial_sum_auxiliary.calc_CNF(sIntegerIndex(i-1), sIntegerIndex(j-1)),
+			 partial_sum_auxiliary.calc_CNF(sIntegerIndex(i), sIntegerIndex(j)));
+*/
+	     }
+	 }
+    }       
+
+
+    void sBoolEncoder::cast_Cardinality(Glucose::Solver            *solver,
+					VariableIDs_vector         &variable_IDs,
+					sInt_32                     cardinality,
+					sInt_32                     last_variable_ID,
+					Glucose::vec<Glucose::Lit> &goal_Assumptions)
+    {
+	 VariableIDs_2vector partial_sum_auxiliary;
+	 partial_sum_auxiliary.resize(variable_IDs.size());
+	 
+	 for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	 {
+	     partial_sum_auxiliary[i].resize(variable_IDs.size());
+	 }
+
+	 for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	 {
+	     for (sInt_32 j = 0; j < variable_IDs.size(); ++j)
+	     {
+		 partial_sum_auxiliary[i][j] = last_variable_ID++;
+	     }	     
+	 }
+	 for (sInt_32 i = 0; i < variable_IDs.size(); ++i)
+	 {
+	     for (sInt_32 j = cardinality; j < variable_IDs.size(); ++j)
+	     {
+		 //cast_Clause(solver, -partial_sum_auxiliary[i][j]);
+		 sInt_32 glu_var = partial_sum_auxiliary[i][j] - 1;
+		 sASSERT(glu_var < solver->nVars());
+	
+		 goal_Assumptions.push(~Glucose::mkLit(glu_var, false));	
+/*		 
+		 fprintf(fw, "-%d 0\n",
+			 partial_sum_auxiliary.calc_CNF(sIntegerIndex(i), sIntegerIndex(j)));
+*/
+	     }
+	 }
     }   
 
-
+    
 /*----------------------------------------------------------------------------*/
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1)
@@ -783,27 +898,45 @@ namespace boOX
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2)
     {
+	/*
 	std::vector<int> Lits;
 	Lits.push_back(lit_1);
 	Lits.push_back(lit_2);
+	*/
+	int Lits[3];
+
+	Lits[0] = lit_1;
+	Lits[1] = lit_2;
+	Lits[2] = 0;
 	
-	cast_Clause(solver, Lits);
+	cast_Clause_(solver, Lits);
     }
 
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3)
     {
+	/*
 	std::vector<int> Lits;
 	Lits.push_back(lit_1);
 	Lits.push_back(lit_2);
 	Lits.push_back(lit_3);
 		
 	cast_Clause(solver, Lits);
+	*/
+	int Lits[4];
+
+	Lits[0] = lit_1;
+	Lits[1] = lit_2;
+	Lits[2] = lit_3;	
+	Lits[3] = 0;
+	
+	cast_Clause_(solver, Lits);	
     }
 
 
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3,sInt_32 lit_4)
     {
+	/*
 	std::vector<int> Lits;
 	Lits.push_back(lit_1);
 	Lits.push_back(lit_2);
@@ -811,6 +944,16 @@ namespace boOX
 	Lits.push_back(lit_4);	
 		
 	cast_Clause(solver, Lits);
+	*/
+	int Lits[5];
+
+	Lits[0] = lit_1;
+	Lits[1] = lit_2;
+	Lits[2] = lit_3;
+	Lits[3] = lit_4;		
+	Lits[4] = 0;
+
+	cast_Clause_(solver, Lits);
     }    
 
     
@@ -832,6 +975,50 @@ namespace boOX
 	solver->addClause(glu_Lits);
     }
 
+
+    void sBoolEncoder::cast_Clause_(Glucose::Solver *solver, int *Lits)
+    {
+	Glucose::vec<Glucose::Lit> glu_Lits;
+	
+	while (*Lits != 0)
+	{
+	    sInt_32 glu_var = sABS(*Lits) - 1;
+	    while (glu_var >= solver->nVars())
+	    {
+		solver->newVar();
+	    }
+	    glu_Lits.push((*Lits > 0) ? Glucose::mkLit(glu_var, false) : ~Glucose::mkLit(glu_var, false));
+	    ++Lits;
+	}
+	solver->addClause(glu_Lits);	
+    }
+
+
+    void sBoolEncoder::build_PositiveAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits)
+    {
+	for (std::vector<sInt_32>::const_iterator var = var_IDs.begin(); var != var_IDs.end(); ++var)
+	{
+//	    printf("%d ", *lit);
+	    sInt_32 glu_var = sABS(*var) - 1;
+	    sASSERT(glu_var < solver->nVars());
+	    
+	    glu_Lits.push(Glucose::mkLit(glu_var, false));
+	}
+    }
+
+    
+    void sBoolEncoder::build_NegativeAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits)
+    {
+	for (std::vector<sInt_32>::const_iterator var = var_IDs.begin(); var != var_IDs.end(); ++var)
+	{
+//	    printf("%d ", *lit);
+	    sInt_32 glu_var = sABS(*var) - 1;
+	    sASSERT(glu_var < solver->nVars());
+	    
+	    glu_Lits.push(~Glucose::mkLit(glu_var, false));
+	}
+    }
+    
     
 /*----------------------------------------------------------------------------*/
 

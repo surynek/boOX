@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-163_planck                              */
+/*                             boOX 2-189_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 2-163_planck                                                       */
+/* cnf.h / 2-189_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -92,8 +92,11 @@ namespace boOX
 	void cast_Mutexes(Glucose::Solver *solver, VariableIDs_vector &variable_IDs_A, VariableIDs_vector &variable_IDs_B, sInt_32 weight = 0);
 	void cast_CapacityMutex(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);		
 	void cast_ConditionalAllMutexConstraint(Glucose::Solver *solver, sInt_32  &spec_condition, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);	
-	void cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);	
-	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);	
+	void cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);
+	void cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions);
+	
+	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);
+	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions);	
 
 	void cast_TriangleMutex(Glucose::Solver *solver,
 				sInt_32          variable_ID_A,
@@ -209,13 +212,32 @@ namespace boOX
 			      VariableIDs_vector &variable_IDs,
 			      sInt_32             cardinality,
 			      sInt_32             weight = 0);
+
+	void cast_Cardinality_inactive(Glucose::Solver    *solver,
+				       VariableIDs_vector &variable_IDs,
+				       sInt_32             cardinality,
+				       sInt_32            &last_variable_ID,				       
+				       sInt_32             weight = 0);	
+
+	void cast_Cardinality(Glucose::Solver            *solver,
+			      VariableIDs_vector         &variable_IDs,
+			      sInt_32                     cardinality,
+			      sInt_32                     last_variable_ID,
+			      Glucose::vec<Glucose::Lit> &goal_Assumptions);			      
+	
 	/*----------------------------------------------------------------*/
 	
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3, sInt_32 lit_4);	
-	void cast_Clause(Glucose::Solver *solver, std::vector<sInt_32> &Lits);	
+	void cast_Clause(Glucose::Solver *solver, std::vector<sInt_32> &Lits);
+	void cast_Clause_(Glucose::Solver *solver, int *Lits);
+
+	/*----------------------------------------------------------------*/	
+
+	void build_PositiveAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits);
+	void build_NegativeAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits);
 
     protected:
 	sInt_32 m_last_variable_ID;

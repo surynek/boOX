@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-163_planck                              */
+/*                             boOX 2-189_planck                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2021 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 2-163_planck                                                   */
+/* version.h / 2-189_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -27,11 +27,11 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "2-163_planck"
-#define sPRODUCT "boOX 2-163_planck"
+#define sVERSION "2-189_planck"
+#define sPRODUCT "boOX 2-189_planck"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.net>"
-#define sCOPYRIGHT "(C) Copyright 2018 - 2021 Pavel Surynek"
+#define sCOPYRIGHT "(C) Copyright 2018 - 2022 Pavel Surynek"
 #define sURL "http://www.surynek.net"
 
 
