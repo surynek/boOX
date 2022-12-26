@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-194_planck                              */
+/*                             boOX 2-193_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.cpp / 2-194_planck                                   */
+/* moviscen_convert_main.cpp / 2-193_planck                                   */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
