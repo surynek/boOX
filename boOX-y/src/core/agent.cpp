@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-193_planck                              */
+/*                             boOX 2-197_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-193_planck                                                   */
+/* agent.cpp / 2-197_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -2864,10 +2864,10 @@ namespace boOX
 	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
 	{
 	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id) + 1, m_environment.calc_GridColumn(init_vertex_id) + 1);
 	    
 	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
+	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id) + 1, m_environment.calc_GridColumn(goal_vertex_id) + 1);
 	}
     }
 
@@ -2879,10 +2879,10 @@ namespace boOX
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
 	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id) + 1, m_environment.calc_GridColumn(init_vertex_id) + 1);
 
 	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
+	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id) + 1, m_environment.calc_GridColumn(goal_vertex_id) + 1);
 	}
     }        
 

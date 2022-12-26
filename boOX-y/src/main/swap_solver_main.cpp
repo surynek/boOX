@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-193_planck                              */
+/*                             boOX 2-197_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.cpp / 2-193_planck                                        */
+/* swap_solver_main.cpp / 2-197_planck                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.

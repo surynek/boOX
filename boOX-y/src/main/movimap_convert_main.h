@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-193_planck                              */
+/*                             boOX 2-197_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* movimap_convert_main.h / 2-193_planck                                      */
+/* movimap_convert_main.h / 2-197_planck                                      */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com map convertor - main program.
