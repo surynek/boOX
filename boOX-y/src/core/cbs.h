@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 2-182_planck                                                       */
+/* cbs.h / 2-194_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -231,6 +231,7 @@ namespace boOX
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;
+	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const;	
 	sInt_32 fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;	
 	/*----------------------------------------------------------------------------*/		
 	

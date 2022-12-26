@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 2-182_planck                                                   */
+/* agent.cpp / 2-194_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -2459,7 +2459,35 @@ namespace boOX
 	fclose(fw);
 
 	return sRESULT_SUCCESS;
-    }    
+    }
+
+
+    sResult sInstance::to_File_lcbs(const sString &filename, const sString &indent, sInt_32 instance_id) const
+    {
+	FILE *fw;
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_LCBS_OPEN_ERROR;
+	}
+	to_Stream_lcbs(fw, indent, instance_id);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }
+
+
+    sResult sInstance::to_File_lcbs(const sString &filename, sInt_32 N_agents, const sString &indent, sInt_32 instance_id) const
+    {
+	FILE *fw;
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sAGENT_INSTANCE_LCBS_OPEN_ERROR;
+	}
+	to_Stream_lcbs(fw, N_agents, indent, instance_id);
+	fclose(fw);
+
+	return sRESULT_SUCCESS;
+    }        
 
 
     void sInstance::to_Stream(FILE *fw, const sString &indent) const
@@ -2778,12 +2806,12 @@ namespace boOX
 	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
 	{
 	    fprintf(fw, "%s%d,", indent.c_str(), agent_id - 1);
-	    
-	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d,",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
-	    
-	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+
+	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);	    
+	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));	    
+
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);	    
+	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
 	}
     }
 
@@ -2810,22 +2838,53 @@ namespace boOX
 		}
 	    }
 	    fprintf(fw, "\n");
-	}
-	
-	fprintf(fw, "%sAgents:\n", indent.c_str());
+	}	
 	fprintf(fw, "%s%d\n", indent.c_str(), N_agents);
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
 	    fprintf(fw, "%s%d,", indent.c_str(), agent_id - 1);
+
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);	    
+	    fprintf(fw, "%d,%d,",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
+
+	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);	    
+	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));	    	    
+	}
+    }
+
+
+
+    void sInstance::to_Stream_lcbs(FILE *fw, const sString &indent, sInt_32 sUNUSED(instance_id)) const
+    {
+	sInt_32 N_Agents = m_start_configuration.get_AgentCount();
+
+	fprintf(fw, "%s%d\n", indent.c_str(), N_Agents);
+
+	for (sInt_32 agent_id = 1; agent_id <= N_Agents; ++agent_id)
+	{
+	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
 	    
 	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d,",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
-	    
-	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
-	    fprintf(fw, "%d,%d\n", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
 	}
-    }    
+    }
+
+
+    void sInstance::to_Stream_lcbs(FILE *fw, sInt_32 N_agents, const sString &indent, sInt_32 sUNUSED(instance_id)) const
+    {
+	fprintf(fw, "%s%d\n", indent.c_str(), N_agents);
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    sInt_32 init_vertex_id = m_start_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d,", m_environment.calc_GridRow(init_vertex_id), m_environment.calc_GridColumn(init_vertex_id));
+
+	    sInt_32 goal_vertex_id = m_goal_configuration.get_AgentLocation(agent_id);
+	    fprintf(fw, "%d,%d,\n",  m_environment.calc_GridRow(goal_vertex_id), m_environment.calc_GridColumn(goal_vertex_id));
+	}
+    }        
 
 
     sResult sInstance::from_File_cpf(const sString &filename)

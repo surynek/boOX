@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 2-182_planck                                                       */
+/* cnf.h / 2-194_planck                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -95,7 +95,8 @@ namespace boOX
 	void cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);
 	void cast_BitSet(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions);
 	
-	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);	
+	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, sInt_32 weight = 0);
+	void cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions);	
 
 	void cast_TriangleMutex(Glucose::Solver *solver,
 				sInt_32          variable_ID_A,

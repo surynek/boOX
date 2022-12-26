@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* movimap_convert_main.h / 2-182_planck                                      */
+/* movimap_convert_main.h / 2-194_planck                                      */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com map convertor - main program.
@@ -46,6 +46,7 @@ namespace boOX
 
 	sString m_input_movi_map_filename;
 	sString m_output_xml_map_filename;
+	sString m_output_ecbs_map_filename;
     };
 
 
@@ -57,7 +58,7 @@ namespace boOX
     
     sResult parse_CommandLineParameter(const sString &parameter, sCommandParameters &parameters);
     
-    sResult convert_MoviMap2XmlMap(const sCommandParameters &parameters);
+    sResult convert_MoviMap2DiffrentMap(const sCommandParameters &parameters);
 
 
 /*----------------------------------------------------------------------------*/

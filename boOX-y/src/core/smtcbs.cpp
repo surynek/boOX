@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 2-182_planck                                                  */
+/* smtcbs.cpp / 2-194_planck                                                  */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -4067,16 +4067,19 @@ namespace boOX
 	solver->s_Glucose_timeout = m_timeout;
 	solver->setIncrementalMode();
 
+	AgentTrees_vector agent_Trees;
+
 	if (!find_InitialNonconflictingPathsInverseOmitted(solver,
-							    context,
-							    sat_Model,
-							    instance,
-							    MDD,
-							    extra_MDD,
-							    inverse_MDD,
-							    extra_cost,
-							    cost_limit,
-							    agent_Paths))	   
+							   context,
+							   sat_Model,
+							   instance,
+							   MDD,
+							   extra_MDD,
+							   inverse_MDD,
+							   extra_cost,
+							   cost_limit,
+							   agent_Paths,
+							   agent_Trees))	   
 	{
 	    return -1;
 	}
@@ -4107,6 +4110,8 @@ namespace boOX
 
 	while (true)
 	{
+	    agent_Trees.clear();
+	    
 	    if (m_timeout >= 0)
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
@@ -4129,18 +4134,19 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
-
+	    
 	    if (!find_NextNonconflictingPathsInverseOmitted(solver,
-							     context,
-							     sat_Model,
-							     Collisions,
-							     instance,
-							     MDD,
-							     extra_MDD,
-							     inverse_MDD,
-							     extra_cost,
-							     cost_limit,
-							     agent_Paths))
+							    context,
+							    sat_Model,
+							    Collisions,
+							    instance,
+							    MDD,
+							    extra_MDD,
+							    inverse_MDD,
+							    extra_cost,
+							    cost_limit,
+							    agent_Paths,
+							    agent_Trees))
 	    {
 		return -1;
 	    }
@@ -4163,7 +4169,7 @@ namespace boOX
 	    #endif
 	    
 	    Collisions.clear();
-	    
+
 	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
 	    {
 		return cummulative;
@@ -8043,15 +8049,16 @@ namespace boOX
 
 
     bool sSMTCBS::find_InitialNonconflictingPathsInverseOmitted(Glucose::Solver              *solver,
-								 Context                      &context,
-								 Model                        &sat_Model,
-								 const sInstance              &instance,
-								 sInstance::MDD_vector        &MDD,
-								 sInstance::MDD_vector        &extra_MDD,
-								 sInstance::InverseMDD_vector &inverse_MDD,
-								 sInt_32                       extra_cost,
-								 sInt_32                       cost_limit,
-								 AgentPaths_vector            &agent_Paths) const
+								Context                      &context,
+								Model                        &sat_Model,
+								const sInstance              &instance,
+								sInstance::MDD_vector        &MDD,
+								sInstance::MDD_vector        &extra_MDD,
+								sInstance::InverseMDD_vector &inverse_MDD,
+								sInt_32                       extra_cost,
+								sInt_32                       cost_limit,
+								AgentPaths_vector            &agent_Paths,
+								AgentTrees_vector            &agent_Trees) const
     {
 	sInt_32 variable_ID;
 
@@ -8097,7 +8104,7 @@ namespace boOX
 	{
 	    sASSERT(false);
 	}	
-	decode_PathTreeModel(solver, instance, MDD, sat_Model, agent_Paths);
+	decode_PathTreeModel(solver, instance, MDD, sat_Model, agent_Paths, agent_Trees);
 	
 	return true;
     }
@@ -8150,7 +8157,8 @@ namespace boOX
 							     sInstance::InverseMDD_vector &inverse_MDD,
 							     sInt_32                       extra_cost,
 							     sInt_32                       cost_limit,
-							     AgentPaths_vector            &agent_Paths) const
+							     AgentPaths_vector            &agent_Paths,
+							     AgentTrees_vector            &agent_Trees) const
     {
 	/*
 	sInt_32 variable_ID;
@@ -8213,8 +8221,8 @@ namespace boOX
 	{
 	    sASSERT(false);
 	}
-	//decode_PathSmallModel(solver, instance, MDD, sat_Model, agent_Paths);	
-	decode_PathTreeModel(solver, instance, MDD, sat_Model, agent_Paths);
+	//decode_PathSmallModel(solver, instance, MDD, sat_Model, agent_Paths);
+	decode_PathTreeModel(solver, instance, MDD, sat_Model, agent_Paths, agent_Trees);
 	
 	return true;
     }
@@ -8502,7 +8510,7 @@ namespace boOX
 	    return false;
 	}
 
-	Glucose::lbool result = solver->solveLimited(goal_Assumptions);
+	Glucose::lbool result = solver->solveLimited_(goal_Assumptions);
 	//Glucose::lbool result = solver->solve_();
 
 	if (result == l_True)
@@ -8585,7 +8593,7 @@ namespace boOX
 	    return false;
 	}
 
-	Glucose::lbool result = solver->solveLimited(goal_Assumptions);
+	Glucose::lbool result = solver->solveLimited_(goal_Assumptions);
 //	Glucose::lbool result = solver->solve_();
 
 	if (result == l_True)
@@ -8862,7 +8870,124 @@ namespace boOX
 	#endif
 	
 	return cummulative;
-    }    
+    }
+
+
+    sInt_32 sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
+					       const AgentPaths_vector &agent_Paths,
+					       const AgentTrees_vector &agent_Trees,					       
+					       Collisions_vector       &Collisions) const
+    {
+	sInt_32 agent_path_length;
+	    
+	#ifdef sPROFILE
+	{
+	    analyzing_begin = clock();
+	}
+	#endif
+
+	sASSERT(Collisions.empty());
+	Cooccupations_vector space_Cooccupations;	
+			
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, agent_Trees, space_Cooccupations);
+	
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+		
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][i]);
+		    
+		    if (occupation_collision != space_Cooccupations[i].end())
+		    {
+			for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+			{
+//			    if (*collide_agent > agent_id)
+			    if (*collide_agent != agent_id)			    
+			    {
+				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
+				Collisions.push_back(next_collision);
+				cummulative = -1;
+			    }
+			}
+		    }
+		    if (agent_Paths[agent_id][i - 1] != agent_Paths[agent_id][i]) // proper move
+		    {
+			Cooccupation_umap::const_iterator swap_expectation_pred = space_Cooccupations[i - 1].find(agent_Paths[agent_id][i]);
+			
+			if (swap_expectation_pred != space_Cooccupations[i - 1].end()) // move into occupied
+			{
+			    for (AgentIDs_uset::const_iterator exp_agent = swap_expectation_pred->second.begin(); exp_agent != swap_expectation_pred->second.end(); ++exp_agent)
+			    {
+				sInt_32 ii = sMIN(agent_Paths[*exp_agent].size() - 1, i - 1);
+				sASSERT(i < agent_Paths[*exp_agent].size());				
+				
+				if (*exp_agent != agent_id)
+				{
+				    Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
+				    Collisions.push_back(next_collision);
+				    cummulative = -1;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Cooccupations.size(); ++i)
+	    {
+		Cooccupation_umap::const_iterator occupation_collision = space_Cooccupations[i].find(agent_Paths[agent_id][agent_path_length - 1]);
+		if (occupation_collision != space_Cooccupations[i].end())
+		{
+		    for (AgentIDs_uset::const_iterator collide_agent = occupation_collision->second.begin(); collide_agent != occupation_collision->second.end(); ++collide_agent)
+		    {
+//			if (*collide_agent > agent_id)
+			if (*collide_agent != agent_id)			
+			{
+			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
+			    Collisions.push_back(next_collision);
+			    cummulative = -1;			    
+			}
+		    }		    
+		}
+	    }
+	}
+	
+	#ifdef sDEBUG
+	{
+	    /*
+	    printf("Number of collisions: %ld\n", Collisions.size());
+	    for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
+	    {       	
+		printf("Collision: %d,%d,%d %d,%d,%d\n",
+		       collision->m_agent_A_id, collision->m_level_A, collision->m_vertex_A_id,
+		       collision->m_agent_B_id, collision->m_level_B, collision->m_vertex_B_id);
+		
+		sASSERT(collision->m_agent_A_id != collision->m_agent_B_id);		
+	    }
+	    */
+	}
+	#endif
+	
+	return cummulative;
+    }        
 
 
 /*----------------------------------------------------------------------------*/
@@ -14089,7 +14214,7 @@ namespace boOX
 	    sInstance::InverseVertexIDs_umap::const_iterator inverse_v = inverse_MDD[collision->m_agent_B_id][collision->m_level_B].find(collision->m_vertex_B_id);
 	    sASSERT(inverse_v != inverse_MDD[collision->m_agent_B_id][collision->m_level_B].end());	    
 	    sInt_32 v = inverse_v->second;
-	    
+
 	    m_solver_Encoder->cast_Mutex(solver,
 					 sat_Model.m_vertex_occupancy[collision->m_agent_A_id][collision->m_level_A][u],
 					 sat_Model.m_vertex_occupancy[collision->m_agent_B_id][collision->m_level_B][v]);
@@ -14453,7 +14578,7 @@ namespace boOX
 	{			    
 	    for (sInt_32 layer = 0; layer < N_layers; ++layer)
 	    {
-		VariableIDs_vector mutex_vertex_Identifiers;
+		//VariableIDs_vector mutex_vertex_Identifiers;
 		
 		for (sInt_32 u = 0; u < MDD[agent_id][layer].size(); ++u)
 		{
@@ -14488,7 +14613,7 @@ namespace boOX
 			++neighbor_index;
 			*/
 		    }
-		    mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][u]);
+		    //mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][layer][u]);
 
 		    m_solver_Encoder->cast_MultiImplication(solver,
 							    sat_Model.m_vertex_occupancy[agent_id][layer][u],
@@ -14497,13 +14622,15 @@ namespace boOX
 		}
 		//m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			
 	    }
+	    /*
 	    VariableIDs_vector mutex_vertex_Identifiers;
 	    
 	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
 	    {
 		mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		
 	    }
-	    //m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
+	    m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
+	    */
 	}
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14577,6 +14704,10 @@ namespace boOX
 		{
 		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][0][u]);
 		}
+		else
+		{
+		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][0][u]);		    
+		}
 	    }
 	}
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14586,6 +14717,10 @@ namespace boOX
 		if (MDD[agent_id][N_layers][u] == instance.m_goal_configuration.get_AgentLocation(agent_id))
 		{
 		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);
+		}
+		else
+		{
+		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		    
 		}
 	    }
 	}
@@ -14669,6 +14804,7 @@ namespace boOX
 		    }
 		//m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			
 		}
+		/*
 		VariableIDs_vector mutex_vertex_Identifiers;
 		
 		for (sInt_32 u = 0; u < MDD[agent_id][mdd_depth - 1].size(); ++u)
@@ -14676,6 +14812,7 @@ namespace boOX
 		    mutex_vertex_Identifiers.push_back(sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u]);		
 		}
 		m_solver_Encoder->cast_AdaptiveAllMutexConstraint(solver, mutex_vertex_Identifiers);			    
+		*/
 	    }
 	    
 	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
@@ -14779,6 +14916,10 @@ namespace boOX
 		if (MDD[agent_id][mdd_depth - 1][u] == instance.m_goal_configuration.get_AgentLocation(agent_id))
 		{
 		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u], goal_Assumptions);
+		}
+		else
+		{
+		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u], goal_Assumptions);		    
 		}
 	    }
 	}
@@ -15267,12 +15408,25 @@ namespace boOX
 				       const Model                 &sat_Model,
 				       AgentPaths_vector           &agent_Paths) const
     {
+	AgentTrees_vector agent_Trees;
+
+	decode_PathTreeModel(solver, instance, MDD, sat_Model, agent_Paths, agent_Trees);
+    }
+    
+    
+    void sSMTCBS::decode_PathTreeModel(Glucose::Solver             *solver,
+				       const sInstance             &instance,
+				       const sInstance::MDD_vector &MDD,
+				       const Model                 &sat_Model,
+				       AgentPaths_vector           &agent_Paths,
+				       AgentTrees_vector           &agent_Trees) const
+    {
 	Configurations_vector mdd_Configurations;
 	sInt_32 mdd_depth = MDD[1].size();
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 
-	AgentTrees_vector agent_Trees;
+	//AgentTrees_vector agent_Trees;
 	agent_Trees.resize(N_agents + 1);
 
 	agent_Paths.resize(N_agents + 1);

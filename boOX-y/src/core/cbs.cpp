@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 2-182_planck                                                     */
+/* cbs.cpp / 2-194_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -156,6 +156,79 @@ namespace boOX
 	}
 	return cummulative;
     }
+
+
+    sInt_32 sCBSBase::fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const
+    {
+	sInt_32 agent_path_length;
+	sInt_32 cummulative = 0;
+
+	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
+
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+
+	    if (!space_Cooccupations.empty())
+	    {
+		while (space_Cooccupations.size() < agent_path_length)
+		{
+		    space_Cooccupations.push_back(space_Cooccupations.back());
+		}
+	    }
+	    else
+	    {
+		space_Cooccupations.resize(agent_path_length);		
+	    }
+	    space_Cooccupations[0][agent_Paths[agent_id][0]].insert(agent_id);
+
+	    for (sInt_32 i = agent_Paths[agent_id].size() - 2; i >= 0; --i)
+	    {
+		if (agent_Paths[agent_id][i] != agent_Paths[agent_id][agent_Paths[agent_id].size() - 1])
+		{
+		    break;
+		}
+		--agent_path_length;
+	    }
+	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	}		       
+	for (sInt_32 i = 1;; ++i)
+	{
+	    bool finished = true;
+		
+	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	    {
+		agent_path_length = agent_Paths[agent_id].size();
+		
+		if (i < agent_path_length)
+		{
+		    finished = false;
+		    
+		    //space_Cooccupations[i][agent_Paths[agent_id][i]].insert(agent_id);
+		    for(sInt_32 occ = 0; occ < agent_Trees[agent_id][i].size(); ++occ)
+		    {
+			space_Cooccupations[i][agent_Trees[agent_id][i][occ]].insert(agent_id);
+		    }
+		}
+	    }
+	    if (finished)
+	    {
+		break;
+	    }
+	}
+	
+	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
+	{
+	    agent_path_length = agent_Paths[agent_id].size();
+	    sASSERT(agent_path_length > 0);
+	    
+	    for (sInt_32 i = agent_path_length; i < space_Cooccupations.size(); ++i)
+	    {
+		space_Cooccupations[i][agent_Paths[agent_id][agent_path_length - 1]].insert(agent_id);
+	    }
+	}
+	return cummulative;
+    }    
 
 
     sInt_32 sCBSBase::fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const

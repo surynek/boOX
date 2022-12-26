@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.cpp / 2-182_planck                                   */
+/* moviscen_convert_main.cpp / 2-194_planck                                   */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -84,6 +84,7 @@ namespace boOX
 	printf("                       --output-mpf-file=<string>\n");
 	printf("                       --output-cpf-file=<string>\n");
 	printf("                       --output-bgu-file=<string>\n");
+	printf("                       --output-lcbs-file=<string>\n");	
 	printf("                       --output-mHpf-file=<string>\n");	
 	printf("                      [--N-kruhobots=<int>]\n");
 	printf("                      [--N-agents=<int>]\n");
@@ -185,7 +186,7 @@ namespace boOX
 	}
   	#endif
 
-	if (!parameters.m_output_mpf_filename.empty() || !parameters.m_output_cpf_filename.empty() || !parameters.m_output_bgu_filename.empty())
+	if (!parameters.m_output_mpf_filename.empty() || !parameters.m_output_cpf_filename.empty() || !parameters.m_output_bgu_filename.empty() || !parameters.m_output_lcbs_filename.empty())
 	{
 	    sInstance mapf_Instance;
 
@@ -260,7 +261,23 @@ namespace boOX
 		    printf("Error: Failed to write bgu file %s (code = %d).\n", parameters.m_output_bgu_filename.c_str(), result);
 		    return result;
 		}
-	    }	    	    
+	    }
+	    if (!parameters.m_output_lcbs_filename.empty())
+	    {
+		if (parameters.m_N_agents >= 0)
+		{
+		    result = mapf_Instance.to_File_lcbs(parameters.m_output_lcbs_filename, parameters.m_N_agents);
+		}
+		else
+		{
+		    result = mapf_Instance.to_File_lcbs(parameters.m_output_lcbs_filename);
+		}
+		if (sFAILED(result))
+		{
+		    printf("Error: Failed to write lcbs file %s (code = %d).\n", parameters.m_output_lcbs_filename.c_str(), result);
+		    return result;
+		}
+	    }	    	    	    
 	}
 	
         #ifdef sSTATISTICS
@@ -375,6 +392,10 @@ namespace boOX
 	{
 	    command_parameters.m_output_bgu_filename = parameter.substr(18, parameter.size());
 	}
+	else if (parameter.find("--output-lcbs-file=") == 0)
+	{
+	    command_parameters.m_output_lcbs_filename = parameter.substr(19, parameter.size());
+	}	
 	else if (parameter.find("--output-mHpf-file=") == 0)
 	{
 	    command_parameters.m_output_mHpf_filename = parameter.substr(19, parameter.size());
@@ -455,7 +476,7 @@ int main(int argc, char **argv)
 	    }
 	}
 	
-	if (!command_parameters.m_output_mpf_filename.empty() || !command_parameters.m_output_cpf_filename.empty() || !command_parameters.m_output_bgu_filename.empty())
+	if (!command_parameters.m_output_mpf_filename.empty() || !command_parameters.m_output_cpf_filename.empty() || !command_parameters.m_output_bgu_filename.empty() || !command_parameters.m_output_lcbs_filename.empty())
 	{
 	    result = convert_MoviScen2MultirobotTask(command_parameters);
 
@@ -481,9 +502,10 @@ int main(int argc, char **argv)
 	    && command_parameters.m_output_mpf_filename.empty()
 	    && command_parameters.m_output_cpf_filename.empty()
 	    && command_parameters.m_output_bgu_filename.empty()
+	    && command_parameters.m_output_lcbs_filename.empty()	       
 	    && command_parameters.m_output_mHpf_filename.empty())
 	{    
-	    printf("Error: Neither .xml nor .mpf nor .cpf nor .bgu nor .mHpf output file specified (code = %d).\n", sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR);
+	    printf("Error: Neither .xml nor .mpf nor .cpf nor .bgu nor .mHpf nor .lcbs output file specified (code = %d).\n", sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR);
 	    print_Help();
 	    
 	    return sMOVISCEN_CONVERT_PROGRAM_NO_OUTPUT_FILE_SPECIFIED_ERROR;		

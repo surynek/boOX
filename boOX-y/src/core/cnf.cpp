@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 2-182_planck                                                     */
+/* cnf.cpp / 2-194_planck                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -384,8 +384,17 @@ namespace boOX
 	    ++s_GlobalStatistics.get_CurrentPhase().m_produced_cnf_Clauses;
 	}
 	#endif
-    }    
+    }
 
+    
+    void sBoolEncoder::cast_BitUnset(Glucose::Solver *solver, sInt_32 variable_ID, Glucose::vec<Glucose::Lit> &goal_Assumptions)
+    {
+	sInt_32 glu_var = variable_ID - 1;
+	sASSERT(glu_var < solver->nVars());
+	
+	goal_Assumptions.push(~Glucose::mkLit(glu_var, false));	
+    }
+    
 
     void sBoolEncoder::cast_TriangleMutex(Glucose::Solver *solver,
 					  sInt_32          variable_ID_A,

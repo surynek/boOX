@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.h / 2-182_planck                                     */
+/* moviscen_convert_main.h / 2-194_planck                                     */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -55,6 +55,7 @@ namespace boOX
 	sString m_output_mpf_filename;
 	sString m_output_cpf_filename;
 	sString m_output_bgu_filename;
+	sString m_output_lcbs_filename;	
 	sString m_output_mHpf_filename;	
     };
 

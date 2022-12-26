@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-182_planck                              */
+/*                             boOX 2-194_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 2-182_planck                                                    */
+/* smtcbs.h / 2-194_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -1021,15 +1021,16 @@ namespace boOX
 							      AgentPaths_vector            &agent_Paths) const;
 
 	bool find_InitialNonconflictingPathsInverseOmitted(Glucose::Solver              *solver,
-							    Context                      &context,
-							    Model                        &sat_Model,
-							    const sInstance              &instance,
-							    sInstance::MDD_vector        &MDD,
-							    sInstance::MDD_vector        &extra_MDD,
-							    sInstance::InverseMDD_vector &inverse_MDD,
-							    sInt_32                       extra_cost,
-							    sInt_32                       cost_limit,
-							    AgentPaths_vector            &agent_Paths) const;
+							   Context                      &context,
+							   Model                        &sat_Model,
+							   const sInstance              &instance,
+							   sInstance::MDD_vector        &MDD,
+							   sInstance::MDD_vector        &extra_MDD,
+							   sInstance::InverseMDD_vector &inverse_MDD,
+							   sInt_32                       extra_cost,
+							   sInt_32                       cost_limit,
+							   AgentPaths_vector            &agent_Paths,
+							   AgentTrees_vector            &agent_Trees) const;
 
 	bool find_InitialNonconflictingPathsInversePremodelOmitted(Glucose::Solver              *solver,
 								   Context                      &context,
@@ -1065,7 +1066,8 @@ namespace boOX
 							sInstance::InverseMDD_vector &inverse_MDD,
 							sInt_32                       extra_cost,
 							sInt_32                       cost_limit,
-							AgentPaths_vector            &agent_Paths) const;
+							AgentPaths_vector            &agent_Paths,
+							AgentTrees_vector            &agent_Trees) const;
 
 	bool find_NextNonconflictingPathsInversePremodelOmitted(Glucose::Solver             *solver,
 								Context                      &context,
@@ -1124,6 +1126,11 @@ namespace boOX
 	sInt_32 check_NonconflictingPaths(const sInstance         &instance,
 					  const AgentPaths_vector &agent_Paths,
 					  Collisions_vector       &Collisions) const;
+
+	sInt_32 check_NonconflictingPaths(const sInstance         &instance,
+					  const AgentPaths_vector &agent_Paths,
+					  const AgentTrees_vector &agent_Trees,					  
+					  Collisions_vector       &Collisions) const;	
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingSwapping(Glucose::Solver       *solver,
@@ -1898,6 +1905,13 @@ namespace boOX
 				  const sInstance::MDD_vector &MDD,
 				  const Model                 &sat_Model,
 				  AgentPaths_vector           &agent_Paths) const;
+
+	void decode_PathTreeModel(Glucose::Solver             *solver,
+				  const sInstance             &instance,
+				  const sInstance::MDD_vector &MDD,
+				  const Model                 &sat_Model,
+				  AgentPaths_vector           &agent_Paths,				  
+				  AgentTrees_vector           &agent_Trees) const;	
 
 	void decode_PathTreeModel(Glucose::Solver             *solver,
 				  const sInstance             &instance,
