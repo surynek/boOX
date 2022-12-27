@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-197_planck                              */
+/*                             boOX 2-201_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* rota_solver_main.h / 2-197_planck                                          */
+/* rota_solver_main.h / 2-201_planck                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Token Rotation Problem Solver - main program.

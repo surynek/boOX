@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-197_planck                              */
+/*                             boOX 2-201_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 2-197_planck                                                    */
+/* mapR.cpp / 2-201_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1363,7 +1363,7 @@ namespace boOX
     
     void s2DMap::to_Stream_ecbs(FILE *fw, const sString &indent) const
     {
-	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_Network.m_y_size + 1, m_Network.m_x_size + 1);
+	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_Network.m_y_size + 2, m_Network.m_x_size + 2);
 
 	fprintf(fw, "%s", indent.c_str());	
 	for (sInt_32 i = 0; i < m_Network.m_x_size + 1; ++i)
