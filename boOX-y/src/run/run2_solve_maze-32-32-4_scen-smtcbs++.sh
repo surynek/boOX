@@ -5,5 +5,5 @@ SCENARIOS_LIST=`cat $SCENARIOS_FILE`
 
 for SCENARIO in $SCENARIOS_LIST;
 do
-    './expr_'$PREFIX'_solve-smtcbs++.sh' $SCENARIO &
+    './expr2_'$PREFIX'_solve-smtcbs++.sh' $SCENARIO &
 done
