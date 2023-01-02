@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-203_planck                              */
+/*                             boOX 2-205_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* stargen_main.h / 2-203_planck                                              */
+/* stargen_main.h / 2-205_planck                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Star Graph Instance Generator - main program.

@@ -1,0 +1,22 @@
+PREFIX="Berlin_1_256"
+
+SCENARIOS_FILE="scenarios_"$PREFIX
+ROBOTS_FILE="robots_"$PREFIX
+
+ROBOTS_LIST=`cat $ROBOTS_FILE`
+SCENARIOS_LIST=`cat $SCENARIOS_FILE`
+
+for ROBOTS in $ROBOTS_LIST;
+do
+    for SCENARIO in $SCENARIOS_LIST;
+    do
+	#echo 'Extracting '$PREFIX' scenario '$SCENARIO' MAPF instance with '$ROBOTS' agents ...'
+	FILE_OUT='out_'$PREFIX'-'$SCENARIO'_a'$ROBOTS'.lcbs.txt'
+	FILE_SOL='solution_'$PREFIX'-'$SCENARIO'_a'$ROBOTS'.lcbs.txt'
+	if test -s "$FILE_OUT"; then
+	  grep "geas" $FILE_OUT
+	else
+	  echo "missing file for $ROBOTS robots"
+	fi
+    done
+done
