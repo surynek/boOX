@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-208_planck                              */
+/*                             boOX 2-210_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.cpp / 2-208_planck                                        */
+/* perm_solver_main.cpp / 2-210_planck                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.
@@ -83,7 +83,7 @@ namespace boOX
 	printf("perm_solver_boOX  --input-file=<string>\n");
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
-	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++}]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++|nrfsat}]\n");
         printf("		 [--subopt-ratio=<double>]\n");		
         printf("	         [--timeout=<double>]\n");
 	printf("\n");
@@ -319,7 +319,7 @@ namespace boOX
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
 	    }
-	    else if (algorithm_str == "smtcbs+++")
+	    else if (algorithm_str == "smtcbs+++" || algorithm_str == "nrfsat") 
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS;
 	    }	    	    	    	    
