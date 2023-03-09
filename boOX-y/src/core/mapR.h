@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-188_planck                              */
+/*                             boOX 2-212_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.h / 2-188_planck                                                      */
+/* mapR.h / 2-212_planck                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Semi-continuous maps for semi-continuous version of MAPF (MAPF-R).
@@ -174,7 +174,10 @@ namespace boOX
 	virtual sResult from_Stream_movi(FILE *fr);	
 
 	virtual sResult to_File_xml(const sString &filename, const sString &indent = "") const;
-	virtual void to_Stream_xml(FILE *fw, const sString &indent = "") const;	
+	virtual void to_Stream_xml(FILE *fw, const sString &indent = "") const;
+
+	virtual sResult to_File_ecbs(const sString &filename, const sString &indent = "") const;
+	virtual void to_Stream_ecbs(FILE *fw, const sString &indent = "") const;		
 
 	virtual sResult from_File_xml(const sString &filename);
 	virtual sResult from_Stream_xml(FILE *fr);

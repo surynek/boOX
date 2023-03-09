@@ -2,7 +2,7 @@
 
 boOX
 
-(C) Pavel Surynek, 2018 - 2021
+(C) Pavel Surynek, 2018 - 2023
 pavel@surynek.net
 
 =======================================================
@@ -12,6 +12,71 @@ related to artificial intelligence.
 
 -------------------------------------------------------
 
+
+
+-- Update 02/2023 -------------------------------------
+
+A novel compilation scheme NRF-SAT (non-refined SAT) has been
+implemented on top of SMT-CBS. NRF-SAT does not encode the
+at-most-one constraints to ensure that there is at most one
+appearance of the specific agent, we call this path-consistency
+constraints. While the conflict elimination constraints are
+encoded in the lazy/CEGAR style in SMT-CBS, the path-consistency
+constraints are not encoded at all in NRF-SAT. The efect of
+such non-refined abstraction in treated in the post-processing
+step where instead of paths for individual agents we obtain
+directed acyclic graphs from which the proper paths need to
+be extracted.
+
+The NRF-SAT algorithm can be invoked in the MAPF, TSWAP, TROT,
+and TPERM solvers via parameter:
+
+--algorithm=nrfsat
+
+Please note that the standard MAPF as understood in most
+papers is TROT within this package, so for the standard MAPF
+solving please run:
+
+./rota_solver_main
+
+-------------------------------------------------------
+
+Please enjoy your CEGAR-based MAPF solving...
+Pavel Surynek, 02/2023
+
+-------------------- **** -----------------------------
+
+
+
+-- Update 05/2020 -------------------------------------
+
+Since the above README the boOX package underwent a
+major update. The most significant is the addition of a
+solver for the continuous variant of multi-agent
+path finding (MAPF^R, sometimes also called MAPF with
+continuous time). The current version of the package
+(2-019) has the following command line tool for MAPF^R:
+
+mapfR_solver_boOX - an optimal makespan/SOC MAPF^R solver
+
+The MAPF^R solver is based on the combination of SMT and
+CBS (in the smart way). Samples for MAPF^R are available
+in the samples/R directory.
+
+-------------------------------------------------------
+
+Please enjoy your CONTINUOUS problem solving...
+Pavel Surynek, 05/2020
+
+-------------------- **** -----------------------------
+
+
+
+-------------------------------------------------------
+
+The original README follows (still mostly valid):
+
+-------------------------------------------------------
 
 The current release of the package (version 0-104) includes
 implementations of optimal solvers for various item
@@ -78,24 +143,3 @@ Pavel Surynek, 09/2018
 
 -------------------- **** -----------------------------
 
--- Update 05/2020 -------------------------------------
-
-Since the above README the boOX package underwent a
-major update. The most significant is the addition of a
-solver for the continuous variant of multi-agent
-path finding (MAPF^R, sometimes also called MAPF with
-continuous time). The current version of the package
-(2-019) has the following command line tool for MAPF^R:
-
-mapfR_solver_boOX - an optimal makespan/SOC MAPF^R solver
-
-The MAPF^R solver is based on the combination of SMT and
-CBS (in the smart way). Samples for MAPF^R are available
-in the samples/R directory.
-
--------------------------------------------------------
-
-Please enjoy your CONTINUOUS problem solving...
-Pavel Surynek, 09/2020
-
--------------------- **** -----------------------------

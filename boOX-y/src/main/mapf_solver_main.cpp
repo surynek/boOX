@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-188_planck                              */
+/*                             boOX 2-212_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.cpp / 2-188_planck                                        */
+/* mapf_solver_main.cpp / 2-212_planck                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.
@@ -54,6 +54,7 @@ namespace boOX
       , m_algorithm(ALGORITHM_CBS)
       , m_subopt_ratio(-1.0)
       , m_timeout(-1.0)
+      , m_directed(false)	
   {
       // nothing
   }
@@ -64,9 +65,9 @@ namespace boOX
     void print_IntroductoryMessage(void)
     {
 	printf("----------------------------------------------------------------\n");
-	printf("%s : Multi-Agent Path Finding (MAPF) Solver\n", sPRODUCT);
+	printf("%s : Multi-Agent Path Finding (MAPF) Solver (move to unoccupied variant)\n", sPRODUCT);
 	printf("%s\n", sCOPYRIGHT);
-	printf("================================================================\n");	
+	printf("========================================================================\n");	
     }
 
 
@@ -82,9 +83,10 @@ namespace boOX
 	printf("mapf_solver_boOX  --input-file=<string>\n");
 	printf("                  --output-file=<sting>\n");
 	printf("                 [--cost-limit=<int>]\n");
-	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++}]\n");
+	printf("                 [--algorithm={cbs|cbs+|cbs++|cbs+++|smtcbs|smtcbs+|smtcbs++|smtcbs++i|nrfsat}]\n");
         printf("		 [--subopt-ratio=<double>]\n");	
         printf("		 [--timeout=<double>]\n");
+        printf("	         [--directed]\n");	
 	printf("\n");
 	printf("Examples:\n");
 	printf("mapf_solver_boOX --input-file=grid_02x02_t04.mpf\n");
@@ -105,6 +107,10 @@ namespace boOX
 	
 	if (!parameters.m_input_filename.empty())
 	{
+	    if (parameters.m_directed)
+	    {
+		instance.m_environment.m_directed = true;
+	    }
 	    result = instance.from_File_mpf(parameters.m_input_filename);
 
 	    if (sFAILED(result))
@@ -332,11 +338,11 @@ namespace boOX
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS;
 	    }
-	    else if (algorithm_str == "smtcbs+++")
+	    else if (algorithm_str == "smtcbs+++" || algorithm_str == "nrfsat") 
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS;
 	    }
-	    else if (algorithm_str == "smtcbs++++")
+	    else if (algorithm_str == "smtcbs++i")
 	    {
 		command_parameters.m_algorithm = sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS_PLUS;
 	    }	    	    
@@ -352,7 +358,11 @@ namespace boOX
 	else if (parameter.find("--timeout=") == 0)
 	{
 	    command_parameters.m_timeout = sDouble_from_String(parameter.substr(10, parameter.size()));
-	}	
+	}
+	else if (parameter.find("--directed") == 0)
+	{
+	    command_parameters.m_directed = true;
+	}		
 	else
 	{
 	    return sMAPF_SOLVER_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;

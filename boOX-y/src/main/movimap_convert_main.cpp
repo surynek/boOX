@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-188_planck                              */
+/*                             boOX 2-212_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* movimap_convert_main.cpp / 2-188_planck                                    */
+/* movimap_convert_main.cpp / 2-212_planck                                    */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com map convertor - main program.
@@ -76,6 +76,7 @@ namespace boOX
 	printf("Usage:\n");
 	printf("movimap_convert_boOX --input-movi-map-file=<string>\n");
 	printf("                     --output-xml-map-file=<string>\n");
+	printf("                     --output-ecbs-map-file=<string>\n");	
 	printf("\n");
 	printf("Examples:\n");
 	printf("movimap_convert_boOX --input-movi-map-file=empty-16-16.map\n");
@@ -86,7 +87,7 @@ namespace boOX
     }
 
 
-    sResult convert_MoviMap2XmlMap(const sCommandParameters &parameters)
+    sResult convert_MoviMap2DifferentMap(const sCommandParameters &parameters)
     {
 	sResult result;
 	s2DMap real_Map;
@@ -116,7 +117,17 @@ namespace boOX
 		printf("Error: Failed to write xml map file %s (code = %d).\n", parameters.m_output_xml_map_filename.c_str(), result);
 		return result;
 	    }
-	}	
+	}
+	if (!parameters.m_output_ecbs_map_filename.empty())
+	{
+	    result = real_Map.to_File_ecbs(parameters.m_output_ecbs_map_filename);
+
+	    if (sFAILED(result))
+	    {
+		printf("Error: Failed to write ECBS map file %s (code = %d).\n", parameters.m_output_ecbs_map_filename.c_str(), result);
+		return result;
+	    }
+	}		
 
         #ifdef sSTATISTICS
 	{
@@ -143,7 +154,11 @@ namespace boOX
 	else if (parameter.find("--output-xml-map-file=") == 0)
 	{
 	    command_parameters.m_output_xml_map_filename = parameter.substr(22, parameter.size());
-	}	
+	}
+	else if (parameter.find("--output-ecbs-map-file=") == 0)
+	{
+	    command_parameters.m_output_ecbs_map_filename = parameter.substr(23, parameter.size());
+	}		
 	else
 	{
 	    return sMOVIMAP_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR;
@@ -182,16 +197,16 @@ int main(int argc, char **argv)
 	}
 	if (!command_parameters.m_input_movi_map_filename.empty())
 	{
-	    if (!command_parameters.m_output_xml_map_filename.empty())
+	    if (!command_parameters.m_output_xml_map_filename.empty() || !command_parameters.m_output_ecbs_map_filename.empty())
 	    {
-		result = convert_MoviMap2XmlMap(command_parameters);
+		result = convert_MoviMap2DifferentMap(command_parameters);
 	    }
 	    else
 	    {
-		printf("Error: No output xml file specified (code = %d).\n", sMOVIMAP_CONVERT_PROGRAM_NO_XML_MAP_FILE_SPECIFIED_ERROR);
+		printf("Error: No output target map file specified (code = %d).\n", sMOVIMAP_CONVERT_PROGRAM_NO_TARGET_MAP_FILE_SPECIFIED_ERROR);
 		print_Help();
 		
-		return sMOVIMAP_CONVERT_PROGRAM_NO_XML_MAP_FILE_SPECIFIED_ERROR;		
+		return sMOVIMAP_CONVERT_PROGRAM_NO_TARGET_MAP_FILE_SPECIFIED_ERROR;		
 	    }
 	}
 	else

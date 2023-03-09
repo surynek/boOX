@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-188_planck                              */
+/*                             boOX 2-212_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 2-188_planck                                                    */
+/* mapR.cpp / 2-212_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
@@ -1343,6 +1343,61 @@ namespace boOX
 	fprintf(fw, "%s%s</map>\n", indent.c_str(), s_INDENT.c_str());
 	fprintf(fw, "%s</root>\n", indent.c_str());
     }
+
+
+    sResult s2DMap::to_File_ecbs(const sString &filename, const sString &indent) const
+    {
+	FILE *fw;
+
+	if ((fw = fopen(filename.c_str(), "w")) == NULL)
+	{
+	    return sUNDIRECTED_GRAPH_OPEN_ERROR;
+	}
+	
+	to_Stream_ecbs(fw, indent);	
+	fclose(fw);
+
+	return sRESULT_SUCCESS;	
+    }
+
+    
+    void s2DMap::to_Stream_ecbs(FILE *fw, const sString &indent) const
+    {
+	fprintf(fw, "%s%d,%d\n", indent.c_str(), m_Network.m_y_size + 2, m_Network.m_x_size + 2);
+
+	fprintf(fw, "%s", indent.c_str());	
+	for (sInt_32 i = 0; i < m_Network.m_x_size + 1; ++i)
+	{
+	    fprintf(fw, "1,");
+	}
+	fprintf(fw, "1\n");
+	    
+	
+	for (sInt_32 j = 0; j < m_Network.m_y_size; ++j)
+	{
+	    fprintf(fw, "%s", indent.c_str());
+	    fprintf(fw, "1,");	    
+	    for (sInt_32 i = 0; i < m_Network.m_x_size; ++i)
+	    {
+		if (m_Network.m_Matrix[j * m_Network.m_x_size + i] >= 0)
+		{
+		    fprintf(fw, "0,");
+		}
+		else
+		{
+		    fprintf(fw, "1,");
+		}
+	    }
+	    fprintf(fw, "1\n");
+	}
+
+	fprintf(fw, "%s", indent.c_str());	
+	for (sInt_32 i = 0; i < m_Network.m_x_size + 1; ++i)
+	{
+	    fprintf(fw, "1,");
+	}
+	fprintf(fw, "1\n");	
+    }        
     
 
     sResult s2DMap::from_File_xml(const sString &filename)

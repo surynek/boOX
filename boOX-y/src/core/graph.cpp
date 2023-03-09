@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-188_planck                              */
+/*                             boOX 2-212_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 2-188_planck                                                   */
+/* graph.cpp / 2-212_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -3558,9 +3558,8 @@ namespace boOX
 	}	
 	fprintf(fw, "%s</grid>\n", indent.c_str());
     }
+
     
-
-
     sResult sUndirectedGraph::from_File_movi(const sString &filename)
     {
 	sResult result;

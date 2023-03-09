@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-188_planck                              */
+/*                             boOX 2-212_planck                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* result.h / 2-188_planck                                                    */
+/* result.h / 2-212_planck                                                    */
 /*----------------------------------------------------------------------------*/
 
 #ifndef __RESULT_H__
@@ -124,12 +124,13 @@ enum sAgentInstance_Result
     sAGENT_INSTANCE_CCPF_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  4),
     sAGENT_INSTANCE_MPF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  5),
     sAGENT_INSTANCE_BGU_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR -  6),
-    sAGENT_INSTANCE_USC_MAP_OPEN_ERROR  = (sAGENT_INSTANCE_ERROR -  7),
-    sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR -  8),    
-    sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR -  9),    
-    sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 10),
-    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 11),
-    sAGENT_INSTANCE_MOVISCEN_OPEN_ERROR = (sAGENT_INSTANCE_ERROR - 12)    
+    sAGENT_INSTANCE_LCBS_OPEN_ERROR     = (sAGENT_INSTANCE_ERROR -  7),    
+    sAGENT_INSTANCE_USC_MAP_OPEN_ERROR  = (sAGENT_INSTANCE_ERROR -  8),
+    sAGENT_INSTANCE_USC_AGNT_OPEN_ERROR = (sAGENT_INSTANCE_ERROR -  9),    
+    sAGENT_INSTANCE_DIBOX_OPEN_ERROR    = (sAGENT_INSTANCE_ERROR - 10),    
+    sAGENT_INSTANCE_CNF_OPEN_ERROR      = (sAGENT_INSTANCE_ERROR - 11),
+    sAGENT_INSTANCE_SEEK_ERROR          = (sAGENT_INSTANCE_ERROR - 12),
+    sAGENT_INSTANCE_MOVISCEN_OPEN_ERROR = (sAGENT_INSTANCE_ERROR - 13)    
 };
 
 
@@ -285,11 +286,13 @@ enum sRealMapConvertorProgram_Result
 
 enum sMoviMapConvertorProgram_Result
 {
-    sMOVIMAP_CONVERT_PROGRAM_INFO                             =  210000,
-    sMOVIMAP_CONVERT_PROGRAM_ERROR                            = -210000,
-    sMOVIMAP_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR     = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 1),
-    sMOVIMAP_CONVERT_PROGRAM_NO_MOVI_MAP_FILE_SPECIFIED_ERROR = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 2),
-    sMOVIMAP_CONVERT_PROGRAM_NO_XML_MAP_FILE_SPECIFIED_ERROR  = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 3)
+    sMOVIMAP_CONVERT_PROGRAM_INFO                               =  210000,
+    sMOVIMAP_CONVERT_PROGRAM_ERROR                              = -210000,
+    sMOVIMAP_CONVERT_PROGRAM_UNRECOGNIZED_PARAMETER_ERROR       = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 1),
+    sMOVIMAP_CONVERT_PROGRAM_NO_MOVI_MAP_FILE_SPECIFIED_ERROR   = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 2),
+    sMOVIMAP_CONVERT_PROGRAM_NO_XML_MAP_FILE_SPECIFIED_ERROR    = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 3),
+    sMOVIMAP_CONVERT_PROGRAM_NO_ECBS_MAP_FILE_SPECIFIED_ERROR   = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 4),
+    sMOVIMAP_CONVERT_PROGRAM_NO_TARGET_MAP_FILE_SPECIFIED_ERROR = (sMOVIMAP_CONVERT_PROGRAM_ERROR - 5)    
 };
 
 
