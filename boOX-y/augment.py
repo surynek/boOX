@@ -1,8 +1,8 @@
 # Augment - C++ Source Code Augmenter
-# Version: 2.2
-# (C) Copyright 2010-2019 Pavel Surynek
-# http://www.surynek.com
-# pavel@surynek.com
+# Version: 2.3
+# (C) Copyright 2010-2024 Pavel Surynek
+# http://www.surynek.net
+# pavel@surynek.net
 
 import fileinput
 import string
@@ -100,10 +100,10 @@ def print_twin_header_info_frame(file, width, height, product, product_line, cop
       left = (width - len(product) - 4) / 2
       right = width - len(product) - left - 4
       file.write("/*")
-      for j in range(left):
+      for j in range(int(left)):
         file.write(" ")
       file.write(product)
-      for j in range(right):
+      for j in range(int(right)):
         file.write(" ")
       file.write("*/")
       file.write("\n")
@@ -112,10 +112,10 @@ def print_twin_header_info_frame(file, width, height, product, product_line, cop
       left = (width - len(copyright) - 4) / 2
       right = width - len(copyright) - left - 4
       file.write("/*")
-      for j in range(left):
+      for j in range(int(left)):
         file.write(" ")
       file.write(copyright)
-      for j in range(right):
+      for j in range(int(right)):
         file.write(" ")
       file.write("*/")
       file.write("\n")
@@ -124,10 +124,10 @@ def print_twin_header_info_frame(file, width, height, product, product_line, cop
       left = (width - len(email) - 4) / 2
       right = width - len(email) - left - 4
       file.write("/*")
-      for j in range(left):
+      for j in range(int(left)):
         file.write(" ")
       file.write(email)
-      for j in range(right):
+      for j in range(int(right)):
         file.write(" ")
       file.write("*/")
       file.write("\n")
@@ -136,10 +136,10 @@ def print_twin_header_info_frame(file, width, height, product, product_line, cop
       left = (width - len(email2) - 4) / 2
       right = width - len(email2) - left - 4
       file.write("/*")
-      for j in range(left):
+      for j in range(int(left)):
         file.write(" ")
       file.write(email2)
-      for j in range(right):
+      for j in range(int(right)):
         file.write(" ")
       file.write("*/")
       file.write("\n")      
@@ -217,17 +217,17 @@ def augment_file(input_filename, output_filename, width, height, version, step, 
   for line in input_file:
     total_lines = total_lines + 1
     total_size = total_size + len(line)
-    if len(line) > 1 and string.find(line, "//") < 0 and string.find(line, "/*") < 0:
+    if len(line) > 1 and line.find("//") < 0 and line.find("/*") < 0:
       code_lines = code_lines + 1
 
-    if string.find(line, "<?php") == 0 or string.find(line, "?>") == 0:
+    if line.find("<?php") == 0 or line.find("?>") == 0:
       php_source = php_source + 1
 
-    if string.find(line, "<!--") == 0 or string.find(line, "-->") == 0:
+    if line.find("<!--") == 0 or line.find("-->") == 0:
       php_comment = True
 
     if phase == 1:
-      if string.find(line, "//") != 0 and string.find(line, "/*") != 0 and (string.find(line, "<?php") != 0 or (string.find(line, "<?php") == 0 and php_source > 1)) and string.find(line, "?>") != 0 and string.find(line, "<!--") != 0 and string.find(line, "-->") != 0:
+      if line.find("//") != 0 and line.find("/*") != 0 and (line.find("<?php") != 0 or (line.find("<?php") == 0 and php_source > 1)) and line.find("?>") != 0 and line.find("<!--") != 0 and line.find("-->") != 0:
         if php_source > 0:
           output_file.write("<?php\n")
         if php_comment:
@@ -239,7 +239,7 @@ def augment_file(input_filename, output_filename, width, height, version, step, 
           output_file.write("-->\n")
         output_file.write(line)
         phase = 3
-      elif string.find(line, "//") == 0 or (string.find(line, "/*") == 0 and len(line) <= 3):
+      elif line.find("//") == 0 or (line.find("/*") == 0 and len(line) <= 3):
         if php_source > 0:
           output_file.write("<?php\n")
         if php_comment:
@@ -255,36 +255,36 @@ def augment_file(input_filename, output_filename, width, height, version, step, 
       print_header_info_frame_files(output_file, input_filename, width, height, version, step, product, copyright, author, email, url)
       phase = 3
     elif phase == 3:
-      if string.find(line, "/*--") == 0:
+      if line.find("/*--") == 0:
         output_file.write("/*")
         for j in range(width-4):
           output_file.write("-")
         output_file.write("*/")
         output_file.write("\n")
-      elif string.find(line, "/*==") == 0:
+      elif line.find("/*==") == 0:
         output_file.write("/*")
         for j in range(width-4):
           output_file.write("=")
         output_file.write("*/")
         output_file.write("\n")
-      elif string.find(line, "namespace") == 0:
+      elif line.find("namespace") == 0:
         output_file.write("namespace " + namespace + "\n")
-      elif string.find(line, "} // namespace") == 0:
+      elif line.find("} // namespace") == 0:
         output_file.write("} // namespace " + namespace + "\n")
       else:
         output_file.write(line)
     elif phase == 4:
-      if string.find(line, "//") == 0:
+      if line.find("//") == 0:
         output_file.write(line)
-      elif string.find(line, "/*--") == 0:
+      elif line.find("/*--") == 0:
         output_file.write("/*")
         for j in range(width-4):
           output_file.write("-")
         output_file.write("*/")
         output_file.write("\n")        
-      elif string.find(line, "/*") == 0:
+      elif line.find("/*") == 0:
         output_file.write(line)
-      elif string.find(line, "*/") == 0:
+      elif line.find("*/") == 0:
         output_file.write(line)
       else:
         output_file.write(line)
@@ -306,17 +306,17 @@ def twin_augment_file(input_filename, output_filename, width, height, version, s
   for line in input_file:
     total_lines = total_lines + 1
     total_size = total_size + len(line)
-    if len(line) > 1 and string.find(line, "//") < 0 and string.find(line, "/*") < 0:
+    if len(line) > 1 and line.find("//") < 0 and line.find("/*") < 0:
       code_lines = code_lines + 1
 
-    if string.find(line, "<?php") == 0 or string.find(line, "?>") == 0:
+    if line.find("<?php") == 0 or line.find("?>") == 0:
       php_source = php_source + 1
 
-    if string.find(line, "<!--") == 0 or string.find(line, "-->") == 0:
+    if line.find("<!--") == 0 or line.find("-->") == 0:
       php_comment = True
 
     if phase == 1:
-      if string.find(line, "//") != 0 and string.find(line, "/*") != 0 and (string.find(line, "<?php") != 0 or (string.find(line, "<?php") == 0 and php_source > 1)) and string.find(line, "?>") != 0 and string.find(line, "<!--") != 0 and string.find(line, "-->") != 0:
+      if line.find("//") != 0 and line.find("/*") != 0 and (line.find("<?php") != 0 or (line.find("<?php") == 0 and php_source > 1)) and line.find("?>") != 0 and line.find("<!--") != 0 and line.find("-->") != 0:
         if php_source > 0:
           output_file.write("<?php\n")
         if php_comment:
@@ -328,7 +328,7 @@ def twin_augment_file(input_filename, output_filename, width, height, version, s
           output_file.write("-->\n")
         output_file.write(line)
         phase = 3
-      elif string.find(line, "//") == 0 or (string.find(line, "/*") == 0 and len(line) <= 3):
+      elif line.find("//") == 0 or (line.find("/*") == 0 and len(line) <= 3):
         if php_source > 0:
           output_file.write("<?php\n")
         if php_comment:
@@ -344,36 +344,36 @@ def twin_augment_file(input_filename, output_filename, width, height, version, s
       print_twin_header_info_frame_files(output_file, input_filename, width, height, version, step, product, copyright, author, email, url, email2, url2)
       phase = 3
     elif phase == 3:
-      if string.find(line, "/*--") == 0:
+      if line.find("/*--") == 0:
         output_file.write("/*")
         for j in range(width-4):
           output_file.write("-")
         output_file.write("*/")
         output_file.write("\n")
-      elif string.find(line, "/*==") == 0:
+      elif line.find("/*==") == 0:
         output_file.write("/*")
         for j in range(width-4):
           output_file.write("=")
         output_file.write("*/")
         output_file.write("\n")
-      elif string.find(line, "namespace") == 0:
+      elif line.find("namespace") == 0:
         output_file.write("namespace " + namespace + "\n")
-      elif string.find(line, "} // namespace") == 0:
+      elif line.find("} // namespace") == 0:
         output_file.write("} // namespace " + namespace + "\n")
       else:
         output_file.write(line)
     elif phase == 4:
-      if string.find(line, "//") == 0:
+      if line.find("//") == 0:
         output_file.write(line)
-      elif string.find(line, "/*--") == 0:
+      elif line.find("/*--") == 0:
         output_file.write("/*")
         for j in range(width-4):
           output_file.write("-")
         output_file.write("*/")
         output_file.write("\n")        
-      elif string.find(line, "/*") == 0:
+      elif line.find("/*") == 0:
         output_file.write(line)
-      elif string.find(line, "*/") == 0:
+      elif line.find("*/") == 0:
         output_file.write(line)
       else:
         output_file.write(line)
@@ -385,17 +385,17 @@ def twin_augment_file(input_filename, output_filename, width, height, version, s
 
 
 def is_source(filename):
-  if len(filename) >= 4 and string.find(filename, ".cpp") == len(filename) - 4:
+  if len(filename) >= 4 and filename.find(".cpp") == len(filename) - 4:
     return True
-  elif len(filename) >= 2 and (string.find(filename, ".h") == len(filename) - 2 or string.find(filename, ".hh") == len(filename) - 3):
+  elif len(filename) >= 2 and (filename.find(".h") == len(filename) - 2 or filename.find(".hh") == len(filename) - 3):
     return True
-  elif len(filename) >= 4 and string.find(filename, ".php") == len(filename) - 4 and string.find(filename, ".txt") != len(filename) - 8:
+  elif len(filename) >= 4 and filename.find(".php") == len(filename) - 4 and filename.find(".txt") != len(filename) - 8:
     return True
-  elif len(filename) >= 4 and string.find(filename, ".css") == len(filename) - 4:
+  elif len(filename) >= 4 and filename.find(".css") == len(filename) - 4:
     return True
-  elif len(filename) >= 5 and string.find(filename, ".html") == len(filename) - 5:
+  elif len(filename) >= 5 and filename.find(".html") == len(filename) - 5:
     return True
-  elif len(filename) >= 3 and string.find(filename, ".js") == len(filename) - 3:
+  elif len(filename) >= 3 and filename.find(".js") == len(filename) - 3:
     return True
   else:
     return False
@@ -406,7 +406,7 @@ def is_exception(filename, exceptions_file):
   exceptions_file.seek(0)
 
   for line in exceptions_file:
-    if string.find(line, filename) == 0:
+    if line.find(filename) == 0:
       result = True
   return result
 
@@ -416,13 +416,13 @@ def augment_directory(indent, directory, width, height, version, step, product, 
   for item in listing:
     if os.path.isfile(item):
       if is_source(item) and (not is_exception(item, exceptions_file)):
-        print indent + "Augmenting: " + item + " ... ",
+        print(indent + "Augmenting: " + item + " ... ", end = "")
         total_lines, code_lines, total_size = augment_file(item, item + ".aug", width, height, version, step, product, copyright, author, email, url, namespace, total_lines, code_lines, total_size)
         shutil.copy(item, item + ".bak")
         shutil.move(item + ".aug", item)
-        print "OK"
+        print("OK")
     elif os.path.isdir(item):
-      print indent + "Subdir:" + item
+      print(indent + "Subdir:" + item)
       os.chdir(item)
       total_lines, code_lines, total_size = augment_directory(indent + "  ", ".", width, height, version, step, product, copyright, author, email, url, namespace, total_lines, code_lines, total_size, exceptions_file)
       os.chdir("..")
@@ -434,13 +434,13 @@ def twin_augment_directory(indent, directory, width, height, version, step, prod
   for item in listing:
     if os.path.isfile(item):
       if is_source(item) and (not is_exception(item, exceptions_file)):
-        print indent + "Augmenting: " + item + " ... ",
+        print(indent + "Augmenting: " + item + " ... ", end = "")
         total_lines, code_lines, total_size = twin_augment_file(item, item + ".aug", width, height, version, step, product, copyright, author, email, url, email2, url2, namespace, total_lines, code_lines, total_size)
         shutil.copy(item, item + ".bak")
         shutil.move(item + ".aug", item)
-        print "OK"
+        print("OK");
     elif os.path.isdir(item):
-      print indent + "Subdir:" + item
+      print(indent + "Subdir:" + item)
       os.chdir(item)
       total_lines, code_lines, total_size = twin_augment_directory(indent + "  ", ".", width, height, version, step, product, copyright, author, email, url, email2, url2, namespace, total_lines, code_lines, total_size, exceptions_file)
       os.chdir("..")
@@ -448,9 +448,9 @@ def twin_augment_directory(indent, directory, width, height, version, step, prod
 
 
 def print_intro():
-  print "Augment 2.2 - C++/PHP Source Code Augmenter"
-  print "(C) Copyright 2010-2019 Pavel Surynek"
-  print "---------------------------------------------"
+  print("Augment 2.3 - C++/PHP Source Code Augmenter")
+  print("(C) Copyright 2010-2024 Pavel Surynek")
+  print("---------------------------------------------")
 
 
 print_intro()
@@ -499,37 +499,37 @@ total_lines, code_lines, total_size = twin_augment_directory("", ".", 80, 11, ve
 exceptions_file.close()
 
 print
-print "Total number of lines:",
-print total_lines
-print " Number of code lines:",
-print code_lines
-print "         Code density:",
+print("Total number of lines: ", end = "")
+print(total_lines)
+print(" Number of code lines: ", end = "")
+print(code_lines)
+print("         Code density: ", end = "")
 density_1 = 10000 * float(code_lines) / float(total_lines)
 density_2 = int(density_1)
 density_3 = float(density_2) / 100
-print density_3, "%"
+print(density_3, "%")
 
-print "           Total size:",
-print total_size,
-print "bytes"
+print("           Total size: ", end = "")
+print(total_size, end = "")
+print(" bytes")
 
 total_size_kb_1 = 100 * float(total_size) / 1024
 total_size_kb_2 = int(total_size_kb_1)
 total_size_kb_3 = float(total_size_kb_2) / 100
-print "                      ",
-print total_size_kb_3,
-print "Kb"
+print("                       ", end = "")
+print(total_size_kb_3, end = "")
+print(" Kb")
 
 total_size_mb_1 = 100 * float(total_size) / (1024 * 1024)
 total_size_mb_2 = int(total_size_mb_1)
 total_size_mb_3 = float(total_size_mb_2) / 100
-print "                      ",
-print total_size_mb_3,
-print "Mb"
+print("                       ", end = "")
+print(total_size_mb_3, end = "")
+print(" Mb")
 
-print "  Average line length:",
+print("  Average line length: ", end = "")
 average_1 = 100 * float(total_size) / float(total_lines)
 average_2 = int(average_1)
 average_3 = float(average_2) / 100
-print average_3
-print "."
+print(average_3)
+print(".")

@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-211_planck                              */
+/*                             boOX 2-213_planck                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* compile.h / 2-211_planck                                                   */
+/* compile.h / 2-213_planck                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Compilation configuration file for boOX package - debugging variant.

@@ -1,8 +1,8 @@
 # Makegen - Makefile Generator
-# Version: 2.0
-# (C) Copyright 2010 - 2018 Pavel Surynek
-# http://www.surynek.com
-# pavel@surynek.com
+# Version: 2.1
+# (C) Copyright 2010 - 2024 Pavel Surynek
+# http://www.surynek.net
+# pavel@surynek.net
 
 import fileinput
 import string
@@ -15,9 +15,9 @@ class ModuleRecord:
   pass
 
 def print_intro():
-  print "Makegen 2.0 - Makefile Generator"
-  print "(C) Copyright 2010 - 2018 Pavel Surynek"
-  print "---------------------------------------"
+  print("Makegen 2.1 - Makefile Generator")
+  print("(C) Copyright 2010 - 2024 Pavel Surynek")
+  print("---------------------------------------")
 
 include_dirs = set()
 program_dirs = set()
@@ -83,7 +83,7 @@ def load_modules(modules_file):
 
     module_type = modules_file.readline()
 
-    if string.find(module_type, "program") == 0:
+    if module_type.find("program") == 0:
       module_record.type = "program"
       module_directory = modules_file.readline()
       module_record.directory = get_first_word(module_directory)
@@ -118,7 +118,7 @@ def load_modules(modules_file):
         module_record.sources.append(source)
         source = get_first_word(module_sources)      
 
-    elif string.find(module_type, "executables") == 0:
+    elif module_type.find("executables") == 0:
       module_record.type = "executables"
       module_directory = modules_file.readline()
       module_record.directory = get_first_word(module_directory)
@@ -132,7 +132,7 @@ def load_modules(modules_file):
         module_record.files.append(file)
         file = get_first_word(module_files)
 
-    elif string.find(module_type, "application") == 0:
+    elif module_type.find("application") == 0:
       module_record.type = "application"
       module_directory = modules_file.readline()
       module_record.directory = get_first_word(module_directory)
@@ -185,7 +185,7 @@ def load_modules(modules_file):
         module_record.own_libraries.append(own_library)
         own_library = get_first_word(module_own_libraries)
 
-    elif string.find(module_type, "library") == 0:
+    elif module_type.find("library") == 0:
       module_record.type = "library"
       module_directory = modules_file.readline()
       module_record.directory = get_first_word(module_directory)
@@ -229,7 +229,7 @@ def load_modules(modules_file):
         module_record.own_libraries.append(own_library)
         own_library = get_first_word(module_own_libraries)
       
-    elif string.find(module_type, "files") == 0:
+    elif module_type.find("files") == 0:
       module_record.type = "files"
       module_directory = modules_file.readline()
       module_record.directory = get_first_word(module_directory)
@@ -245,19 +245,19 @@ def load_modules(modules_file):
         module_files = get_remaining_words(module_files)
         module_record.files.append(file)
 
-        if (   (len(file) >= 4 and string.find(file, ".php") == len(file) - 4)
-            or (len(file) >= 5 and string.find(file, ".html") == len(file) - 5)
-            or (len(file) >= 3 and string.find(file, ".js") == len(file) - 3)
-            or (len(file) >= 4 and string.find(file, ".css") == len(file) - 4)):
+        if (   (len(file) >= 4 and file.find(".php") == len(file) - 4)
+            or (len(file) >= 5 and file.find(".html") == len(file) - 5)
+            or (len(file) >= 3 and file.find(".js") == len(file) - 3)
+            or (len(file) >= 4 and file.find(".css") == len(file) - 4)):
           web_files.append(module_record.directory[1:len(module_record.directory)] + "/" + file);
 
-        if (len(file) >= 4 and string.find(file, ".png") == len(file) - 4) or (len(file) >= 4 and string.find(file, ".jpg") == len(file) - 4) or (len(file) >= 4 and string.find(file, ".ico") == len(file) - 4):
+        if (len(file) >= 4 and file.find(".png") == len(file) - 4) or (len(file) >= 4 and file.find(".jpg") == len(file) - 4) or (len(file) >= 4 and file.find(".ico") == len(file) - 4):
           art_files.append(module_record.directory[1:len(module_record.directory)] + "/" + file);
 
         file = get_first_word(module_files)
        
     else:
-      print "Error: Unrecognized module type: " + module_type
+      print("Error: Unrecognized module type: " + module_type)
       break;
 
     modules.append(module_record)
@@ -285,20 +285,20 @@ def construct_object_name_debug(module_directory, source):
   depth = 0
   start = 0
 
-  pos = string.find(module_directory, "/", start)
+  pos = module_directory.find("/", start)
   while pos >= 0:
     depth = depth + 1
     start = pos + 1
-    pos = string.find(module_directory, "/", start)
+    pos = module_directory.find("/", start)
 
   if source[0] == '/':
     prefix = ""
     for d in range(depth):
       prefix = prefix + "../"
-    ext_pos = string.find(source, ".")
+    ext_pos = source.find(".")
     return prefix + source[1:ext_pos] + ".o_dbg"
   else:
-    ext_pos = string.find(source, ".")
+    ext_pos = source.find(".")
     return source[0:ext_pos] + ".o_dbg"
 
 
@@ -306,20 +306,20 @@ def construct_object_name_optimized(module_directory, source):
   depth = 0
   start = 0
 
-  pos = string.find(module_directory, "/", start)
+  pos = module_directory.find("/", start)
   while pos >= 0:
     depth = depth + 1
     start = pos + 1
-    pos = string.find(module_directory, "/", start)
+    pos = module_directory.find("/", start)
 
   if source[0] == '/':
     prefix = ""
     for d in range(depth):
       prefix = prefix + "../"
-    ext_pos = string.find(source, ".")
+    ext_pos = source.find(".")
     return prefix + source[1:ext_pos] + ".o_opt"
   else:
-    ext_pos = string.find(source, ".")
+    ext_pos = source.find(".")
     return source[0:ext_pos] + ".o_opt"
 
 
@@ -327,11 +327,11 @@ def construct_header_name(module_directory, header):
   depth = 0
   start = 0
 
-  pos = string.find(module_directory, "/", start)
+  pos = module_directory.find("/", start)
   while pos >= 0:
     depth = depth + 1
     start = pos + 1
-    pos = string.find(module_directory, "/", start)
+    pos = module_directory.find("/", start)
 
   if header[0] == '/':
     prefix = ""
@@ -344,10 +344,10 @@ def construct_header_name(module_directory, header):
 
 def construct_header_directory(header):
   start_hdr = 0
-  pos_hdr = string.find(header, "/", start_hdr)
+  pos_hdr = header.find("/", start_hdr)
   while pos_hdr >= 0:
     start_hdr = pos_hdr + 1
-    pos_hdr = string.find(header, "/", start_hdr)
+    pos_hdr = header.find("/", start_hdr)
   return header[0:start_hdr-1]
 
 
@@ -355,11 +355,11 @@ def construct_source_name(module_directory, source):
   depth = 0
   start = 0
 
-  pos = string.find(module_directory, "/", start)
+  pos = module_directory.find("/", start)
   while pos >= 0:
     depth = depth + 1
     start = pos + 1
-    pos = string.find(module_directory, "/", start)
+    pos = module_directory.find("/", start)
 
   if source[0] == '/':
     prefix = ""
@@ -374,11 +374,11 @@ def construct_library_name_debug(module_directory, library):
   depth = 0
   start = 0
 
-  pos = string.find(module_directory, "/", start)
+  pos = module_directory.find("/", start)
   while pos >= 0:
     depth = depth + 1
     start = pos + 1
-    pos = string.find(module_directory, "/", start)
+    pos = module_directory.find("/", start)
   
   if library[0] == '/':
     prefix = ""
@@ -393,11 +393,11 @@ def construct_library_name_optimized(module_directory, library):
   depth = 0
   start = 0
 
-  pos = string.find(module_directory, "/", start)
+  pos = module_directory.find("/", start)
   while pos >= 0:
     depth = depth + 1
     start = pos + 1
-    pos = string.find(module_directory, "/", start)
+    pos = module_directory.find("/", start)
   
   if library[0] == '/':
     prefix = ""
@@ -410,37 +410,37 @@ def construct_library_name_optimized(module_directory, library):
 
 def construct_library_directory(library):
   start_hdr = 0
-  pos_hdr = string.find(library, "/", start_hdr)
+  pos_hdr = library.find("/", start_hdr)
   while pos_hdr >= 0:
     start_hdr = pos_hdr + 1
-    pos_hdr = string.find(library, "/", start_hdr)
+    pos_hdr = library.find("/", start_hdr)
   return library[0:start_hdr-1]
 
 
 def construct_library_module_name(library):
   start_lib = 0
-  pos_lib = string.find(library, "/", start_lib)
+  pos_lib = library.find("/", start_lib)
   while pos_lib >= 0:
     start_lib = pos_lib + 1
-    pos_lib = string.find(library, "/", start_lib)
+    pos_lib = library.find("/", start_lib)
   return library[start_lib:len(library)]
 
 
 def construct_library_module_name_debug(library):
   start_lib = 0
-  pos_lib = string.find(library, "/", start_lib)
+  pos_lib = library.find("/", start_lib)
   while pos_lib >= 0:
     start_lib = pos_lib + 1
-    pos_lib = string.find(library, "/", start_lib)
+    pos_lib = library.find("/", start_lib)
   return library[start_lib:len(library)] + "_dbg"
 
 
 def construct_library_module_name_optimized(library):
   start_lib = 0
-  pos_lib = string.find(library, "/", start_lib)
+  pos_lib = library.find("/", start_lib)
   while pos_lib >= 0:
     start_lib = pos_lib + 1
-    pos_lib = string.find(library, "/", start_lib)
+    pos_lib = library.find("/", start_lib)
   return library[start_lib:len(library)] + "_opt"
 
 
@@ -472,11 +472,11 @@ def generate_rules(clean_pattern):
      continue
 
    if os.path.isdir(pd2):
-     print "Processing existent directory ... " + pd2
+     print("Processing existent directory ... " + pd2)
    else:
-     print "Processing non-existent directory ... " + pd2
+     print("Processing non-existent directory ... " + pd2)
      os.makedirs(pd2)
-   print "  Generating '" + pd2 + "/Makefile' ... ",
+   print("  Generating '" + pd2 + "/Makefile' ... ", end = "")
    makefile = open(pd2 + "/Makefile", "w")
 
    create_rules = False
@@ -627,7 +627,7 @@ def generate_rules(clean_pattern):
                    header_dirs.add(hdr_dir)
                src = construct_source_name(md.directory, sr)
                makefile.write(src + "\n")
-               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -std=c++0x -g -c ")
+               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -Wno-stringop-truncation -std=c++14 -g -c ")
                for hdr_dir in header_dirs:
                  makefile.write("-I" + hdr_dir + " ")
                makefile.write("-o" + obj + " " + src + "\n")
@@ -664,7 +664,7 @@ def generate_rules(clean_pattern):
                src = construct_source_name(md.directory, sr)
                makefile.write(src + "\n")
 
-               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c ")
+               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -Wno-stringop-truncation -g -std=c++14 -c ")
                for hdr_dir in header_dirs:
                  makefile.write("-I" + hdr_dir + " ")
                makefile.write("-o" + obj + " " + src + "\n")
@@ -694,7 +694,7 @@ def generate_rules(clean_pattern):
                src = construct_source_name(md.directory, sr)
                makefile.write(src + "\n")
 
-               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -g -std=c++0x -c ")
+               makefile.write("\tg++ -Wall -Wextra -pedantic -Wno-class-memaccess -Wno-long-long -Wno-unused-result -Wno-sign-compare -Wno-delete-non-virtual-dtor -Wno-stringop-truncation -g -std=c++14 -c ")
                for hdr_dir in head_dirs:
                  makefile.write("-I" + hdr_dir + " ")
                makefile.write("-o" + obj + " " + src + "\n")
@@ -806,9 +806,9 @@ def generate_rules(clean_pattern):
             
    makefile.write("\n")
    makefile.close()
-   print "OK"
+   print("OK")
 
- print "  Generating 'Makefile' ... ",
+ print("  Generating 'Makefile' ... ", end = "")
  main_makefile = open("Makefile", "w")
  main_makefile.write("SUBDIRS =")
  for pd in project_dirs:
@@ -864,7 +864,7 @@ def generate_rules(clean_pattern):
  deploy_file.close();
  os.chmod("deploy.sh", stat.S_IRWXU | stat.S_IXGRP | stat.S_IXOTH);
 
- print "OK"
+ print("OK")
 
 print_intro()
 
@@ -881,4 +881,4 @@ clean_pattern = clean_file.readline()
 clean_file.close()
 
 generate_rules(clean_pattern)
-print "."
+print(".")

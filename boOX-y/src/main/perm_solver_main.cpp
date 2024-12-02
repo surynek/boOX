@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-211_planck                              */
+/*                             boOX 2-213_planck                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.cpp / 2-211_planck                                        */
+/* perm_solver_main.cpp / 2-213_planck                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.

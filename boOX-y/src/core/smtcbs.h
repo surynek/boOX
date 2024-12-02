@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-211_planck                              */
+/*                             boOX 2-213_planck                             */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                   */
+/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 2-211_planck                                                    */
+/* smtcbs.h / 2-213_planck                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
