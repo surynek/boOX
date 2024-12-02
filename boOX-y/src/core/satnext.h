@@ -9,17 +9,39 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* defs.h / 2-214_planck                                                      */
+/* satnext.h / 2-214_planck                                                   */
+/*----------------------------------------------------------------------------*/
+//
+// Next generation SAT-based algorithms for MAPF and related problems.
+//
 /*----------------------------------------------------------------------------*/
 
-#ifndef __DEFS_H__
-#define __DEFS_H__
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef __SATNEXT_H__
+#define __SATNEXT_H__
 
-#include "compile.h"
+#include <vector>
+#include <list>
+#include <set>
+#include <map>
+#include <unordered_map>
+
+#include "glucose/System.h"
+#include "glucose/ParseUtils.h"
+#include "glucose/Options.h"
+#include "glucose/Dimacs.h"
+#include "glucose/Solver.h"
+
+#include "result.h"
+
+#include "common/types.h"
+
+#include "core/graph.h"
+#include "core/cbs.h"
+#include "core/cnf.h"
+
+
+using namespace std;
 
 
 /*----------------------------------------------------------------------------*/
@@ -27,63 +49,29 @@
 namespace boOX
 {
 
-
 /*----------------------------------------------------------------------------*/
-// Auxiliary macros
+// sSATNext
+    
+    class sSATNext
+    {
+    public:
+	typedef std::vector<sConfiguration> Configurations_vector;
+	
+    public:
+	sSATNext(sBoolEncoder *solver_Encoder, sInstance *instance);
 
-#define sUNUSED(x)
+	/*----------------------------------------------------------------------------*/	
+	
+    private:
+	sSATNext(const sSATNext &sat_next);
+	const sSATNext& operator=(const sSATNext &sat_next);
 
-#ifdef sDEBUG
-  #define sUNUSED_(x) x
-#else
-  #define sUNUSED_(x)
-#endif
+    public:		
+};
 
-#ifdef sDEEP_CONSISTENCY
-  #define sUSED_(x) x
-#else
-  #define sUSED_(x)
-#endif
-
-
-/*----------------------------------------------------------------------------*/
-// Maximum, minimum macros
-
-#define sMIN(x,y) (((x) < (y)) ? (x) : (y))
-#define sMAX(x,y) (((x) > (y)) ? (x) : (y))
-#define sDFR(x,y) (((x) < (y)) ? ((y) - (x)) : ((x) - (y)))
-#define sABS(x) (((x) < 0) ? -(x) : (x))
-#define sSGN(x) (((x) < 0) ? -(-1) : ((x) > 0) ? 1 : 0)
-
-
-/*----------------------------------------------------------------------------*/
-// Auxiliary macros
-
-#define sSWAP(x, y, T)      \
-    {                       \
-        T z;                \
-	z = x;              \
-	x = y;              \
-	y = z;              \
-    }
-
-
-/*----------------------------------------------------------------------------*/
-// C++ Language extensions
-
-#define SEMICONST
-
-
-/*----------------------------------------------------------------------------*/
-// Size definitions
-
-#define sKILO(x) (1024 * (x))
-#define sMEGA(x) (1024 * 1024 * (x))
-#define sGIGA(x) (1024 * 1024 * 1024 * (x))
-
-
+    
 /*----------------------------------------------------------------------------*/
 
 } // namespace boOX
 
-#endif /* __DEFS_H__ */
+#endif /* __SATNEXT_H__ */

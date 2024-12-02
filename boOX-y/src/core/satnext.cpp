@@ -9,19 +9,32 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* basic_test.h / 2-214_planck                                                */
+/* satnext.cpp / 2-214_planck                                                 */
 /*----------------------------------------------------------------------------*/
 //
-// Basic initial test.
+// Next generation SAT-based algorithms for MAPF and related problems.
 //
 /*----------------------------------------------------------------------------*/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
-#ifndef __BASIC_TEST_H__
-#define __BASIC_TEST_H__
+#include <map>
 
+#include "config.h"
+#include "compile.h"
+#include "version.h"
 #include "defs.h"
 #include "result.h"
+
+#include "common/types.h"
+#include "core/satnext.h"
+#include "util/statistics.h"
+
+
+using namespace std;
+using namespace boOX;
 
 
 /*----------------------------------------------------------------------------*/
@@ -29,13 +42,16 @@
 namespace boOX
 {
 
-void print_Introduction(void);
-int test_basic_1(void);
+
+/*----------------------------------------------------------------------------*/
+// sSATNext
 
 
 /*----------------------------------------------------------------------------*/
 
+
+    
+
 } // namespace boOX
-
-#endif /* __BASIC_TEST_H__ */
-
+    
+    
