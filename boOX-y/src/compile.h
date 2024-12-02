@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-214_planck                             */
+/*                              boOX 3-002_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* compile.h / 2-214_planck                                                   */
+/* compile.h / 3-002_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Compilation configuration file for boOX package - debugging variant.

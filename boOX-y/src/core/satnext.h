@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             boOX 2-214_planck                             */
+/*                              boOX 3-002_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* satnext.h / 2-214_planck                                                   */
+/* satnext.h / 3-002_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Next generation SAT-based algorithms for MAPF and related problems.
