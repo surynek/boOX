@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-002_godel                              */
+/*                              boOX 3-001_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs_test.cpp / 3-002_godel                                                 */
+/* cbs_test.cpp / 3-001_godel                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Graph data structures and algorithms - testing program.

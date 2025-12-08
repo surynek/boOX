@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-002_godel                              */
+/*                              boOX 3-001_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 3-002_godel                                                    */
+/* agent.cpp / 3-001_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1066,7 +1066,8 @@ namespace boOX
 
 	    if (agent_id > 0)
 	    {
-		++N_Agents;
+		//++N_Agents;
+		N_Agents = sMAX(agent_id + 1, N_Agents);
 	    }
 	    ++N_Vertices;
 	    if (c != '\n')
@@ -1184,7 +1185,7 @@ namespace boOX
 
 	    if (agent_id > 0)
 	    {
-		++N_Agents;
+		N_Agents = sMAX(agent_id + 1, N_Agents);
 	    }
 	    ++N_Vertices;
 	    if (c != '\n')
@@ -1302,7 +1303,7 @@ namespace boOX
 
 	    if (agent_id > 0)
 	    {
-		++N_Agents;
+		N_Agents = sMAX(agent_id + 1, N_Agents);
 	    }
 	    ++N_Vertices;
 	    if (c != '\n')
@@ -1413,7 +1414,7 @@ namespace boOX
 
 	    if (agent_id > 0)
 	    {
-		++N_Agents;
+		N_Agents = sMAX(agent_id + 1, N_Agents);
 	    }
 	    ++N_Vertices;
 	    if (c != '\n')
