@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-001_godel                              */
+/*                              boOX 3-003_godel                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
+/*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 3-001_godel                                                   */
+/* smtcbs.cpp / 3-003_godel                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -868,6 +868,7 @@ namespace boOX
 	sInt_32 cost;
 	AgentPaths_vector agent_Paths;
 
+	printf("gamma -1\n");	
 	if ((cost = find_ShortestNonconflictingPathsInverseDepleted(agent_Paths, cost_limit)) < 0)
 	{
 	    return cost;
@@ -912,28 +913,35 @@ namespace boOX
     sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	sInt_32 solution_cost, max_individual_cost;
-	
+
+	printf("gamma 1\n");
         #ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
 	sDouble start_time = sStatistics::get_CPU_Seconds();
 	#endif
 
+	printf("gamma 1.1\n");		
 	sInt_32 min_total_cost = instance.estimate_TotalPathCost(max_individual_cost);
+	printf("gamma 1.2\n");
 	Context context;
+	printf("gamma 2\n");	
 	
 	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
 	{
+	    printf("gamma 3\n");	    
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));		
 	    }
 	    #endif
+	    printf("gamma 4\n");
 	    if ((solution_cost = find_NonconflictingPathsInverseDepleted(context, instance, agent_Paths, cost)) >= 0)
 	    {
 		return solution_cost;
 	    }
-	    
+
+	    printf("gamma 5\n");	    
 	    if (m_timeout >= 0)
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
@@ -2657,9 +2665,12 @@ namespace boOX
 	sInt_32 extra_cost;
 	sInstance::MDD_vector MDD, extra_MDD;
 	sInstance::InverseMDD_vector inverse_MDD;
-
+	
+	printf("  psi 1\n");
 	instance.construct_PathMDD(cost_limit, MDD, extra_cost, extra_MDD);
+	printf("  psi 2\n");	
 	instance.construct_InverseMDD(MDD, inverse_MDD);
+	printf("  psi 3\n");
 
 	m_cbs_instance = instance;
 	
@@ -4084,8 +4095,7 @@ namespace boOX
 	    return -1;
 	}
 
-	#ifdef sDEBUG
-	/*
+	#ifdef sDEBUG	
 	{
 	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	    {
@@ -4098,7 +4108,6 @@ namespace boOX
 		printf("\n");
 	    }
 	}
-	*/
 	#endif
 
 	Collisions_vector Collisions;
@@ -4134,7 +4143,7 @@ namespace boOX
 		++s_GlobalStatistics.get_CurrentPhase().m_macro_search_Steps;
 	    }
             #endif
-	    
+
 	    if (!find_NextNonconflictingPathsInverseOmitted(solver,
 							    context,
 							    sat_Model,
@@ -7751,7 +7760,7 @@ namespace boOX
 	{
 	    context.m_trans_Collisions.push_back(*collision);
 	}
-		
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -7829,7 +7838,7 @@ namespace boOX
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
 	    context.m_trans_Collisions.push_back(*collision);
-	}		
+	}
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -7838,7 +7847,7 @@ namespace boOX
 					       inverse_MDD,
 					       cost_limit, 
 					       extra_cost,
-					       sat_Model);	
+					       sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -7899,7 +7908,7 @@ namespace boOX
 	{
 	    context.m_trans_Collisions.push_back(*collision);
 	}
-		
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -7978,7 +7987,7 @@ namespace boOX
 	{
 	    context.m_trans_Collisions.push_back(*collision);
 	}
-		
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -8173,7 +8182,7 @@ namespace boOX
 	{
 	    context.m_trans_Collisions.push_back(*collision);
 	}
-		
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -8251,7 +8260,7 @@ namespace boOX
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
 	    context.m_trans_Collisions.push_back(*collision);
-	}		
+	}
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -8260,7 +8269,7 @@ namespace boOX
 					       inverse_MDD,
 					       cost_limit, 
 					       extra_cost,
-					       sat_Model);	
+					       sat_Model);
 
 	if (!solver->simplify())
 	{
@@ -8321,7 +8330,7 @@ namespace boOX
 	{
 	    context.m_trans_Collisions.push_back(*collision);
 	}
-		
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -8400,7 +8409,7 @@ namespace boOX
 	{
 	    context.m_trans_Collisions.push_back(*collision);
 	}
-		
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       Collisions,
 					       instance,
@@ -14028,7 +14037,7 @@ namespace boOX
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
 	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
-	    {
+	    {		
 		if (MDD[agent_id][N_layers][u] == instance.m_goal_configuration.get_AgentLocation(agent_id))
 		{
 		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);
@@ -14546,7 +14555,7 @@ namespace boOX
 		}
 	    }
 	}
-	
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       context.m_trans_Collisions,
 					       instance,
@@ -14706,25 +14715,30 @@ namespace boOX
 		}
 		else
 		{
-		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][0][u]);		    
+		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][0][u]);
 		}
 	    }
 	}
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+	    sInt_32 agent_location = instance.m_goal_configuration.get_AgentLocation(agent_id);
+	    
+	    if (agent_location >= 0)
 	    {
-		if (MDD[agent_id][N_layers][u] == instance.m_goal_configuration.get_AgentLocation(agent_id))
-		{
-		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);
-		}
-		else
-		{
-		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		    
+		for (sInt_32 u = 0; u < MDD[agent_id][N_layers].size(); ++u)
+		{       	    
+		    if (MDD[agent_id][N_layers][u] == agent_location)
+		    {
+			m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);
+		    }
+		    else
+		    {
+			m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][N_layers][u]);		    
+		    }
 		}
 	    }
 	}
-	
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       context.m_trans_Collisions,
 					       instance,
@@ -14861,7 +14875,7 @@ namespace boOX
 		    }
 		}
 	    }
-	    
+
 	    refine_PathSmallModelCollisionsInverse(solver,
 						   context.m_trans_Collisions,
 						   instance,
@@ -14870,7 +14884,7 @@ namespace boOX
 						   inverse_MDD,
 						   cost_limit,
 						   extra_cost,
-						   sat_Model);	
+						   sat_Model);
 	}
 
 	VariableIDs_vector cardinality_Identifiers;
@@ -14911,15 +14925,20 @@ namespace boOX
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    for (sInt_32 u = 0; u < MDD[agent_id][mdd_depth - 1].size(); ++u)
+	    sInt_32 agent_location = instance.m_goal_configuration.get_AgentLocation(agent_id);
+
+	    if (agent_location >= 0)
 	    {
-		if (MDD[agent_id][mdd_depth - 1][u] == instance.m_goal_configuration.get_AgentLocation(agent_id))
+		for (sInt_32 u = 0; u < MDD[agent_id][mdd_depth - 1].size(); ++u)
 		{
-		    m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u], goal_Assumptions);
-		}
-		else
-		{
-		    m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u], goal_Assumptions);		    
+		    if (MDD[agent_id][mdd_depth - 1][u] == agent_location)
+		    {
+			m_solver_Encoder->cast_BitSet(solver, sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u], goal_Assumptions);
+		    }
+		    else
+		    {
+			m_solver_Encoder->cast_BitUnset(solver, sat_Model.m_vertex_occupancy[agent_id][mdd_depth - 1][u], goal_Assumptions);		    
+		    }
 		}
 	    }
 	}
@@ -15018,7 +15037,7 @@ namespace boOX
 		}
 	    }
 	}
-	
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       context.m_trans_Collisions,
 					       instance,
@@ -15123,7 +15142,7 @@ namespace boOX
 		}
 	    }
 	}
-	
+
 	refine_PathSmallModelCollisionsInverse(solver,
 					       context.m_trans_Collisions,
 					       instance,
@@ -15308,8 +15327,10 @@ namespace boOX
     {	
 	for (Collisions_vector::const_iterator collision = Collisions.begin(); collision != Collisions.end(); ++collision)
 	{
+    
 	    sInstance::InverseVertexIDs_umap::const_iterator inverse_u = inverse_MDD[collision->m_agent_A_id][collision->m_level_A].find(collision->m_vertex_A_id);
 	    sASSERT(inverse_u != inverse_MDD[collision->m_agent_A_id][collision->m_level_A].end());
+
 	    sInt_32 u = inverse_u->second;
 	    
 	    sInstance::InverseVertexIDs_umap::const_iterator inverse_v = inverse_MDD[collision->m_agent_B_id][collision->m_level_B].find(collision->m_vertex_B_id);
@@ -15561,7 +15582,7 @@ namespace boOX
 	    }
 	}       
 	decode_Tree2Path(instance, agent_Trees, agent_Paths);
-	
+
 	#ifdef sDEBUG
 	/*
 	{
@@ -15596,11 +15617,13 @@ namespace boOX
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	#ifdef sDEBUG
+	/*	
 	{
-	    /*
 	    for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	    {
-		printf("Agent: %d: %d ---> %d\n", agent_id, instance.m_start_configuration.get_AgentLocation(agent_id), instance.m_goal_configuration.get_AgentLocation(agent_id));
+		sInt_32 agent_final_location = agent_Trees[agent_id].back().front();
+				
+		printf("Agent: %d: %d ---> %d (%d)\n", agent_id, instance.m_start_configuration.get_AgentLocation(agent_id), instance.m_goal_configuration.get_AgentLocation(agent_id), agent_final_location);
 		for (sInt_32 layer = 0; layer < agent_Trees[agent_id].size(); ++layer)
 		{
 		    printf("%d: ", layer);
@@ -15611,22 +15634,40 @@ namespace boOX
 		    printf("\n");
 		}
 	    }
-	    */
 	}
-	#endif
+	*/
+	#endif	
 	
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
-	    if (!convert_Tree2Path(instance,
-				   instance.m_start_configuration.get_AgentLocation(agent_id),
-				   instance.m_goal_configuration.get_AgentLocation(agent_id),
-				   1,
-				   agent_Trees[agent_id],
-				   agent_Paths[agent_id]))
+	    sInt_32 agent_goal_location = instance.m_goal_configuration.get_AgentLocation(agent_id);
+	    
+	    if (agent_goal_location >= 0)
 	    {
-		return false;
+		if (!convert_Tree2Path(instance,
+				       instance.m_start_configuration.get_AgentLocation(agent_id),
+				       agent_goal_location,
+				       1,
+				       agent_Trees[agent_id],
+				       agent_Paths[agent_id]))
+		{
+		    return false;
+		}
+		agent_Paths[agent_id][0] = instance.m_start_configuration.get_AgentLocation(agent_id);
 	    }
-	    agent_Paths[agent_id][0] = instance.m_start_configuration.get_AgentLocation(agent_id);
+	    else
+	    {
+		if (!convert_Tree2Path(instance,
+				       instance.m_start_configuration.get_AgentLocation(agent_id),
+				       -1,
+				       1,
+				       agent_Trees[agent_id],
+				       agent_Paths[agent_id]))
+		{
+		    return false;
+		}
+		agent_Paths[agent_id][0] = instance.m_start_configuration.get_AgentLocation(agent_id);		
+	    }
 	}
 	
 	return true;
@@ -15642,13 +15683,20 @@ namespace boOX
     {
 	if (path_index == agent_Path.size())
 	{
-	    if (curr_vertex_id == goal_vertex_id)
+	    if (goal_vertex_id < 0)
 	    {
 		return true;
 	    }
 	    else
 	    {
-		return false;
+		if (curr_vertex_id == goal_vertex_id)
+		{
+		    return true;
+		}
+		else
+		{
+		    return false;
+		}
 	    }
 	}
 	else

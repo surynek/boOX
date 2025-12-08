@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-001_godel                              */
+/*                              boOX 3-003_godel                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
+/*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapf_solver_main.cpp / 3-001_godel                                         */
+/* mapf_solver_main.cpp / 3-003_godel                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Path Finding Solver - main program.
@@ -104,7 +104,7 @@ namespace boOX
     {
 	sResult result;
 	sInstance instance;
-	
+
 	if (!parameters.m_input_filename.empty())
 	{
 	    if (parameters.m_directed)
@@ -208,8 +208,11 @@ namespace boOX
 	    #endif
 	    
 	    sBoolEncoder encoder;
+	    printf("alpha 1\n");
 	    sSMTCBS smtcbs_Solver(&encoder, parameters.m_subopt_ratio, &instance, parameters.m_timeout);
+	    printf("alpha 2\n");	    
 	    cost = smtcbs_Solver.find_ShortestNonconflictingPathsInverseDepleted(solution, parameters.m_cost_limit);
+	    printf("alpha 3\n");	    
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_SMTCBS_PLUS_PLUS_PLUS:
@@ -403,8 +406,8 @@ int main(int argc, char **argv)
 	{
 	    printf("Error: Input file name missing (code = %d).\n", sMAPF_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR);
 	    return sMAPF_SOLVER_PROGRAM_MISSING_INPUT_FILE_ERROR;
-	}	
-	result = solve_MultiAgentPathFindingInstance(command_parameters);
+	}
+	result = solve_MultiAgentPathFindingInstance(command_parameters);	
 	if (sFAILED(result))
 	{
 	    return result;

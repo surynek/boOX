@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-001_godel                              */
+/*                              boOX 3-003_godel                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
+/*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 3-001_godel                                                      */
+/* cnf.cpp / 3-003_godel                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.

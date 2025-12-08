@@ -1,15 +1,15 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-001_godel                              */
+/*                              boOX 3-003_godel                              */
 /*                                                                            */
-/*                  (C) Copyright 2018 - 2022 Pavel Surynek                  */
+/*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
 /*                http://www.surynek.net | <pavel@surynek.net>                */
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 3-001_godel                                                    */
+/* graph.cpp / 3-003_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -1775,12 +1775,15 @@ namespace boOX
 	{
 	    source_Distances[*source].resize(N_Vertices);
 	}
-
 	for (VertexIDs_vector::const_iterator goal = goal_IDs.begin(); goal != goal_IDs.end(); ++goal)
 	{
-	    goal_Distances[*goal].resize(N_Vertices);
+	    if (*goal >= 0)
+	    {
+		goal_Distances[*goal].resize(N_Vertices);
+	    }
 	}
 
+	
 	for (VertexIDs_vector::const_iterator source = source_IDs.begin(); source != source_IDs.end(); ++source)
 	{
 	    calc_SingleSourceShortestPathsBreadth(*source);
@@ -1793,19 +1796,21 @@ namespace boOX
 		++vertex_id;
 	    }
 	}
-
 	if (m_directed)
 	{
 	    for (VertexIDs_vector::const_iterator goal = goal_IDs.begin(); goal != goal_IDs.end(); ++goal)
 	    {
-		calc_SingleSourceShortestPathsBreadth_opposite(*goal);
-
-		sInt_32 vertex_id = 0;
-		
-		for (Distances_vector::const_iterator distance = m_Distances.begin(); distance != m_Distances.end(); ++distance)
+		if (*goal >= 0)
 		{
-		    goal_Distances[*goal][vertex_id] = *distance;
-		    ++vertex_id;
+		    calc_SingleSourceShortestPathsBreadth_opposite(*goal);
+
+		    sInt_32 vertex_id = 0;
+		    
+		    for (Distances_vector::const_iterator distance = m_Distances.begin(); distance != m_Distances.end(); ++distance)
+		    {
+			goal_Distances[*goal][vertex_id] = *distance;
+			++vertex_id;
+		    }
 		}
 	    }	    
 	}
@@ -1813,14 +1818,17 @@ namespace boOX
 	{
 	    for (VertexIDs_vector::const_iterator goal = goal_IDs.begin(); goal != goal_IDs.end(); ++goal)
 	    {
-		calc_SingleSourceShortestPathsBreadth(*goal);
-
-		sInt_32 vertex_id = 0;
-		
-		for (Distances_vector::const_iterator distance = m_Distances.begin(); distance != m_Distances.end(); ++distance)
+		if (*goal >= 0)
 		{
-		    goal_Distances[*goal][vertex_id] = *distance;
-		    ++vertex_id;
+		    calc_SingleSourceShortestPathsBreadth(*goal);
+		    
+		    sInt_32 vertex_id = 0;
+		
+		    for (Distances_vector::const_iterator distance = m_Distances.begin(); distance != m_Distances.end(); ++distance)
+		    {
+			goal_Distances[*goal][vertex_id] = *distance;
+			++vertex_id;
+		    }
 		}
 	    }
 	}
