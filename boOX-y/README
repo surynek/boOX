@@ -2,7 +2,7 @@
 
 boOX
 
-(C) Pavel Surynek, 2018 - 2023
+(C) Pavel Surynek, 2018 - 2025
 pavel@surynek.net
 
 =======================================================
@@ -12,6 +12,34 @@ related to artificial intelligence.
 
 -------------------------------------------------------
 
+
+-- Update 12/2025 -------------------------------------
+
+Added support for agents that have no assigned goal vertex.
+These agent behave like movable obstacles. There was no need
+to change the algorithms, all the main algorithms work with
+agents with no assigned goals. It was only necessary to
+change the construction of MDD for unassigned agents. The
+following algorithms and their variants are supported.
+
+--algorithm=smtcbs
+--algorithm=smtcbs+
+--algorithm=smtcbs++
+--algorithm=nrfsat
+
+The input file format has the .npf suffix, examples are in
+the /samples/nogoal directory. The file format is almost the
+same as for .mpf but the unassigned agents do not occupy any
+vertex in the goal configuration (the third component of
+the vertex triple (vertex index, intial agent, goal agent)
+is zero).
+
+-------------------------------------------------------
+
+Please MAPF solving with unassigned agents...
+Pavel Surynek, 12/2025
+
+-------------------- **** -----------------------------
 
 
 -- Update 02/2023 -------------------------------------
