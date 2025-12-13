@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-003_godel                              */
+/*                              boOX 3-004_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 3-003_godel                                                    */
+/* agent.cpp / 3-004_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -1823,7 +1823,7 @@ namespace boOX
 	    }
 	    else
 	    {
-		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(0, mdd_agent_id));		
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(0, mdd_agent_id));
 	    }
 	}
 
@@ -1956,10 +1956,17 @@ namespace boOX
 	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
 
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
-	    sInt_32 agent_sink_vertex_id = m_goal_configuration.get_AgentLocation(mdd_agent_id);   
-	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+	    sInt_32 agent_sink_vertex_id = m_goal_configuration.get_AgentLocation(mdd_agent_id);
 
-	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	    if (agent_sink_vertex_id >= 0)
+	    {	    
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	    }
+	    else
+	    {
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(0, mdd_agent_id));
+	    }	    
 	}
 
 	sInt_32 sort_index = 0;
@@ -1972,29 +1979,47 @@ namespace boOX
 
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
 	    sInt_32 agent_sink_vertex_id  = m_goal_configuration.get_AgentLocation(mdd_agent_id);
-   	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
 
-	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+	    if (agent_sink_vertex_id >= 0)
 	    {
-		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
-		     mdd_level <= sMIN(agent_cost + extra_cost - goal_Distances[agent_sink_vertex_id][vertex_id], mdd_depth);
-		     ++mdd_level)
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+		
+		for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
 		{
-		    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
+			 mdd_level <= sMIN(agent_cost + extra_cost - goal_Distances[agent_sink_vertex_id][vertex_id], mdd_depth);
+			 ++mdd_level)
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    }
+		}
+		
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    if (MDD[mdd_agent_id][mdd_level].empty())
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		    if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+			&& mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		    {
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
 		}
 	    }
-
-	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    else
 	    {
-		if (MDD[mdd_agent_id][mdd_level].empty())
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
 		{
-		    MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
-		}
-		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
-		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
-		{
-		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
-		}
+		    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+		    {
+			if (mdd_level >= source_Distances[agent_source_vertex_id][vertex_id])
+			{
+			    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);			    
+			    //extra_MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+			}
+		    }
+		}				
 	    }
 	    ++sort_index;
 	}
@@ -2073,10 +2098,17 @@ namespace boOX
 	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
 
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
-	    sInt_32 agent_sink_vertex_id = m_goal_configuration.get_AgentLocation(mdd_agent_id);   
-	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
-
-	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	    sInt_32 agent_sink_vertex_id = m_goal_configuration.get_AgentLocation(mdd_agent_id);
+	    
+	    if (agent_sink_vertex_id >= 0)
+	    {	    
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	    }
+	    else
+	    {
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(0, mdd_agent_id));
+	    }
 	}
 
 	sInt_32 sort_index = 0;
@@ -2089,35 +2121,54 @@ namespace boOX
 
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
 	    sInt_32 agent_sink_vertex_id  = m_goal_configuration.get_AgentLocation(mdd_agent_id);
-   	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
 
-	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
-	    {
-		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
-		     mdd_level <= sMIN(agent_cost + extra_cost - goal_Distances[agent_sink_vertex_id][vertex_id], mdd_depth);
-		     ++mdd_level)
+	    if (agent_sink_vertex_id >= 0)
+	    {	    
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+
+		for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
 		{
-		    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
+			 mdd_level <= sMIN(agent_cost + extra_cost - goal_Distances[agent_sink_vertex_id][vertex_id], mdd_depth);
+			 ++mdd_level)
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    }
 		}
+
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    if (MDD[mdd_agent_id][mdd_level].empty())
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		    if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+			&& mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		    {
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		}	    
 	    }
-
-	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    else
 	    {
-		if (MDD[mdd_agent_id][mdd_level].empty())
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
 		{
-		    MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
-		}
-		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
-		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
-		{
-		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
-		}
+		    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+		    {
+			if (mdd_level >= source_Distances[agent_source_vertex_id][vertex_id])
+			{
+			    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);			    
+			    //extra_MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+			}
+		    }
+		}				
 	    }
 	    ++sort_index;
 	}
 
         #ifdef sDEBUG
 	{
+	    /*
 	    printf("<----\n");	
 	    printf("MDD printout\n");
 	    for (sInt_32 mdd_agent = 1; mdd_agent <= N_Agents; ++mdd_agent)
@@ -2134,6 +2185,7 @@ namespace boOX
 		printf("\n");
 	    }
 	    printf("<----\n");
+	    */
 	}
 	#endif
 	
@@ -2188,10 +2240,17 @@ namespace boOX
 	    extra_MDD[mdd_agent_id].resize(mdd_depth + 1);
 
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
-	    sInt_32 agent_sink_vertex_id = m_goal_configuration.get_AgentLocation(mdd_agent_id);   
-	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+	    sInt_32 agent_sink_vertex_id = m_goal_configuration.get_AgentLocation(mdd_agent_id);
 
-	    sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	    if (agent_sink_vertex_id >= 0)
+	    {	    
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(agent_cost, mdd_agent_id));
+	    }
+	    else
+	    {
+		sorted_mdd_Agents.insert(AgentIndices_mmap::value_type(0, mdd_agent_id));		
+	    }
 	}
 
 	sInt_32 sort_index = 0;
@@ -2204,28 +2263,46 @@ namespace boOX
 
 	    sInt_32 agent_source_vertex_id = m_start_configuration.get_AgentLocation(mdd_agent_id);
 	    sInt_32 agent_sink_vertex_id  = m_goal_configuration.get_AgentLocation(mdd_agent_id);
-   	    sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
-
-	    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
-	    {
-		for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
-		     mdd_level <= sMIN(agent_cost + extra_cost - goal_Distances[agent_sink_vertex_id][vertex_id], mdd_depth);
-		     ++mdd_level)
+	    
+	    if (agent_sink_vertex_id >= 0)
+	    {	   
+		sInt_32 agent_cost = source_Distances[agent_source_vertex_id][agent_sink_vertex_id];
+		
+		for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
 		{
-		    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    for (sInt_32 mdd_level = source_Distances[agent_source_vertex_id][vertex_id];		     
+			 mdd_level <= sMIN(agent_cost + extra_cost - goal_Distances[agent_sink_vertex_id][vertex_id], mdd_depth);
+			 ++mdd_level)
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+		    }
+		}
+		
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+		{
+		    if (MDD[mdd_agent_id][mdd_level].empty())
+		    {
+			MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
+		    if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
+			&& mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
+		    {
+			extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    }
 		}
 	    }
-
-	    for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
+	    else
 	    {
-		if (MDD[mdd_agent_id][mdd_level].empty())
+		for (sInt_32 mdd_level = 0; mdd_level <= mdd_depth; ++mdd_level)
 		{
-		    MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
-		}
-		if (   mdd_level >= source_Distances[agent_source_vertex_id][agent_sink_vertex_id]
-		    && mdd_level < source_Distances[agent_source_vertex_id][agent_sink_vertex_id] + extra_cost)
-		{
-		    extra_MDD[mdd_agent_id][mdd_level].push_back(agent_sink_vertex_id);
+		    for (sInt_32 vertex_id = 0; vertex_id < N_Vertices; ++vertex_id)
+		    {
+			if (mdd_level >= source_Distances[agent_source_vertex_id][vertex_id])
+			{
+			    MDD[mdd_agent_id][mdd_level].push_back(vertex_id);			    
+			    //extra_MDD[mdd_agent_id][mdd_level].push_back(vertex_id);
+			}
+		    }
 		}
 	    }
 	    ++sort_index;

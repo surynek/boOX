@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-003_godel                              */
+/*                              boOX 3-004_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* swap_solver_main.h / 3-003_godel                                           */
+/* swap_solver_main.h / 3-004_godel                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Token Swapping Problem Solver - main program.

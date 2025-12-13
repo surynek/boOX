@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-003_godel                              */
+/*                              boOX 3-004_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cliquegen_main.h / 3-003_godel                                             */
+/* cliquegen_main.h / 3-004_godel                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Clique Graph Instance Generator - main program.

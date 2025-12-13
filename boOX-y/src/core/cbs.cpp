@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-003_godel                              */
+/*                              boOX 3-004_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 3-003_godel                                                      */
+/* cbs.cpp / 3-004_godel                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and

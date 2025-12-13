@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-003_godel                              */
+/*                              boOX 3-004_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* hamilton_solver_main.h / 3-003_godel                                       */
+/* hamilton_solver_main.h / 3-004_godel                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Multi-Agent Hamiltonian Path Finding Solver - main program.

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-003_godel                              */
+/*                              boOX 3-004_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* mapR.cpp / 3-003_godel                                                     */
+/* mapR.cpp / 3-004_godel                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Repsesentation of continuous and semi-continuous MAPF instance (MAPF-R).
