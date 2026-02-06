@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 3-005_godel                                                      */
+/* cbs.cpp / 3-006_godel                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -90,10 +90,10 @@ namespace boOX
     
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sCBSBase::fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const
+    std::pair<sInt_32, sInt_32> sCBSBase::fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const
     {
 	sInt_32 agent_path_length;
-	sInt_32 cummulative = 0;
+        std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 
@@ -122,7 +122,12 @@ namespace boOX
 		}
 		--agent_path_length;
 	    }
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+	    
+	    if (instance.m_goal_configuration.get_AgentLocation(agent_id) >= 0)
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }
 	}		       
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -158,10 +163,10 @@ namespace boOX
     }
 
 
-    sInt_32 sCBSBase::fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const
+    std::pair<sInt_32, sInt_32> sCBSBase::fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const
     {
 	sInt_32 agent_path_length;
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 
@@ -190,7 +195,12 @@ namespace boOX
 		}
 		--agent_path_length;
 	    }
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (instance.m_goal_configuration.get_AgentLocation(agent_id) > 0)
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }	    
 	}		       
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -231,10 +241,10 @@ namespace boOX
     }    
 
 
-    sInt_32 sCBSBase::fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const
+    std::pair<sInt_32, sInt_32> sCBSBase::fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const
     {
 	sInt_32 agent_path_length;
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 
 	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
 
@@ -263,7 +273,12 @@ namespace boOX
 		}
 		--agent_path_length;
 	    }
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (!mission.m_goal_commitment.m_agent_Tasks[agent_id].empty())
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }	    	    
 	}		       
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -3530,7 +3545,7 @@ namespace boOX
 		return -1;
 	    }
 	}
-	if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement)) > cost_limit)
+	if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement).first) > cost_limit)
 	{
 	    return -1;
 	}	
@@ -3637,7 +3652,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -3764,7 +3779,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -3916,7 +3931,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -4107,7 +4122,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -4301,7 +4316,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingSwapping(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -4876,7 +4891,7 @@ namespace boOX
 		return -1;
 	    }
 	}
-	if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement)) > cost_limit)
+	if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement).first) > cost_limit)
 	{
 	    return -1;
 	}	
@@ -4983,7 +4998,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -5121,7 +5136,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -5277,7 +5292,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -5470,7 +5485,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -5686,7 +5701,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > relaxation * cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPaths(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > relaxation * cost_limit)
 	    {
 		return -1;
 	    }
@@ -6290,7 +6305,7 @@ namespace boOX
 		return -1;
 	    }
 	}
-	if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement)) > cost_limit)
+	if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement).first) > cost_limit)
 	{
 	    return -1;
 	}	
@@ -6397,7 +6412,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -6535,7 +6550,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -6683,7 +6698,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -6874,7 +6889,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -7067,7 +7082,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingPermutation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -7646,7 +7661,7 @@ namespace boOX
 		return -1;
 	    }
 	}
-	if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement)) > cost_limit)
+	if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, initial_node.m_tanglement).first) > cost_limit)
 	{
 	    return -1;
 	}	
@@ -7753,7 +7768,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -7891,7 +7906,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, initial_node.m_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -8053,7 +8068,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -8244,7 +8259,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -8437,7 +8452,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingRotation(instance, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -8637,7 +8652,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -8836,7 +8851,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {
 		return -1;
 	    }
@@ -9035,7 +9050,7 @@ namespace boOX
 	{
 	    Cooccupations_vector space_Cooccupations;
 	    
-	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement)) > cost_limit)
+	    if ((initial_node.m_cost = analyze_NonconflictingHamiltonian(mission, initial_node.m_agent_Conflicts, initial_node.m_agent_edge_Conflicts, m_first_agent_Paths, space_Cooccupations, initial_node.m_tanglement).first) > cost_limit)
 	    {		
 		return -1;
 	    }
@@ -9331,10 +9346,13 @@ namespace boOX
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
 	}
 
-	if ((cummulative = analyze_NonconflictingSwapping(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)) > cost_limit)
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingSwapping(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)).first > cost_limit)
 	{
 	    return -1;
-	}	
+	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -9434,11 +9452,14 @@ namespace boOX
 	sInt_32 cummulative, tanglement;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	
-	if ((cummulative = analyze_NonconflictingSwapping(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingSwapping(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    return -1;
 	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -9650,11 +9671,14 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}				
-	if ((cummulative = analyze_NonconflictingSwapping(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingSwapping(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -9908,10 +9932,12 @@ namespace boOX
 		return -1;
 	    }
 	}
-	if ((cummulative = analyze_NonconflictingSwapping(instance, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingSwapping(instance, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -10038,9 +10064,9 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sCBS::analyze_NonconflictingSwapping(const sInstance         &instance,
-						 const AgentPaths_vector &agent_Paths,
-						 sInt_32                 &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingSwapping(const sInstance         &instance,
+								     const AgentPaths_vector &agent_Paths,
+								     sInt_32                 &tanglement) const
     {
 	AgentConflicts_vector dummy_Conflicts;
 	AgentEdgeConflicts_vector dummy_edge_Conflicts;
@@ -10051,17 +10077,18 @@ namespace boOX
 					      agent_Paths,
 					      tanglement);
     }
+
     
-    sInt_32 sCBS::analyze_NonconflictingSwapping(const sInstance           &instance,
-						 AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						 AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						 const AgentPaths_vector   &agent_Paths,
-						 sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingSwapping(const sInstance           &instance,
+								     AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+								     AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+								     const AgentPaths_vector   &agent_Paths,
+								     sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	Occupations_vector space_Occupations;
 
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
@@ -10082,7 +10109,12 @@ namespace boOX
 		space_Occupations.resize(agent_path_length);		
 	    }
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (instance.m_goal_configuration.get_AgentLocation(agent_id) >= 0)
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }
 	}
 	
 	for (sInt_32 i = 1;; ++i)
@@ -10144,10 +10176,10 @@ namespace boOX
     }
 
 
-    sInt_32 sCBS::analyze_NonconflictingSwapping(const sInstance         &instance,
-						 const AgentPaths_vector &agent_Paths,
-						 Cooccupations_vector    &space_Cooccupations,
-						 sInt_32                 &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingSwapping(const sInstance         &instance,
+								     const AgentPaths_vector &agent_Paths,
+								     Cooccupations_vector    &space_Cooccupations,
+								     sInt_32                 &tanglement) const
     {
 	AgentConflicts_vector dummy_Conflicts;
 	AgentEdgeConflicts_vector dummy_edge_Conflicts;
@@ -10162,18 +10194,18 @@ namespace boOX
     }
 
     
-    sInt_32 sCBS::analyze_NonconflictingSwapping(const sInstance           &instance,
-						 AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						 AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						 const AgentPaths_vector   &agent_Paths,
-						 Cooccupations_vector      &space_Cooccupations,
-						 sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingSwapping(const sInstance           &instance,
+								     AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+								     AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+								     const AgentPaths_vector   &agent_Paths,
+								     Cooccupations_vector      &space_Cooccupations,
+								     sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -10564,10 +10596,12 @@ namespace boOX
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
 	}
 
-	if ((cummulative = analyze_NonconflictingPaths(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)) > cost_limit)
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPaths(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)).first > cost_limit)
 	{
 	    return -1;
-	}	
+	}
+	cummulative = cummulative_pair.first;
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -10662,11 +10696,13 @@ namespace boOX
 	sInt_32 cummulative, tanglement;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	
-	if ((cummulative = analyze_NonconflictingPaths(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPaths(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    return -1;
 	}
+	cummulative = cummulative_pair.first;
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -10831,11 +10867,13 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingPaths(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPaths(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();
@@ -11013,11 +11051,13 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingPaths(instance, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPaths(instance, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();
@@ -11144,9 +11184,9 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
-					      const AgentPaths_vector   &agent_Paths,
-					      sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
+								  const AgentPaths_vector   &agent_Paths,
+								  sInt_32                   &tanglement) const
     {
 	AgentConflicts_vector dummy_Conflicts;
 	AgentEdgeConflicts_vector dummy_edge_Conflicts;
@@ -11159,16 +11199,16 @@ namespace boOX
     }
 
     
-    sInt_32 sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
-					      AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-					      AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-					      const AgentPaths_vector   &agent_Paths,
-					      sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
+								  AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+								  AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+								  const AgentPaths_vector   &agent_Paths,
+								  sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	Occupations_vector space_Occupations;
 
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
@@ -11188,8 +11228,13 @@ namespace boOX
 	    {
 		space_Occupations.resize(agent_path_length);		
 	    }
-	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;	    
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (instance.m_goal_configuration.get_AgentLocation(agent_id) >= 0)
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }
 	}
 	
 	for (sInt_32 i = 1;; ++i)
@@ -11247,10 +11292,10 @@ namespace boOX
     }
 
 
-    sInt_32 sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
-					      const AgentPaths_vector   &agent_Paths,
-					      Cooccupations_vector      &space_Cooccupations,
-					      sInt_32                   &tanglement) const    
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
+								  const AgentPaths_vector   &agent_Paths,
+								  Cooccupations_vector      &space_Cooccupations,
+								  sInt_32                   &tanglement) const    
     {
 	AgentConflicts_vector dummy_Conflicts;
 	AgentEdgeConflicts_vector dummy_edge_Conflicts;
@@ -11263,18 +11308,18 @@ namespace boOX
 					   tanglement);	
     }
 
-    sInt_32 sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
-					      AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-					      AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-					      const AgentPaths_vector   &agent_Paths,
-					      Cooccupations_vector      &space_Cooccupations,
-					      sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingPaths(const sInstance           &instance,
+								  AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+								  AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+								  const AgentPaths_vector   &agent_Paths,
+								  Cooccupations_vector      &space_Cooccupations,
+								  sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -11662,10 +11707,13 @@ namespace boOX
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
 	}
 
-	if ((cummulative = analyze_NonconflictingPermutation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)) > cost_limit)
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPermutation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)).first > cost_limit)
 	{
 	    return -1;
-	}	
+	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -11765,11 +11813,14 @@ namespace boOX
 	sInt_32 cummulative, tanglement;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	
-	if ((cummulative = analyze_NonconflictingPermutation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPermutation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    return -1;
 	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -11939,11 +11990,14 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingPermutation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPermutation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
+	
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();
@@ -12126,11 +12180,13 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingPaths(instance, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cumulative_pair;
+	if ((cumulative_pair = analyze_NonconflictingPaths(instance, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cumulative_pair.first;
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();
@@ -12259,16 +12315,16 @@ namespace boOX
     
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sCBS::analyze_NonconflictingPermutation(const sInstance           &instance,
-						    AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						    AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						    const AgentPaths_vector   &agent_Paths,
-						    sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingPermutation(const sInstance           &instance,
+									AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+									AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+									const AgentPaths_vector   &agent_Paths,
+									sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	Occupations_vector space_Occupations;
 
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
@@ -12289,7 +12345,12 @@ namespace boOX
 		space_Occupations.resize(agent_path_length);		
 	    }
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+	    if (instance.m_goal_configuration.get_AgentLocation(agent_id) >= 0)
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }
 	}
 	
 	for (sInt_32 i = 1;; ++i)
@@ -12353,18 +12414,18 @@ namespace boOX
     }
 
 
-    sInt_32 sCBS::analyze_NonconflictingPermutation(const sInstance           &instance,
-						    AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						    AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						    const AgentPaths_vector   &agent_Paths,
-						    Cooccupations_vector      &space_Cooccupations,
-						    sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingPermutation(const sInstance           &instance,
+									AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+									AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+									const AgentPaths_vector   &agent_Paths,
+									Cooccupations_vector      &space_Cooccupations,
+									sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -12762,10 +12823,13 @@ namespace boOX
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
 	}
 
-	if ((cummulative = analyze_NonconflictingRotation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)) > cost_limit)
+	std::pair<sInt_32, sInt_32> cummulative_pair;	
+	if ((cummulative_pair = analyze_NonconflictingRotation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, tanglement)).first > cost_limit)
 	{
 	    return -1;
-	}	
+	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -12865,11 +12929,14 @@ namespace boOX
 	sInt_32 cummulative, tanglement;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	
-	if ((cummulative = analyze_NonconflictingRotation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingRotation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    return -1;
 	}
+	cummulative = cummulative_pair.first;
+	
 	for (sInt_32 i = 1;; ++i)
 	{
 	    bool finished = true;
@@ -13091,7 +13158,7 @@ namespace boOX
         #endif
 		    
 	sInt_32 agent_path_length;
-	sInt_32 cummulative, tanglement;
+	sInt_32 tanglement, cummulative;
 
 	#ifdef sPROFILE
 	{
@@ -13111,11 +13178,15 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingRotation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingRotation(instance, agent_Conflicts, agent_edge_Conflicts, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
+	
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();
@@ -13424,11 +13495,14 @@ namespace boOX
 	    {
 		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingPaths(instance, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cummulative_pair;
+	if ((cummulative_pair = analyze_NonconflictingPaths(instance, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
+	
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();
@@ -13580,16 +13654,16 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sCBS::analyze_NonconflictingRotation(const sInstance           &instance,
-						 AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						 AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						 const AgentPaths_vector   &agent_Paths,
-						 sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingRotation(const sInstance           &instance,
+								     AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+								     AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+								     const AgentPaths_vector   &agent_Paths,
+								     sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	Occupations_vector space_Occupations;
 
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
@@ -13610,7 +13684,12 @@ namespace boOX
 		space_Occupations.resize(agent_path_length);		
 	    }
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (instance.m_goal_configuration.get_AgentLocation(agent_id) >= 0)
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }	    
 	}
 	
 	for (sInt_32 i = 1;; ++i)
@@ -13673,18 +13752,18 @@ namespace boOX
     }
 
 
-    sInt_32 sCBS::analyze_NonconflictingRotation(const sInstance           &instance,
-						 AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						 AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						 const AgentPaths_vector   &agent_Paths,
-						 Cooccupations_vector      &space_Cooccupations,
-						 sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingRotation(const sInstance           &instance,
+								     AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+								     AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+								     const AgentPaths_vector   &agent_Paths,
+								     Cooccupations_vector      &space_Cooccupations,
+								     sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	tanglement = 0;
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -13770,14 +13849,13 @@ namespace boOX
     {
 	sASSERT(false);
 
-	sInt_32 cost, cummulative, agent_path_length;
+	sInt_32 cummulative, cost, agent_path_length;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	VertexIDs_vector stored_path = agent_Paths[upd_agent_id];
   	agent_Paths[upd_agent_id].clear();
 
 	Occupations_vector space_Occupations;
-	cummulative = 0;
 
 	#ifdef sSTATISTICS
 	{
@@ -13814,7 +13892,6 @@ namespace boOX
 		space_Occupations.resize(agent_path_length);
 	    }
 	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
-
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
 	}
 	if (cummulative > cost_limit)
@@ -13929,9 +14006,9 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission          &mission,
-						    const AgentPaths_vector &agent_Paths,
-						    sInt_32                 &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingHamiltonian(const sMission          &mission,
+									const AgentPaths_vector &agent_Paths,
+									sInt_32                 &tanglement) const
     {
 	AgentConflicts_vector dummy_Conflicts;
 	AgentEdgeConflicts_vector dummy_edge_Conflicts;
@@ -13944,10 +14021,10 @@ namespace boOX
     }
     
 
-    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission          &mission,
-						    const AgentPaths_vector &agent_Paths,
-						    Cooccupations_vector    &space_Cooccupations,
-						    sInt_32                 &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingHamiltonian(const sMission          &mission,
+									const AgentPaths_vector &agent_Paths,
+									Cooccupations_vector    &space_Cooccupations,
+									sInt_32                 &tanglement) const
     {
 	AgentConflicts_vector dummy_Conflicts;
 	AgentEdgeConflicts_vector dummy_edge_Conflicts;
@@ -13962,16 +14039,16 @@ namespace boOX
     }
 
     
-    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission            &mission,
-						    AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						    AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						    const AgentPaths_vector   &agent_Paths,
-						    sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingHamiltonian(const sMission            &mission,
+									AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+									AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+									const AgentPaths_vector   &agent_Paths,
+									sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	Occupations_vector space_Occupations;
 
-	sInt_32 cummulative = 0;
+	std::pair<sInt_32, sInt_32> cummulative = std::pair<sInt_32, sInt_32>(0, 0);
 	tanglement = 0;
 
 	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
@@ -13992,7 +14069,13 @@ namespace boOX
 		space_Occupations.resize(agent_path_length);		
 	    }
 	    space_Occupations[0][agent_Paths[agent_id][0]] = agent_id;
-	    cummulative += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    cummulative.first += (agent_path_length > 1) ? agent_path_length : 0;
+
+	    if (!mission.m_goal_commitment.m_agent_Tasks[agent_id].empty())
+	    {
+		cummulative.second += (agent_path_length > 1) ? agent_path_length : 0;		
+	    }
 	}
 	
 	for (sInt_32 i = 1;; ++i)
@@ -14055,18 +14138,18 @@ namespace boOX
     }
 
 
-    sInt_32 sCBS::analyze_NonconflictingHamiltonian(const sMission            &mission,
-						    AgentConflicts_vector     &sUNUSED(agent_Conflicts),
-						    AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
-						    const AgentPaths_vector   &agent_Paths,
-						    Cooccupations_vector      &space_Cooccupations,
-						    sInt_32                   &tanglement) const
+    std::pair<sInt_32, sInt_32> sCBS::analyze_NonconflictingHamiltonian(const sMission            &mission,
+									AgentConflicts_vector     &sUNUSED(agent_Conflicts),
+									AgentEdgeConflicts_vector &sUNUSED(agent_edge_Conflicts),
+									const AgentPaths_vector   &agent_Paths,
+									Cooccupations_vector      &space_Cooccupations,
+									sInt_32                   &tanglement) const
     {
 	sInt_32 agent_path_length;
 	tanglement = 0;
 
 	sInt_32 N_agents = mission.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(mission, agent_Paths, space_Cooccupations);
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -14343,11 +14426,13 @@ namespace boOX
 	    {
 //		return -1;
 	    }
-	}		
-	if ((cummulative = analyze_NonconflictingHamiltonian(mission, agent_Paths, space_Cooccupations, tanglement)) > cost_limit)
+	}
+	std::pair<sInt_32, sInt_32> cummulative_pair;	
+	if ((cummulative_pair = analyze_NonconflictingHamiltonian(mission, agent_Paths, space_Cooccupations, tanglement)).first > cost_limit)
 	{
 //	    sASSERT(false);
 	}
+	cummulative = cummulative_pair.first;
 	#ifdef sPROFILE
 	{	
 	    analyzing_end = clock();

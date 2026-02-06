@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.h / 3-005_godel                                                     */
+/* smtcbs.h / 3-006_godel                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -185,166 +185,166 @@ namespace boOX
 	sSMTCBS(sBoolEncoder *solver_Encoder, sDouble subopt_weight, sMission *mission);
 	sSMTCBS(sBoolEncoder *solver_Encoder, sDouble subopt_weight, sMission *mission, sDouble timeout);			
 	/*----------------------------------------------------------------------------*/
+ 
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwapping(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwapping(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwapping(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingSwapping(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwapping(sInstance         &instance,
+									AgentPaths_vector &agent_Paths,
+									sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingSwapping(sInstance         &instance,
-						    AgentPaths_vector &agent_Paths,
-						    sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverse(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwappingInverse(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingSwappingInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverse(sInstance         &instance,
+									       AgentPaths_vector &agent_Paths,
+									       sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwappingInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingSwappingInverse(sInstance         &instance,
-							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseDepleted(sInstance         &instance,
+										       AgentPaths_vector &agent_Paths,
+										       sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingSwappingInverseDepleted(sInstance         &instance,
-								   AgentPaths_vector &agent_Paths,
-								   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseOmitted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingSwappingInverseOmitted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingSwappingInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
-
-	sInt_32 find_ShortestNonconflictingSwappingInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingSwappingInverseOmitted(sInstance         &instance,
-								  AgentPaths_vector &agent_Paths,
-								  sInt_32            cost_limit) const;		
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingSwappingInverseOmitted(sInstance         &instance,
+										      AgentPaths_vector &agent_Paths,
+										      sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingPaths(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPaths(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
 	
-	sInt_32 find_ShortestNonconflictingPaths(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingPaths(sInstance         &instance,
-						 AgentPaths_vector &agent_Paths,
-						 sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPaths(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPaths(sInstance         &instance,
+								     AgentPaths_vector &agent_Paths,
+								     sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPathsInverse(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingPathsInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverse(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;	
 	
-	sInt_32 find_ShortestNonconflictingPathsInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingPathsInverse(sInstance         &instance,
-							AgentPaths_vector &agent_Paths,
-							sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverse(sInstance         &instance,
+									    AgentPaths_vector &agent_Paths,
+									    sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(sSolution &solution, sInt_32 cost_limit);
-	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseSeparated(sSolution &solution, sInt_32 cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
 	
-	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
-	sInt_32 find_ShortestNonconflictingPathsInverseSeparated(sInstance         &instance,
-								 AgentPaths_vector &agent_Paths,
-								 sInt_32            cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseSeparated(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseSeparated(sInstance         &instance,
+										     AgentPaths_vector &agent_Paths,
+										     sInt_32            cost_limit);
 
-	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(sSolution &solution, sInt_32 cost_limit);
-	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseDepleted(sSolution &solution, sInt_32 cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
 	
-	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
-	sInt_32 find_ShortestNonconflictingPathsInverseDepleted(sInstance         &instance,
-								AgentPaths_vector &agent_Paths,
-								sInt_32            cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseDepleted(sInstance         &instance,
+										    AgentPaths_vector &agent_Paths,
+										    sInt_32            cost_limit);
 
-	sInt_32 find_ShortestNonconflictingPathsInverseOmitted(sSolution &solution, sInt_32 cost_limit);
-	sInt_32 find_ShortestNonconflictingPathsInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseOmitted(sSolution &solution, sInt_32 cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);	
 	
-	sInt_32 find_ShortestNonconflictingPathsInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
-	sInt_32 find_ShortestNonconflictingPathsInverseOmitted(sInstance         &instance,
-							       AgentPaths_vector &agent_Paths,
-							       sInt_32            cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInverseOmitted(sInstance         &instance,
+										   AgentPaths_vector &agent_Paths,
+										   sInt_32            cost_limit);
 
-	sInt_32 find_ShortestNonconflictingPathsInversePremodelOmitted(sSolution &solution, sInt_32 cost_limit);
-	sInt_32 find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInversePremodelOmitted(sSolution &solution, sInt_32 cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit);
 
-	sInt_32 find_ShortestNonconflictingPathsInversePremodelOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
-	sInt_32 find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance         &instance,
-								       AgentPaths_vector &agent_Paths,
-								       sInt_32            cost_limit);
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInversePremodelOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit);	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance         &instance,
+											   AgentPaths_vector &agent_Paths,
+											   sInt_32            cost_limit);
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_ShortestNonconflictingPermutation(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingPermutation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutation(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingPermutation(sInstance         &instance,
-						       AgentPaths_vector &agent_Paths,
-						       sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutation(sInstance         &instance,
+									   AgentPaths_vector &agent_Paths,
+									   sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutationInverse(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingPermutationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverse(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingPermutationInverse(sInstance         &instance,
-							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverse(sInstance         &instance,
+										  AgentPaths_vector &agent_Paths,
+										  sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingPermutationInverseDepleted(sInstance         &instance,
-								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseDepleted(sInstance         &instance,
+											  AgentPaths_vector &agent_Paths,
+											  sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingPermutationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingPermutationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingPermutationInverseOmitted(sInstance         &instance,
-								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit) const;			
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingPermutationInverseOmitted(sInstance         &instance,
+											 AgentPaths_vector &agent_Paths,
+											 sInt_32            cost_limit) const;			
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingRotation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingRotation(sInstance         &instance,
-						    AgentPaths_vector &agent_Paths,
-						    sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotation(sInstance         &instance,
+									AgentPaths_vector &agent_Paths,
+									sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotationInverse(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingRotationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverse(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingRotationInverse(sInstance         &instance,
-							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverse(sInstance         &instance,
+									       AgentPaths_vector &agent_Paths,
+									       sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingRotationInverseDepleted(sInstance         &instance,
-								   AgentPaths_vector &agent_Paths,
-								   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseDepleted(sInstance         &instance,
+										       AgentPaths_vector &agent_Paths,
+										       sInt_32            cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingRotationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingRotationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingRotationInverseOmitted(sInstance         &instance,
-								  AgentPaths_vector &agent_Paths,
-								  sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingRotationInverseOmitted(sInstance         &instance,
+										      AgentPaths_vector &agent_Paths,
+										      sInt_32            cost_limit) const;	
 
-	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
-	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const;
 
-	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
-	sInt_32 find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance         &instance,
-									      AgentPaths_vector &agent_Paths,
-									      sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingCapacitatedRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance         &instance,
+												  AgentPaths_vector &agent_Paths,
+												  sInt_32            cost_limit) const;
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(sSolution &solution, sInt_32 cost_limit) const;
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(sMission &mission, sSolution &solution, sInt_32 cost_limit) const;
-
+	
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const;	
 	sInt_32 find_ShortestNonconflictingHamiltonianInverseDepleted(sMission          &mission,
 								      AgentPaths_vector &agent_Paths,
@@ -392,160 +392,160 @@ namespace boOX
 									  sInt_32            cost_limit) const;			
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_NonconflictingSwapping(Context           &context,
-					    AgentPaths_vector &agent_Paths,
-					    sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingSwapping(Context           &context,
-					    sInstance         &instance,
-					    AgentPaths_vector &agent_Paths,
-					    sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping(Context           &context,
+								AgentPaths_vector &agent_Paths,
+								sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping(Context           &context,
+								sInstance         &instance,
+								AgentPaths_vector &agent_Paths,
+								sInt_32            cost_limit) const;
 
-	sInt_32 find_NonconflictingSwappingInverse(Context           &context,
-						   AgentPaths_vector &agent_Paths,
-						   sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingSwappingInverse(Context           &context,
-						   sInstance         &instance,
-						   AgentPaths_vector &agent_Paths,
-						   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwappingInverse(Context           &context,
+								       AgentPaths_vector &agent_Paths,
+								       sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwappingInverse(Context           &context,
+								       sInstance         &instance,
+								       AgentPaths_vector &agent_Paths,
+								       sInt_32            cost_limit) const;
 
-	sInt_32 find_NonconflictingSwappingInverseDepleted(Context           &context,
-							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingSwappingInverseDepleted(Context           &context,
-							   sInstance         &instance,
-							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwappingInverseDepleted(Context           &context,
+									       AgentPaths_vector &agent_Paths,
+									       sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwappingInverseDepleted(Context           &context,
+									       sInstance         &instance,
+									       AgentPaths_vector &agent_Paths,
+									       sInt_32            cost_limit) const;
 
-	sInt_32 find_NonconflictingSwappingInverseOmitted(Context           &context,
-							  AgentPaths_vector &agent_Paths,
-							  sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingSwappingInverseOmitted(Context           &context,
-							  sInstance         &instance,
-							  AgentPaths_vector &agent_Paths,
-							  sInt_32            cost_limit) const;		
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwappingInverseOmitted(Context           &context,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwappingInverseOmitted(Context           &context,
+									      sInstance         &instance,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_NonconflictingPaths(Context           &context,
-					 AgentPaths_vector &agent_Paths,
-					 sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingPaths(Context           &context,
-					 sInstance         &instance,
-					 AgentPaths_vector &agent_Paths,
-					 sInt_32            cost_limit) const;
-
-	sInt_32 find_NonconflictingPathsInverse(Context           &context,
-						AgentPaths_vector &agent_Paths,
-						sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingPathsInverse(Context           &context,
-						sInstance         &instance,
-						AgentPaths_vector &agent_Paths,
-						sInt_32            cost_limit) const;
-
-	sInt_32 find_NonconflictingPathsInverseSeparated(Context           &context,
-							 AgentPaths_vector &agent_Paths,
-							 sInt_32            cost_limit);	
-	sInt_32 find_NonconflictingPathsInverseSeparated(Context           &context,
-							 sInstance         &instance,
-							 AgentPaths_vector &agent_Paths,
-							 sInt_32            cost_limit);
-
-	sInt_32 find_NonconflictingPathsInverseDepleted(Context           &context,
-							AgentPaths_vector &agent_Paths,
-							sInt_32            cost_limit);	
-	sInt_32 find_NonconflictingPathsInverseDepleted(Context           &context,
-							sInstance         &instance,
-							AgentPaths_vector &agent_Paths,
-							sInt_32            cost_limit);
-
-	sInt_32 find_NonconflictingPathsInverseOmitted(Context           &context,
-						       AgentPaths_vector &agent_Paths,
-						       sInt_32            cost_limit);	
-	sInt_32 find_NonconflictingPathsInverseOmitted(Context           &context,
-						       sInstance         &instance,
-						       AgentPaths_vector &agent_Paths,
-						       sInt_32            cost_limit);
-
-	sInt_32 find_NonconflictingPathsInversePremodelOmitted(Context           &context,
-							       AgentPaths_vector &agent_Paths,
-							       sInt_32            cost_limit);	
-	sInt_32 find_NonconflictingPathsInversePremodelOmitted(Context           &context,
-							       sInstance         &instance,
-							       AgentPaths_vector &agent_Paths,
-							       sInt_32            cost_limit);					
-	/*----------------------------------------------------------------------------*/	
-
-	sInt_32 find_NonconflictingPermutation(Context           &context,
-					       AgentPaths_vector &agent_Paths,
-					       sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingPermutation(Context           &context,
-					       sInstance         &instance,
-					       AgentPaths_vector &agent_Paths,
-					       sInt_32            cost_limit) const;
-
-	sInt_32 find_NonconflictingPermutationInverse(Context           &context,
-						      AgentPaths_vector &agent_Paths,
-						      sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingPermutationInverse(Context           &context,
-						      sInstance         &instance,
-						      AgentPaths_vector &agent_Paths,
-						      sInt_32            cost_limit) const;
-
-	sInt_32 find_NonconflictingPermutationInverseDepleted(Context           &context,
-							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingPermutationInverseDepleted(Context           &context,
-							      sInstance         &instance,
-							      AgentPaths_vector &agent_Paths,
-							      sInt_32            cost_limit) const;
-
-	sInt_32 find_NonconflictingPermutationInverseOmitted(Context           &context,
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths(Context           &context,
 							     AgentPaths_vector &agent_Paths,
 							     sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingPermutationInverseOmitted(Context           &context,
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths(Context           &context,
 							     sInstance         &instance,
 							     AgentPaths_vector &agent_Paths,
-							     sInt_32            cost_limit) const;		
+							     sInt_32            cost_limit) const;
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverse(Context           &context,
+								    AgentPaths_vector &agent_Paths,
+								    sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverse(Context           &context,
+								    sInstance         &instance,
+								    AgentPaths_vector &agent_Paths,
+								    sInt_32            cost_limit) const;
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverseSeparated(Context           &context,
+									     AgentPaths_vector &agent_Paths,
+									     sInt_32            cost_limit);	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverseSeparated(Context           &context,
+									     sInstance         &instance,
+									     AgentPaths_vector &agent_Paths,
+									     sInt_32            cost_limit);
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverseDepleted(Context           &context,
+									    AgentPaths_vector &agent_Paths,
+									    sInt_32            cost_limit);	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverseDepleted(Context           &context,
+									    sInstance         &instance,
+									    AgentPaths_vector &agent_Paths,
+									    sInt_32            cost_limit);
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverseOmitted(Context           &context,
+									   AgentPaths_vector &agent_Paths,
+									   sInt_32            cost_limit);	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInverseOmitted(Context           &context,
+									   sInstance         &instance,
+									   AgentPaths_vector &agent_Paths,
+									   sInt_32            cost_limit);
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInversePremodelOmitted(Context           &context,
+										   AgentPaths_vector &agent_Paths,
+										   sInt_32            cost_limit);	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPathsInversePremodelOmitted(Context           &context,
+										   sInstance         &instance,
+										   AgentPaths_vector &agent_Paths,
+										   sInt_32            cost_limit);					
+	/*----------------------------------------------------------------------------*/	
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation(Context           &context,
+								   AgentPaths_vector &agent_Paths,
+								   sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation(Context           &context,
+								   sInstance         &instance,
+								   AgentPaths_vector &agent_Paths,
+								   sInt_32            cost_limit) const;
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutationInverse(Context           &context,
+									  AgentPaths_vector &agent_Paths,
+									  sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutationInverse(Context           &context,
+									  sInstance         &instance,
+									  AgentPaths_vector &agent_Paths,
+									  sInt_32            cost_limit) const;
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutationInverseDepleted(Context           &context,
+										  AgentPaths_vector &agent_Paths,
+										  sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutationInverseDepleted(Context           &context,
+										  sInstance         &instance,
+										  AgentPaths_vector &agent_Paths,
+										  sInt_32            cost_limit) const;
+
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutationInverseOmitted(Context           &context,
+										 AgentPaths_vector &agent_Paths,
+										 sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutationInverseOmitted(Context           &context,
+										 sInstance         &instance,
+										 AgentPaths_vector &agent_Paths,
+										 sInt_32            cost_limit) const;		
 	/*----------------------------------------------------------------------------*/ 	
 
-	sInt_32 find_NonconflictingRotation(Context           &context,
-					    AgentPaths_vector &agent_Paths,
-					    sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingRotation(Context           &context,
-					    sInstance         &instance,
-					    AgentPaths_vector &agent_Paths,
-					    sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation(Context           &context,
+								AgentPaths_vector &agent_Paths,
+								sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation(Context           &context,
+								sInstance         &instance,
+								AgentPaths_vector &agent_Paths,
+								sInt_32            cost_limit) const;
 
-	sInt_32 find_NonconflictingRotationInverse(Context           &context,
-						   AgentPaths_vector &agent_Paths,
-						   sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingRotationInverse(Context           &context,
-						   sInstance         &instance,
-						   AgentPaths_vector &agent_Paths,
-						   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotationInverse(Context           &context,
+								       AgentPaths_vector &agent_Paths,
+								       sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotationInverse(Context           &context,
+								       sInstance         &instance,
+								       AgentPaths_vector &agent_Paths,
+								       sInt_32            cost_limit) const;
 
-	sInt_32 find_NonconflictingRotationInverseDepleted(Context           &context,
-							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingRotationInverseDepleted(Context           &context,
-							   sInstance         &instance,
-							   AgentPaths_vector &agent_Paths,
-							   sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotationInverseDepleted(Context           &context,
+									       AgentPaths_vector &agent_Paths,
+									       sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotationInverseDepleted(Context           &context,
+									       sInstance         &instance,
+									       AgentPaths_vector &agent_Paths,
+									       sInt_32            cost_limit) const;
 
-	sInt_32 find_NonconflictingRotationInverseOmitted(Context           &context,
-							  AgentPaths_vector &agent_Paths,
-							  sInt_32            cost_limit) const;	
-	sInt_32 find_NonconflictingRotationInverseOmitted(Context           &context,
-							  sInstance         &instance,
-							  AgentPaths_vector &agent_Paths,
-							  sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotationInverseOmitted(Context           &context,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotationInverseOmitted(Context           &context,
+									      sInstance         &instance,
+									      AgentPaths_vector &agent_Paths,
+									      sInt_32            cost_limit) const;	
 
-	sInt_32 find_NonconflictingCapacitatedRotationInverseDepleted(Context           &context,
-								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit) const;
-	sInt_32 find_NonconflictingCapacitatedRotationInverseDepleted(Context           &context,
-								      sInstance         &instance,
-								      AgentPaths_vector &agent_Paths,
-								      sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingCapacitatedRotationInverseDepleted(Context           &context,
+											  AgentPaths_vector &agent_Paths,
+											  sInt_32            cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingCapacitatedRotationInverseDepleted(Context           &context,
+											  sInstance         &instance,
+											  AgentPaths_vector &agent_Paths,
+											  sInt_32            cost_limit) const;
 	/*----------------------------------------------------------------------------*/
 	
 	sInt_32 find_NonconflictingHamiltonianInverseDepleted(Context           &context,
@@ -597,218 +597,217 @@ namespace boOX
 								      sInt_32            cost_limit) const;				
 	/*----------------------------------------------------------------------------*/
 
-	sInt_32 find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
-							  Context               &context,
-							  sInstance::MDD_vector &MDD,
-							  sInstance::MDD_vector &extra_MDD,
-							  sInt_32                extra_cost,
-							  AgentPaths_vector     &agent_Paths,
-							  sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
+									      Context               &context,
+									      sInstance::MDD_vector &MDD,
+									      sInstance::MDD_vector &extra_MDD,
+									      sInt_32                extra_cost,
+									      AgentPaths_vector     &agent_Paths,
+									      sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingPaths_GlucoseCollisions(const sInstance       &instance,
-							   Context               &context,
-							   sInstance::MDD_vector &MDD,
-							   sInstance::MDD_vector &extra_MDD,
-							   sInt_32                extra_cost,
-							   AgentPaths_vector     &agent_Paths,
-							   sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisions(const sInstance       &instance,
+									       Context               &context,
+									       sInstance::MDD_vector &MDD,
+									       sInstance::MDD_vector &extra_MDD,
+									       sInt_32                extra_cost,
+									       AgentPaths_vector     &agent_Paths,
+									       sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverse(const sInstance              &instance,
-								  Context                      &context,
-								  sInstance::MDD_vector        &MDD,
-								  sInstance::MDD_vector        &extra_MDD,
-								  sInstance::InverseMDD_vector &inverse_MDD,
-								  sInt_32                       extra_cost,
-								  AgentPaths_vector            &agent_Paths,
-								  sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisionsInverse(const sInstance              &instance,
+										      Context                      &context,
+										      sInstance::MDD_vector        &MDD,
+										      sInstance::MDD_vector        &extra_MDD,
+										      sInstance::InverseMDD_vector &inverse_MDD,
+										      sInt_32                       extra_cost,
+										      AgentPaths_vector            &agent_Paths,
+										      sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseSeparated(const sInstance              &instance,
-									   Context                      &context,
-									   sInstance::MDD_vector        &MDD,
-									   sInstance::MDD_vector        &extra_MDD,
-									   sInstance::InverseMDD_vector &inverse_MDD,
-									   sInt_32                       extra_cost,
-									   AgentPaths_vector            &agent_Paths,
-									   sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisionsInverseSeparated(const sInstance              &instance,
+											       Context                      &context,
+											       sInstance::MDD_vector        &MDD,
+											       sInstance::MDD_vector        &extra_MDD,
+											       sInstance::InverseMDD_vector &inverse_MDD,
+											       sInt_32                       extra_cost,
+											       AgentPaths_vector            &agent_Paths,
+											       sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseSemiseparated(const sInstance              &instance,
-									       Context                      &context,
-									       sInstance::MDD_vector        &MDD,
-									       sInstance::MDD_vector        &extra_MDD,
-									       sInstance::InverseMDD_vector &inverse_MDD,
-									       sInt_32                       extra_cost,
-									       AgentPaths_vector            &agent_Paths,
-									       sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisionsInverseSemiseparated(const sInstance              &instance,
+												   Context                      &context,
+												   sInstance::MDD_vector        &MDD,
+												   sInstance::MDD_vector        &extra_MDD,
+												   sInstance::InverseMDD_vector &inverse_MDD,
+												   sInt_32                       extra_cost,
+												   AgentPaths_vector            &agent_Paths,
+												   sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-									  Context                      &context,
-									  sInstance::MDD_vector        &MDD,
-									  sInstance::MDD_vector        &extra_MDD,
-									  sInstance::InverseMDD_vector &inverse_MDD,
-									  sInt_32                       extra_cost,
-									  AgentPaths_vector            &agent_Paths,
-									  sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+											      Context                      &context,
+											      sInstance::MDD_vector        &MDD,
+											      sInstance::MDD_vector        &extra_MDD,
+											      sInstance::InverseMDD_vector &inverse_MDD,
+											      sInt_32                       extra_cost,
+											      AgentPaths_vector            &agent_Paths,
+											      sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-									 Context                      &context,
-									 sInstance::MDD_vector        &MDD,
-									 sInstance::MDD_vector        &extra_MDD,
-									 sInstance::InverseMDD_vector &inverse_MDD,
-									 sInt_32                       extra_cost,
-									 AgentPaths_vector            &agent_Paths,
-									 sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+											     Context                      &context,
+											     sInstance::MDD_vector        &MDD,
+											     sInstance::MDD_vector        &extra_MDD,
+											     sInstance::InverseMDD_vector &inverse_MDD,
+											     sInt_32                       extra_cost,
+											     AgentPaths_vector            &agent_Paths,
+											     sInt_32                       cost_limit) const;
 	
-	sInt_32 find_NonconflictingPaths_GlucoseCollisionsInversePremodelOmitted(const sInstance              &instance,
-										 Context                      &context,
-										 sInstance::MDD_vector        &MDD,
-										 sInstance::MDD_vector        &extra_MDD,
-										 sInstance::InverseMDD_vector &inverse_MDD,
-										 sInt_32                       mdd_depth,
-										 sInt_32                       extra_cost,
-										 AgentPaths_vector            &agent_Paths,
-										 sInt_32                       cost_limit);
+	std::pair<sInt_32, sInt_32> find_NonconflictingPaths_GlucoseCollisionsInversePremodelOmitted(const sInstance              &instance,
+												     Context                      &context,
+												     sInstance::MDD_vector        &MDD,
+												     sInstance::MDD_vector        &extra_MDD,
+												     sInstance::InverseMDD_vector &inverse_MDD,
+												     sInt_32                       mdd_depth,
+												     sInt_32                       extra_cost,
+												     AgentPaths_vector            &agent_Paths,
+												     sInt_32                       cost_limit);
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_NonconflictingSwapping_GlucosePrincipal(const sInstance       &instance,
-							     Context               &context,
-							     sInstance::MDD_vector &MDD,
-							     sInstance::MDD_vector &extra_MDD,
-							     sInt_32                extra_cost,
-							     AgentPaths_vector     &agent_Paths,
-							     sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping_GlucosePrincipal(const sInstance       &instance,
+										 Context               &context,
+										 sInstance::MDD_vector &MDD,
+										 sInstance::MDD_vector &extra_MDD,
+										 sInt_32                extra_cost,
+										 AgentPaths_vector     &agent_Paths,
+										 sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingSwapping_GlucoseCollisions(const sInstance       &instance,
-							      Context               &context,
-							      sInstance::MDD_vector &MDD,
-							      sInstance::MDD_vector &extra_MDD,
-							      sInt_32                extra_cost,
-							      AgentPaths_vector     &agent_Paths,
-							      sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping_GlucoseCollisions(const sInstance       &instance,
+										  Context               &context,
+										  sInstance::MDD_vector &MDD,
+										  sInstance::MDD_vector &extra_MDD,
+										  sInt_32                extra_cost,
+										  AgentPaths_vector     &agent_Paths,
+										  sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingSwapping_GlucoseCollisionsInverse(const sInstance              &instance,
-								     Context                      &context,
-								     sInstance::MDD_vector        &MDD,
-								     sInstance::MDD_vector        &extra_MDD,
-								     sInstance::InverseMDD_vector &inverse_MDD,
-								     sInt_32                       extra_cost,
-								     AgentPaths_vector            &agent_Paths,
-								     sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping_GlucoseCollisionsInverse(const sInstance              &instance,
+											 Context                      &context,
+											 sInstance::MDD_vector        &MDD,
+											 sInstance::MDD_vector        &extra_MDD,
+											 sInstance::InverseMDD_vector &inverse_MDD,
+											 sInt_32                       extra_cost,
+											 AgentPaths_vector            &agent_Paths,
+											 sInt_32                       cost_limit) const;
 
-
-	sInt_32 find_NonconflictingSwapping_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-									     Context                      &context,
-									     sInstance::MDD_vector        &MDD,
-									     sInstance::MDD_vector        &extra_MDD,
-									     sInstance::InverseMDD_vector &inverse_MDD,
-									     sInt_32                       extra_cost,
-									     AgentPaths_vector            &agent_Paths,
-									     sInt_32                       cost_limit) const;
-
-	sInt_32 find_NonconflictingSwapping_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-									    Context                      &context,
-									    sInstance::MDD_vector        &MDD,
-									    sInstance::MDD_vector        &extra_MDD,
-									    sInstance::InverseMDD_vector &inverse_MDD,
-									    sInt_32                       extra_cost,
-									    AgentPaths_vector            &agent_Paths,
-									    sInt_32                       cost_limit) const;		
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+												 Context                      &context,
+												 sInstance::MDD_vector        &MDD,
+												 sInstance::MDD_vector        &extra_MDD,
+												 sInstance::InverseMDD_vector &inverse_MDD,
+												 sInt_32                       extra_cost,
+												 AgentPaths_vector            &agent_Paths,
+												 sInt_32                       cost_limit) const;
+	
+	std::pair<sInt_32, sInt_32> find_NonconflictingSwapping_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+												Context                      &context,
+												sInstance::MDD_vector        &MDD,
+												sInstance::MDD_vector        &extra_MDD,
+												sInstance::InverseMDD_vector &inverse_MDD,
+												sInt_32                       extra_cost,
+												AgentPaths_vector            &agent_Paths,
+												sInt_32                       cost_limit) const;		
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 find_NonconflictingPermutation_GlucosePrincipal(const sInstance       &instance,
-								Context               &context,
-								sInstance::MDD_vector &MDD,
-								sInstance::MDD_vector &extra_MDD,
-								sInt_32                extra_cost,
-								AgentPaths_vector     &agent_Paths,
-								sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation_GlucosePrincipal(const sInstance       &instance,
+										    Context               &context,
+										    sInstance::MDD_vector &MDD,
+										    sInstance::MDD_vector &extra_MDD,
+										    sInt_32                extra_cost,
+										    AgentPaths_vector     &agent_Paths,
+										    sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingPermutation_GlucoseCollisions(const sInstance       &instance,
-								 Context               &context,
-								 sInstance::MDD_vector &MDD,
-								 sInstance::MDD_vector &extra_MDD,
-								 sInt_32                extra_cost,
-								 AgentPaths_vector     &agent_Paths,
-								 sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation_GlucoseCollisions(const sInstance       &instance,
+										     Context               &context,
+										     sInstance::MDD_vector &MDD,
+										     sInstance::MDD_vector &extra_MDD,
+										     sInt_32                extra_cost,
+										     AgentPaths_vector     &agent_Paths,
+										     sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingPermutation_GlucoseCollisionsInverse(const sInstance              &instance,
-									Context                      &context,
-									sInstance::MDD_vector        &MDD,
-									sInstance::MDD_vector        &extra_MDD,
-									sInstance::InverseMDD_vector &inverse_MDD,
-									sInt_32                       extra_cost,
-									AgentPaths_vector            &agent_Paths,
-									sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation_GlucoseCollisionsInverse(const sInstance              &instance,
+											    Context                      &context,
+											    sInstance::MDD_vector        &MDD,
+											    sInstance::MDD_vector        &extra_MDD,
+											    sInstance::InverseMDD_vector &inverse_MDD,
+											    sInt_32                       extra_cost,
+											    AgentPaths_vector            &agent_Paths,
+											    sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingPermutation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-										Context                      &context,
-										sInstance::MDD_vector        &MDD,
-										sInstance::MDD_vector        &extra_MDD,
-										sInstance::InverseMDD_vector &inverse_MDD,
-										sInt_32                       extra_cost,
-										AgentPaths_vector            &agent_Paths,
-										sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+												    Context                      &context,
+												    sInstance::MDD_vector        &MDD,
+												    sInstance::MDD_vector        &extra_MDD,
+												    sInstance::InverseMDD_vector &inverse_MDD,
+												    sInt_32                       extra_cost,
+												    AgentPaths_vector            &agent_Paths,
+												    sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingPermutation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-									       Context                      &context,
-									       sInstance::MDD_vector        &MDD,
-									       sInstance::MDD_vector        &extra_MDD,
-									       sInstance::InverseMDD_vector &inverse_MDD,
-									       sInt_32                       extra_cost,
-									       AgentPaths_vector            &agent_Paths,
-									       sInt_32                       cost_limit) const;			
+	std::pair<sInt_32, sInt_32> find_NonconflictingPermutation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+												   Context                      &context,
+												   sInstance::MDD_vector        &MDD,
+												   sInstance::MDD_vector        &extra_MDD,
+												   sInstance::InverseMDD_vector &inverse_MDD,
+												   sInt_32                       extra_cost,
+												   AgentPaths_vector            &agent_Paths,
+												   sInt_32                       cost_limit) const;			
 	/*----------------------------------------------------------------------------*/		
 
-	sInt_32 find_NonconflictingRotation_GlucosePrincipal(const sInstance       &instance,
-							     Context               &context,
-							     sInstance::MDD_vector &MDD,
-							     sInstance::MDD_vector &extra_MDD,
-							     sInt_32                extra_cost,
-							     AgentPaths_vector     &agent_Paths,
-							     sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation_GlucosePrincipal(const sInstance       &instance,
+										 Context               &context,
+										 sInstance::MDD_vector &MDD,
+										 sInstance::MDD_vector &extra_MDD,
+										 sInt_32                extra_cost,
+										 AgentPaths_vector     &agent_Paths,
+										 sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingRotation_GlucoseCollisions(const sInstance       &instance,
-							      Context               &context,
-							      sInstance::MDD_vector &MDD,
-							      sInstance::MDD_vector &extra_MDD,
-							      sInt_32                extra_cost,
-							      AgentPaths_vector     &agent_Paths,
-							      sInt_32                cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation_GlucoseCollisions(const sInstance       &instance,
+										  Context               &context,
+										  sInstance::MDD_vector &MDD,
+										  sInstance::MDD_vector &extra_MDD,
+										  sInt_32                extra_cost,
+										  AgentPaths_vector     &agent_Paths,
+										  sInt_32                cost_limit) const;
 
-	sInt_32 find_NonconflictingRotation_GlucoseCollisionsInverse(const sInstance              &instance,
-								     Context                      &context,
-								     sInstance::MDD_vector        &MDD,
-								     sInstance::MDD_vector        &extra_MDD,
-								     sInstance::InverseMDD_vector &inverse_MDD,
-								     sInt_32                       extra_cost,
-								     AgentPaths_vector            &agent_Paths,
-								     sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation_GlucoseCollisionsInverse(const sInstance              &instance,
+											 Context                      &context,
+											 sInstance::MDD_vector        &MDD,
+											 sInstance::MDD_vector        &extra_MDD,
+											 sInstance::InverseMDD_vector &inverse_MDD,
+											 sInt_32                       extra_cost,
+											 AgentPaths_vector            &agent_Paths,
+											 sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-									     Context                      &context,
-									     sInstance::MDD_vector        &MDD,
-									     sInstance::MDD_vector        &extra_MDD,
-									     sInstance::InverseMDD_vector &inverse_MDD,
-									     sInt_32                       extra_cost,
-									     AgentPaths_vector            &agent_Paths,
-									     sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+												 Context                      &context,
+												 sInstance::MDD_vector        &MDD,
+												 sInstance::MDD_vector        &extra_MDD,
+												 sInstance::InverseMDD_vector &inverse_MDD,
+												 sInt_32                       extra_cost,
+												 AgentPaths_vector            &agent_Paths,
+												 sInt_32                       cost_limit) const;
 
-	sInt_32 find_NonconflictingRotation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-									    Context                      &context,
-									    sInstance::MDD_vector        &MDD,
-									    sInstance::MDD_vector        &extra_MDD,
-									    sInstance::InverseMDD_vector &inverse_MDD,
-									    sInt_32                       extra_cost,
-									    AgentPaths_vector            &agent_Paths,
-									    sInt_32                       cost_limit) const;	
+	std::pair<sInt_32, sInt_32> find_NonconflictingRotation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+												Context                      &context,
+												sInstance::MDD_vector        &MDD,
+												sInstance::MDD_vector        &extra_MDD,
+												sInstance::InverseMDD_vector &inverse_MDD,
+												sInt_32                       extra_cost,
+												AgentPaths_vector            &agent_Paths,
+												sInt_32                       cost_limit) const;	
 
-	sInt_32 find_NonconflictingCapacitatedRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-											Context                      &context,
-											sInstance::MDD_vector        &MDD,
-											sInstance::MDD_vector        &extra_MDD,
-											sInstance::InverseMDD_vector &inverse_MDD,
-											sInt_32                       extra_cost,
-											AgentPaths_vector            &agent_Paths,
-											sInt_32                       cost_limit) const;
+	std::pair<sInt_32, sInt_32> find_NonconflictingCapacitatedRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+													    Context                      &context,
+													    sInstance::MDD_vector        &MDD,
+													    sInstance::MDD_vector        &extra_MDD,
+													    sInstance::InverseMDD_vector &inverse_MDD,
+													    sInt_32                       extra_cost,
+													    AgentPaths_vector            &agent_Paths,
+													    sInt_32                       cost_limit) const;
 	/*----------------------------------------------------------------------------*/	
 
 	sInt_32 find_NonconflictingHamiltonian_GlucoseCollisionsInverseDepleted(const sMission              &mission,
@@ -1119,18 +1118,18 @@ namespace boOX
 							     sInt_32                       cost_limit,
 							     AgentPaths_vector            &agent_Paths) const;		
 
-	sInt_32 check_NonconflictingPaths(const sInstance         &instance,
-					  const AgentPaths_vector &agent_Paths,
-					  Collision               &principal_collision) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingPaths(const sInstance         &instance,
+							      const AgentPaths_vector &agent_Paths,
+							      Collision               &principal_collision) const;
 
-	sInt_32 check_NonconflictingPaths(const sInstance         &instance,
-					  const AgentPaths_vector &agent_Paths,
-					  Collisions_vector       &Collisions) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingPaths(const sInstance         &instance,
+							      const AgentPaths_vector &agent_Paths,
+							      Collisions_vector       &Collisions) const;
 
-	sInt_32 check_NonconflictingPaths(const sInstance         &instance,
-					  const AgentPaths_vector &agent_Paths,
-					  const AgentTrees_vector &agent_Trees,					  
-					  Collisions_vector       &Collisions) const;	
+	std::pair<sInt_32, sInt_32> check_NonconflictingPaths(const sInstance         &instance,
+							      const AgentPaths_vector &agent_Paths,
+							      const AgentTrees_vector &agent_Trees,
+							      Collisions_vector       &Collisions) const;	
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingSwapping(Glucose::Solver       *solver,
@@ -1238,14 +1237,14 @@ namespace boOX
 							   sInt_32                      cost_limit,
 							   AgentPaths_vector           &agent_Paths) const;		
 
-	sInt_32 check_NonconflictingSwapping(const sInstance         &instance,
-					     const AgentPaths_vector &agent_Paths,
-					     Collision               &principal_collision) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingSwapping(const sInstance         &instance,
+								 const AgentPaths_vector &agent_Paths,
+								 Collision               &principal_collision) const;
 	
-	sInt_32 check_NonconflictingSwapping(const sInstance         &instance,
-					     const AgentPaths_vector &agent_Paths,
-					     Collisions_vector       &Collisions,
-					     EdgeCollisions_vector   &edge_Collisions) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingSwapping(const sInstance         &instance,
+								 const AgentPaths_vector &agent_Paths,
+								 Collisions_vector       &Collisions,
+								 EdgeCollisions_vector   &edge_Collisions) const;
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingPermutation(Glucose::Solver       *solver,
@@ -1349,13 +1348,13 @@ namespace boOX
 							      sInt_32                       cost_limit,
 							      AgentPaths_vector            &agent_Paths) const;			
 	
-	sInt_32 check_NonconflictingPermutation(const sInstance         &instance,
-						const AgentPaths_vector &agent_Paths,
-						Collision               &principal_collision) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingPermutation(const sInstance         &instance,
+								    const AgentPaths_vector &agent_Paths,
+								    Collision               &principal_collision) const;
 	
-	sInt_32 check_NonconflictingPermutation(const sInstance         &instance,
-						const AgentPaths_vector &agent_Paths,
-						Collisions_vector       &Collisions) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingPermutation(const sInstance         &instance,
+								    const AgentPaths_vector &agent_Paths,
+								    Collisions_vector       &Collisions) const;
 	/*----------------------------------------------------------------------------*/
 
 	bool find_InitialNonconflictingRotation(Glucose::Solver       *solver,
@@ -1488,25 +1487,25 @@ namespace boOX
 								       sInt_32                             cost_limit,
 								       AgentPaths_vector                  &agent_Paths) const;
 
-	sInt_32 check_NonconflictingRotation(const sInstance         &instance,
-					     const AgentPaths_vector &agent_Paths,
-					     Collision               &principal_collision) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingRotation(const sInstance         &instance,
+								 const AgentPaths_vector &agent_Paths,
+								 Collision               &principal_collision) const;
 	
-	sInt_32 check_NonconflictingRotation(const sInstance         &instance,
-					     const AgentPaths_vector &agent_Paths,
-					     Collisions_vector       &Collisions,
-					     EdgeCollisions_vector   &edge_Collisions) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingRotation(const sInstance         &instance,
+								 const AgentPaths_vector &agent_Paths,
+								 Collisions_vector       &Collisions,
+								 EdgeCollisions_vector   &edge_Collisions) const;
 
-	sInt_32 check_NonconflictingCapacitatedRotation(const sInstance         &instance,
-							const AgentPaths_vector &agent_Paths,
-							Collision               &principal_collision,
-							CapacitatedCollision    &principal_capacitated_collision) const;
+	std::pair<sInt_32, sInt_32> check_NonconflictingCapacitatedRotation(const sInstance         &instance,
+									    const AgentPaths_vector &agent_Paths,
+									    Collision               &principal_collision,
+									    CapacitatedCollision    &principal_capacitated_collision) const;
 	
-	sInt_32 check_NonconflictingCapacitatedRotation(const sInstance              &instance,
-							const AgentPaths_vector      &agent_Paths,
-							Collisions_vector            &Collisions,
-							EdgeCollisions_vector        &edge_Collisions,
-							CapacitatedCollisions_vector &capacitated_Collisions) const;		
+	std::pair<sInt_32, sInt_32> check_NonconflictingCapacitatedRotation(const sInstance              &instance,
+									    const AgentPaths_vector      &agent_Paths,
+									    Collisions_vector            &Collisions,
+									    EdgeCollisions_vector        &edge_Collisions,
+									    CapacitatedCollisions_vector &capacitated_Collisions) const;		
 	/*----------------------------------------------------------------------------*/	
 
 	bool find_InitialNonconflictingHamiltonianInverseDepleted(Glucose::Solver      *solver,

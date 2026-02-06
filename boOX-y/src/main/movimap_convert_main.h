@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* movimap_convert_main.h / 3-005_godel                                       */
+/* movimap_convert_main.h / 3-006_godel                                       */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com map convertor - main program.

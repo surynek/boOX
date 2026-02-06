@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* smtcbs.cpp / 3-005_godel                                                   */
+/* smtcbs.cpp / 3-006_godel                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented using SAT-modulo theories
@@ -222,18 +222,18 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwapping(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwapping(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwapping(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwapping(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwapping(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingSwapping(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingSwapping(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -268,15 +268,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwapping(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwapping(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwapping(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwapping(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -294,7 +295,7 @@ namespace boOX
 		printf("Solving TSWAP cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingSwapping(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingSwapping(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -304,26 +305,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverse(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverse(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwappingInverse(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingSwappingInverse(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingSwappingInverse(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -358,15 +359,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwappingInverse(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -385,7 +387,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((solution_cost = find_NonconflictingSwappingInverse(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingSwappingInverse(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -395,26 +397,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwappingInverseDepleted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingSwappingInverseDepleted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingSwappingInverseDepleted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -449,15 +451,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwappingInverseDepleted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -476,7 +479,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((solution_cost = find_NonconflictingSwappingInverseDepleted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingSwappingInverseDepleted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -486,26 +489,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwappingInverseOmitted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+        std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingSwappingInverseOmitted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingSwappingInverseOmitted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -540,15 +543,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingSwappingInverseOmitted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingSwappingInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -567,7 +571,7 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((solution_cost = find_NonconflictingSwappingInverseOmitted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingSwappingInverseOmitted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -577,28 +581,28 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }        
 
     
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPaths(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPaths(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPaths(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPaths(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPaths(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPaths(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -633,15 +637,16 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPaths(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPaths(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPaths(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPaths(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPaths(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;
 	
         #ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
@@ -659,7 +664,7 @@ namespace boOX
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));		
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPaths(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPaths(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -669,26 +674,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }	    
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverse(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverse(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPathsInverse(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPathsInverse(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPathsInverse(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -723,15 +728,16 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPathsInverse(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;
 	
         #ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
@@ -749,7 +755,7 @@ namespace boOX
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));		
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPathsInverse(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPathsInverse(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -759,26 +765,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }	    
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(sSolution &solution, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInverseSeparated(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPathsInverseSeparated(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPathsInverseSeparated(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -813,15 +819,16 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInverseSeparated(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseSeparated(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
-	sInt_32 solution_cost, max_individual_cost;
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;
 	
         #ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
@@ -839,7 +846,7 @@ namespace boOX
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPathsInverseSeparated(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPathsInverseSeparated(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -849,27 +856,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }	    
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sSolution &solution, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInverseDepleted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	printf("gamma -1\n");	
-	if ((cost = find_ShortestNonconflictingPathsInverseDepleted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPathsInverseDepleted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -904,69 +910,63 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInverseDepleted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
-	sInt_32 solution_cost, max_individual_cost;
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;
 
-	printf("gamma 1\n");
         #ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
 	sDouble start_time = sStatistics::get_CPU_Seconds();
 	#endif
 
-	printf("gamma 1.1\n");		
 	sInt_32 min_total_cost = instance.estimate_TotalPathCost(max_individual_cost);
-	printf("gamma 1.2\n");
 	Context context;
-	printf("gamma 2\n");	
 	
 	for (sInt_32 cost = min_total_cost; cost <= cost_limit; ++cost)	
 	{
-	    printf("gamma 3\n");	    
 	    #ifdef sVERBOSE
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));		
 	    }
 	    #endif
-	    printf("gamma 4\n");
-	    if ((solution_cost = find_NonconflictingPathsInverseDepleted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPathsInverseDepleted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
 
-	    printf("gamma 5\n");	    
 	    if (m_timeout >= 0)
 	    {
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);		 
 		}
 	    }	    
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(sSolution &solution, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInverseOmitted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPathsInverseOmitted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPathsInverseOmitted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1001,15 +1001,16 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInverseOmitted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
-	sInt_32 solution_cost, max_individual_cost;
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;
 	
         #ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();	
@@ -1027,7 +1028,7 @@ namespace boOX
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));		
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPathsInverseOmitted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPathsInverseOmitted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1037,26 +1038,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }	    
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(sSolution &solution, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInversePremodelOmitted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit)
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPathsInversePremodelOmitted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPathsInversePremodelOmitted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1091,15 +1092,16 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	return find_ShortestNonconflictingPathsInversePremodelOmitted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPathsInversePremodelOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
-	sInt_32 solution_cost, max_individual_cost;
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;
 
 	m_premodel_extra = 8;
 	m_premodel_cost = -1;
@@ -1120,7 +1122,7 @@ namespace boOX
 		printf("Solving MAPF cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));		
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPathsInversePremodelOmitted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPathsInversePremodelOmitted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1130,28 +1132,28 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }	    
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
     
     
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutation(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutation(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutation(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPermutation(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPermutation(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1186,15 +1188,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutation(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutation(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutation(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1212,7 +1215,7 @@ namespace boOX
 		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPermutation(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPermutation(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1222,26 +1225,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverse(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverse(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutationInverse(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPermutationInverse(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPermutationInverse(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1276,15 +1279,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutation(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1302,7 +1306,7 @@ namespace boOX
 		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPermutationInverse(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPermutationInverse(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1312,26 +1316,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutationInverseDepleted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPermutationInverseDepleted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPermutationInverseDepleted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1366,15 +1370,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutationInverseDepleted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1392,7 +1397,7 @@ namespace boOX
 		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPermutationInverseDepleted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPermutationInverseDepleted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1402,26 +1407,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutationInverseOmitted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingPermutationInverseOmitted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingPermutationInverseOmitted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1456,15 +1461,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingPermutationInverseOmitted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingPermutationInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1482,7 +1488,7 @@ namespace boOX
 		printf("Solving TPERM cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingPermutationInverseOmitted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingPermutationInverseOmitted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1492,28 +1498,28 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotation(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotation(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotation(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingRotation(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingRotation(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1548,15 +1554,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotation(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotation(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotation(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotation(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1574,7 +1581,7 @@ namespace boOX
 		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingRotation(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingRotation(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1584,26 +1591,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverse(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverse(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotationInverse(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverse(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingRotationInverse(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingRotationInverse(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1638,15 +1645,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverse(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotationInverse(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverse(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1664,7 +1672,7 @@ namespace boOX
 		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingRotationInverse(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingRotationInverse(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1674,26 +1682,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotationInverseDepleted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingRotationInverseDepleted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingRotationInverseDepleted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1728,15 +1736,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotationInverseDepleted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1754,7 +1763,7 @@ namespace boOX
 		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingRotationInverseDepleted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingRotationInverseDepleted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1764,26 +1773,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotationInverseOmitted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingRotationInverseOmitted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingRotationInverseOmitted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1818,15 +1827,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingRotationInverseOmitted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingRotationInverseOmitted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1844,7 +1854,7 @@ namespace boOX
 		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingRotationInverseOmitted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingRotationInverseOmitted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1854,26 +1864,26 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
     
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sSolution &solution, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingCapacitatedRotationInverseDepleted(*m_Instance, solution, cost_limit);
     }
 
 
-    sInt_32 sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, sSolution &solution, sInt_32 cost_limit) const
     {
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost;
 	AgentPaths_vector agent_Paths;
 
-	if ((cost = find_ShortestNonconflictingCapacitatedRotationInverseDepleted(agent_Paths, cost_limit)) < 0)
+	if ((cost = find_ShortestNonconflictingCapacitatedRotationInverseDepleted(agent_Paths, cost_limit)).first < 0)
 	{
 	    return cost;
 	}
@@ -1908,15 +1918,16 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_ShortestNonconflictingCapacitatedRotationInverseDepleted(*m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_ShortestNonconflictingCapacitatedRotationInverseDepleted(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
-	sInt_32 solution_cost, max_individual_cost;	
+	std::pair<sInt_32, sInt_32> solution_cost;
+	sInt_32 max_individual_cost;	
 	
 	#ifdef sVERBOSE
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();		
@@ -1934,7 +1945,7 @@ namespace boOX
 		printf("Solving TROT cost %d (elapsed time [seconds]: %.3f)...\n", cost + N_agents, (end_time - start_time));
 	    }
 	    #endif
-	    if ((solution_cost = find_NonconflictingCapacitatedRotationInverseDepleted(context, instance, agent_Paths, cost)) >= 0)
+	    if ((solution_cost = find_NonconflictingCapacitatedRotationInverseDepleted(context, instance, agent_Paths, cost)).first >= 0)
 	    {
 		return solution_cost;
 	    }
@@ -1944,11 +1955,11 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }        
 
     
@@ -2519,13 +2530,13 @@ namespace boOX
     
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::find_NonconflictingSwapping(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingSwapping(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingSwapping(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2537,13 +2548,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingSwappingInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwappingInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingSwappingInverse(context, *m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingSwappingInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwappingInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2557,13 +2568,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingSwappingInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwappingInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingSwappingInverse(context, *m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingSwappingInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwappingInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2577,13 +2588,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingSwappingInverseOmitted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwappingInverseOmitted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingSwappingInverse(context, *m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingSwappingInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwappingInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2599,13 +2610,13 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::find_NonconflictingPaths(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPaths(context, *m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingPaths(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2617,13 +2628,13 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingPathsInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPathsInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPathsInverse(context, *m_Instance, agent_Paths, cost_limit);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingPathsInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPathsInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2637,7 +2648,7 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPathsInverseSeparated(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPathsInverseSeparated(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2659,18 +2670,15 @@ namespace boOX
     }
     
 
-    sInt_32 sSMTCBS::find_NonconflictingPathsInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPathsInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
 	sInstance::MDD_vector MDD, extra_MDD;
 	sInstance::InverseMDD_vector inverse_MDD;
 	
-	printf("  psi 1\n");
 	instance.construct_PathMDD(cost_limit, MDD, extra_cost, extra_MDD);
-	printf("  psi 2\n");	
 	instance.construct_InverseMDD(MDD, inverse_MDD);
-	printf("  psi 3\n");
 
 	m_cbs_instance = instance;
 	
@@ -2684,7 +2692,7 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPathsInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPathsInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2706,7 +2714,7 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPathsInversePremodelOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPathsInversePremodelOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit)
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2741,13 +2749,13 @@ namespace boOX
     
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutation(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPermutation(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingPermutation(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2759,13 +2767,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutationInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutationInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPermutationInverse(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingPermutationInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutationInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2779,13 +2787,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutationInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutationInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPermutationInverseDepleted(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingPermutationInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutationInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2799,13 +2807,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutationInverseOmitted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutationInverseOmitted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingPermutationInverseOmitted(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingPermutationInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutationInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2821,13 +2829,13 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::find_NonconflictingRotation(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingRotation(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingRotation(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2839,13 +2847,13 @@ namespace boOX
     }            
 
     
-    sInt_32 sSMTCBS::find_NonconflictingRotationInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotationInverse(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingRotationInverse(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingRotationInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotationInverse(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2859,13 +2867,13 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingRotationInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotationInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingRotationInverseDepleted(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingRotationInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotationInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2879,13 +2887,13 @@ namespace boOX
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingRotationInverseOmitted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotationInverseOmitted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingRotationInverseOmitted(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingRotationInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotationInverseOmitted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -2899,13 +2907,13 @@ namespace boOX
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingCapacitatedRotationInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingCapacitatedRotationInverseDepleted(Context &context, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	return find_NonconflictingCapacitatedRotationInverseDepleted(context, *m_Instance, agent_Paths, cost_limit);
     }
     
     
-    sInt_32 sSMTCBS::find_NonconflictingCapacitatedRotationInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingCapacitatedRotationInverseDepleted(Context &context, sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit) const
     {
 	AgentConflicts_vector agent_Conflicts;
 	sInt_32 extra_cost;
@@ -3048,15 +3056,15 @@ namespace boOX
 /*----------------------------------------------------------------------------*/
     
 
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
-							       Context               &context,
-							       sInstance::MDD_vector &MDD,
-							       sInstance::MDD_vector &extra_MDD,
-							       sInt_32                extra_cost,
-							       AgentPaths_vector     &agent_Paths,
-							       sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucosePrincipal(const sInstance       &instance,
+										   Context               &context,
+										   sInstance::MDD_vector &MDD,
+										   sInstance::MDD_vector &extra_MDD,
+										   sInt_32                extra_cost,
+										   AgentPaths_vector     &agent_Paths,
+										   sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -3087,7 +3095,7 @@ namespace boOX
 					     cost_limit,
 					     agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -3107,7 +3115,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -3119,7 +3127,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 
@@ -3140,7 +3148,7 @@ namespace boOX
 					      cost_limit,
 					      agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -3158,24 +3166,24 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, principal_collision)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisions(const sInstance       &instance,
-								Context               &context,
-								sInstance::MDD_vector &MDD,
-								sInstance::MDD_vector &extra_MDD,
-								sInt_32                extra_cost,
-								AgentPaths_vector     &agent_Paths,
-								sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisions(const sInstance       &instance,
+										    Context               &context,
+										    sInstance::MDD_vector &MDD,
+										    sInstance::MDD_vector &extra_MDD,
+										    sInt_32                extra_cost,
+										    AgentPaths_vector     &agent_Paths,
+										    sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -3206,7 +3214,7 @@ namespace boOX
 					     cost_limit,
 					     agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -3226,7 +3234,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -3238,7 +3246,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -3259,7 +3267,7 @@ namespace boOX
 					      cost_limit,
 					      agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -3279,25 +3287,25 @@ namespace boOX
 	    
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverse(const sInstance              &instance,
-								       Context                      &context,
-								       sInstance::MDD_vector        &MDD,
-								       sInstance::MDD_vector        &extra_MDD,
-								       sInstance::InverseMDD_vector &inverse_MDD,
-								       sInt_32                       extra_cost,
-								       AgentPaths_vector            &agent_Paths,
-								       sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverse(const sInstance              &instance,
+											   Context                      &context,
+											   sInstance::MDD_vector        &MDD,
+											   sInstance::MDD_vector        &extra_MDD,
+											   sInstance::InverseMDD_vector &inverse_MDD,
+											   sInt_32                       extra_cost,
+											   AgentPaths_vector            &agent_Paths,
+											   sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -3330,7 +3338,7 @@ namespace boOX
 						    cost_limit,
 						    agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -3352,7 +3360,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -3364,7 +3372,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -3394,7 +3402,7 @@ namespace boOX
 						     cost_limit,
 						     agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -3416,25 +3424,25 @@ namespace boOX
 	    
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseSeparated(const sInstance              &instance,
-										Context                      &context,
-										sInstance::MDD_vector        &MDD,
-										sInstance::MDD_vector        &extra_MDD,
-										sInstance::InverseMDD_vector &inverse_MDD,
-										sInt_32                       extra_cost,
-										AgentPaths_vector            &agent_Paths,
-										sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseSeparated(const sInstance              &instance,
+												    Context                      &context,
+												    sInstance::MDD_vector        &MDD,
+												    sInstance::MDD_vector        &extra_MDD,
+												    sInstance::InverseMDD_vector &inverse_MDD,
+												    sInt_32                       extra_cost,
+												    AgentPaths_vector            &agent_Paths,
+												    sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -3467,7 +3475,7 @@ namespace boOX
 							     cost_limit,
 							     agent_Paths))   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG	
@@ -3488,7 +3496,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	bool model_introduced = false;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    while (true)
 	    {
@@ -3497,7 +3505,7 @@ namespace boOX
 		    sDouble end_time = sStatistics::get_CPU_Seconds();
 		    if (end_time - start_time > m_timeout)
 		    {
-			return -2;
+			return std::pair<sInt_32, sInt_32>(-2, -2);
 		    }
 		}
 	    
@@ -3521,7 +3529,7 @@ namespace boOX
 								      cost_limit,
 								      agent_Paths))
 		    {
-			return -1;
+			return std::pair<sInt_32, sInt_32>(-1, -1);
 		    }
 		}
 		else
@@ -3538,18 +3546,18 @@ namespace boOX
 								     cost_limit,
 								     agent_Paths))
 		    {
-			return -1;
+			return std::pair<sInt_32, sInt_32>(-1, -1);
 		    }
 		    model_introduced = true;
 		}
 		Collisions.clear();		
 		
-		if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+		if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 		{
 		    return cummulative;
 		}
 	    }
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	while (true)
@@ -3559,7 +3567,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -3583,7 +3591,7 @@ namespace boOX
 								 cost_limit,
 								 agent_Paths))
 		{
-		    return -1;
+		    return std::pair<sInt_32, sInt_32>(-1, -1);
 		}		
 	    }
 	    else
@@ -3600,7 +3608,7 @@ namespace boOX
 								 cost_limit,
 								 agent_Paths))
 		{
-		    return -1;
+		    return std::pair<sInt_32, sInt_32>(-1, -1);
 		}
 		model_introduced = true;
 	    }
@@ -3626,7 +3634,7 @@ namespace boOX
 
 	    bool cost_bound_introduced = false;	    
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		while (true)
 		{
@@ -3635,7 +3643,7 @@ namespace boOX
 			sDouble end_time = sStatistics::get_CPU_Seconds();
 			if (end_time - start_time > m_timeout)
 			{
-			    return -2;
+			    return std::pair<sInt_32, sInt_32>(-2, -2);
 			}
 		    }
 		    
@@ -3659,7 +3667,7 @@ namespace boOX
 									  cost_limit,
 									  agent_Paths))
 			{
-			    return -1;
+			    return std::pair<sInt_32, sInt_32>(-1, -1);
 			}			
 		    }
 		    else
@@ -3676,34 +3684,34 @@ namespace boOX
 								      cost_limit,
 								      agent_Paths))
 			{
-			    return -1;
+			    return std::pair<sInt_32, sInt_32>(-1, -1);
 			}
 			cost_bound_introduced = true;
 		    }
 		    Collisions.clear();
 		    
-		    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+		    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 		    {
 			return cummulative;
 		    }
 		}
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseSemiseparated(const sInstance              &instance,
-										    Context                      &context,
-										    sInstance::MDD_vector        &MDD,
-										    sInstance::MDD_vector        &extra_MDD,
-										    sInstance::InverseMDD_vector &inverse_MDD,
-										    sInt_32                       extra_cost,
-										    AgentPaths_vector            &agent_Paths,
-										    sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseSemiseparated(const sInstance              &instance,
+													Context                      &context,
+													sInstance::MDD_vector        &MDD,
+													sInstance::MDD_vector        &extra_MDD,
+													sInstance::InverseMDD_vector &inverse_MDD,
+													sInt_32                       extra_cost,
+													AgentPaths_vector            &agent_Paths,
+													sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -3736,7 +3744,7 @@ namespace boOX
 							     cost_limit,
 							     agent_Paths))   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG	
@@ -3757,7 +3765,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	bool model_introduced = false;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    while (true)
 	    {
@@ -3766,7 +3774,7 @@ namespace boOX
 		    sDouble end_time = sStatistics::get_CPU_Seconds();
 		    if (end_time - start_time > m_timeout)
 		    {
-			return -2;
+			return std::pair<sInt_32, sInt_32>(-2, -2);
 		    }
 		}
 		
@@ -3775,7 +3783,7 @@ namespace boOX
 		    sDouble end_time = sStatistics::get_CPU_Seconds();
 		    if (end_time - start_time > m_timeout)
 		    {
-			return -2;
+			return std::pair<sInt_32, sInt_32>(-2, -2);
 		    }
 		}
 		
@@ -3799,7 +3807,7 @@ namespace boOX
 								      cost_limit,
 								      agent_Paths))
 		    {
-			return -1;
+			return std::pair<sInt_32, sInt_32>(-1, -1);
 		    }
 		}
 		else
@@ -3816,18 +3824,18 @@ namespace boOX
 								     cost_limit,
 								     agent_Paths))
 		    {
-			return -1;
+			return std::pair<sInt_32, sInt_32>(-1, -1);
 		    }
 		    model_introduced = true;
 		}
 		Collisions.clear();		
 		
-		if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+		if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 		{
 		    return cummulative;
 		}
 	    }
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	while (true)
@@ -3837,7 +3845,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -3861,7 +3869,7 @@ namespace boOX
 								 cost_limit,
 								 agent_Paths))
 		{
-		    return -1;
+		    return std::pair<sInt_32, sInt_32>(-1, -1);
 		}		
 	    }
 	    else
@@ -3878,7 +3886,7 @@ namespace boOX
 								 cost_limit,
 								 agent_Paths))
 		{
-		    return -1;
+		    return std::pair<sInt_32, sInt_32>(-1, -1);
 		}
 		model_introduced = true;
 	    }
@@ -3901,25 +3909,25 @@ namespace boOX
 	    #endif
 	    
 	    Collisions.clear();	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }	
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-									       Context                      &context,
-									       sInstance::MDD_vector        &MDD,
-									       sInstance::MDD_vector        &extra_MDD,
-									       sInstance::InverseMDD_vector &inverse_MDD,
-									       sInt_32                       extra_cost,
-									       AgentPaths_vector            &agent_Paths,
-									       sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+												   Context                      &context,
+												   sInstance::MDD_vector        &MDD,
+												   sInstance::MDD_vector        &extra_MDD,
+												   sInstance::InverseMDD_vector &inverse_MDD,
+												   sInt_32                       extra_cost,
+												   AgentPaths_vector            &agent_Paths,
+												   sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -3952,7 +3960,7 @@ namespace boOX
 							    cost_limit,
 							    agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -3974,7 +3982,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -3986,7 +3994,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4016,7 +4024,7 @@ namespace boOX
 							     cost_limit,
 							     agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4038,25 +4046,25 @@ namespace boOX
 	    
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }    
 
     
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-									      Context                      &context,
-									      sInstance::MDD_vector        &MDD,
-									      sInstance::MDD_vector        &extra_MDD,
-									      sInstance::InverseMDD_vector &inverse_MDD,
-									      sInt_32                       extra_cost,
-									      AgentPaths_vector            &agent_Paths,
-									      sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+												  Context                      &context,
+												  sInstance::MDD_vector        &MDD,
+												  sInstance::MDD_vector        &extra_MDD,
+												  sInstance::InverseMDD_vector &inverse_MDD,
+												  sInt_32                       extra_cost,
+												  AgentPaths_vector            &agent_Paths,
+												  sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4092,7 +4100,7 @@ namespace boOX
 							   agent_Paths,
 							   agent_Trees))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG	
@@ -4112,7 +4120,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4126,7 +4134,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4157,7 +4165,7 @@ namespace boOX
 							    agent_Paths,
 							    agent_Trees))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4179,26 +4187,26 @@ namespace boOX
 	    
 	    Collisions.clear();
 
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInversePremodelOmitted(const sInstance              &instance,
-										      Context                      &context,
-										      sInstance::MDD_vector        &MDD,
-										      sInstance::MDD_vector        &extra_MDD,
-										      sInstance::InverseMDD_vector &inverse_MDD,
-										      sInt_32                       mdd_depth,
-										      sInt_32                       extra_cost,
-										      AgentPaths_vector            &agent_Paths,
-										      sInt_32                       cost_limit)
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPaths_GlucoseCollisionsInversePremodelOmitted(const sInstance              &instance,
+													  Context                      &context,
+													  sInstance::MDD_vector        &MDD,
+													  sInstance::MDD_vector        &extra_MDD,
+													  sInstance::InverseMDD_vector &inverse_MDD,
+													  sInt_32                       mdd_depth,
+													  sInt_32                       extra_cost,
+													  AgentPaths_vector            &agent_Paths,
+													  sInt_32                       cost_limit)
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4238,7 +4246,7 @@ namespace boOX
 								   agent_Paths,
 								   goal_Assumptions))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -4261,7 +4269,7 @@ namespace boOX
 	Collisions_vector Collisions;
 
 	
-	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4273,7 +4281,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4305,7 +4313,7 @@ namespace boOX
 								    agent_Paths,
 								    goal_Assumptions))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4327,26 +4335,26 @@ namespace boOX
 	    #endif
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPaths(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
     
 
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sSMTCBS::find_NonconflictingSwapping_GlucosePrincipal(const sInstance       &instance,
-								  Context               &context,
-								  sInstance::MDD_vector &MDD,
-								  sInstance::MDD_vector &extra_MDD,
-								  sInt_32                extra_cost,
-								  AgentPaths_vector     &agent_Paths,
-								  sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping_GlucosePrincipal(const sInstance       &instance,
+										      Context               &context,
+										      sInstance::MDD_vector &MDD,
+										      sInstance::MDD_vector &extra_MDD,
+										      sInt_32                extra_cost,
+										      AgentPaths_vector     &agent_Paths,
+										      sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4377,7 +4385,7 @@ namespace boOX
 						cost_limit,
 						agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -4397,7 +4405,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)) >= 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4409,7 +4417,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4430,7 +4438,7 @@ namespace boOX
 						 cost_limit,
 						 agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4448,24 +4456,24 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)) >= 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, principal_collision)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingSwapping_GlucoseCollisions(const sInstance       &instance,
-								   Context               &context,
-								   sInstance::MDD_vector &MDD,
-								   sInstance::MDD_vector &extra_MDD,
-								   sInt_32                extra_cost,
-								   AgentPaths_vector     &agent_Paths,
-								   sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping_GlucoseCollisions(const sInstance       &instance,
+										       Context               &context,
+										       sInstance::MDD_vector &MDD,
+										       sInstance::MDD_vector &extra_MDD,
+										       sInt_32                extra_cost,
+										       AgentPaths_vector     &agent_Paths,
+										       sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4496,7 +4504,7 @@ namespace boOX
 						cost_limit,
 						agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -4517,7 +4525,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4529,7 +4537,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4551,7 +4559,7 @@ namespace boOX
 						 cost_limit,
 						 agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4571,25 +4579,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingSwapping_GlucoseCollisionsInverse(const sInstance              &instance,
-									  Context                      &context,
-									  sInstance::MDD_vector        &MDD,
-									  sInstance::MDD_vector        &extra_MDD,
-									  sInstance::InverseMDD_vector &inverse_MDD,
-									  sInt_32                       extra_cost,
-									  AgentPaths_vector            &agent_Paths,
-									  sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping_GlucoseCollisionsInverse(const sInstance              &instance,
+											      Context                      &context,
+											      sInstance::MDD_vector        &MDD,
+											      sInstance::MDD_vector        &extra_MDD,
+											      sInstance::InverseMDD_vector &inverse_MDD,
+											      sInt_32                       extra_cost,
+											      AgentPaths_vector            &agent_Paths,
+											      sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4621,7 +4629,7 @@ namespace boOX
 						       cost_limit,
 						       agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -4642,7 +4650,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4654,7 +4662,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4677,7 +4685,7 @@ namespace boOX
 							cost_limit,
 							agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4697,25 +4705,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingSwapping_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-										  Context                      &context,
-										  sInstance::MDD_vector        &MDD,
-										  sInstance::MDD_vector        &extra_MDD,
-										  sInstance::InverseMDD_vector &inverse_MDD,
-										  sInt_32                       extra_cost,
-										  AgentPaths_vector            &agent_Paths,
-										  sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+												      Context                      &context,
+												      sInstance::MDD_vector        &MDD,
+												      sInstance::MDD_vector        &extra_MDD,
+												      sInstance::InverseMDD_vector &inverse_MDD,
+												      sInt_32                       extra_cost,
+												      AgentPaths_vector            &agent_Paths,
+												      sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4747,7 +4755,7 @@ namespace boOX
 							       cost_limit,
 							       agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -4768,7 +4776,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4780,7 +4788,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4803,7 +4811,7 @@ namespace boOX
 							       cost_limit,
 							       agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4823,25 +4831,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }                
     
 
-    sInt_32 sSMTCBS::find_NonconflictingSwapping_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-										 Context                      &context,
-										 sInstance::MDD_vector        &MDD,
-										 sInstance::MDD_vector        &extra_MDD,
-										 sInstance::InverseMDD_vector &inverse_MDD,
-										 sInt_32                       extra_cost,
-										 AgentPaths_vector            &agent_Paths,
-										 sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingSwapping_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+												     Context                      &context,
+												     sInstance::MDD_vector        &MDD,
+												     sInstance::MDD_vector        &extra_MDD,
+												     sInstance::InverseMDD_vector &inverse_MDD,
+												     sInt_32                       extra_cost,
+												     AgentPaths_vector            &agent_Paths,
+												     sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4873,7 +4881,7 @@ namespace boOX
 							       cost_limit,
 							       agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -4894,7 +4902,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -4906,7 +4914,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -4929,7 +4937,7 @@ namespace boOX
 							       cost_limit,
 							       agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -4949,26 +4957,26 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingSwapping(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }            
 
 
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutation_GlucosePrincipal(const sInstance       &instance,
-								     Context               &context,
-								     sInstance::MDD_vector &MDD,
-								     sInstance::MDD_vector &extra_MDD,
-								     sInt_32                extra_cost,
-								     AgentPaths_vector     &agent_Paths,
-								     sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation_GlucosePrincipal(const sInstance       &instance,
+											 Context               &context,
+											 sInstance::MDD_vector &MDD,
+											 sInstance::MDD_vector &extra_MDD,
+											 sInt_32                extra_cost,
+											 AgentPaths_vector     &agent_Paths,
+											 sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -4999,7 +5007,7 @@ namespace boOX
 						   cost_limit,
 						   agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5019,7 +5027,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)) >= 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5031,7 +5039,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5052,7 +5060,7 @@ namespace boOX
 						    cost_limit,
 						    agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5070,24 +5078,24 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)) >= 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, principal_collision)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingPermutation_GlucoseCollisions(const sInstance       &instance,
-								      Context               &context,
-								      sInstance::MDD_vector &MDD,
-								      sInstance::MDD_vector &extra_MDD,
-								      sInt_32                extra_cost,
-								      AgentPaths_vector     &agent_Paths,
-								      sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation_GlucoseCollisions(const sInstance       &instance,
+											  Context               &context,
+											  sInstance::MDD_vector &MDD,
+											  sInstance::MDD_vector &extra_MDD,
+											  sInt_32                extra_cost,
+											  AgentPaths_vector     &agent_Paths,
+											  sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5118,7 +5126,7 @@ namespace boOX
 						   cost_limit,
 						   agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5138,7 +5146,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5150,7 +5158,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5171,7 +5179,7 @@ namespace boOX
 						    cost_limit,
 						    agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5190,25 +5198,25 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutation_GlucoseCollisionsInverse(const sInstance              &instance,
-									     Context                      &context,
-									     sInstance::MDD_vector        &MDD,
-									     sInstance::MDD_vector        &extra_MDD,
-									     sInstance::InverseMDD_vector &inverse_MDD,
-									     sInt_32                       extra_cost,
-									     AgentPaths_vector            &agent_Paths,
-									     sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation_GlucoseCollisionsInverse(const sInstance              &instance,
+												 Context                      &context,
+												 sInstance::MDD_vector        &MDD,
+												 sInstance::MDD_vector        &extra_MDD,
+												 sInstance::InverseMDD_vector &inverse_MDD,
+												 sInt_32                       extra_cost,
+												 AgentPaths_vector            &agent_Paths,
+												 sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5240,7 +5248,7 @@ namespace boOX
 							  cost_limit,
 							  agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5260,7 +5268,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5272,7 +5280,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5294,7 +5302,7 @@ namespace boOX
 							   cost_limit,
 							   agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5313,25 +5321,25 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-										     Context                      &context,
-										     sInstance::MDD_vector        &MDD,
-										     sInstance::MDD_vector        &extra_MDD,
-										     sInstance::InverseMDD_vector &inverse_MDD,
-										     sInt_32                       extra_cost,
-										     AgentPaths_vector            &agent_Paths,
-										     sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+													 Context                      &context,
+													 sInstance::MDD_vector        &MDD,
+													 sInstance::MDD_vector        &extra_MDD,
+													 sInstance::InverseMDD_vector &inverse_MDD,
+													 sInt_32                       extra_cost,
+													 AgentPaths_vector            &agent_Paths,
+													 sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5362,7 +5370,7 @@ namespace boOX
 								  cost_limit,
 								  agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5382,7 +5390,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5394,7 +5402,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5416,7 +5424,7 @@ namespace boOX
 								   cost_limit,
 								   agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5435,25 +5443,25 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingPermutation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-										     Context                      &context,
-										     sInstance::MDD_vector        &MDD,
-										     sInstance::MDD_vector        &extra_MDD,
-										     sInstance::InverseMDD_vector &inverse_MDD,
-										     sInt_32                       extra_cost,
-										     AgentPaths_vector            &agent_Paths,
-										     sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingPermutation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+													Context                      &context,
+													sInstance::MDD_vector        &MDD,
+													sInstance::MDD_vector        &extra_MDD,
+													sInstance::InverseMDD_vector &inverse_MDD,
+													sInt_32                       extra_cost,
+													AgentPaths_vector            &agent_Paths,
+													sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5484,7 +5492,7 @@ namespace boOX
 								  cost_limit,
 								  agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5504,7 +5512,7 @@ namespace boOX
 
 	Collisions_vector Collisions;
 	
-	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5516,7 +5524,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5538,7 +5546,7 @@ namespace boOX
 								   cost_limit,
 								   agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5557,26 +5565,26 @@ namespace boOX
 	    #endif   
 	    Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingPermutation(instance, agent_Paths, Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }               
 
     
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::find_NonconflictingRotation_GlucosePrincipal(const sInstance       &instance,
-								  Context               &context,
-								  sInstance::MDD_vector &MDD,
-								  sInstance::MDD_vector &extra_MDD,
-								  sInt_32                extra_cost,
-								  AgentPaths_vector     &agent_Paths,
-								  sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation_GlucosePrincipal(const sInstance       &instance,
+										      Context               &context,
+										      sInstance::MDD_vector &MDD,
+										      sInstance::MDD_vector &extra_MDD,
+										      sInt_32                extra_cost,
+										      AgentPaths_vector     &agent_Paths,
+										      sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5606,7 +5614,7 @@ namespace boOX
 						cost_limit,
 						agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5626,7 +5634,7 @@ namespace boOX
 
 	Collision principal_collision;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)) >= 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5638,7 +5646,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5659,7 +5667,7 @@ namespace boOX
 						 cost_limit,
 						 agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5677,24 +5685,24 @@ namespace boOX
 	    }
 	    #endif
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)) >= 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, principal_collision)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
     
-    sInt_32 sSMTCBS::find_NonconflictingRotation_GlucoseCollisions(const sInstance       &instance,
-								   Context               &context,
-								   sInstance::MDD_vector &MDD,
-								   sInstance::MDD_vector &extra_MDD,
-								   sInt_32                extra_cost,
-								   AgentPaths_vector     &agent_Paths,
-								   sInt_32                cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation_GlucoseCollisions(const sInstance       &instance,
+										       Context               &context,
+										       sInstance::MDD_vector &MDD,
+										       sInstance::MDD_vector &extra_MDD,
+										       sInt_32                extra_cost,
+										       AgentPaths_vector     &agent_Paths,
+										       sInt_32                cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5724,7 +5732,7 @@ namespace boOX
 						cost_limit,
 						agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5745,7 +5753,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5757,7 +5765,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5779,7 +5787,7 @@ namespace boOX
 						 cost_limit,
 						 agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5799,25 +5807,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingRotation_GlucoseCollisionsInverse(const sInstance              &instance,
-									  Context                      &context,
-									  sInstance::MDD_vector        &MDD,
-									  sInstance::MDD_vector        &extra_MDD,
-									  sInstance::InverseMDD_vector &inverse_MDD,
-									  sInt_32                       extra_cost,
-									  AgentPaths_vector            &agent_Paths,
-									  sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation_GlucoseCollisionsInverse(const sInstance              &instance,
+											      Context                      &context,
+											      sInstance::MDD_vector        &MDD,
+											      sInstance::MDD_vector        &extra_MDD,
+											      sInstance::InverseMDD_vector &inverse_MDD,
+											      sInt_32                       extra_cost,
+											      AgentPaths_vector            &agent_Paths,
+											      sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5848,7 +5856,7 @@ namespace boOX
 						       cost_limit,
 						       agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5869,7 +5877,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -5881,7 +5889,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -5904,7 +5912,7 @@ namespace boOX
 							cost_limit,
 							agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -5924,25 +5932,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-										  Context                      &context,
-										  sInstance::MDD_vector        &MDD,
-										  sInstance::MDD_vector        &extra_MDD,
-										  sInstance::InverseMDD_vector &inverse_MDD,
-										  sInt_32                       extra_cost,
-										  AgentPaths_vector            &agent_Paths,
-										  sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+												      Context                      &context,
+												      sInstance::MDD_vector        &MDD,
+												      sInstance::MDD_vector        &extra_MDD,
+												      sInstance::InverseMDD_vector &inverse_MDD,
+												      sInt_32                       extra_cost,
+												      AgentPaths_vector            &agent_Paths,
+												      sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -5973,7 +5981,7 @@ namespace boOX
 							       cost_limit,
 							       agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -5994,7 +6002,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -6006,7 +6014,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -6029,7 +6037,7 @@ namespace boOX
 								cost_limit,
 								agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -6049,25 +6057,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }
 
 
-    sInt_32 sSMTCBS::find_NonconflictingRotation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
-										  Context                      &context,
-										  sInstance::MDD_vector        &MDD,
-										  sInstance::MDD_vector        &extra_MDD,
-										  sInstance::InverseMDD_vector &inverse_MDD,
-										  sInt_32                       extra_cost,
-										  AgentPaths_vector            &agent_Paths,
-										  sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingRotation_GlucoseCollisionsInverseOmitted(const sInstance              &instance,
+												     Context                      &context,
+												     sInstance::MDD_vector        &MDD,
+												     sInstance::MDD_vector        &extra_MDD,
+												     sInstance::InverseMDD_vector &inverse_MDD,
+												     sInt_32                       extra_cost,
+												     AgentPaths_vector            &agent_Paths,
+												     sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -6098,7 +6106,7 @@ namespace boOX
 							       cost_limit,
 							       agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -6119,7 +6127,7 @@ namespace boOX
 	Collisions_vector Collisions;
 	EdgeCollisions_vector edge_Collisions;
 	
-	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -6131,7 +6139,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -6154,7 +6162,7 @@ namespace boOX
 								cost_limit,
 								agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -6174,25 +6182,25 @@ namespace boOX
 	    Collisions.clear();
 	    edge_Collisions.clear();
 	    
-	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)) >= 0)
+	    if ((cummulative = check_NonconflictingRotation(instance, agent_Paths, Collisions, edge_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }    
 
 
-    sInt_32 sSMTCBS::find_NonconflictingCapacitatedRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
-											     Context                      &context,
-											     sInstance::MDD_vector        &MDD,
-											     sInstance::MDD_vector        &extra_MDD,
-											     sInstance::InverseMDD_vector &inverse_MDD,
-											     sInt_32                       extra_cost,
-											     AgentPaths_vector            &agent_Paths,
-											     sInt_32                       cost_limit) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::find_NonconflictingCapacitatedRotation_GlucoseCollisionsInverseDepleted(const sInstance              &instance,
+														 Context                      &context,
+														 sInstance::MDD_vector        &MDD,
+														 sInstance::MDD_vector        &extra_MDD,
+														 sInstance::InverseMDD_vector &inverse_MDD,
+														 sInt_32                       extra_cost,
+														 AgentPaths_vector            &agent_Paths,
+														 sInt_32                       cost_limit) const
     {
-	sInt_32 cummulative;
+	std::pair<sInt_32, sInt_32> cummulative;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
 	
 	agent_Paths.clear();
@@ -6223,7 +6231,7 @@ namespace boOX
 									  cost_limit,
 									  agent_Paths))	   
 	{
-	    return -1;
+	    return std::pair<sInt_32, sInt_32>(-1, -1);
 	}
 
 	#ifdef sDEBUG
@@ -6249,7 +6257,7 @@ namespace boOX
 								   agent_Paths,
 								   Collisions,
 								   edge_Collisions,
-								   capacitated_Collisions)) >= 0)
+								   capacitated_Collisions)).first >= 0)
 	{
 	    return cummulative;
 	}
@@ -6261,7 +6269,7 @@ namespace boOX
 		sDouble end_time = sStatistics::get_CPU_Seconds();
 		if (end_time - start_time > m_timeout)
 		{
-		    return -2;
+		    return std::pair<sInt_32, sInt_32>(-2, -2);
 		}
 	    }
 	    
@@ -6285,7 +6293,7 @@ namespace boOX
 									   cost_limit,
 									   agent_Paths))
 	    {
-		return -1;
+		return std::pair<sInt_32, sInt_32>(-1, -1);
 	    }
 	    
 	    #ifdef sDEBUG
@@ -6310,12 +6318,12 @@ namespace boOX
 								       agent_Paths,
 								       Collisions,
 								       edge_Collisions,
-								       capacitated_Collisions)) >= 0)
+								       capacitated_Collisions)).first >= 0)
 	    {
 		return cummulative;
 	    }
 	}
-	return -1;
+	return std::pair<sInt_32, sInt_32>(-1, -1);
     }    
 
 
@@ -8641,9 +8649,9 @@ namespace boOX
 /*----------------------------------------------------------------------------*/
     
     
-    sInt_32 sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
-					       const AgentPaths_vector &agent_Paths,
-					       Collision               &principal_collision) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
+								   const AgentPaths_vector &agent_Paths,
+								   Collision               &principal_collision) const
     {
 	sInt_32 agent_path_length;
 	Collision best_collision(sINT_32_MAX, 1, 1, 0, 0);	
@@ -8657,7 +8665,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -8684,7 +8692,7 @@ namespace boOX
 				{
 				    best_collision = next_collision;
 				}
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -8708,7 +8716,7 @@ namespace boOX
 				    {
 					best_collision = next_collision;
 				    }
-				    cummulative = -1;
+				    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				}
 			    }
 			}
@@ -8741,7 +8749,7 @@ namespace boOX
 			    {
 				best_collision = next_collision;
 			    }
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -8766,9 +8774,9 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
-					       const AgentPaths_vector &agent_Paths,
-					       Collisions_vector       &Collisions) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
+								   const AgentPaths_vector &agent_Paths,
+								   Collisions_vector       &Collisions) const
     {
 	sInt_32 agent_path_length;
 	    
@@ -8782,7 +8790,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -8806,7 +8814,7 @@ namespace boOX
 			    {
 				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
 				Collisions.push_back(next_collision);
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -8825,7 +8833,7 @@ namespace boOX
 				{
 				    Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
 				    Collisions.push_back(next_collision);
-				    cummulative = -1;
+				    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				}
 			    }
 			}
@@ -8855,7 +8863,7 @@ namespace boOX
 			{
 			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
 			    Collisions.push_back(next_collision);
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -8882,10 +8890,10 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
-					       const AgentPaths_vector &agent_Paths,
-					       const AgentTrees_vector &agent_Trees,					       
-					       Collisions_vector       &Collisions) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingPaths(const sInstance         &instance,
+								   const AgentPaths_vector &agent_Paths,
+								   const AgentTrees_vector &agent_Trees,					       
+								   Collisions_vector       &Collisions) const
     {
 	sInt_32 agent_path_length;
 	    
@@ -8899,7 +8907,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, agent_Trees, space_Cooccupations);
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, agent_Trees, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -8923,7 +8931,7 @@ namespace boOX
 			    {
 				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
 				Collisions.push_back(next_collision);
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -8942,7 +8950,7 @@ namespace boOX
 				{
 				    Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
 				    Collisions.push_back(next_collision);
-				    cummulative = -1;
+				    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				}
 			    }
 			}
@@ -8972,7 +8980,7 @@ namespace boOX
 			{
 			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
 			    Collisions.push_back(next_collision);
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -9744,9 +9752,9 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::check_NonconflictingSwapping(const sInstance         &instance,
-						  const AgentPaths_vector &agent_Paths,
-						  Collision               &principal_collision) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingSwapping(const sInstance         &instance,
+								      const AgentPaths_vector &agent_Paths,
+								      Collision               &principal_collision) const
     {
 	sInt_32 agent_path_length;
 	Collision best_collision(sINT_32_MAX, 1, 1, 0, 0);	
@@ -9760,7 +9768,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -9787,7 +9795,7 @@ namespace boOX
 				{
 				    best_collision = next_collision;
 				}
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -9813,7 +9821,7 @@ namespace boOX
 					{
 					    best_collision = next_collision;
 					}
-					cummulative = -1;
+					cummulative = std::pair<sInt_32, sInt_32>(-1, -1);;
 				    }
 				}
 			    }
@@ -9847,7 +9855,7 @@ namespace boOX
 			    {
 				best_collision = next_collision;
 			    }
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);;			    
 			}
 		    }		    
 		}
@@ -9872,10 +9880,10 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::check_NonconflictingSwapping(const sInstance         &instance,
-						  const AgentPaths_vector &agent_Paths,
-						  Collisions_vector       &Collisions,
-						  EdgeCollisions_vector   &edge_Collisions) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingSwapping(const sInstance         &instance,
+								      const AgentPaths_vector &agent_Paths,
+								      Collisions_vector       &Collisions,
+								      EdgeCollisions_vector   &edge_Collisions) const
     {
 	sInt_32 agent_path_length;
 	    
@@ -9889,7 +9897,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -9913,7 +9921,7 @@ namespace boOX
 			    {
 				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
 				Collisions.push_back(next_collision);
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -9942,7 +9950,7 @@ namespace boOX
 					Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
 					Collisions.push_back(next_collision);
 					*/
-					cummulative = -1;
+					cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				    }
 				}
 			    }
@@ -9975,7 +9983,7 @@ namespace boOX
 			{
 			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
 			    Collisions.push_back(next_collision);
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -10700,9 +10708,9 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
 
-    sInt_32 sSMTCBS::check_NonconflictingPermutation(const sInstance         &instance,
-						     const AgentPaths_vector &agent_Paths,
-						     Collision               &principal_collision) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingPermutation(const sInstance         &instance,
+									 const AgentPaths_vector &agent_Paths,
+									 Collision               &principal_collision) const
     {
 	sInt_32 agent_path_length;
 	Collision best_collision(sINT_32_MAX, 1, 1, 0, 0);	
@@ -10716,7 +10724,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -10743,7 +10751,7 @@ namespace boOX
 				{
 				    best_collision = next_collision;
 				}
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -10807,7 +10815,7 @@ namespace boOX
 			    {
 				best_collision = next_collision;
 			    }
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -10832,9 +10840,9 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::check_NonconflictingPermutation(const sInstance         &instance,
-						     const AgentPaths_vector &agent_Paths,
-						     Collisions_vector       &Collisions) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingPermutation(const sInstance         &instance,
+									 const AgentPaths_vector &agent_Paths,
+									 Collisions_vector       &Collisions) const
     {
 	sInt_32 agent_path_length;
 	    
@@ -10848,7 +10856,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -10872,7 +10880,7 @@ namespace boOX
 			    {
 				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
 				Collisions.push_back(next_collision);
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -10929,7 +10937,7 @@ namespace boOX
 			{
 			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
 			    Collisions.push_back(next_collision);
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			}
 		    }		    
 		}
@@ -12101,9 +12109,9 @@ namespace boOX
 
 /*----------------------------------------------------------------------------*/
     
-    sInt_32 sSMTCBS::check_NonconflictingRotation(const sInstance         &instance,
-						  const AgentPaths_vector &agent_Paths,
-						  Collision               &principal_collision) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingRotation(const sInstance         &instance,
+								      const AgentPaths_vector &agent_Paths,
+								      Collision               &principal_collision) const
     {
 	sInt_32 agent_path_length;
 	Collision best_collision(sINT_32_MAX, 1, 1, 0, 0);	
@@ -12117,7 +12125,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -12144,7 +12152,7 @@ namespace boOX
 				{
 				    best_collision = next_collision;
 				}
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -12170,7 +12178,7 @@ namespace boOX
 					{
 					    best_collision = next_collision;
 					}
-					cummulative = -1;
+					cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				    }
 				}
 			    }
@@ -12206,7 +12214,7 @@ namespace boOX
 			    {
 				best_collision = next_collision;
 			    }
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -12231,10 +12239,10 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::check_NonconflictingRotation(const sInstance         &instance,
-						  const AgentPaths_vector &agent_Paths,
-						  Collisions_vector       &Collisions,
-						  EdgeCollisions_vector   &edge_Collisions) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingRotation(const sInstance         &instance,
+								      const AgentPaths_vector &agent_Paths,
+								      Collisions_vector       &Collisions,
+								      EdgeCollisions_vector   &edge_Collisions) const
     {
 	sInt_32 agent_path_length;
 	    
@@ -12248,7 +12256,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -12272,7 +12280,7 @@ namespace boOX
 			    {
 				Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][i]);
 				Collisions.push_back(next_collision);
-				cummulative = -1;
+				cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			    }
 			}
 		    }
@@ -12301,7 +12309,7 @@ namespace boOX
 					Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
 					Collisions.push_back(next_collision);
 					*/
-					cummulative = -1;
+					cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				    }
 				}
 			    }
@@ -12332,7 +12340,7 @@ namespace boOX
 			{
 			    Collision next_collision(occupation_collision->second.size(), agent_id, *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]);
 			    Collisions.push_back(next_collision);
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -12359,10 +12367,10 @@ namespace boOX
     }    
 
     
-    sInt_32 sSMTCBS::check_NonconflictingCapacitatedRotation(const sInstance         &instance,
-							     const AgentPaths_vector &agent_Paths,
-							     Collision               &principal_collision,
-							     CapacitatedCollision    &principal_capacitated_collision) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingCapacitatedRotation(const sInstance         &instance,
+										 const AgentPaths_vector &agent_Paths,
+										 Collision               &principal_collision,
+										 CapacitatedCollision    &principal_capacitated_collision) const
     {
 	sInt_32 agent_path_length;
 	Collision best_collision(sINT_32_MAX, 1, 1, 0, 0);	
@@ -12377,7 +12385,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -12406,7 +12414,7 @@ namespace boOX
 			    {
 				best_capacitated_collision = next_capacitated_collision;
 			    }
-			    cummulative = -1;
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			}
 		    }
 
@@ -12431,7 +12439,7 @@ namespace boOX
 					{
 					    best_collision = next_collision;
 					}
-					cummulative = -1;
+					cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				    }
 				}
 			    }
@@ -12467,7 +12475,7 @@ namespace boOX
 			    {
 				best_collision = next_collision;
 			    }
-			    cummulative = -1;			    
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);			    
 			}
 		    }		    
 		}
@@ -12493,11 +12501,11 @@ namespace boOX
     }
 
 
-    sInt_32 sSMTCBS::check_NonconflictingCapacitatedRotation(const sInstance              &instance,
-							     const AgentPaths_vector      &agent_Paths,
-							     Collisions_vector            &sUNUSED_(Collisions),
-							     EdgeCollisions_vector        &edge_Collisions,
-							     CapacitatedCollisions_vector &capacitated_Collisions) const
+    std::pair<sInt_32, sInt_32> sSMTCBS::check_NonconflictingCapacitatedRotation(const sInstance              &instance,
+										 const AgentPaths_vector      &agent_Paths,
+										 Collisions_vector            &sUNUSED_(Collisions),
+										 EdgeCollisions_vector        &edge_Collisions,
+										 CapacitatedCollisions_vector &capacitated_Collisions) const
     {
 	sInt_32 agent_path_length;
 	    
@@ -12511,7 +12519,7 @@ namespace boOX
 	Cooccupations_vector space_Cooccupations;	
 			
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
-	sInt_32 cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
+	std::pair<sInt_32, sInt_32> cummulative = fill_Cooccupations(instance, agent_Paths, space_Cooccupations);	
 	
 	for (sInt_32 i = 1;; ++i)
 	{
@@ -12537,7 +12545,7 @@ namespace boOX
 				next_capacitated_collision.m_mono_Collisions.push_back(MonoCollision(occupation_collision->second.size(), *collide_agent, i, agent_Paths[agent_id][i]));				    
 			    }
 			    capacitated_Collisions.push_back(next_capacitated_collision);
-			    cummulative = -1;
+			    cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 			}			
 		    }
 
@@ -12565,7 +12573,7 @@ namespace boOX
 					Collision next_collision(swap_expectation_pred->second.size(), agent_id, *exp_agent, i, ii, agent_Paths[agent_id][i], agent_Paths[*exp_agent][ii]);
 					Collisions.push_back(next_collision);
 					*/
-					cummulative = -1;
+					cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 				    }
 				}
 			    }
@@ -12598,7 +12606,7 @@ namespace boOX
 			    next_capacitated_collision.m_mono_Collisions.push_back(MonoCollision(occupation_collision->second.size(), *collide_agent, i, agent_Paths[agent_id][agent_path_length - 1]));
 			}
 			capacitated_Collisions.push_back(next_capacitated_collision);
-			cummulative = -1;
+			cummulative = std::pair<sInt_32, sInt_32>(-1, -1);
 		    }			
 		}
 	    }
@@ -15245,6 +15253,7 @@ namespace boOX
 							     sInt_32                             extra_cost,
 							     Model                              &sat_Model) const
     {
+	// edit here
 	sASSERT(!MDD.empty());
 
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();

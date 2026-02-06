@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* perm_solver_main.cpp / 3-005_godel                                         */
+/* perm_solver_main.cpp / 3-006_godel                                         */
 /*----------------------------------------------------------------------------*/
 //
 // Token Permutation Problem Solver - main program.
@@ -122,7 +122,7 @@ namespace boOX
 	}
 
 	sSolution solution;
-	sInt_32 cost;
+	std::pair<sInt_32, sInt_32> cost = {-1, -1};
 
 	switch (parameters.m_algorithm)
 	{
@@ -135,7 +135,7 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingPermutation(solution, parameters.m_cost_limit);
+	    cost.first = cbs_Solver.find_ShortestNonconflictingPermutation(solution, parameters.m_cost_limit);
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_CBS_PLUS:
@@ -147,7 +147,7 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingPermutation_Delta(solution, parameters.m_cost_limit);
+	    cost.first = cbs_Solver.find_ShortestNonconflictingPermutation_Delta(solution, parameters.m_cost_limit);
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS:
@@ -159,7 +159,7 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingPermutation_DeltaStar(solution, parameters.m_cost_limit);
+	    cost.first = cbs_Solver.find_ShortestNonconflictingPermutation_DeltaStar(solution, parameters.m_cost_limit);
 	    break;
 	}
 	case sCommandParameters::ALGORITHM_CBS_PLUS_PLUS_PLUS:
@@ -171,7 +171,7 @@ namespace boOX
   	    #endif
 	    
 	    sCBS cbs_Solver(&instance, parameters.m_timeout);
-	    cost = cbs_Solver.find_ShortestNonconflictingPermutation_DeltaSuperStar(solution, parameters.m_cost_limit);
+	    cost.first = cbs_Solver.find_ShortestNonconflictingPermutation_DeltaSuperStar(solution, parameters.m_cost_limit);
 	    break;
 	}			
 	case sCommandParameters::ALGORITHM_SMTCBS:
@@ -232,13 +232,13 @@ namespace boOX
 	    break;
 	}
 	}       
-	if (cost < 0)
+	if (cost.first < 0)
 	{
-	    if (cost == -1)
+	    if (cost.first == -1)
 	    {
 		printf("The input instance is UNSOLVABLE within a cost smaller than %d.\n", parameters.m_cost_limit);
 	    }
-	    else if (cost == -2)
+	    else if (cost.first == -2)
 	    {
 		printf("The answer is INDETERMINATE for the input instance under given timeout of %.3f seconds.\n", parameters.m_timeout);
 	    }
@@ -249,7 +249,7 @@ namespace boOX
 	}
 	else
 	{
-	    printf("The input instance is SOLVABLE with a solution of cost %d !\n", cost);	    
+	    printf("The input instance is SOLVABLE with a solution of cost %d [unassigned cost %d] !\n", cost.first, cost.second);	    
 	    solution.to_Screen();
 	    
 	    if (!parameters.m_output_filename.empty())

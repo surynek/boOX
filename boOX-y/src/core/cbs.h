@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.h / 3-005_godel                                                        */
+/* cbs.h / 3-006_godel                                                        */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -230,9 +230,9 @@ namespace boOX
 	sCBSBase(sMission *mission, sDouble timeout);		
 	/*----------------------------------------------------------------------------*/	
 
-	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;
-	sInt_32 fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const;	
-	sInt_32 fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;	
+	std::pair<sInt_32, sInt_32> fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;
+	std::pair<sInt_32, sInt_32> fill_Cooccupations(const sInstance &instance, const AgentPaths_vector &agent_Paths, const AgentTrees_vector &agent_Trees, Cooccupations_vector &space_Cooccupations) const;	
+	std::pair<sInt_32, sInt_32> fill_Cooccupations(const sMission &mission, const AgentPaths_vector &agent_Paths, Cooccupations_vector &space_Cooccupations) const;	
 	/*----------------------------------------------------------------------------*/		
 	
 	void cast_Occupations(sInt_32 agent_id, sInt_32 prefix_length, const VertexIDs_vector &path, Occupations_vector &space_Occupations) const;
@@ -1111,25 +1111,25 @@ namespace boOX
 						    Nodes_vector              &search_Store,
 						    NodeReferences_mset       &search_Queue) const;	
 
-	sInt_32 analyze_NonconflictingSwapping(const sInstance           &instance,
-					       const AgentPaths_vector   &agent_Paths,
-					       sInt_32                   &tanglement) const;
-	sInt_32 analyze_NonconflictingSwapping(const sInstance           &instance,
-					       AgentConflicts_vector     &agent_Conflicts,
-					       AgentEdgeConflicts_vector &agent_edge_Conflicts,
-					       const AgentPaths_vector   &agent_Paths,
-					       sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingSwapping(const sInstance           &instance,
+								   const AgentPaths_vector   &agent_Paths,
+								   sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingSwapping(const sInstance           &instance,
+								   AgentConflicts_vector     &agent_Conflicts,
+								   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								   const AgentPaths_vector   &agent_Paths,
+								   sInt_32                   &tanglement) const;
 
-	sInt_32 analyze_NonconflictingSwapping(const sInstance           &instance,
-					       const AgentPaths_vector   &agent_Paths,
-					       Cooccupations_vector      &space_Cooccupations,
-					       sInt_32                   &tanglement) const;	
-	sInt_32 analyze_NonconflictingSwapping(const sInstance           &instance,
-					       AgentConflicts_vector     &agent_Conflicts,
-					       AgentEdgeConflicts_vector &agent_edge_Conflicts,
-					       const AgentPaths_vector   &agent_Paths,
-					       Cooccupations_vector      &space_Cooccupations,
-					       sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32>  analyze_NonconflictingSwapping(const sInstance           &instance,
+								    const AgentPaths_vector   &agent_Paths,
+								    Cooccupations_vector      &space_Cooccupations,
+								    sInt_32                   &tanglement) const;	
+	std::pair<sInt_32, sInt_32>  analyze_NonconflictingSwapping(const sInstance           &instance,
+								    AgentConflicts_vector     &agent_Conflicts,
+								    AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								    const AgentPaths_vector   &agent_Paths,
+								    Cooccupations_vector      &space_Cooccupations,
+								    sInt_32                   &tanglement) const;
 	/*----------------------------------------------------------------------------*/
 	
 	sInt_32 revise_NonconflictingPaths(const sInstance           &instance,
@@ -1169,25 +1169,25 @@ namespace boOX
 						 Nodes_vector         &search_Store,
 						 NodeReferences_mset  &search_Queue) const;
 
-	sInt_32 analyze_NonconflictingPaths(const sInstance           &instance,
-					    const AgentPaths_vector   &agent_Paths,
-					    sInt_32                   &tanglement) const;	
-	sInt_32 analyze_NonconflictingPaths(const sInstance           &instance,
-					    AgentConflicts_vector     &agent_Conflicts,
-					    AgentEdgeConflicts_vector &agent_edge_Conflicts,
-					    const AgentPaths_vector   &agent_Paths,
-					    sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingPaths(const sInstance           &instance,
+								const AgentPaths_vector   &agent_Paths,
+								sInt_32                   &tanglement) const;	
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingPaths(const sInstance           &instance,
+								AgentConflicts_vector     &agent_Conflicts,
+								AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								const AgentPaths_vector   &agent_Paths,
+								sInt_32                   &tanglement) const;
 
-	sInt_32 analyze_NonconflictingPaths(const sInstance           &instance,
-					    const AgentPaths_vector   &agent_Paths,
-					    Cooccupations_vector      &space_Cooccupations,
-					    sInt_32                   &tanglement) const;	
-	sInt_32 analyze_NonconflictingPaths(const sInstance           &instance,
-					    AgentConflicts_vector     &agent_Conflicts,
-					    AgentEdgeConflicts_vector &agent_edge_Conflicts,
-					    const AgentPaths_vector   &agent_Paths,
-					    Cooccupations_vector      &space_Cooccupations,
-					    sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingPaths(const sInstance           &instance,
+								const AgentPaths_vector   &agent_Paths,
+								Cooccupations_vector      &space_Cooccupations,
+								sInt_32                   &tanglement) const;	
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingPaths(const sInstance           &instance,
+								 AgentConflicts_vector     &agent_Conflicts,
+								 AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								 const AgentPaths_vector   &agent_Paths,
+								 Cooccupations_vector      &space_Cooccupations,
+								 sInt_32                   &tanglement) const;
 	/*----------------------------------------------------------------------------*/
 	
 	sInt_32 revise_NonconflictingPermutation(const sInstance           &instance,
@@ -1227,18 +1227,18 @@ namespace boOX
 						       Nodes_vector         &search_Store,
 						       NodeReferences_mset  &search_Queue) const;	
 	
-	sInt_32 analyze_NonconflictingPermutation(const sInstance           &instance,
-						  AgentConflicts_vector     &agent_Conflicts,
-						  AgentEdgeConflicts_vector &agent_edge_Conflicts,
-						  const AgentPaths_vector   &agent_Paths,
-						  sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingPermutation(const sInstance           &instance,
+								      AgentConflicts_vector     &agent_Conflicts,
+								      AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								      const AgentPaths_vector   &agent_Paths,
+								      sInt_32                   &tanglement) const;
 	
-	sInt_32 analyze_NonconflictingPermutation(const sInstance           &instance,
-						  AgentConflicts_vector     &agent_Conflicts,
-						  AgentEdgeConflicts_vector &agent_edge_Conflicts,
-						  const AgentPaths_vector   &agent_Paths,
-						  Cooccupations_vector      &space_Cooccupations,
-						  sInt_32                   &tanglement) const;       
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingPermutation(const sInstance           &instance,
+								      AgentConflicts_vector     &agent_Conflicts,
+								      AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								      const AgentPaths_vector   &agent_Paths,
+								      Cooccupations_vector      &space_Cooccupations,
+								      sInt_32                   &tanglement) const;       
 	/*----------------------------------------------------------------------------*/
 	
 	sInt_32 revise_NonconflictingRotation(const sInstance           &instance,
@@ -1278,18 +1278,18 @@ namespace boOX
 						    Nodes_vector         &search_Store,
 						    NodeReferences_mset  &search_Queue) const;	
 
-	sInt_32 analyze_NonconflictingRotation(const sInstance           &instance,
-					       AgentConflicts_vector     &agent_Conflicts,
-					       AgentEdgeConflicts_vector &agent_edge_Conflicts,
-					       const AgentPaths_vector   &agent_Paths,
-					       sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingRotation(const sInstance           &instance,
+								   AgentConflicts_vector     &agent_Conflicts,
+								   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								   const AgentPaths_vector   &agent_Paths,
+								   sInt_32                   &tanglement) const;
 	
-	sInt_32 analyze_NonconflictingRotation(const sInstance           &instance,
-					       AgentConflicts_vector     &agent_Conflicts,
-					       AgentEdgeConflicts_vector &agent_edge_Conflicts,
-					       const AgentPaths_vector   &agent_Paths,
-					       Cooccupations_vector      &space_Cooccupations,
-					       sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingRotation(const sInstance           &instance,
+								   AgentConflicts_vector     &agent_Conflicts,
+								   AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								   const AgentPaths_vector   &agent_Paths,
+								   Cooccupations_vector      &space_Cooccupations,
+								   sInt_32                   &tanglement) const;
 	/*----------------------------------------------------------------------------*/
 
 	sInt_32 examine_NonconflictingHamiltonianDelta(const sMission       &mission,
@@ -1299,27 +1299,27 @@ namespace boOX
 						       Nodes_vector         &search_Store,
 						       NodeReferences_mset  &search_Queue) const;
 
-	sInt_32 analyze_NonconflictingHamiltonian(const sMission          &mission,
-						  const AgentPaths_vector &agent_Paths,
-						  sInt_32                 &tanglement) const;
-
-	sInt_32 analyze_NonconflictingHamiltonian(const sMission          &mission,
-						  const AgentPaths_vector &agent_Paths,
-						  Cooccupations_vector    &space_Cooccupations,
-						  sInt_32                 &tanglement) const;
-		
-	sInt_32 analyze_NonconflictingHamiltonian(const sMission            &mission,
-						  AgentConflicts_vector     &agent_Conflicts,
-						  AgentEdgeConflicts_vector &agent_edge_Conflicts,
-						  const AgentPaths_vector   &agent_Paths,
-						  sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingHamiltonian(const sMission          &mission,
+								      const AgentPaths_vector &agent_Paths,
+								      sInt_32                 &tanglement) const;
 	
-	sInt_32 analyze_NonconflictingHamiltonian(const sMission            &mission,
-						  AgentConflicts_vector     &agent_Conflicts,
-						  AgentEdgeConflicts_vector &agent_edge_Conflicts,
-						  const AgentPaths_vector   &agent_Paths,
-						  Cooccupations_vector      &space_Cooccupations,
-						  sInt_32                   &tanglement) const;
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingHamiltonian(const sMission          &mission,
+								      const AgentPaths_vector &agent_Paths,
+								      Cooccupations_vector    &space_Cooccupations,
+								      sInt_32                 &tanglement) const;
+		
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingHamiltonian(const sMission            &mission,
+								      AgentConflicts_vector     &agent_Conflicts,
+								      AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								      const AgentPaths_vector   &agent_Paths,
+								      sInt_32                   &tanglement) const;
+	
+	std::pair<sInt_32, sInt_32> analyze_NonconflictingHamiltonian(const sMission            &mission,
+								      AgentConflicts_vector     &agent_Conflicts,
+								      AgentEdgeConflicts_vector &agent_edge_Conflicts,
+								      const AgentPaths_vector   &agent_Paths,
+								      Cooccupations_vector      &space_Cooccupations,
+								      sInt_32                   &tanglement) const;
 	/*----------------------------------------------------------------------------*/	
 	
 	sInt_32 find_NonconflictingSequence(const sUndirectedGraph &graph,
