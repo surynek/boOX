@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.h / 3-006_godel                                                      */
+/* agent.h / 3-007_godel                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -68,6 +68,11 @@ namespace boOX
 	
 	bool operator==(const sConfiguration &agent_configuration) const;
 	bool operator<(const sConfiguration &agent_configuration) const;
+
+        /*----------------------------------------------------------------------------*/
+
+	void unassign_Agents(sInt_32 N_unassigned);
+        /*----------------------------------------------------------------------------*/ 		
 
 	sInt_32 get_AgentCount(void) const;
 	sInt_32 get_VertexCount(void) const;

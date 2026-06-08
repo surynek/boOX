@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cbs.cpp / 3-006_godel                                                      */
+/* cbs.cpp / 3-007_godel                                                      */
 /*----------------------------------------------------------------------------*/
 //
 // Conflict based search implemented in a standard way. A version for MAPF and
@@ -1710,6 +1710,7 @@ namespace boOX
 	sInt_32 cost;
 	AgentPaths_vector agent_Paths;
 
+	printf("gamma 1\n");
 	if ((cost = find_ShortestNonconflictingRotation_DeltaStar(agent_Paths, cost_limit)) < 0)
 	{
 	    return cost;
@@ -1718,6 +1719,7 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
+	    printf("gamma 2: %d\n", agent_id);
 	    #ifdef sDEBUG
 	    {
 		printf("Agent %d: ", agent_id);
@@ -1739,7 +1741,8 @@ namespace boOX
 	    {
 		printf("%d\n", *agent_Paths[agent_id].rbegin());
 	    }
-            #endif	    
+            #endif
+	    printf("gamma 3\n");
 	}	
 	return cost;
     }    
@@ -2676,6 +2679,8 @@ namespace boOX
     
     sInt_32 sCBS::find_NonconflictingRotation_DeltaStar(sInstance &instance, AgentPaths_vector &agent_Paths, sInt_32 cost_limit, sInt_32 extra_cost)
     {
+	printf("Delta star at: %d, %d\n", cost_limit, extra_cost);
+	
 	AgentConflicts_vector agent_Conflicts;
 	AgentEdgeConflicts_vector agent_edge_Conflicts;
 	sInt_32 N_agents = instance.m_start_configuration.get_AgentCount();
@@ -8242,6 +8247,7 @@ namespace boOX
 
 	for (sInt_32 agent_id = 1; agent_id <= N_agents; ++agent_id)
 	{
+	    printf("Agent: %d\n", agent_id);
 	    if (findStar_NonconflictingSequence(instance.m_environment,
 						instance.m_start_configuration.get_AgentLocation(agent_id),
 						instance.m_goal_configuration.get_AgentLocation(agent_id),
@@ -8252,7 +8258,8 @@ namespace boOX
 						m_first_agent_Paths[agent_id]) < 0)
 	    {
 		return -1;
-	    }	    
+	    }
+	    printf("Agent: %d - done\n", agent_id);
 	    m_delta_agent_Paths[agent_id] = m_first_agent_Paths[agent_id];
 	    m_delta_path_node_IDs[agent_id] = initial_node.m_node_id;
 	}
@@ -15515,7 +15522,6 @@ namespace boOX
 	}
 	#endif
 
-	printf("gamma 1\n");
 	if (source_id == sink_id)
 	{
 	    bool non_conflicting_sink = true;
@@ -15536,26 +15542,19 @@ namespace boOX
 	    }
 	}
 
-	printf("gamma 2\n");	
 	if (Conflicts.empty() || Conflicts[0].find(source_id) == Conflicts[0].end())
 	{
-	    printf("gamma 2.1\n");
 	    visit_Queue.insert(Visits_mmap::value_type(0 + relaxation * m_goal_Distances[sink_id][source_id], Visit(0, source_id, -1)));
-	    printf("gamma 2.2\n");
 	    visited_Vertices.push_back(Visits_umap());
-	    printf("gamma 2.3\n");	    
 	    
 	    Visit source_visit(0, source_id, -1);
-	    printf("gamma 2.4\n");	    
 	    visited_Vertices[0][source_id] = source_visit;
-	    printf("gamma 2.5\n");	    
 	}
 	else
 	{
 	    return -1;
 	}
 
-	printf("gamma 3\n");	
 	while (!visit_Queue.empty())
 	{
   	    #ifdef sSTATISTICS
@@ -15581,10 +15580,8 @@ namespace boOX
 	    }
 
 //	    if (front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= m_goal_Distances[sink_id][source_id] + extra_cost)
-	    printf("gamma 4\n");
 	    if (cost_limit < 0 || front_visit.m_level + m_goal_Distances[sink_id][front_visit.m_vertex_id] <= relaxation * (m_goal_Distances[sink_id][source_id] + extra_cost))
 	    {
-		printf("gamma 5\n");
 		for (sVertex::Neighbors_list::const_iterator neighbor = graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.begin(); neighbor != graph.m_Vertices[front_visit.m_vertex_id].m_Neighbors.end(); ++neighbor)
 		{
 		    sInt_32 neighbor_id = (*neighbor)->m_target->m_id;
@@ -15702,9 +15699,7 @@ namespace boOX
 		    printf("    -:%d\n", front_visit.m_vertex_id);
 		}
                 #endif		
-		*/
-		    printf("gamma 6\n");		    
-		    
+		*/		    
 		    if (visited_Vertices.size() <= front_visit.m_level + 1)
 		    {
 			sASSERT(visited_Vertices.size() == front_visit.m_level + 1);

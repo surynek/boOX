@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* agent.cpp / 3-006_godel                                                    */
+/* agent.cpp / 3-007_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Agent and multi-agent problem related structures.
@@ -230,6 +230,18 @@ namespace boOX
 	return false;
     }
 
+
+/*----------------------------------------------------------------------------*/
+    
+    void sConfiguration::unassign_Agents(sInt_32 N_unassigned)
+    {
+	for (sInt_32 agent_id = 1; agent_id <= N_unassigned; ++agent_id)
+	{
+	    m_vertex_Occups[m_agent_Locs[agent_id]] = VACANT_VERTEX;
+	    m_agent_Locs[agent_id] = UNDEFINED_LOCATION;		    
+	}		
+    }
+    
     
 /*----------------------------------------------------------------------------*/
     
@@ -507,22 +519,25 @@ namespace boOX
 	{	    
 	    for (sInt_32 agent_id = 1; agent_id < m_agent_Locs.size(); ++agent_id)
 	    {
-		const sVertex *vertex = environment.get_Vertex(agent_configuration.get_AgentLocation(agent_id));
-
-		if (!vertex->m_Neighbors.empty())
+		if (m_agent_Locs[agent_id] != UNDEFINED_LOCATION)
 		{
-		    sInt_32 rn = rand() % vertex->m_Neighbors.size();
-
-		    sVertex::Neighbors_list::const_iterator neighbor = vertex->m_Neighbors.begin();
-		    for (sInt_32 n = 0; n < rn; ++n)
+		    const sVertex *vertex = environment.get_Vertex(agent_configuration.get_AgentLocation(agent_id));
+		    
+		    if (!vertex->m_Neighbors.empty())
 		    {
-			++neighbor;
-		    }
-		    vertex = (*neighbor)->m_target;
-
-		    if (agent_configuration.get_VertexOccupancy(vertex->m_id) == VACANT_VERTEX)
-		    {
-			agent_configuration.move_Agent(agent_id, vertex->m_id);
+			sInt_32 rn = rand() % vertex->m_Neighbors.size();
+			
+			sVertex::Neighbors_list::const_iterator neighbor = vertex->m_Neighbors.begin();
+			for (sInt_32 n = 0; n < rn; ++n)
+			{
+			    ++neighbor;
+			}
+			vertex = (*neighbor)->m_target;
+			
+			if (agent_configuration.get_VertexOccupancy(vertex->m_id) == VACANT_VERTEX)
+			{
+			    agent_configuration.move_Agent(agent_id, vertex->m_id);
+			}
 		    }
 		}
 	    }
@@ -602,35 +617,38 @@ namespace boOX
 	{	    
 	    for (sInt_32 agent_id = 1; agent_id < m_agent_Locs.size(); ++agent_id)
 	    {
-		const sVertex *vertex = environment.get_Vertex(agent_configuration.get_AgentLocation(agent_id));
-
-		if (!vertex->m_Neighbors.empty())
+		if (m_agent_Locs[agent_id] != UNDEFINED_LOCATION)
 		{
-		    sInt_32 rn = rand() % vertex->m_Neighbors.size();
-
-		    sVertex::Neighbors_list::const_iterator neighbor = vertex->m_Neighbors.begin();
-		    for (sInt_32 n = 0; n < rn; ++n)
+		    const sVertex *vertex = environment.get_Vertex(agent_configuration.get_AgentLocation(agent_id));
+		    
+		    if (!vertex->m_Neighbors.empty())
 		    {
-			++neighbor;
-		    }
-		    vertex = (*neighbor)->m_target;
-
-		    if (agent_configuration.get_VertexOccupancy(vertex->m_id) == VACANT_VERTEX)
-		    {
-			bool non_conflict = true;
-			sVertex::VertexIDs_vector Conflicts = environment.m_Vertices[vertex->m_id].m_Conflicts;
-			for (sVertex::VertexIDs_vector::const_iterator conflict = Conflicts.begin(); conflict != Conflicts.end(); ++conflict)
+			sInt_32 rn = rand() % vertex->m_Neighbors.size();
+			
+			sVertex::Neighbors_list::const_iterator neighbor = vertex->m_Neighbors.begin();
+			for (sInt_32 n = 0; n < rn; ++n)
 			{
-			    if (agent_configuration.get_VertexOccupancy(*conflict) != VACANT_VERTEX && agent_configuration.get_VertexOccupancy(*conflict) != agent_id)
-			    {
-				non_conflict = false;
-				break;
-			    }
+			    ++neighbor;
 			}
-
-			if (non_conflict)
-			{			    
-			    agent_configuration.move_Agent(agent_id, vertex->m_id);
+			vertex = (*neighbor)->m_target;
+			
+			if (agent_configuration.get_VertexOccupancy(vertex->m_id) == VACANT_VERTEX)
+			{
+			    bool non_conflict = true;
+			    sVertex::VertexIDs_vector Conflicts = environment.m_Vertices[vertex->m_id].m_Conflicts;
+			    for (sVertex::VertexIDs_vector::const_iterator conflict = Conflicts.begin(); conflict != Conflicts.end(); ++conflict)
+			    {
+				if (agent_configuration.get_VertexOccupancy(*conflict) != VACANT_VERTEX && agent_configuration.get_VertexOccupancy(*conflict) != agent_id)
+				{
+				    non_conflict = false;
+				    break;
+				}
+			    }
+			    
+			    if (non_conflict)
+			    {			    
+				agent_configuration.move_Agent(agent_id, vertex->m_id);
+			    }
 			}
 		    }
 		}

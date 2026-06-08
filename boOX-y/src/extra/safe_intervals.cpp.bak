@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-005_godel                              */
+/*                              boOX 3-006_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* safe_intervals.cpp / 3-005_godel                                           */
+/* safe_intervals.cpp / 3-006_godel                                           */
 /*----------------------------------------------------------------------------*/
 //
 // Exact safe time interval calculation for circular robots

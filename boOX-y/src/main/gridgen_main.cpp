@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.cpp / 3-006_godel                                             */
+/* gridgen_main.cpp / 3-007_godel                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -52,6 +52,7 @@ namespace boOX
       , m_x_size(4)
       , m_y_size(4)
       , m_N_agents(5)
+      , m_N_unassigned(0)
       , m_seed(0)
       , m_obstacle_probability(0.0)
       , m_N_obstacles(-1)
@@ -84,6 +85,7 @@ namespace boOX
 	printf("gridgen_boOX  --x-size=<int>\n");
 	printf("              --y-size=<int>\n");
 	printf("              --N-agents=<int>\n");
+	printf("             [--N-unassigned=<int>]\n");	
 	printf("             [--obstacle-probability=<double>]\n");
 	printf("             [--walk]\n");		
 	printf("             [--N-obstacles=<int>]\n");
@@ -109,6 +111,7 @@ namespace boOX
 	printf("Defaults: --x-size=4\n");
 	printf("          --y-size=4\n");
 	printf("          --N-agents=5\n");
+	printf("          --N-unassigned=0\n");		
 	printf("          --capacity=1\n");
 	printf("          --seed=0\n");
 	printf("          --obstacle-probability=0.0\n");
@@ -150,7 +153,11 @@ namespace boOX
 			printf("Error: Failed to generate initial configuration because of too many conflicts.\n");
 			return result;
 		    }
-		    sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);		
+		    sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);
+		    if (parameters.m_N_unassigned > 0)
+		    {
+			goal_configuration.unassign_Agents(parameters.m_N_unassigned);
+		    }		    
 		    goal_configuration.generate_NovelNonconflictingWalk(initial_configuration, environment);
 		    instance = sInstance(environment, initial_configuration, goal_configuration);
 		}
@@ -188,12 +195,20 @@ namespace boOX
 	    if (parameters.m_walk)
 	    {
 		sConfiguration goal_configuration(environment.get_VertexCount(), parameters.m_N_agents);
+		if (parameters.m_N_unassigned > 0)
+		{
+		    goal_configuration.unassign_Agents(parameters.m_N_unassigned);
+		}		    		
 		goal_configuration.generate_NovelWalk(initial_configuration, environment);
 		instance = sInstance(environment, initial_configuration, goal_configuration);
 	    }
 	    else
 	    {
 		sConfiguration goal_configuration(environment.get_VertexCount(), sMIN(parameters.m_N_agents, environment.get_VertexCount()), true);
+		if (parameters.m_N_unassigned > 0)
+		{
+		    goal_configuration.unassign_Agents(parameters.m_N_unassigned);
+		}		    		
 		instance = sInstance(environment, initial_configuration, goal_configuration);
 	    }
 	}
@@ -314,6 +329,10 @@ namespace boOX
 	{
 	    command_parameters.m_N_agents = sInt_32_from_String(parameter.substr(11, parameter.size()));
 	}
+	else if (parameter.find("--N-unassigned=") == 0)
+	{
+	    command_parameters.m_N_unassigned = sInt_32_from_String(parameter.substr(15, parameter.size()));
+	}	
 	else if (parameter.find("--seed=") == 0)
 	{
 	    command_parameters.m_seed = sInt_32_from_String(parameter.substr(7, parameter.size()));

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* gridgen_main.h / 3-006_godel                                               */
+/* gridgen_main.h / 3-007_godel                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Grid Instance Generator - main program.
@@ -48,6 +48,7 @@ namespace boOX
 	sInt_32 m_x_size;
 	sInt_32 m_y_size;
 	sInt_32 m_N_agents;
+	sInt_32 m_N_unassigned;
 	sInt_32 m_seed;
 	sDouble m_obstacle_probability;	
 	sInt_32 m_N_obstacles;

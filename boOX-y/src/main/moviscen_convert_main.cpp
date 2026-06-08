@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.cpp / 3-006_godel                                    */
+/* moviscen_convert_main.cpp / 3-007_godel                                    */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -53,6 +53,7 @@ namespace boOX
   sCommandParameters::sCommandParameters()
       : m_N_kruhobots(-1)
       , m_N_agents(-1)
+      , m_N_unassigned(0)	
   {
      // nothing
   }
@@ -88,6 +89,7 @@ namespace boOX
 	printf("                       --output-mHpf-file=<string>\n");	
 	printf("                      [--N-kruhobots=<int>]\n");
 	printf("                      [--N-agents=<int>]\n");
+	printf("                      [--N-unassigned=<int>]\n");	
 	printf("                      [--N-tasks=<int>]\n");	
 	printf("\n");
 	printf("Examples:\n");
@@ -99,7 +101,8 @@ namespace boOX
 	printf("moviscen_convert_boOX --input-movi-map-file=empty-16-16.map\n");
 	printf("                      --input-movi-scen-file=empty-16-16-random-1.scen\n");
 	printf("                      --output-mpf-file=empty-16-16-random-1.mpf\n");
-	printf("                      --N-agents=10\n");			
+	printf("                      --N-agents=10\n");
+	printf("                      --N-unassigned=0\n");				
 	printf("\n");
 	printf("Defaults: --N-kruhobots=-1 (unspecified)\n");	
 	printf("\n");
@@ -216,6 +219,10 @@ namespace boOX
 	    {
 		if (parameters.m_N_agents >= 0)
 		{
+		    if (parameters.m_N_unassigned > 0)
+		    {
+			mapf_Instance.m_goal_configuration.unassign_Agents(parameters.m_N_unassigned);
+		    }
 		    result = mapf_Instance.to_File_mpf(parameters.m_output_mpf_filename, parameters.m_N_agents);
 		}
 		else
@@ -408,6 +415,10 @@ namespace boOX
 	{
 	    command_parameters.m_N_agents = sInt_32_from_String(parameter.substr(11, parameter.size()));
 	}
+	else if (parameter.find("--N-unassigned=") == 0)
+	{
+	    command_parameters.m_N_unassigned = sInt_32_from_String(parameter.substr(15, parameter.size()));
+	}	
 	else if (parameter.find("--N-tasks=") == 0)
 	{
 	    command_parameters.m_N_tasks = sInt_32_from_String(parameter.substr(10, parameter.size()));

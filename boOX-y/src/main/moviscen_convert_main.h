@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-006_godel                              */
+/*                              boOX 3-007_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* moviscen_convert_main.h / 3-006_godel                                      */
+/* moviscen_convert_main.h / 3-007_godel                                      */
 /*----------------------------------------------------------------------------*/
 //
 // movingai.com scenario convertor - main program.
@@ -46,6 +46,7 @@ namespace boOX
 
 	sInt_32 m_N_kruhobots;
 	sInt_32 m_N_agents;
+	sInt_32 m_N_unassigned;
 	sInt_32 m_N_tasks;
 	
 	sString m_input_movi_map_filename;
