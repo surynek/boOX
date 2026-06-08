@@ -16,6 +16,6 @@ do
     for SCENARIO in $SCENARIOS_LIST;
     do
 	echo 'Generating '$PREFIX' scenario '$SCENARIO' MAPF instance with '$UNASSIGNED' unassigned agents of '$AGENTS ' agents ...'
-	../../main/moviscen_convert_boOX '--input-movi-map-file='$PREFIX'.map' '--input-movi-scen-file='$SCENARIO_PREFIX'-'$SCENARIO'.scen' '--output-mpf-file='$PREFIX'-'$SCENARIO'_a'$AGENTS'_u'$UNASSIGNED'.npf' '--N-unassigned='$UNASSIGNED '--N-agents='$AGENTS
+	../../main/moviscen_convert_boOX '--input-movi-map-file='$PREFIX'.map' '--input-movi-scen-file='$SCENARIO_PREFIX'-'$SCENARIO'.scen' '--output-mpf-file='$SCENARIO_PREFIX'-'$SCENARIO'_a'$AGENTS'_u'$UNASSIGNED'.npf' '--N-unassigned='$UNASSIGNED '--N-agents='$AGENTS
     done
 done
