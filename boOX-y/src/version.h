@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                              boOX 3-007_godel                              */
+/*                              boOX 3-009_godel                              */
 /*                                                                            */
 /*                  (C) Copyright 2018 - 2025 Pavel Surynek                  */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* version.h / 3-007_godel                                                    */
+/* version.h / 3-009_godel                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for boOX
@@ -27,8 +27,8 @@ using namespace boOX;
 namespace boOX
 {
 
-#define sVERSION "3-007_godel"
-#define sPRODUCT "boOX 3-007_godel"
+#define sVERSION "3-009_godel"
+#define sPRODUCT "boOX 3-009_godel"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.net>"
 #define sCOPYRIGHT "(C) Copyright 2018 - 2025 Pavel Surynek"
